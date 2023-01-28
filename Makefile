@@ -8,6 +8,6 @@ encrypt:
 	ansible-vault encrypt vars/vault.yml
 
 gitinit:
-	@./git-init.sh
+	@./scripts/git-init.sh
 	@echo "ansible vault pre-commit hook installed"
 	@echo "don't forget to create a .vault_pass"
