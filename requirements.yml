@@ -5,12 +5,11 @@ roles:
   - src: artis3n.tailscale
   - src: geerlingguy.docker
   - src: geerlingguy.github-users
-  - src: geerlingguy.nfs
   - src: geerlingguy.ntp
   - src: geerlingguy.pip
   - src: geerlingguy.security
   - src: grog.package
-  - src: rossmcdonald.telegraf
+  - src: oefenweb.nfs_client
   - src: shelleg.ansible_role_portainer
   - src: weareinteractive.environment
   - src: weareinteractive.users

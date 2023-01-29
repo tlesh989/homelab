@@ -1,6 +1,7 @@
 ---
 main_gid: "1000"
 
+# weareinteractive.users
 users:
   - username: "{{ vault_username }}"
     users_group: "{{ vault_username }}"

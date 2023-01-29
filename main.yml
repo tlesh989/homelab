@@ -8,7 +8,6 @@
     - role: grog.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security
-    - role: geerlingguy.nfs
     - role: geerlingguy.docker
     - role: geerlingguy.pip
 #  artis3n.tailscale

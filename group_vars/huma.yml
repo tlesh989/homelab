@@ -1,9 +1,24 @@
 ---
-# geerlingguy.nfs
-nfs_exports: [ "/mnt/storage/proxmox    *(rw,sync,no_root_squash,fsid=25)"]
+# weareinteractive.users
+users:
+  - username: "moby"
+    users_group: "moby"
 
-{{ nfs_server }}:/volume1/backup /mnt/backup nfs nouser,atime,auto,rw,dev,exec,suid 0 0
-{{ nfs_server }}:/volume1/docker /mnt/docker nfs nouser,atime,auto,rw,dev,exec,suid 0 0
-{{ nfs_server }}:/volume1/music /mnt/music nfs nouser,atime,auto,rw,dev,exec,suid 0 0
-{{ nfs_server }}:/volume1/public /mnt/public nfs nouser,atime,auto,rw,dev,exec,suid 0 0
-{{ nfs_server }}:/volume1/video /mnt/video nfs nouser,atime,auto,rw,dev,exec,suid 0 0
+# oefenweb.nfs_client
+nfs_mount_opts: "nouser,atime,auto,rw,dev,exec,suid"
+nfs_client_mounts:
+  - src: "{{ vault_nfs_server }}:/volume1/backup"
+    path: /mnt/backup
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/docker"
+    path: /mnt/docker
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/music"
+    path: /mnt/music
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/public"
+    path: /mnt/public
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/video"
+    path: /mnt/video
+    opts: "{{ nfs_mount_opts }}"
