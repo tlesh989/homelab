@@ -1,0 +1,50 @@
+---
+main_gid: "1000"
+
+users:
+  - username: "{{ vault_username }}"
+    users_group: "{{ vault_username }}"
+    authorized_keys:
+      - "{{ lookup('file', '/home/{{ vault_username }}/.ssh/id_rsa.pub') }}"
+
+# grog.package
+package_list:
+  - name: curl
+  - name: git
+  - name: htop
+  - name: iftop
+  - name: iotop
+  - name: jq
+  - name: lm-sensors
+  - name: mc
+  - name: ncdu
+  - name: neofetch
+  - name: net-tools
+  - name: nmap
+  - name: openssh-server
+  - name: python
+  - name: screen
+  - name: smartmontools
+  - name: sudo
+  - name: tmux
+  - name: tree
+  - name: unzip
+  - name: wget
+
+# geerlingguy.ntp
+ntp_timezone: "America/Detroit"
+
+# geerlingguy.security
+security_ssh_port: 22
+security_ssh_password_authentication: "no"
+security_ssh_permit_root_login: "no"
+security_ssh_usedns: "no"
+security_autoupdate_enabled: true
+security_autoupdate_reboot: true
+security_autoupdate_reboot_time: "03:00"
+security_fail2ban_enabled: true
+security_sudoers_passwordless:
+  - "{{ vault_username }}"
+
+# weareinteractive.environment
+environment_config: { "PUID": "{{ main_gid }}", "PGID": "{{ main_gid }}" }

@@ -1,0 +1,17 @@
+---
+- hosts: huma
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: weareinteractive.users
+    - role: weareinteractive.environment
+    - role: grog.package
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: geerlingguy.nfs
+    - role: geerlingguy.docker
+    - role: geerlingguy.pip
+#  artis3n.tailscale
+#  geerlingguy.github-users
+#  rossmcdonald.telegraf
+#  shelleg.ansible_role_portainer

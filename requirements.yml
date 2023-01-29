@@ -1,7 +1,19 @@
 # ansible-galaxy install -r requirements.yml
 ---
 roles:
+
+  - src: artis3n.tailscale
   - src: geerlingguy.docker
+  - src: geerlingguy.github-users
+  - src: geerlingguy.nfs
+  - src: geerlingguy.ntp
+  - src: geerlingguy.pip
+  - src: geerlingguy.security
+  - src: grog.package
+  - src: rossmcdonald.telegraf
+  - src: shelleg.ansible_role_portainer
+  - src: weareinteractive.environment
+  - src: weareinteractive.users
 
 collections:
   - name: community.general

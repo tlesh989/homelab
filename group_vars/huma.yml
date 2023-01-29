@@ -1,0 +1,9 @@
+---
+# geerlingguy.nfs
+nfs_exports: [ "/mnt/storage/proxmox    *(rw,sync,no_root_squash,fsid=25)"]
+
+{{ nfs_server }}:/volume1/backup /mnt/backup nfs nouser,atime,auto,rw,dev,exec,suid 0 0
+{{ nfs_server }}:/volume1/docker /mnt/docker nfs nouser,atime,auto,rw,dev,exec,suid 0 0
+{{ nfs_server }}:/volume1/music /mnt/music nfs nouser,atime,auto,rw,dev,exec,suid 0 0
+{{ nfs_server }}:/volume1/public /mnt/public nfs nouser,atime,auto,rw,dev,exec,suid 0 0
+{{ nfs_server }}:/volume1/video /mnt/video nfs nouser,atime,auto,rw,dev,exec,suid 0 0
