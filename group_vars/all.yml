@@ -1,5 +1,5 @@
 ---
-main_gid: "1000"
+main_gid: "1001"
 
 # weareinteractive.users
 users:
@@ -24,6 +24,7 @@ package_list:
   - name: nmap
   - name: openssh-server
   - name: python
+    apt: python-is-python3
   - name: screen
   - name: smartmontools
   - name: sudo
@@ -44,7 +45,7 @@ security_autoupdate_enabled: true
 security_autoupdate_reboot: true
 security_autoupdate_reboot_time: "03:00"
 security_fail2ban_enabled: true
-security_sudoers_passwordless:
+security_sudoers_passworded:
   - "{{ vault_username }}"
 
 # weareinteractive.environment

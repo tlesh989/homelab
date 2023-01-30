@@ -10,6 +10,7 @@
     - role: geerlingguy.security
     - role: geerlingguy.docker
     - role: geerlingguy.pip
+    - role: oefenweb.nfs_client
 #  artis3n.tailscale
 #  geerlingguy.github-users
 #  rossmcdonald.telegraf

@@ -5,7 +5,7 @@ users:
     users_group: "moby"
 
 # oefenweb.nfs_client
-nfs_mount_opts: "nouser,atime,auto,rw,dev,exec,suid"
+nfs_mount_opts: "auto,defaults,nofail"
 nfs_client_mounts:
   - src: "{{ vault_nfs_server }}:/volume1/backup"
     path: /mnt/backup
