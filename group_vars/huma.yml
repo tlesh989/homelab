@@ -22,3 +22,7 @@ nfs_client_mounts:
   - src: "{{ vault_nfs_server }}:/volume1/video"
     path: /mnt/video
     opts: "{{ nfs_mount_opts }}"
+
+# artis3n.tailscale
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+tailscale_args: "--advertise-routes=192.168.233.0/24 --advertise-exit-node"

@@ -11,7 +11,8 @@
     - role: geerlingguy.docker
     - role: geerlingguy.pip
     - role: oefenweb.nfs_client
-#  artis3n.tailscale
+    - role: network
+    - role: artis3n.tailscale
 #  geerlingguy.github-users
 #  rossmcdonald.telegraf
 #  shelleg.ansible_role_portainer
