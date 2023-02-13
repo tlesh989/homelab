@@ -1,20 +1,22 @@
 ---
+# proxmox lxc container
+
 # grog.package
 package_list:
+  - name: apt-transport-https
+  - name: ca-certificates
   - name: curl
   - name: git
+  - name: gpg
+  - name: haveged
   - name: htop
   - name: iftop
   - name: iotop
-  - name: lm-sensors
-  - name: mc
   - name: ncdu
   - name: net-tools
-  - name: nmap
-  - name: openssh-server
+  - name: openjdk-8-jre-headless
   - name: python
   - name: screen
-  - name: smartmontools
   - name: sudo
   - name: tmux
   - name: tree

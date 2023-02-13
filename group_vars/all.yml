@@ -1,6 +1,4 @@
 ---
-main_gid: "1001"
-
 # weareinteractive.users
 users:
   - username: "{{ vault_username }}"
@@ -15,38 +13,20 @@ package_list:
   - name: htop
   - name: iftop
   - name: iotop
-  - name: jq
   - name: lm-sensors
   - name: mc
   - name: ncdu
-  - name: neofetch
   - name: net-tools
   - name: nmap
   - name: openssh-server
   - name: python
-    apt: python-is-python3
+  - name: qemu-guest-agent
   - name: screen
   - name: smartmontools
   - name: sudo
   - name: tmux
   - name: tree
-  - name: unzip
   - name: wget
 
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
-
-# geerlingguy.security
-security_ssh_port: 22
-security_ssh_password_authentication: "no"
-security_ssh_permit_root_login: "no"
-security_ssh_usedns: "no"
-security_autoupdate_enabled: true
-security_autoupdate_reboot: true
-security_autoupdate_reboot_time: "03:00"
-security_fail2ban_enabled: true
-security_sudoers_passworded:
-  - "{{ vault_username }}"
-
-# weareinteractive.environment
-environment_config: { "PUID": "{{ main_gid }}", "PGID": "{{ main_gid }}" }

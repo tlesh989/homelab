@@ -9,6 +9,7 @@ roles:
   - src: geerlingguy.security
   - src: grog.package
   - src: ironicbadger.docker_compose_generator
+  - src: ironicbadger.proxmox_nag_removal
   - src: oefenweb.nfs_client
   - src: shelleg.ansible_role_portainer
   - src: weareinteractive.environment

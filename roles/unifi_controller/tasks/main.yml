@@ -1,0 +1,43 @@
+---
+- name: Add the Unifi apt signing key
+  ansible.builtin.apt_key:
+    url: https://dl.ui.com/unifi/unifi-repo.gpg
+    state: present
+
+- name: Add Unifi repository
+  ansible.builtin.apt_repository:
+    repo: deb https://www.ui.com/downloads/unifi/debian stable ubiquiti
+    state: present
+    filename: 100-ubnt-unifi
+
+- name: Add the MongoDB apt signing key
+  ansible.builtin.apt_key:
+    url: https://pgp.mongodb.com/server-3.6.asc
+    state: present
+
+- name: Add Unifi repository
+  ansible.builtin.apt_repository:
+    repo: deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/3.6 multiverse
+    state: present
+    filename: mongodb-org-3.6
+
+- name: Install MongoDB 3.6
+  ansible.builtin.apt:
+    name: mongodb-org-server
+    state: present
+
+- name: Enable and start MongoDB server
+  ansible.builtin.service:
+    name: mongod
+    state: started
+    enabled: true
+
+- name: Prevent Java from being upgraded
+  ansible.builtin.dpkg_selections:
+    name: openjdk-11-*
+    selection: hold
+
+- name: Install Unifi Controller
+  ansible.builtin.apt:
+    name: unifi
+    state: present

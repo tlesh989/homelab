@@ -3,16 +3,27 @@
   vars_files:
     - vars/vault.yml
   roles:
-    - role: weareinteractive.users
-    - role: weareinteractive.environment
     - role: grog.package
-    - role: geerlingguy.ntp
-    - role: geerlingguy.security
-    - role: geerlingguy.docker
-    - role: geerlingguy.pip
-    - role: oefenweb.nfs_client
-    - role: network
-    - role: artis3n.tailscale
-#  geerlingguy.github-users
+    - role: ironicbadger.proxmox_nag_removal
+    - role: weareinteractive.users
+#     - role: weareinteractive.users
+#     - role: weareinteractive.environment
+#     - role: geerlingguy.ntp
+#     - role: geerlingguy.security
+#     - role: geerlingguy.docker
+#     - role: geerlingguy.pip
+#     - role: oefenweb.nfs_client
+#     - role: network
+#     - role: artis3n.tailscale
+# #  geerlingguy.github-users
 #  rossmcdonald.telegraf
 #  shelleg.ansible_role_portainer
+
+- hosts: unifi
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: geerlingguy.ntp
+    - role: grog.package
+    - role: unifi_controller
+    - role: weareinteractive.users

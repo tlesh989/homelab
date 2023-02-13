@@ -131,6 +131,7 @@ dmypy.json
 # Secrets
 .envrc
 .vault_pass
+*.tfvars
 
 # Ansible
 galaxy_roles/

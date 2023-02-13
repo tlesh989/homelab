@@ -1,5 +1,17 @@
+huma:
+	ansible-playbook -b main.yml --limit huma --ask-pass
+
+unifi:
+	ansible-playbook -b main.yml --limit unifi --ask-pass
+
+reqs:
+	ansible-galaxy install -r requirements.yml
+
+forcereqs:
+	ansible-galaxy install -r requirements.yml --force
+
 vault_pass:
-	bw get password homelab_vault_pass > .vault_pass
+	op read op://CLI/HOMELAB_VAULT_PASS/password > .vault_pass
 
 decrypt:
 	ansible-vault decrypt vars/vault.yml

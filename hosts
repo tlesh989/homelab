@@ -1,2 +1,5 @@
 [huma]
-192.168.233.10
+192.168.233.6 ansible_ssh_user=root
+
+[unifi]
+192.168.233.5 ansible_ssh_user=root

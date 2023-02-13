@@ -1,0 +1,45 @@
+---
+main_gid: "1001"
+
+# weareinteractive.users
+users:
+  - username: "moby"
+    users_group: "moby"
+
+# oefenweb.nfs_client
+nfs_mount_opts: "auto,defaults,nofail"
+nfs_client_mounts:
+  - src: "{{ vault_nfs_server }}:/volume1/backup"
+    path: /mnt/backup
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/docker"
+    path: /mnt/docker
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/music"
+    path: /mnt/music
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/public"
+    path: /mnt/public
+    opts: "{{ nfs_mount_opts }}"
+  - src: "{{ vault_nfs_server }}:/volume1/video"
+    path: /mnt/video
+    opts: "{{ nfs_mount_opts }}"
+
+# artis3n.tailscale
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+tailscale_args: "--advertise-routes=192.168.233.0/24 --advertise-exit-node --accept-routes"
+
+# geerlingguy.security
+security_ssh_port: 22
+security_ssh_password_authentication: "no"
+# security_ssh_permit_root_login: "no"
+security_ssh_usedns: "no"
+security_autoupdate_enabled: true
+security_autoupdate_reboot: true
+security_autoupdate_reboot_time: "03:00"
+# security_fail2ban_enabled: false
+security_sudoers_passworded:
+  - "{{ vault_username }}"
+
+# weareinteractive.environment
+environment_config: { "PUID": "{{ main_gid }}", "PGID": "{{ main_gid }}" }
