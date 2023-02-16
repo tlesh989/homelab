@@ -21,6 +21,10 @@
     state: present
     filename: mongodb-org-3.6
 
+- name: Install libssl1.1 (required by MongoDB 3.6 Install)
+  ansible.builtin.apt:
+    deb: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+
 - name: Install MongoDB 3.6
   ansible.builtin.apt:
     name: mongodb-org-server
@@ -34,7 +38,7 @@
 
 - name: Prevent Java from being upgraded
   ansible.builtin.dpkg_selections:
-    name: openjdk-11-*
+    name: openjdk-11-jre
     selection: hold
 
 - name: Install Unifi Controller

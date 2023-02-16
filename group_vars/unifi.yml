@@ -16,6 +16,7 @@ package_list:
   - name: net-tools
   - name: openjdk-8-jre-headless
   - name: python
+    apt: python-is-python3
   - name: screen
   - name: sudo
   - name: tmux
