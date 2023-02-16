@@ -1,10 +1,10 @@
-resource "proxmox_lxc" "unifi" {
+resource "proxmox_lxc" "tailscale" {
   target_node  = "huma"
-  hostname     = "unifi"
+  hostname     = "tailscale"
   ostemplate   = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   password     = var.root_pass
   memory       = 2048
-  unprivileged = true
+  unprivileged = false
   onboot       = true
   start        = true
 
@@ -19,7 +19,6 @@ resource "proxmox_lxc" "unifi" {
   network {
     name   = "eth0"
     bridge = "vmbr0"
-    ip     = "192.168.233.5/24"
-    gw     = "192.168.233.1"
+    ip     = "dhcp"
   }
 }
