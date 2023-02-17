@@ -4,6 +4,9 @@ huma:
 unifi:
 	ansible-playbook -b main.yml --limit unifi --ask-pass
 
+tailscale:
+	ansible-playbook -b main.yml --limit tailscale --ask-pass
+
 reqs:
 	ansible-galaxy install -r requirements.yml
 

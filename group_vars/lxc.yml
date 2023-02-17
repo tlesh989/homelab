@@ -1,4 +1,6 @@
 ---
+# proxmox lxc container
+
 # grog.package
 package_list:
   - name: curl
@@ -6,15 +8,11 @@ package_list:
   - name: htop
   - name: iftop
   - name: iotop
-  - name: lm-sensors
-  - name: mc
   - name: ncdu
   - name: net-tools
-  - name: nmap
-  - name: openssh-server
   - name: python
+    apt: python-is-python3
   - name: screen
-  - name: smartmontools
   - name: sudo
   - name: tmux
   - name: tree

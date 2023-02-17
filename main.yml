@@ -27,3 +27,12 @@
     - role: grog.package
     - role: unifi_controller
     - role: weareinteractive.users
+
+- hosts: tailscale
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: geerlingguy.ntp
+    - role: grog.package
+    - role: artis3n.tailscale
+    - role: weareinteractive.users

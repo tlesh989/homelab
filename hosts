@@ -3,3 +3,10 @@
 
 [unifi]
 192.168.233.5 ansible_ssh_user=root
+
+[tailscale]
+192.168.233.21 ansible_ssh_user=root
+
+[lxc:children]
+unifi
+tailscale
