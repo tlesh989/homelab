@@ -2,9 +2,12 @@
 # weareinteractive.users
 users:
   - username: "{{ vault_username }}"
+    password: "{{ lookup('env', 'MKPASSWD_USER') }}"
+    shell: /bin/bash
     users_group: "{{ vault_username }}"
     authorized_keys:
       - "{{ lookup('file', '/home/{{ vault_username }}/.ssh/id_rsa.pub') }}"
+      - "{{ lookup('file', '/home/{{ vault_username }}/.ssh/id_rsa2022.pub') }}"
 
 # grog.package
 package_list:

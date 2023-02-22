@@ -36,3 +36,17 @@
     - role: grog.package
     - role: artis3n.tailscale
     - role: weareinteractive.users
+  tasks:
+    - name: Enable IP forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        ignoreerrors: true
+        sysctl_set: true
+
+    - name: Allow IP masquerading
+      ansible.builtin.iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: MASQUERADE
