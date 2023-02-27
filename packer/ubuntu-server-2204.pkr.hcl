@@ -13,7 +13,7 @@ source "proxmox" "ubuntu-server-2204" {
   insecure_skip_tls_verify = true
 
   node                 = "huma"
-  vm_id                = "999"
+  vm_id                = "900"
   vm_name              = "ubuntu-server-2204"
   template_description = "Ubuntu Server 22.04"
   iso_file             = "local:iso/ubuntu-22.04.1-live-server-amd64.iso"
@@ -21,12 +21,13 @@ source "proxmox" "ubuntu-server-2204" {
 
   qemu_agent = true
 
-  scsi_controller = "virtio-scsi-pci"
+  scsi_controller = "virtio-scsi-single"
   disks {
     disk_size         = "20G"
     storage_pool      = "local-lvm"
     storage_pool_type = "lvm"
     type              = "virtio"
+    io_thread         = true
   }
 
   cores  = "1"
@@ -64,7 +65,15 @@ build {
 
   provisioner "shell" {
     inline = [
-      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
+      "sudo rm /etc/ssh/ssh_host_*",
+      "sudo truncate -s 0 /etc/machine-id",
+      "sudo apt -y autoremove --purge",
+      "sudo apt -y clean",
+      "sudo apt -y autoclean",
+      "sudo cloud-init clean",
+      "sudo rm -f /etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg",
+      "sudo sync"
     ]
   }
 }

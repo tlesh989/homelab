@@ -17,8 +17,13 @@ autoinstall:
       - {{ op://Private/id_rsa2022/public key }}
   packages:
     - qemu-guest-agent
-  timezone: America/Detroit
-  identity:
-    hostname: ubuntu-server
-    password: op://Private/ssh/mkpasswd
-    username: op://Private/ssh/username
+  user-data:
+    package_upgrade: false
+    timezone: America/Detroit
+    users: 
+      - name: op://Private/ssh/username
+        password: op://Private/ssh/mkpasswd
+        groups: [adm, sudo]
+        lock_passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        shell: /bin/bash
