@@ -1,0 +1,23 @@
+---
+# grog.package
+package_list:
+  - name: curl
+  - name: git
+  - name: htop
+  - name: iftop
+  - name: iotop
+  - name: libguestfs-tools
+  - name: lm-sensors
+  - name: mc
+  - name: ncdu
+  - name: net-tools
+  - name: nmap
+  - name: openssh-server
+  - name: python
+  - name: qemu-guest-agent
+  - name: screen
+  - name: smartmontools
+  - name: sudo
+  - name: tmux
+  - name: tree
+  - name: wget

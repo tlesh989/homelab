@@ -38,7 +38,7 @@ source "proxmox" "ubuntu-server-2204" {
     bridge = "vmbr0"
   }
 
-  boot_wait      = "5s"
+  boot_wait      = "10s"
   http_directory = "http"
   boot_command = [
     "c",
@@ -55,7 +55,7 @@ source "proxmox" "ubuntu-server-2204" {
 
   ssh_username = var.ssh_user_name
   ssh_password = var.ssh_user_pass
-  ssh_timeout  = "20m"
+  ssh_timeout  = "90m"
 }
 
 build {
@@ -64,16 +64,17 @@ build {
   sources = ["source.proxmox.ubuntu-server-2204"]
 
   provisioner "shell" {
+    environment_vars = ["SUDO_USER=${var.ssh_user_name}"]
     inline = [
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
-      "sudo rm /etc/ssh/ssh_host_*",
-      "sudo truncate -s 0 /etc/machine-id",
-      "sudo apt -y autoremove --purge",
-      "sudo apt -y clean",
-      "sudo apt -y autoclean",
-      "sudo cloud-init clean",
-      "sudo rm -f /etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg",
-      "sudo sync"
+      "echo '$SUDO_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/$SUDO_USER"
     ]
+  }
+  provisioner "file" {
+    source      = "scripts/ubuntu-cleanup.sh"
+    destination = "/tmp/cleanup.sh"
+  }
+  provisioner "shell" {
+    inline = ["sudo /tmp/cleanup.sh"]
   }
 }

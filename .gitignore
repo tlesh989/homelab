@@ -140,3 +140,4 @@ galaxy_roles/
 user-data
 *.log
 .vscode
+packer/http/autoinstall-user-data
