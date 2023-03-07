@@ -1,7 +1,7 @@
 resource "proxmox_vm_qemu" "kaz" {
   name        = "kaz"
   target_node = "huma"
-  clone       = "ubuntu-server-2204"
+  clone       = "ubuntu-cloud"
 
   desc             = "Docker host"
   os_type          = "ubuntu"

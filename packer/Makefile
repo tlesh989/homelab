@@ -1,4 +1,4 @@
-jammy_file := ubuntu-server-2204
+jammy_file := ubuntu-cloud-2204
 
 ubuntu-jammy:
 	op inject -f -i http/${jammy_file}.tpl -o http/user-data
