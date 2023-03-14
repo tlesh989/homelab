@@ -27,8 +27,6 @@ source "proxmox-clone" "ubuntu-cloud-2204" {
   }
 
   node        = "huma"
-  username    = "${var.ssh_user_name}"
-  password    = "${var.ssh_user_pass}"
   proxmox_url = "https://192.168.233.6:8006/api2/json"
 }
 

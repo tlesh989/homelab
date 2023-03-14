@@ -8,14 +8,17 @@ resource "proxmox_vm_qemu" "kaz" {
   memory           = 16384
   sockets          = 1
   cores            = 4
-  ipconfig0        = "ip=192.168.233.10/32,gw=192.168.233.1"
+  ipconfig0        = "ip=192.168.233.10/24,gw=192.168.233.1"
+  ssh_user         = "root"
+  sshkeys          = file("~/.ssh/id_rsa.pub")
   automatic_reboot = true
   onboot           = true
   oncreate         = true
   agent            = 1
-  qemu_os = "l26"
+  qemu_os          = "l26"
   nameserver       = "192.168.233.1"
   scsihw           = "virtio-scsi-single"
+  tags             = "terraform"
 
   disk {
     storage  = "local-lvm"
