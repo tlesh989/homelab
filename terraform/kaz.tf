@@ -9,8 +9,10 @@ resource "proxmox_vm_qemu" "kaz" {
   sockets          = 1
   cores            = 4
   ipconfig0        = "ip=192.168.233.10/24,gw=192.168.233.1"
-  ssh_user         = "root"
+  ssh_user         = var.ssh_user
   sshkeys          = file("~/.ssh/id_rsa.pub")
+  ciuser           = var.ssh_user
+  cipassword       = var.ssh_pass
   automatic_reboot = true
   onboot           = true
   oncreate         = true

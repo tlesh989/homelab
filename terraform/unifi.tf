@@ -2,7 +2,7 @@ resource "proxmox_lxc" "unifi" {
   target_node     = "huma"
   hostname        = "unifi"
   ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-  password        = var.root_pass
+  password        = var.ssh_pass
   memory          = 2048
   unprivileged    = true
   onboot          = true
