@@ -10,20 +10,15 @@ if [ -d .git/ ]; then
 cat <<EOT >> .git/hooks/pre-commit
 ENCRYPTED_FILES=("vars/vault.yml" "envrc")
 
-check_encryption () {
-    FILE_GROUP=("@")
-    for file in "\${FILE_GROUP[@]}"
-        do
-            if ( git show :"\$file" | grep -q "\$ANSIBLE_VAULT;" ); then
-                echo "[38;5;108mVault encrypted. Safe to commit.[0m"
-            else
-                echo "[38;5;208mVault not encrypted! Run 'make encrypt' and try again.[0m"
-            exit 1
-        fi
-    done
-}
-
-check_encryption "\${ENCRYPTED_FILES[@]}"
+for file in "\${ENCRYPTED_FILES[@]}"
+do
+    if ( git show :"\$file" | grep -q "\$ANSIBLE_VAULT;" ); then
+        printf "\e[32m\$file encrypted. Safe to commit.\e[0m\n"
+    else
+        printf "\e[31m\$file is not encrypted! Run 'make encrypt' and try again.\e[0m\n"
+        exit 1
+    fi
+done
 EOT
     
 fi
