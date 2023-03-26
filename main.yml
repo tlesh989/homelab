@@ -51,6 +51,4 @@
     - role: geerlingguy.docker
     - role: geerlingguy.pip
     - role: oefenweb.nfs_client
-    - role: artis3n.tailscale
-    - role: geerlingguy.github-users
     - role: shelleg.ansible_role_portainer
