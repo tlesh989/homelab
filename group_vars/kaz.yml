@@ -4,7 +4,12 @@ main_gid: "1001"
 # weareinteractive.users
 users:
   - username: "moby"
-    users_group: "moby"
+    name: Docker User 
+    group: "moby"
+    uid: {{ main_gid }}
+    groups: ["moby", "docker"]
+users_groups:
+  - docker
 
 # oefenweb.nfs_client
 nfs_mount_opts: "auto,defaults,nofail"

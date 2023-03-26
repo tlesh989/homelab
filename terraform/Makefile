@@ -1,5 +1,8 @@
 default: test
 
+init:
+	terraform init
+	
 test:
 	terraform fmt . 
 	terraform validate .

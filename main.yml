@@ -6,18 +6,6 @@
     - role: grog.package
     - role: ironicbadger.proxmox_nag_removal
     - role: weareinteractive.users
-#     - role: weareinteractive.users
-#     - role: weareinteractive.environment
-#     - role: geerlingguy.ntp
-#     - role: geerlingguy.security
-#     - role: geerlingguy.docker
-#     - role: geerlingguy.pip
-#     - role: oefenweb.nfs_client
-#     - role: network
-#     - role: artis3n.tailscale
-# #  geerlingguy.github-users
-#  rossmcdonald.telegraf
-#  shelleg.ansible_role_portainer
 
 - hosts: unifi
   vars_files:
@@ -50,3 +38,19 @@
         table: nat
         chain: POSTROUTING
         jump: MASQUERADE
+
+- hosts: kaz
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: grog.package
+    - role: weareinteractive.users
+    - role: weareinteractive.environment
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: geerlingguy.docker
+    - role: geerlingguy.pip
+    - role: oefenweb.nfs_client
+    - role: artis3n.tailscale
+    - role: geerlingguy.github-users
+    - role: shelleg.ansible_role_portainer

@@ -4,18 +4,28 @@
 #
 # credit goes to nick busey from homelabos for this neat little trick
 # https://gitlab.com/NickBusey/HomelabOS/-/issues/355
+pwd
+if [ -d .git/ ]; then
+    rm .git/hooks/pre-commit
+cat <<EOT >> .git/hooks/pre-commit
+ENCRYPTED_FILES=("vars/vault.yml" "envrc")
 
-if [ -d ../.git/ ]; then
-    rm ../.git/hooks/pre-commit
-cat <<EOT >> ../.git/hooks/pre-commit
-if ( git show :vars/vault.yml | grep -q "\$ANSIBLE_VAULT;" ); then
-echo "[38;5;108mVault encrypted. Safe to commit.[0m"
-else
-    echo "[38;5;208mVault not encrypted! Run 'make encrypt' and try again.[0m"
-exit 1
-fi
+check_encryption () {
+    FILE_GROUP=("@")
+    for file in "\${FILE_GROUP[@]}"
+        do
+            if ( git show :"\$file" | grep -q "\$ANSIBLE_VAULT;" ); then
+                echo "[38;5;108mVault encrypted. Safe to commit.[0m"
+            else
+                echo "[38;5;208mVault not encrypted! Run 'make encrypt' and try again.[0m"
+            exit 1
+        fi
+    done
+}
+
+check_encryption "\${ENCRYPTED_FILES[@]}"
 EOT
     
 fi
 
-chmod +x ../.git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit

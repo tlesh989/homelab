@@ -7,6 +7,9 @@
 [tailscale]
 192.168.233.21 ansible_ssh_user=root
 
+[kaz]
+192.168.233.10
+
 [lxc:children]
 unifi
 tailscale

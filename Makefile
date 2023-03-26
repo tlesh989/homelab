@@ -18,9 +18,11 @@ vault_pass:
 
 decrypt:
 	ansible-vault decrypt vars/vault.yml
+	ansible-vault decrypt envrc --output .envrc
 
 encrypt:
 	ansible-vault encrypt vars/vault.yml
+	ansible-vault encrypt .envrc --output envrc
 
 gitinit:
 	@./scripts/git-init.sh

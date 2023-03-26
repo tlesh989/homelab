@@ -13,3 +13,13 @@ variable "ssh_mkpasswd" {
   description = "Override the default cloud-init user's password. Not sure if this is used..."
   type        = string
 }
+
+variable "cf_tlesh_net_zone" {
+  description = "The Cloudflare zone identifier to target for the resource."
+  type        = string
+}
+
+variable "cf_tlesh_net_api" {
+  description = "The Cloudflare API Token for operations."
+  type        = string
+}
