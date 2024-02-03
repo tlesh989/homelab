@@ -1,6 +1,9 @@
 [huma]
 192.168.233.6 ansible_ssh_user=root
 
+[tasslehoff]
+192.168.233.7 ansible_ssh_user=root
+
 [unifi]
 192.168.233.5 ansible_ssh_user=root
 
@@ -9,6 +12,10 @@
 
 [kaz]
 192.168.233.10
+
+[proxmox:children]
+huma
+tasslehoff
 
 [lxc:children]
 unifi

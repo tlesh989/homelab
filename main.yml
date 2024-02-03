@@ -1,5 +1,13 @@
 ---
-- hosts: huma
+- name: initial setup
+  hosts: all
+  tasks:
+    - name: linux/macos find current user home directory
+      ansible.builtin.set_fact:
+        my_home: "{{ lookup('env', 'HOME') }}"
+
+- name: setup proxmox hosts
+  hosts: proxmox
   vars_files:
     - vars/vault.yml
   roles:
@@ -7,7 +15,8 @@
     - role: ironicbadger.proxmox_nag_removal
     - role: weareinteractive.users
 
-- hosts: unifi
+- name: setup unifi server
+  hosts: unifi
   vars_files:
     - vars/vault.yml
   roles:
@@ -16,7 +25,8 @@
     - role: unifi_controller
     - role: weareinteractive.users
 
-- hosts: tailscale
+- name: setup tailscale server
+  hosts: tailscale
   vars_files:
     - vars/vault.yml
   roles:
@@ -39,7 +49,8 @@
         chain: POSTROUTING
         jump: MASQUERADE
 
-- hosts: kaz
+- name: setup docker server
+  hosts: kaz
   vars_files:
     - vars/vault.yml
   roles:

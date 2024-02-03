@@ -6,8 +6,8 @@ users:
     shell: /bin/bash
     users_group: "{{ vault_username }}"
     authorized_keys:
-      - "{{ lookup('file', '/home/{{ vault_username }}/.ssh/id_rsa.pub') }}"
-      - "{{ lookup('file', '/home/{{ vault_username }}/.ssh/id_rsa2022.pub') }}"
+      - "{{ lookup('file', '{{ my_home }}/.ssh/id_rsa.pub') }}"
+      - "{{ lookup('file', '{{ my_home }}/.ssh/id_rsa2022.pub') }}"
 
 # grog.package
 package_list:
@@ -42,4 +42,4 @@ global_env_vars:
   - "TZ={{ ntp_timezone }}"
 docker_compose_generator_uid: "{{ main_uid }}"
 docker_compose_generator_gid: "{{ main_gid }}"
-docker_compose_generator_output_path: /home/{{ vault_username }}
+docker_compose_generator_output_path: "/home/{{ vault_username }}"

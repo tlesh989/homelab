@@ -1,5 +1,5 @@
-huma:
-	ansible-playbook -b main.yml --limit huma --ask-pass
+proxmox:
+	ansible-playbook -b main.yml --limit proxmox --ask-pass
 
 unifi:
 	ansible-playbook -b main.yml --limit unifi --ask-pass
