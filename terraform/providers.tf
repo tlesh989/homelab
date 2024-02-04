@@ -10,7 +10,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "Telmate/proxmox"
-      version = "2.9.13"
+      version = "3.0.1-rc1"
     }
     linode = {
       source  = "linode/linode"
@@ -19,6 +19,14 @@ terraform {
     cloudflare = {
       source  = "cloudflare/cloudflare"
       version = "4.1.0"
+    }
+    nextdns = {
+      source  = "amalucelli/nextdns"
+      version = "0.1.0"
+    }
+    unifi = {
+      source  = "paultyng/unifi"
+      version = "0.41.0"
     }
   }
 }

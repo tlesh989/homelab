@@ -3,6 +3,7 @@ resource "proxmox_lxc" "tailscale" {
   hostname        = "tailscale"
   ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   password        = var.ssh_pass
+  cores           = 1
   memory          = 2048
   unprivileged    = false
   onboot          = true

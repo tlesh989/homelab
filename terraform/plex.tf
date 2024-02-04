@@ -1,11 +1,11 @@
-resource "proxmox_lxc" "unifi" {
-  target_node     = "huma"
-  hostname        = "unifi"
+resource "proxmox_lxc" "plex_server" {
+  target_node     = "tasslehoff"
+  hostname        = "plex"
   ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   password        = var.ssh_pass
-  cores           = 1
-  memory          = 2048
-  unprivileged    = true
+  cores           = 3
+  memory          = 12288
+  unprivileged    = false
   onboot          = true
   start           = true
   tags            = "terraform"
@@ -14,13 +14,13 @@ resource "proxmox_lxc" "unifi" {
   // Terraform will crash without rootfs defined
   rootfs {
     storage = "local-lvm"
-    size    = "10G"
+    size    = "100G"
   }
 
   network {
     name   = "eth0"
     bridge = "vmbr0"
-    ip     = "192.168.233.5/24"
+    ip     = "192.168.233.11/24"
     gw     = "192.168.233.1"
   }
 }

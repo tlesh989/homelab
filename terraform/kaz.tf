@@ -15,19 +15,33 @@ resource "proxmox_vm_qemu" "kaz" {
   cipassword       = var.ssh_pass
   automatic_reboot = true
   onboot           = true
-  oncreate         = true
   agent            = 1
   qemu_os          = "l26"
   nameserver       = "192.168.233.1"
   scsihw           = "virtio-scsi-single"
   tags             = "terraform"
+  vm_state         = "running"
 
-  disk {
-    storage  = "local-lvm"
-    type     = "virtio"
-    size     = "100G"
-    iothread = 1
+  disks {
+    virtio {
+      virtio0 {
+        disk {
+          # backup             = true
+          # cache              = "none"
+          # discard            = true
+          iothread = true
+          # mbps_r_burst       = 0.0
+          # mbps_r_concurrent  = 0.0
+          # mbps_wr_burst      = 0.0
+          # mbps_wr_concurrent = 0.0
+          replicate = true
+          size      = 100
+          storage   = "local-lvm"
+        }
+      }
+    }
   }
+
 
   network {
     bridge = "vmbr0"
