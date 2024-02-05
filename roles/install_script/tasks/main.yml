@@ -1,0 +1,22 @@
+---
+# tasks file for install_script
+- name: Install shell script file
+  ansible.builtin.copy:
+    src: "{{ install_script_src }}"
+    dest: "{{ install_script_dest }}"
+    mode: "{{ install_script_mode }}"
+    owner: "{{ install_script_owner }}"
+    group: "{{ install_script_group }}"
+
+- name: Schedule script to run via crontab
+  ansible.builtin.cron:
+    name: "{{ install_script_cron_name }}"
+    minute: "{{ install_script_cron_minute }}"
+    hour: "{{ install_script_cron_hour }}"
+    day: "{{ install_script_cron_day }}"
+    month: "{{ install_script_cron_month }}"
+    weekday: "{{ install_script_cron_weekday }}"
+    user: "{{ install_script_cron_user }}"
+    job: "{{ install_script_cron_job }}"
+    state: "{{ install_script_cron_state }}"
+  when: install_script_cron_enabled

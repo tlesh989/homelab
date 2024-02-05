@@ -10,22 +10,33 @@
     state: present
     filename: 100-ubnt-unifi
 
-- name: Add the MongoDB apt signing key
+- name: Remove the MongoDB 3.6 apt signing key
   ansible.builtin.apt_key:
     url: https://pgp.mongodb.com/server-3.6.asc
-    state: present
+    state: absent
 
-- name: Add Unifi repository
+- name: Remove the MongoDB 3.6 repository
   ansible.builtin.apt_repository:
     repo: deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/3.6 multiverse
-    state: present
+    state: absent
     filename: mongodb-org-3.6
 
-- name: Install libssl1.1 (required by MongoDB 3.6 Install)
+- name: Add the MongoDB 4.4 apt signing key
+  ansible.builtin.apt_key:
+    url: https://pgp.mongodb.com/server-4.4.asc
+    state: present
+
+- name: Add MongoDB repository
+  ansible.builtin.apt_repository:
+    repo: deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse
+    state: present
+    filename: mongodb-org-4.4
+
+- name: Install libssl1.1 (required by Unifi Installer)
   ansible.builtin.apt:
     deb: http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
 
-- name: Install MongoDB 3.6
+- name: Install MongoDB 4.4
   ansible.builtin.apt:
     name: mongodb-org-server
     state: present
@@ -38,7 +49,7 @@
 
 - name: Prevent Java from being upgraded
   ansible.builtin.dpkg_selections:
-    name: openjdk-11-jre
+    name: openjdk-17-jre-headless
     selection: hold
 
 - name: Install Unifi Controller

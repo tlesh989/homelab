@@ -14,7 +14,7 @@ package_list:
   - name: iotop
   - name: ncdu
   - name: net-tools
-  - name: openjdk-8-jre-headless
+  - name: openjdk-17-jre-headless
   - name: python
     apt: python-is-python3
   - name: screen

@@ -34,6 +34,16 @@ package_list:
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
 
+# geerlingguy.security
+security_ssh_port: 22
+security_ssh_password_authentication: "yes"
+security_ssh_permit_root_login: "yes"
+security_ssh_usedns: "no"
+security_autoupdate_enabled: true
+security_fail2ban_enabled: false
+security_sudoers_passwordless:
+  - "{{ vault_username }}"
+
 # ironicbadger.docker_compose_generator
 appdata_path: /opt/appdata
 global_env_vars:

@@ -14,6 +14,8 @@
     - role: grog.package
     - role: ironicbadger.proxmox_nag_removal
     - role: weareinteractive.users
+    - role: artis3n.tailscale
+    - role: install_script
 
 - name: setup unifi server
   hosts: unifi
@@ -21,6 +23,7 @@
     - vars/vault.yml
   roles:
     - role: geerlingguy.ntp
+    - role: geerlingguy.security
     - role: grog.package
     - role: unifi_controller
     - role: weareinteractive.users
@@ -31,9 +34,11 @@
     - vars/vault.yml
   roles:
     - role: geerlingguy.ntp
+    - role: geerlingguy.security
     - role: grog.package
     - role: artis3n.tailscale
     - role: weareinteractive.users
+
   tasks:
     - name: Enable IP forwarding
       ansible.posix.sysctl:
@@ -63,3 +68,4 @@
     - role: geerlingguy.pip
     - role: oefenweb.nfs_client
     - role: shelleg.ansible_role_portainer
+    - role: weareinteractive.apt

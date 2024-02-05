@@ -1,0 +1,17 @@
+---
+# defaults file for install_script
+install_script_src: install_script.sh
+install_script_dest: /root/install_script.sh
+install_script_owner: root
+install_script_group: root
+install_script_mode: "0755"
+install_script_cron_name: "install script test"
+install_script_cron_minute: "0"
+install_script_cron_hour: "0"
+install_script_cron_day: "*"
+install_script_cron_month: "*"
+install_script_cron_weekday: "*"
+install_script_cron_user: root
+install_script_cron_job: "/root/install_script.sh > /tmp/test.txt"
+install_script_cron_state: present
+install_script_cron_enabled: false

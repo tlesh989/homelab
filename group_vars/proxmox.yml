@@ -6,6 +6,8 @@ package_list:
   - name: htop
   - name: iftop
   - name: iotop
+  - name: iperf3
+  - name: jq
   - name: libguestfs-tools
   - name: lm-sensors
   - name: mc
@@ -15,9 +17,21 @@ package_list:
   - name: openssh-server
   - name: python
   - name: qemu-guest-agent
+    state: absent
   - name: screen
   - name: smartmontools
   - name: sudo
   - name: tmux
   - name: tree
   - name: wget
+
+# artis3n.tailscale
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+
+# install_script
+install_script_src: proxmox_tailscale_ssl.sh
+install_script_dest: /root/tailscale_ssl.sh
+install_script_cron_name: "renew tailscale ssl certificates"
+install_script_cron_weekday: "1"
+install_script_cron_job: "{{ install_script_dest }}"
+install_script_cron_enabled: true
