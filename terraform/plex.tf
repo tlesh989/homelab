@@ -1,7 +1,7 @@
 resource "proxmox_lxc" "plex_server" {
   target_node     = "tasslehoff"
   hostname        = "plex"
-  ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
+  ostemplate      = "nfs_proxmox:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   password        = var.ssh_pass
   cores           = 3
   memory          = 12288

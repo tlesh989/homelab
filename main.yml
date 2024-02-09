@@ -66,6 +66,17 @@
     - role: geerlingguy.security
     - role: geerlingguy.docker
     - role: geerlingguy.pip
-    - role: oefenweb.nfs_client
     - role: shelleg.ansible_role_portainer
-    - role: weareinteractive.apt
+
+- name: setup plex server
+  hosts: plex
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: grog.package
+    - role: weareinteractive.users
+    - role: weareinteractive.environment
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: geerlingguy.pip
+    - role: joenyland.plexmediaserver

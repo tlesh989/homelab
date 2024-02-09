@@ -13,6 +13,9 @@
 [kaz]
 192.168.233.10
 
+[plex]
+192.168.233.11 ansible_ssh_user=root
+
 [proxmox:children]
 huma
 tasslehoff
@@ -20,3 +23,4 @@ tasslehoff
 [lxc:children]
 unifi
 tailscale
+plex

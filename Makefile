@@ -7,6 +7,9 @@ unifi:
 tailscale:
 	ansible-playbook -b main.yml --limit tailscale --ask-pass
 
+plex:
+	ansible-playbook -b main.yml --limit plex --ask-pass
+
 reqs:
 	ansible-galaxy install -r requirements.yml
 
