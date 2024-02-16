@@ -6,6 +6,7 @@ provider "registry.terraform.io/amalucelli/nextdns" {
   constraints = "0.1.0"
   hashes = [
     "h1:UMkrBm5WinWYS+wgb/g43rU/lbTNLg3mN6j1GmIaEmc=",
+    "h1:gMr0SdAMp/8X4zM+6oCF6PD4cvMVTLXLRKXrsvUH9oA=",
     "zh:1c3e89cf19118fc07d7b04257251fc9897e722c16e0a0df7b07fcd261f8c12e7",
     "zh:2881f5565acc3434fe733d7db8f65556c54c73519a15c4d96608fe1953d80bce",
     "zh:2ae64b47385f61f0e8c15936f76727e7d54a64fb3902ef88a78d6745a96d5255",
@@ -76,6 +77,7 @@ provider "registry.terraform.io/paultyng/unifi" {
   constraints = "0.41.0"
   hashes = [
     "h1:fc0gUNc7ddxeLKVgVbt2iuYBn0U9GKE9lxK78w8oRF4=",
+    "h1:vE4C9E7NtYUC7otQrAvNNkDFBHqEMxkUlcqJhLWchLY=",
     "zh:03ddd3aee05a08e1446f75a7b3f52810181d3307728cba08ce8fb67f109a9c00",
     "zh:11b14b79ad02b0a55fd6116b10c0eb6fab432dd7d1f3527af0e2055adf292451",
     "zh:18c0eb19889927f115a1e05d64f59b4e8d530ccdf1a8b574940a86be20973564",
@@ -97,6 +99,7 @@ provider "registry.terraform.io/telmate/proxmox" {
   version     = "3.0.1-rc1"
   constraints = "3.0.1-rc1"
   hashes = [
+    "h1:4xZeGV+uRpYX6Boe0kWI3Dw3B+x8P4tT4JTnUpE1FJU=",
     "h1:KvYyKXNAgmYr16S9qT2g/NxnO+Yff+oLfFlnzbCDs3A=",
     "zh:4c4a5739ed8b0fdec644632de9cc3219a31022b03aaaf6b77d49efe58541d5c1",
     "zh:5c97c58a1d15d3b77bade630c70c75f24cf884560625afa78f408f682c09cc05",
