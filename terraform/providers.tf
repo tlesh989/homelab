@@ -18,11 +18,11 @@ terraform {
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.1.0"
+      version = "~>4"
     }
     nextdns = {
       source  = "amalucelli/nextdns"
-      version = "0.1.0"
+      version = "~>0.2"
     }
     unifi = {
       source  = "paultyng/unifi"

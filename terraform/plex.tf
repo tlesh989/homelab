@@ -8,8 +8,13 @@ resource "proxmox_lxc" "plex_server" {
   unprivileged    = false
   onboot          = true
   start           = true
+  full            = true
   tags            = "terraform"
   ssh_public_keys = file("~/.ssh/id_rsa.pub")
+
+  features {
+    mount = "nfs"
+  }
 
   // Terraform will crash without rootfs defined
   rootfs {
