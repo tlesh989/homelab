@@ -4,6 +4,9 @@
 [tasslehoff]
 192.168.233.7 ansible_ssh_user=root
 
+[bupu]
+192.168.233.8 ansible_ssh_user=root
+
 [unifi]
 192.168.233.5 ansible_ssh_user=root
 
@@ -19,6 +22,7 @@
 [proxmox:children]
 huma
 tasslehoff
+bubu
 
 [lxc:children]
 unifi
