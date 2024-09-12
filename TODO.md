@@ -1,7 +1,7 @@
 # TODO
 
-- [ ] Task 1
-- [ ] Task 2
+- [ ] [Tailscale Optimizations](https://tailscale.com/kb/1320/performance-best-practices#ethtool-configuration)
+- [ ] [Tailscale IP forwarding](https://tailscale.com/kb/1019/subnets?tab=linux#enable-ip-forwarding)
 - [ ] Task 3
 
 ## In Progress
