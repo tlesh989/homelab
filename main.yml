@@ -11,8 +11,9 @@
   vars_files:
     - vars/vault.yml
   roles:
+    - role: proxmox
+    - role: buluma.bootstrap
     - role: grog.package
-    - role: ironicbadger.proxmox_nag_removal
     - role: weareinteractive.users
     - role: artis3n.tailscale
     - role: install_script

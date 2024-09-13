@@ -1,3 +1,9 @@
+reqs:
+	ansible-galaxy install -r requirements.yml
+
+forcereqs:
+	ansible-galaxy install -r requirements.yml --force
+	
 proxmox:
 	ansible-playbook -b main.yml --limit proxmox --ask-pass
 
@@ -9,12 +15,6 @@ tailscale:
 
 plex:
 	ansible-playbook -b main.yml --limit plex --ask-pass
-
-reqs:
-	ansible-galaxy install -r requirements.yml
-
-forcereqs:
-	ansible-galaxy install -r requirements.yml --force
 
 vault_pass:
 	op read op://CLI/HOMELAB_VAULT_PASS/password > .vault_pass

@@ -2,6 +2,7 @@
 ---
 roles:
   - src: artis3n.tailscale
+  - src: buluma.bootstrap
   - src: geerlingguy.docker
   - src: geerlingguy.github-users
   - src: geerlingguy.ntp
@@ -9,7 +10,7 @@ roles:
   - src: geerlingguy.security
   - src: grog.package
   - src: ironicbadger.docker_compose_generator
-  - src: ironicbadger.proxmox_nag_removal
+  # - src: ironicbadger.proxmox_nag_removal
   - src: joenyland.plexmediaserver
   - src: oefenweb.nfs_client
   - src: shelleg.ansible_role_portainer
