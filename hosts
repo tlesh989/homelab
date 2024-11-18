@@ -1,30 +1,40 @@
 [huma]
-huma.tlesh.xyz ansible_host=192.168.233.6 ansible_ssh_user=root
+huma.tlesh.xyz ansible_host=192.168.233.6
 
 [tasslehoff]
-tasslehoff.tlesh.xyz ansible_host=192.168.233.7 ansible_ssh_user=root
+tasslehoff.tlesh.xyz ansible_host=192.168.233.7
 
 [bupu]
-bupu.tlesh.xyz ansible_host=192.168.233.8 ansible_ssh_user=root
+bupu.tlesh.xyz ansible_host=192.168.233.8
+
+[sturm]
+sturm.tlesh.xyz ansible_host=192.168.233.9
 
 [unifi]
-unifi.tlesh.xyz ansible_host=192.168.233.5 ansible_ssh_user=root
+unifi.tlesh.xyz ansible_host=192.168.233.5
 
 [tailscale]
-tailscale.tlesh.xyz ansible_host=192.168.233.21 ansible_ssh_user=root
+tailscale.tlesh.xyz ansible_host=192.168.233.21
 
 [kaz]
 kaz.tlesh.xyz ansible_host=192.168.233.10
 
 [plex]
-plex.tlesh.xyz ansible_host=192.168.233.11 ansible_ssh_user=root
+plex.tlesh.xyz ansible_host=192.168.233.11
 
 [proxmox:children]
 huma
 tasslehoff
 bupu
+sturm
 
 [lxc:children]
 unifi
 tailscale
 plex
+
+[proxmox:vars]
+ansible_ssh_user=root
+
+[lxc:vars]
+ansible_ssh_user=root
