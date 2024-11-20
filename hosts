@@ -1,8 +1,8 @@
 [huma]
 huma.tlesh.xyz ansible_host=192.168.233.6
 
-[tasslehoff]
-tasslehoff.tlesh.xyz ansible_host=192.168.233.7
+[tika]
+tika.tlesh.xyz ansible_host=192.168.233.7
 
 [bupu]
 bupu.tlesh.xyz ansible_host=192.168.233.8
@@ -24,7 +24,7 @@ plex.tlesh.xyz ansible_host=192.168.233.11
 
 [proxmox:children]
 huma
-tasslehoff
+tika
 bupu
 sturm
 
