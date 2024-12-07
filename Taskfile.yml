@@ -65,4 +65,4 @@ tasks:
     cmds:
       - ./scripts/git-init.sh
       - echo "ansible vault pre-commit hook installed"
-      - echo "don't forget to create a .vault_pass" 
+      - echo "don't forget to create a .vault_pass"
