@@ -1,0 +1,36 @@
+---
+- name: Stop and disable Ceph services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - ceph-osd.target
+    - ceph-mon.target
+    - ceph-mgr.target
+    - ceph-mds.target
+
+- name: Remove ceph config files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/pve/ceph.conf
+    - /etc/ceph
+    - /var/lib/ceph
+
+- name: Purge Ceph settings and services
+  ansible.builtin.command: pveceph purge
+  register: purge_result
+  changed_when: purge_result.rc == 0
+
+- name: Clean up Ceph packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+    purge: true
+  loop:
+    - ceph-mon
+    - ceph-osd
+    - ceph-mgr
+    - ceph-mds

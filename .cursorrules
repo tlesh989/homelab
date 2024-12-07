@@ -1,0 +1,112 @@
+{
+  "rules": [
+    {
+      "name": "terraform_resource_naming",
+      "pattern": "resource\\s+\"([a-z0-9_]+)\"\\s+\"([a-z0-9_]+)\"",
+      "message": "Terraform resource names should use snake_case",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_variable_naming",
+      "pattern": "variable\\s+\"([^\"]+)\"",
+      "message": "Terraform variable names should use snake_case",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_output_naming",
+      "pattern": "output\\s+\"([^\"]+)\"",
+      "message": "Terraform output names should use snake_case",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_tags",
+      "pattern": "resource\\s+\"[^\"]+\"\\s+\"[^\"]+\"\\s*{[^}]*}",
+      "negative_pattern": "tags\\s*=",
+      "message": "Resources should have tags defined",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_description",
+      "pattern": "variable\\s+\"[^\"]+\"\\s*{[^}]*}",
+      "negative_pattern": "description\\s*=",
+      "message": "Variables should have descriptions",
+      "severity": "warning"
+    },
+    {
+      "name": "ansible_task_name",
+      "pattern": "-\\s*(\\w+):\\s*$",
+      "negative_pattern": "-\\s*name:",
+      "message": "Ansible tasks should have names",
+      "severity": "error"
+    },
+    {
+      "name": "ansible_handler_name",
+      "pattern": "handlers:\\s*$",
+      "negative_pattern": "-\\s*name:",
+      "message": "Ansible handlers should have names",
+      "severity": "error"
+    },
+    {
+      "name": "yaml_spacing",
+      "pattern": "^\\s*-\\s+\\w+:\\s*$",
+      "message": "Maintain consistent YAML spacing",
+      "severity": "info"
+    },
+    {
+      "name": "terraform_provider_version",
+      "pattern": "provider\\s+\"[^\"]+\"\\s*{",
+      "negative_pattern": "version\\s*=",
+      "message": "Provider blocks should specify version constraints",
+      "severity": "warning"
+    },
+    {
+      "name": "ansible_become_usage",
+      "pattern": "become:\\s*true",
+      "message": "Review usage of become: true for security implications",
+      "severity": "info"
+    },
+    {
+      "name": "terraform_data_source_naming",
+      "pattern": "data\\s+\"([a-z0-9_]+)\"\\s+\"([a-z0-9_]+)\"",
+      "message": "Data source names should use snake_case",
+      "severity": "warning"
+    },
+    {
+      "name": "ansible_module_naming",
+      "pattern": "- name: ([A-Z])",
+      "message": "Task names should start with lowercase letters",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_backend_config",
+      "pattern": "terraform\\s*{[^}]*}",
+      "negative_pattern": "backend\\s+\"[^\"]+\"",
+      "message": "Terraform configuration should specify a backend",
+      "severity": "warning"
+    },
+    {
+      "name": "ansible_loop_usage",
+      "pattern": "with_items:",
+      "message": "Consider using loop instead of with_items (deprecated)",
+      "severity": "warning"
+    },
+    {
+      "name": "terraform_workspace_vars",
+      "pattern": "\\$\\{terraform\\.workspace\\}",
+      "message": "Review workspace-dependent configuration",
+      "severity": "info"
+    }
+  ],
+  "exclusions": [
+    "**/.terraform/**",
+    "**/ansible.cfg",
+    "**/inventory/**",
+    "**/*.md",
+    "**/group_vars/all.yml"
+  ],
+  "options": {
+    "ignore_case": false,
+    "max_line_length": 120,
+    "tab_width": 2
+  }
+}

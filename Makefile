@@ -5,7 +5,8 @@ forcereqs:
 	ansible-galaxy install -r requirements.yml --force
 	
 proxmox:
-	ansible-playbook -b main.yml --limit proxmox --ask-pass
+	@echo "Running ansible-playbook with args: $@$@*"
+	ansible-playbook -b main.yml --limit proxmox --ask-pass $(ANSIBLE_ARGS)
 
 unifi:
 	ansible-playbook -b main.yml --limit unifi --ask-pass
@@ -31,3 +32,4 @@ gitinit:
 	@./scripts/git-init.sh
 	@echo "ansible vault pre-commit hook installed"
 	@echo "don't forget to create a .vault_pass"
+

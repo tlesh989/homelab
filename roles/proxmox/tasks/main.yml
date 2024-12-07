@@ -1,82 +1,16 @@
-# https://github.com/dronenb/ansible-role-proxmox
 ---
-# tasks file for proxmox
-- name: Set hostname
-  ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+- name: Optimize Proxmox VE
+  ansible.builtin.include_tasks: optimize.yml
 
-- name: Remove Proxmox enterprise repo from apt
-  loop:
-    - /etc/apt/sources.list.d/pve-enterprise.list
-    - /etc/apt/sources.list.d/pve-enterprise.list.dpkg-dist
-    - /etc/apt/sources.list.d/ceph.list
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
-
-- name: Variabilize Proxmox no-sub repo
-  ansible.builtin.set_fact:
-    proxmox_no_sub_repo: pve-install-repo
-
-- name: Add Proxmox VE no subscription repo
-  ansible.builtin.apt_repository:
-    filename: "{{ proxmox_no_sub_repo }}"
-    repo: >-
-      deb http://download.proxmox.com/debian/pve
-        {{ ansible_facts.distribution_release }} pve-no-subscription
-    state: present
-
-- name: Find Proxmox VE no sub repos for older distributions
-  ansible.builtin.command:
-    cmd: >-
-      grep -v {{ ansible_facts.distribution_release }}
-        /etc/apt/sources.list.d/{{ proxmox_no_sub_repo }}.list
-  register: old_repos
+- name: Check ceph status
+  ansible.builtin.shell: pveceph status 2>&1 | grep -v "not initialized"
+  register: pveceph_status
+  ignore_errors: true
   changed_when: false
-  failed_when: false
 
-- name: Remove Proxmox VE no subscription repo for older distributions
-  loop: "{{ old_repos.stdout_lines }}"
-  ansible.builtin.apt_repository:
-    filename: "{{ proxmox_no_sub_repo }}"
-    repo: "{{ item }}"
-    state: absent
-
-- name: Add proxmoxlib.js path to variable
-  ansible.builtin.set_fact:
-    proxmoxlib_path: >-
-      /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-
-- name: Check proxmoxlib.js.bak exists
-  ansible.builtin.stat:
-    path: "{{ proxmoxlib_path }}.bak"
-  register: pmx_js_bak
-
-- name: Make backup from proxmoxlib.js
-  when: not pmx_js_bak.stat.exists
-  ansible.builtin.copy:
-    src: "{{ proxmoxlib_path }}"
-    dest: "{{ proxmoxlib_path }}.bak"
-    remote_src: true
-    mode: '644'
-
-- name: Remove no valid sub popup
-  ansible.builtin.replace:
-    path: "{{ proxmoxlib_path }}"
-    regexp: >-
-      (^\s+)(Ext.Msg.show\(\{\s+title:\s+gettext\('No valid subscription)
-    replace: '\1void({ //\2'
-  notify: Restart pveproxy
-
-- name: Enable IOMMU (Intel)
-  when: >-
-    ansible_facts.processor |
-      list |
-      intersect(['GenuineIntel']) |
-      length > 0
-  ansible.builtin.lineinfile:
-    path: /etc/default/grub
-    search_string: GRUB_CMDLINE_LINUX_DEFAULT
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on"'
-    state: present
-  notify: Update grub
+- name: Disable Ceph
+  ansible.builtin.include_tasks: ceph.yml
+  when:
+    - proxmox_ceph_disabled is true
+    - pveceph_status.rc == 0
+    - "'binary not installed' not in pveceph_status.stdout"
