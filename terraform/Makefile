@@ -6,7 +6,7 @@ init:
 test:
 	terraform fmt . 
 	terraform validate .
-	terraform plan
+	doppler run --name-transformer tf-var -- terraform plan
 
 apply:
 	terraform apply -auto-approve

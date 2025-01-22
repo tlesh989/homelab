@@ -1,5 +1,6 @@
 resource "proxmox_lxc" "plex_server" {
-  target_node     = "tasslehoff"
+  provider = proxmox-telmate
+  target_node     = "sturm"
   hostname        = "plex"
   ostemplate      = "nfs_proxmox:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   password        = var.ssh_pass

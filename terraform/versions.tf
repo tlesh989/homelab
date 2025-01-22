@@ -1,4 +1,5 @@
 terraform {
+  required_version = "~>1.10.0"
   cloud {
     organization = "tlesh-net"
 
@@ -9,8 +10,8 @@ terraform {
 
   required_providers {
     proxmox = {
-      source  = "Telmate/proxmox"
-      version = "3.0.1-rc1"
+      source  = "bpg/proxmox"
+      version = "0.69.1"
     }
     linode = {
       source  = "linode/linode"
@@ -32,13 +33,19 @@ terraform {
 }
 
 provider "proxmox" {
-  pm_api_url = "https://192.168.233.6:8006/api2/json"
-  # pm_log_enable = true
-  # pm_log_file   = "terraform-plugin-proxmox.log"
-  # pm_debug      = true
-  # pm_log_levels = {
+  endpoint = "https://192.168.233.7:8006/api2/json"
+  insecure = true
+  ssh {
+    agent    = true
+    username = "terraform-prov"
+  }
+  # log_enable = true
+  # log_file   = "terraform-plugin-proxmox.log"
+  # debug      = true
+  # log_levels = {
   #   _default    = "debug"
   #   _capturelog = ""
+  # }
 }
 
 provider "cloudflare" {

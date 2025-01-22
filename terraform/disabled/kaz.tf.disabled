@@ -1,6 +1,7 @@
 resource "proxmox_vm_qemu" "kaz" {
+  provider = proxmox-telmate
   name        = "kaz"
-  target_node = "huma"
+  target_node = "sturm"
   clone       = "ubuntu-cloud"
 
   desc             = "Docker host"
