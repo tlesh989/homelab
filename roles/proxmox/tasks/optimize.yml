@@ -68,6 +68,14 @@
     replace: '\1void({ //\2'
   notify: Restart pveproxy
 
+- name: Configure common GRUB optimizations
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    search_string: GRUB_CMDLINE_LINUX_DEFAULT
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off nofb nomodeset video=efifb:off systemd.unified_cgroup_hierarchy=1"'
+    state: present
+  notify: Update grub
+
 - name: Enable IOMMU (Intel)
   when: >-
     ansible_facts.processor |
@@ -76,7 +84,67 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    search_string: GRUB_CMDLINE_LINUX_DEFAULT
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on"'
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    line: >-
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
+      intel_pstate=disable nofb nomodeset video=efifb:off
+      systemd.unified_cgroup_hierarchy=1"
     state: present
   notify: Update grub
+
+- name: Enable IOMMU (AMD)
+  when: >-
+    ansible_facts.processor |
+      list |
+      intersect(['AuthenticAMD']) |
+      length > 0
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    line: >-
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
+      kvm.ignore_msrs=1 kvm.report_ignored_msrs=0 nofb nomodeset video=efifb:off
+      systemd.unified_cgroup_hierarchy=1"
+    state: present
+  notify: Update grub
+
+- name: Configure AMD CPU power states
+  when: >-
+    ansible_facts.processor |
+      list |
+      intersect(['AuthenticAMD']) |
+      length > 0
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    search_string: GRUB_CMDLINE_LINUX
+    line: 'GRUB_CMDLINE_LINUX="processor.max_cstate=1 amd_idle.max_cstate=1"'
+    state: present
+  notify: Update grub
+
+- name: Get PCI devices information
+  ansible.builtin.command: lspci -nn
+  register: lspci_output
+  changed_when: false
+
+- name: Extract GPU vendor and device IDs
+  ansible.builtin.set_fact:
+    gpu_info: "{{ lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') }}"
+
+- name: Set GPU vendor and device IDs
+  ansible.builtin.set_fact:
+    gpu_vendor_id: "{{ gpu_info[0] }}"
+    gpu_device_id: "{{ gpu_info[1] }}"
+
+- name: Configure modprobe for GPU passthrough
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/vfio.conf
+    content: |
+      options vfio-pci ids={{ gpu_vendor_id }}:{{ gpu_device_id }}
+      options kvm ignore_msrs=1
+      options kvm report_ignored_msrs=0
+    mode: '0644'
+  notify: Update initramfs
+
+- name: Debug GPU IDs
+  ansible.builtin.debug:
+    msg: "Found GPU with vendor ID {{ gpu_vendor_id }} and device ID {{ gpu_device_id }}"
