@@ -9,9 +9,10 @@ variable "ssh_user" {
   type        = string
 }
 
-variable "ssh_mkpasswd" {
-  description = "Override the default cloud-init user's password. Not sure if this is used..."
+variable "default_node_name" {
+  description = "The default Proxmox node to deploy resources on."
   type        = string
+  default     = "bupu"
 }
 
 variable "cf_tlesh_net_zone" {
@@ -22,4 +23,5 @@ variable "cf_tlesh_net_zone" {
 variable "cf_tlesh_net_api" {
   description = "The Cloudflare API Token for operations."
   type        = string
+  sensitive   = true
 }

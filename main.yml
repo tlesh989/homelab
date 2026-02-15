@@ -8,6 +8,7 @@
 
 - name: setup proxmox hosts
   hosts: proxmox
+  become: true
   vars_files:
     - vars/vault.yml
   roles:
@@ -18,19 +19,9 @@
     - role: artis3n.tailscale
     - role: install_script
 
-- name: setup unifi server
-  hosts: unifi
-  vars_files:
-    - vars/vault.yml
-  roles:
-    - role: geerlingguy.ntp
-    - role: geerlingguy.security
-    - role: grog.package
-    - role: unifi_controller
-    - role: weareinteractive.users
-
 - name: setup tailscale server
   hosts: tailscale
+  become: true
   vars_files:
     - vars/vault.yml
   roles:
@@ -41,6 +32,11 @@
     - role: weareinteractive.users
 
   tasks:
+    - name: Install iptables-persistent
+      ansible.builtin.apt:
+        name: iptables-persistent
+        state: present
+
     - name: Enable IP forwarding
       ansible.posix.sysctl:
         name: net.ipv4.ip_forward
@@ -54,9 +50,16 @@
         table: nat
         chain: POSTROUTING
         jump: MASQUERADE
+      notify: Save iptables rules
+
+  handlers:
+    - name: Save iptables rules
+      ansible.builtin.command: netfilter-persistent save
+      changed_when: true
 
 - name: setup docker server
   hosts: kaz
+  become: true
   vars_files:
     - vars/vault.yml
   roles:
@@ -71,6 +74,7 @@
 
 - name: setup plex server
   hosts: plex
+  become: true
   vars_files:
     - vars/vault.yml
   roles:

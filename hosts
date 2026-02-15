@@ -7,9 +7,6 @@ bupu.tlesh.xyz ansible_host=192.168.233.8
 [sturm]
 sturm.tlesh.xyz ansible_host=192.168.233.9
 
-[unifi]
-unifi.tlesh.xyz ansible_host=192.168.233.5
-
 [tailscale]
 tailscale.tlesh.xyz ansible_host=192.168.233.21
 
@@ -25,7 +22,6 @@ bupu
 sturm
 
 [lxc:children]
-unifi
 tailscale
 plex
 

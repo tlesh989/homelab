@@ -6,7 +6,7 @@ users:
   - username: "moby"
     name: Docker User 
     group: "moby"
-    uid: {{ main_gid }}
+    uid: "{{ main_gid }}"
     groups: ["moby", "docker"]
 users_groups:
   - docker

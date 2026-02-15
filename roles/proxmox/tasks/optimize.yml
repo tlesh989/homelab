@@ -68,14 +68,6 @@
     replace: '\1void({ //\2'
   notify: Restart pveproxy
 
-- name: Configure common GRUB optimizations
-  ansible.builtin.lineinfile:
-    path: /etc/default/grub
-    search_string: GRUB_CMDLINE_LINUX_DEFAULT
-    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off nofb nomodeset video=efifb:off systemd.unified_cgroup_hierarchy=1"'
-    state: present
-  notify: Update grub
-
 - name: Enable IOMMU (Intel)
   when: >-
     ansible_facts.processor |

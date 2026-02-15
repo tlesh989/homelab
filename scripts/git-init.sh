@@ -6,7 +6,7 @@
 # https://gitlab.com/NickBusey/HomelabOS/-/issues/355
 pwd
 if [ -d .git/ ]; then
-    rm .git/hooks/pre-commit
+    rm -f .git/hooks/pre-commit
 cat <<EOT >> .git/hooks/pre-commit
 ENCRYPTED_FILES=("vars/vault.yml" "envrc")
 
@@ -15,7 +15,7 @@ do
     if ( git show :"\$file" | grep -q "\$ANSIBLE_VAULT;" ); then
         printf "\e[32m\$file encrypted. Safe to commit.\e[0m\n"
     else
-        printf "\e[31m\$file is not encrypted! Run 'make encrypt' and try again.\e[0m\n"
+        printf "\e[31m\$file is not encrypted! Run 'task encrypt' and try again.\e[0m\n"
         exit 1
     fi
 done

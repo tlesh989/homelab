@@ -28,11 +28,6 @@ tasks:
       - echo Running ansible-playbook with args {{.CLI_ARGS}}
       - ansible-playbook -b main.yml --limit proxmox --ask-pass {{.CLI_ARGS}}
 
-  unifi:
-    desc: Run Ansible playbook for Unifi hosts
-    cmds:
-      - ansible-playbook -b main.yml --limit unifi --ask-pass
-
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:

@@ -1,3 +1,4 @@
+# NOTE: Written for proxmox-telmate provider. Requires rewrite for bpg/proxmox.
 resource "proxmox_lxc" "plex_server" {
   provider = proxmox-telmate
   target_node     = "sturm"

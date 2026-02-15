@@ -3,7 +3,7 @@ resource "proxmox_virtual_environment_vm" "k8s_master" {
   description = "Managed by Terraform"
   tags        = ["terraform", "debian", "k8s"]
 
-  node_name = "bupu"
+  node_name = var.default_node_name
   vm_id     = 301
 
   agent {
@@ -76,8 +76,7 @@ resource "random_password" "ubuntu_vm_password" {
 }
 
 resource "tls_private_key" "ubuntu_vm_key" {
-  algorithm = "RSA"
-  rsa_bits  = 2048
+  algorithm = "ED25519"
 }
 
 output "ubuntu_vm_password" {

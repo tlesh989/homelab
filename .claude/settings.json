@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(1) if any(b in path for b in blocked) else sys.exit(0)\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ext=path.rsplit('.',1)[-1] if '.' in path else ''; sys.exit(0) if ext not in ('yml','yaml') else None; yamllint=shutil.which('yamllint'); sys.exit(0) if not yamllint else None; r=subprocess.run([yamllint,'-d','relaxed',path],capture_output=True,text=True); print(r.stdout) if r.stdout else None; print(r.stderr) if r.stderr else None; sys.exit(0)\"",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
+  }
+}

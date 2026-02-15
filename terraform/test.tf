@@ -3,11 +3,11 @@ data "proxmox_virtual_environment_nodes" "available_nodes" {}
 data "proxmox_virtual_environment_pools" "available_pools" {}
 
 data "proxmox_virtual_environment_datastores" "available_datastores" {
-  node_name = "bupu"
+  node_name = var.default_node_name
 }
 
 data "proxmox_virtual_environment_hosts" "first_node_host_entries" {
-  node_name = "bupu"
+  node_name = var.default_node_name
 }
 
 output "available_nodes" {
