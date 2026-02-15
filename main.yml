@@ -42,7 +42,6 @@
         name: net.ipv4.ip_forward
         value: 1
         state: present
-        ignoreerrors: true
         sysctl_set: true
 
     - name: Allow IP masquerading
