@@ -1,46 +1,79 @@
 // This tailnet's ACLs are maintained in https://github.com/tlesh989/homelab/tailscale/policy.hujson
 {
-	// Declare static groups of users beyond those in the identity service.
 	"groups": {
-		"group:owner":  ["thomas.lesh@gmail.com"],
-		"group:castle": ["thomas.lesh@gmail.com"],
+		// Owner/admin
+		"group:owner": [
+			"thomas.lesh@gmail.com",
+		],
+
+		// Castle nodes only
+		"group:castle": [
+			"thomas.lesh@gmail.com",
+			"jcottrell@castlemuseum.org",
+		],
 	},
 
-	// Declare convenient hostname aliases to use in place of IP addresses.
 	"hosts": {
+		// Example host
 		"example-host-1": "100.100.100.100",
 	},
 
-	// Access control lists.
-	"acls": [
-		// Match absolutely everything.
-		// Comment this section out if you want to define specific restrictions.
-		{"action": "accept", "users": ["*"], "ports": ["*:*"]},
-	],
-	"ssh": [
-		// Allow all users to SSH into their own devices in check mode.
-		// Comment this section out if you want to define specific restrictions.
-		{
-			"action": "check",
-			"src":    ["autogroup:members"],
-			"dst":    ["autogroup:self"],
-			"users":  ["autogroup:nonroot", "root"],
-		},
-	],
 	"tagOwners": {
+		// Home infra + services
+		"tag:home-core":     ["group:owner"],
+		"tag:home-services": ["group:owner"],
+
+		// Generic tags
 		"tag:server":    ["group:owner"],
 		"tag:laptop":    ["group:owner"],
 		"tag:device":    ["group:owner"],
 		"tag:streaming": ["group:owner"],
-		"tag:castle":    ["group:castle"],
-		"tag:mcc":       ["group:owner"],
+
+		// Castle and mcc routers / services
+		"tag:castle": ["group:castle"], // Shared with castle group
+		"tag:mcc":    ["group:owner"], // Only you
 	},
+
 	"nodeAttrs": [
 		{
 			"target": ["tag:streaming"],
-			"attr": [
-				"nextdns:bede4f",
-			],
+			"attr":   ["nextdns:bede4f"],
 		},
 	],
+
+	"ssh": [
+		{
+			"action": "check",
+			"src":    ["autogroup:member"],
+			"dst":    ["autogroup:self"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+	],
+
+	"grants": [
+		// 1) Owner can reach everything, everywhere.
+		{
+			"src": ["group:owner"],
+			"dst": ["*"],
+			"ip":  ["*"],
+		},
+
+		// 2) Any regular member can reach home infra + services, but NOT castle or mcc.
+		{
+			"src": ["autogroup:member"],
+			"dst": ["tag:home-core", "tag:home-services"],
+			"ip":  ["*"],
+		},
+
+		// 3) Castle group: can reach castle-tagged devices only.
+		{
+			"src": ["group:castle"],
+			"dst": ["tag:castle"],
+			"ip":  ["*"],
+		},
+
+		// No grant listing tag:mcc as a dst, so only group:owner, via rule 1
+		// can reach mcc-tagged devices.
+	],
 }
+
