@@ -1,47 +1,87 @@
 version: '3'
 
+vars:
+  PLAYBOOK: main.yml
+  VAULT_PASS: "{{if .VAULT_PASS_FILE}}.vault_pass{{else}}--ask-vault-pass{{end}}"
+  # Helper to check if .vault_pass exists (Task doesn't have a clean 'file_exists', so we use a subshell if needed or rely on env/vars)
+  # For now, let's assume the user prefers .vault_pass if it exists.
+
 tasks:
   default:
-    desc: Default task
+    desc: List all available tasks
     silent: true
     cmds:
       - task --list-all
       - |
-        echo "------------------------------------------"
-        echo "Pass args to ansible-playbook with -- args"
-        echo "Example: task proxmox -- --check"
-        echo "------------------------------------------"
+        echo ""
+        echo "-------------------------------------------------------"
+        echo " Usage Hints:"
+        echo "  - Pass extra args:  task <target> -- --check"
+        echo "  - Limit hosts:      task <target> -- --limit <host>"
+        echo "  - Debug output:     task <target> -- -vvv"
+        echo "-------------------------------------------------------"
+
+  # Internal helper for running playbooks
+  ansible:
+    internal: true
+    cmds:
+      - |
+        VAULT_ARG=""
+        if [ -f .vault_pass ]; then
+          VAULT_ARG="--vault-password-file .vault_pass"
+        else
+          VAULT_ARG="--ask-vault-pass"
+        fi
+        ansible-playbook -b {{.PLAYBOOK}} $VAULT_ARG --limit {{.LIMIT}} {{.CLI_ARGS}}
 
   reqs:
     desc: Install Ansible Galaxy requirements
     cmds:
-      - ansible-galaxy install -r requirements.yml
-
-  forcereqs:
-    desc: Force install Ansible Galaxy requirements
-    cmds:
-      - ansible-galaxy install -r requirements.yml --force
+      - ansible-galaxy install -r requirements.yml --force-with-deps
 
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
-      - echo Running ansible-playbook with args {{.CLI_ARGS}}
-      - ansible-playbook -b main.yml --limit proxmox --ask-pass {{.CLI_ARGS}}
+      - task: ansible
+        vars: { LIMIT: 'proxmox' }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
-      - ansible-playbook -b main.yml --limit tailscale --ask-pass
+      - task: ansible
+        vars: { LIMIT: 'tailscale' }
 
   plex:
     desc: Run Ansible playbook for Plex hosts
     cmds:
-      - ansible-playbook -b main.yml --limit plex --ask-pass
+      - task: ansible
+        vars: { LIMIT: 'plex' }
+
+  ping:
+    desc: Test connectivity to all hosts
+    cmds:
+      - ansible all -m ping
+
+  check:
+    desc: Dry-run for all hosts
+    cmds:
+      - ansible-playbook -b {{.PLAYBOOK}} --check {{.CLI_ARGS}}
+
+  syntax:
+    desc: Check playbook syntax
+    cmds:
+      - ansible-playbook {{.PLAYBOOK}} --syntax-check
+
+  lint:
+    desc: Lint the project
+    cmds:
+      - ansible-lint .
 
   vault_pass:
     desc: Read vault password from 1Password
     cmds:
       - op read op://CLI/HOMELAB_VAULT_PASS/password > .vault_pass
+      - chmod 600 .vault_pass
 
   decrypt:
     desc: Decrypt vault files

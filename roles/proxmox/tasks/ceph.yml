@@ -9,6 +9,7 @@
     - ceph-mon.target
     - ceph-mgr.target
     - ceph-mds.target
+  ignore_errors: true
 
 - name: Remove ceph config files
   ansible.builtin.file:

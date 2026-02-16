@@ -1,0 +1,35 @@
+---
+# tasks file for users
+- name: Create groups
+  ansible.builtin.group:
+    name: "{{ item.name | default(item) }}"
+    gid: "{{ item.gid | default(omit) }}"
+    state: present
+  loop: "{{ users_groups }}"
+  when: users_groups | length > 0
+
+- name: Create user accounts
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    comment: "{{ item.name | default(omit) }}"
+    uid: "{{ item.uid | default(omit) }}"
+    group: "{{ item.group | default(item.username) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    append: true
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    password: "{{ item.password | default(omit) }}"
+    state: present
+  loop: "{{ users }}"
+  when: users | length > 0
+
+- name: Manage SSH authorized keys
+  ansible.builtin.authorized_key:
+    user: "{{ item.username }}"
+    key: "{{ item.authorized_keys | join('\n') }}"
+    state: present
+    exclusive: "{{ users_ssh_exclusive | default(false) }}"
+  loop: "{{ users }}"
+  when:
+    - users | length > 0
+    - item.authorized_keys is defined
+    - item.authorized_keys | length > 0

@@ -1,10 +1,6 @@
 # ansible-galaxy install -r requirements.yml
 ---
 roles:
-  - src: artis3n.tailscale
-    version: "5.0.1"
-  - src: buluma.bootstrap
-    version: "24.8.0"
   - src: geerlingguy.docker
     version: "8.0.0"
   - src: geerlingguy.github-users
@@ -15,23 +11,23 @@ roles:
     version: "3.1.2"
   - src: geerlingguy.security
     version: "3.0.0"
-  - src: grog.package
-    version: "1.4.1"
-  - src: ironicbadger.docker_compose_generator
-    version: "2.1.1"
+  - src: GROG.package
+    version: "v1.4.1"
+  - src: IronicBadger.docker_compose_generator
+    version: "v2.1.1"
   # no tagged releases — unpinned
   - src: joenyland.plexmediaserver
-  - src: oefenweb.nfs_client
-    version: "1.0.7"
   # no tagged releases — unpinned
   - src: shelleg.ansible_role_portainer
   - src: weareinteractive.environment
     version: "1.5.0"
-  - src: weareinteractive.users
-    version: "1.17.0"
 
 collections:
   - name: community.general
     version: "12.3.0"
   - name: ansible.posix
     version: "2.1.0"
+  - name: artis3n.tailscale
+    version: "1.2.0"
+  - name: buluma.roles
+    version: "2.0.2"
