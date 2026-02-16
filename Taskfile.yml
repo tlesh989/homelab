@@ -2,9 +2,6 @@ version: '3'
 
 vars:
   PLAYBOOK: main.yml
-  VAULT_PASS: "{{if .VAULT_PASS_FILE}}.vault_pass{{else}}--ask-vault-pass{{end}}"
-  # Helper to check if .vault_pass exists (Task doesn't have a clean 'file_exists', so we use a subshell if needed or rely on env/vars)
-  # For now, let's assume the user prefers .vault_pass if it exists.
 
 tasks:
   default:
@@ -65,7 +62,14 @@ tasks:
   check:
     desc: Dry-run for all hosts
     cmds:
-      - ansible-playbook -b {{.PLAYBOOK}} --check {{.CLI_ARGS}}
+      - |
+        VAULT_ARG=""
+        if [ -f .vault_pass ]; then
+          VAULT_ARG="--vault-password-file .vault_pass"
+        else
+          VAULT_ARG="--ask-vault-pass"
+        fi
+        ansible-playbook -b {{.PLAYBOOK}} $VAULT_ARG --check {{.CLI_ARGS}}
 
   syntax:
     desc: Check playbook syntax

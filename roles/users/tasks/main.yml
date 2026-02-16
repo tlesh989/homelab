@@ -17,6 +17,7 @@
     groups: "{{ item.groups | default(omit) }}"
     append: true
     shell: "{{ item.shell | default('/bin/bash') }}"
+    # Password must be pre-hashed (e.g., SHA-512) using mkpasswd or python -c 'import crypt; ...'
     password: "{{ item.password | default(omit) }}"
     state: present
   loop: "{{ users }}"

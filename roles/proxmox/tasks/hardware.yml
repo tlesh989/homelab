@@ -2,10 +2,9 @@
 # tasks file for hardware-specific optimizations
 - name: Install microcode updates
   ansible.builtin.apt:
-    name:
-      - intel-microcode
-      - amd64-microcode
+    name: "{{ (ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0) | ternary('intel-microcode', 'amd64-microcode') }}"
     state: present
+  when: ansible_facts.processor | list | intersect(['GenuineIntel', 'AuthenticAMD']) | length > 0
   notify: Update initramfs
 
 - name: Set ZFS ARC Limit
@@ -26,7 +25,7 @@
     - name: Configure ZFS ARC max size
       ansible.builtin.copy:
         dest: /etc/modprobe.d/zfs.conf
-        content: "options zfs zfs_arc_max={{ zfs_arc_calculated_max }}"
+        content: "options zfs zfs_arc_max={{ zfs_arc_calculated_max }}\n"
         mode: '0644'
       notify: Update initramfs
 
@@ -61,7 +60,7 @@
     - name: Configure SR-IOV Kernel Parameters
       ansible.builtin.lineinfile:
         path: /etc/default/grub
-        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*)"$'
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((?!.*i915\.enable_guc).*)"\s*$'
         line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 i915.enable_guc=3 i915.max_vfs=7"'
         backrefs: true
       notify: Update grub
@@ -69,7 +68,7 @@
     - name: Load i915 module with SR-IOV support
       ansible.builtin.copy:
         dest: /etc/modprobe.d/i915.conf
-        content: "options i915 enable_guc=3 max_vfs=7"
+        content: "options i915 enable_guc=3 max_vfs=7\n"
         mode: '0644'
       notify: Update initramfs
 
