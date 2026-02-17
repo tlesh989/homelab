@@ -8,7 +8,6 @@
 - name: Hardware-Specific Optimizations
   ansible.builtin.include_tasks: hardware.yml
 
-
 - name: Check ceph status
   ansible.builtin.shell: pveceph status 2>&1 | grep -v "not initialized"
   register: pveceph_status

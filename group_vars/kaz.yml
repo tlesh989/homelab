@@ -4,7 +4,7 @@ main_gid: "1001"
 # weareinteractive.users
 users:
   - username: "moby"
-    name: Docker User 
+    name: Docker User
     group: "moby"
     uid: "{{ main_gid }}"
     groups: ["moby", "docker"]

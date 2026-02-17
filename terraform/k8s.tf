@@ -20,8 +20,8 @@ resource "proxmox_virtual_environment_vm" "k8s_master" {
   }
 
   cpu {
-    cores        = 2
-    type         = "x86-64-v2-AES"  # recommended for modern CPUs
+    cores = 2
+    type  = "x86-64-v2-AES" # recommended for modern CPUs
   }
 
   memory {

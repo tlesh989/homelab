@@ -7,12 +7,11 @@ This repository manages a Proxmox-based homelab using Ansible for configuration 
 **Infrastructure Components:**
 
 - **Proxmox hosts** (tika, bupu, sturm): Physical servers running VMs and LXC containers
-- **LXC containers**: unifi (controller), tailscale (subnet router), plex (media server), kaz (Docker host)
+- **LXC containers**: tailscale (subnet router), plex (media server), kaz (Docker host)
 - **VMs**: Kubernetes cluster nodes managed via Terraform
 
 **Key Services:**
 
-- Unifi Controller (network management)
 - Tailscale (zero-trust networking)
 - Plex Media Server
 - Docker containers on kaz host
@@ -38,7 +37,6 @@ task decrypt
 ```bash
 # Deploy to specific host groups
 task proxmox    # Proxmox hypervisor configuration
-task unifi      # Unifi controller setup
 task tailscale  # Tailscale subnet router
 task plex       # Plex media server
 
@@ -56,14 +54,14 @@ task proxmox -- --check
 
 **Ansible Patterns:**
 
-- All tasks must have descriptive `name:` fields (enforced by .cursorrules)
+- All tasks must have descriptive `name:` fields
 - Use `become: true` judiciously - review security implications
 - Group variables in `group_vars/` override defaults
 - Custom roles in `roles/` directory, Galaxy roles auto-installed
 
 **Terraform Patterns:**
 
-- Resources use snake_case naming (enforced by .cursorrules)
+- Resources use snake_case naming
 - All variables must have `description` fields
 - Resources should include `tags` for organization
 - State managed in Terraform Cloud workspace "homelab"
@@ -111,12 +109,11 @@ task proxmox -- --check
 1. Define host in `hosts` inventory
 2. Add host group in `main.yml` playbook
 3. Create group_vars file if needed
-4. Add roles from Ansible Galaxy or create custom roles
+4. Add roles and collections from Ansible Galaxy or create custom roles
 
 **Infrastructure Changes:**
 
 1. Modify Terraform files in `terraform/` directory
 2. Plan changes: `cd terraform && terraform plan`
 3. Apply: `terraform apply`
-4. Update Ansible inventory if new hosts added</content>
-   <parameter name="filePath">/Users/tommy/repos/tlesh989/homelab/.github/copilot-instructions.md
+4. Update Ansible inventory if new hosts added

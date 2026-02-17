@@ -1,6 +1,9 @@
 ---
 exclude_paths:
   - .github
+  - .ansibles
+  - galaxy_roles
+  - galaxy_collections
 
 skip_list:
   - "name[casing]"

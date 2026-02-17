@@ -24,7 +24,7 @@
   when: users | length > 0
 
 - name: Manage SSH authorized keys
-  ansible.builtin.authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.username }}"
     key: "{{ item.authorized_keys | join('\n') }}"
     state: present

@@ -1,4 +1,6 @@
 ---
+ansible_python_interpreter: auto_silent
+
 # weareinteractive.users
 users:
   - username: "{{ vault_username }}"
@@ -6,8 +8,8 @@ users:
     shell: /bin/bash
     users_group: "{{ vault_username }}"
     authorized_keys:
-      - "{{ lookup('file', '{{ my_home }}/.ssh/id_rsa.pub') }}"
-      - "{{ lookup('file', '{{ my_home }}/.ssh/id_rsa2022.pub') }}"
+      - "{{ lookup('file', my_home ~ '/.ssh/id_rsa.pub') }}"
+      - "{{ lookup('file', my_home ~ '/.ssh/id_rsa2022.pub') }}"
 
 # grog.package
 package_list:

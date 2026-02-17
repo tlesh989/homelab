@@ -17,6 +17,7 @@
     - role: grog.package
     - role: users
     - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: install_script
 
 - name: setup tailscale server
@@ -29,6 +30,7 @@
     - role: geerlingguy.security
     - role: grog.package
     - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: users
 
   tasks:

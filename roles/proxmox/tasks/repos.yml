@@ -34,8 +34,8 @@
     - name: Disable entries in /etc/apt/sources.list
       ansible.builtin.replace:
         path: /etc/apt/sources.list
-        regexp: '^(\s*deb )'
-        replace: '# Disabled by Ansible - \1'
+        regexp: "^(\\s*deb )"
+        replace: "# Disabled by Ansible - \\1"
       register: sources_list_disable
       when: sources_list_stat.stat.exists
 
@@ -63,7 +63,7 @@
           Suites: {{ ansible_facts.distribution_release }}-updates
           Components: main contrib
           Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-        mode: '0644'
+        mode: "0644"
 
     - name: Create proxmox.sources
       ansible.builtin.copy:
@@ -89,7 +89,7 @@
           Components: pve-test
           Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
           Enabled: {{ proxmox_pve_test | bool | lower }}
-        mode: '0644'
+        mode: "0644"
 
     - name: Create ceph.sources
       ansible.builtin.copy:
@@ -101,4 +101,4 @@
           Components: no-subscription
           Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
           Enabled: {{ proxmox_ceph_repo | bool | lower }}
-        mode: '0644'
+        mode: "0644"

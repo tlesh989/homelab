@@ -1,6 +1,6 @@
 # NOTE: Written for proxmox-telmate provider. Requires rewrite for bpg/proxmox.
 resource "proxmox_lxc" "plex_server" {
-  provider = proxmox-telmate
+  provider        = proxmox-telmate
   target_node     = "sturm"
   hostname        = "plex"
   ostemplate      = "nfs_proxmox:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
@@ -18,7 +18,7 @@ resource "proxmox_lxc" "plex_server" {
     mount = "nfs"
   }
 
-  // Terraform will crash without rootfs defined
+  # Terraform will crash without rootfs defined
   rootfs {
     storage = "local-lvm"
     size    = "100G"

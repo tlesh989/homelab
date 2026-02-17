@@ -58,13 +58,13 @@
     src: "{{ proxmoxlib_path }}"
     dest: "{{ proxmoxlib_path }}.bak"
     remote_src: true
-    mode: '644'
+    mode: "644"
 
 - name: Create robust nag removal script
   when: proxmox_remove_nag | bool
   ansible.builtin.copy:
     dest: /usr/local/bin/pve-remove-nag.sh
-    mode: '0755'
+    mode: "0755"
     content: |
       #!/bin/sh
       WEB_JS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
@@ -102,10 +102,10 @@
   ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/no-nag-script
     content: 'DPkg::Post-Invoke { "/usr/local/bin/pve-remove-nag.sh"; };'
-    mode: '0644'
+    mode: "0644"
 
 - name: Run nag removal script
-  when: 
+  when:
     - proxmox_remove_nag | bool
     - nag_script.changed
   ansible.builtin.command: /usr/local/bin/pve-remove-nag.sh
@@ -120,7 +120,7 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
       intel_pstate=disable nofb nomodeset video=efifb:off
@@ -136,7 +136,7 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
       kvm.ignore_msrs=1 kvm.report_ignored_msrs=0 nofb nomodeset video=efifb:off
@@ -185,7 +185,7 @@
       blacklist nvidiafb
       blacklist amdgpu
       blacklist radeon
-    mode: '0644'
+    mode: "0644"
   notify: Update initramfs
 
 - name: Configure modprobe for GPU passthrough
@@ -200,10 +200,15 @@
       softdep amdgpu pre: vfio-pci
       options kvm ignore_msrs=1
       options kvm report_ignored_msrs=0
-    mode: '0644'
+    mode: "0644"
   notify: Update initramfs
 
-- name: Disable High Availability services
+- name: Check for Proxmox Cluster configuration
+  ansible.builtin.stat:
+    path: /etc/pve/corosync.conf
+  register: proxmox_cluster_conf
+
+- name: Disable HA Manager services
   when: proxmox_disable_ha | bool
   ansible.builtin.systemd:
     name: "{{ item }}"
@@ -212,7 +217,16 @@
   loop:
     - pve-ha-lrm
     - pve-ha-crm
-    - corosync
+  ignore_errors: true
+
+- name: Disable corosync (Non-clustered nodes only)
+  when:
+    - proxmox_disable_ha | bool
+    - not proxmox_cluster_conf.stat.exists
+  ansible.builtin.systemd:
+    name: corosync
+    state: stopped
+    enabled: false
   ignore_errors: true
 
 - name: Enable High Availability services

@@ -1,4 +1,5 @@
-version: '3'
+---
+version: "3"
 
 vars:
   PLAYBOOK: main.yml
@@ -22,59 +23,47 @@ tasks:
   ansible:
     internal: true
     cmds:
-      - |
-        VAULT_ARG=""
-        if [ -f .vault_pass ]; then
-          VAULT_ARG="--vault-password-file .vault_pass"
-        else
-          VAULT_ARG="--ask-vault-pass"
-        fi
-        ansible-playbook -b {{.PLAYBOOK}} $VAULT_ARG --limit {{.LIMIT}} {{.CLI_ARGS}}
+      - ansible-playbook -b {{.PLAYBOOK}} --limit {{.LIMIT}} {{.CLI_ARGS}}
 
   reqs:
     desc: Install Ansible Galaxy requirements
     cmds:
-      - ansible-galaxy install -r requirements.yml --force-with-deps
+      - ansible-galaxy install -r requirements.yml --force-with-deps --ignore-errors
 
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
       - task: ansible
-        vars: { LIMIT: 'proxmox' }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
       - task: ansible
-        vars: { LIMIT: 'tailscale' }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
 
   plex:
     desc: Run Ansible playbook for Plex hosts
     cmds:
       - task: ansible
-        vars: { LIMIT: 'plex' }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts
     cmds:
-      - ansible all -m ping
+      - ansible all -m ping --ask-pass
 
   check:
     desc: Dry-run for all hosts
     cmds:
-      - |
-        VAULT_ARG=""
-        if [ -f .vault_pass ]; then
-          VAULT_ARG="--vault-password-file .vault_pass"
-        else
-          VAULT_ARG="--ask-vault-pass"
-        fi
-        ansible-playbook -b {{.PLAYBOOK}} $VAULT_ARG --check {{.CLI_ARGS}}
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--ask-pass --check {{.CLI_ARGS}}" }
 
   syntax:
     desc: Check playbook syntax
     cmds:
-      - ansible-playbook {{.PLAYBOOK}} --syntax-check
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--syntax-check" }
 
   lint:
     desc: Lint the project
@@ -98,10 +87,3 @@ tasks:
     cmds:
       - ansible-vault encrypt vars/vault.yml
       - ansible-vault encrypt .envrc --output envrc
-
-  gitinit:
-    desc: Initialize git hooks
-    cmds:
-      - ./scripts/git-init.sh
-      - echo "ansible vault pre-commit hook installed"
-      - echo "don't forget to create a .vault_pass"
