@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: tlesh989
   description: Run custom install scripts on Proxmox hosts

@@ -134,6 +134,7 @@ dmypy.json
 *.tfvars
 
 # Ansible
+.ansible
 galaxy_roles/
 
 

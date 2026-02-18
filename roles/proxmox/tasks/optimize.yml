@@ -58,14 +58,58 @@
     src: "{{ proxmoxlib_path }}"
     dest: "{{ proxmoxlib_path }}.bak"
     remote_src: true
-    mode: '644'
+    mode: "644"
 
-- name: Remove no valid sub popup
-  ansible.builtin.replace:
-    path: "{{ proxmoxlib_path }}"
-    regexp: >-
-      (^\s+)(Ext.Msg.show\(\{\s+title:\s+gettext\('No valid subscription)
-    replace: '\1void({ //\2'
+- name: Create robust nag removal script
+  when: proxmox_remove_nag | bool
+  ansible.builtin.copy:
+    dest: /usr/local/bin/pve-remove-nag.sh
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      WEB_JS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+      if [ -s "$WEB_JS" ] && ! grep -q NoMoreNagging "$WEB_JS"; then
+          echo "Patching Web UI nag..."
+          sed -i -e "/data\.status/ s/!//" -e "/data\.status/ s/active/NoMoreNagging/" "$WEB_JS"
+      fi
+
+      MOBILE_TPL=/usr/share/pve-yew-mobile-gui/index.html.tpl
+      MARKER="<!-- MANAGED BLOCK FOR MOBILE NAG -->"
+      if [ -f "$MOBILE_TPL" ] && ! grep -q "$MARKER" "$MOBILE_TPL"; then
+          echo "Patching Mobile UI nag..."
+          printf "%s\n" \
+            "$MARKER" \
+            "<script>" \
+            "  function removeSubscriptionElements() {" \
+            "    const dialogs = document.querySelectorAll('dialog.pwt-outer-dialog');" \
+            "    dialogs.forEach(dialog => {" \
+            "      const text = (dialog.textContent || '').toLowerCase();" \
+            "      if (text.includes('subscription')) {" \
+            "        dialog.remove();" \
+            "      }" \
+            "    });" \
+            "  }" \
+            "  const observer = new MutationObserver(removeSubscriptionElements);" \
+            "  observer.observe(document.body, { childList: true, subtree: true });" \
+            "  removeSubscriptionElements();" \
+            "  setTimeout(() => {observer.disconnect();}, 10000);" \
+            "</script>" >> "$MOBILE_TPL"
+      fi
+  register: nag_script
+
+- name: Configure APT Hook for nag removal
+  when: proxmox_remove_nag | bool
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/no-nag-script
+    content: 'DPkg::Post-Invoke { "/usr/local/bin/pve-remove-nag.sh"; };'
+    mode: "0644"
+
+- name: Run nag removal script
+  when:
+    - proxmox_remove_nag | bool
+    - nag_script.changed
+  ansible.builtin.command: /usr/local/bin/pve-remove-nag.sh
+  changed_when: true
   notify: Restart pveproxy
 
 - name: Enable IOMMU (Intel)
@@ -76,7 +120,7 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
       intel_pstate=disable nofb nomodeset video=efifb:off
@@ -92,7 +136,7 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT=.*$'
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
       kvm.ignore_msrs=1 kvm.report_ignored_msrs=0 nofb nomodeset video=efifb:off
@@ -117,26 +161,82 @@
   ansible.builtin.command: lspci -nn
   register: lspci_output
   changed_when: false
+  check_mode: false
 
-- name: Extract GPU vendor and device IDs
+- name: Extract GPU and Audio device IDs
   ansible.builtin.set_fact:
-    gpu_info: "{{ lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') }}"
+    gpu_devices_raw: "{{ lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
+    gpu_vga_id: "{{ lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+    gpu_audio_id: "{{ lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+  when: lspci_output.stdout is search('VGA')
 
-- name: Set GPU vendor and device IDs
+- name: Set combined VFIO IDs
   ansible.builtin.set_fact:
-    gpu_vendor_id: "{{ gpu_info[0] }}"
-    gpu_device_id: "{{ gpu_info[1] }}"
+    vfio_ids: "{{ [gpu_vga_id, gpu_audio_id] | select('defined') | select('ne', '') | join(',') }}"
+  when: gpu_vga_id is defined and gpu_vga_id != ""
+
+- name: Blacklist host GPU drivers
+  when: vfio_ids is defined and vfio_ids != ""
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/blacklist.conf
+    content: |
+      blacklist nouveau
+      blacklist nvidia
+      blacklist nvidiafb
+      blacklist amdgpu
+      blacklist radeon
+    mode: "0644"
+  notify: Update initramfs
 
 - name: Configure modprobe for GPU passthrough
+  when: vfio_ids is defined and vfio_ids != ""
   ansible.builtin.copy:
     dest: /etc/modprobe.d/vfio.conf
     content: |
-      options vfio-pci ids={{ gpu_vendor_id }}:{{ gpu_device_id }}
+      options vfio-pci ids={{ vfio_ids }} disable_vga=1
+      softdep nvidia pre: vfio-pci
+      softdep nouveau pre: vfio-pci
+      softdep radeon pre: vfio-pci
+      softdep amdgpu pre: vfio-pci
       options kvm ignore_msrs=1
       options kvm report_ignored_msrs=0
-    mode: '0644'
+    mode: "0644"
   notify: Update initramfs
 
-- name: Debug GPU IDs
-  ansible.builtin.debug:
-    msg: "Found GPU with vendor ID {{ gpu_vendor_id }} and device ID {{ gpu_device_id }}"
+- name: Check for Proxmox Cluster configuration
+  ansible.builtin.stat:
+    path: /etc/pve/corosync.conf
+  register: proxmox_cluster_conf
+
+- name: Disable HA Manager services
+  when: proxmox_disable_ha | bool
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - pve-ha-lrm
+    - pve-ha-crm
+  ignore_errors: true
+
+- name: Disable corosync (Non-clustered nodes only)
+  when:
+    - proxmox_disable_ha | bool
+    - not proxmox_cluster_conf.stat.exists
+  ansible.builtin.systemd:
+    name: corosync
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Enable High Availability services
+  when: not (proxmox_disable_ha | bool)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - pve-ha-lrm
+    - pve-ha-crm
+    - corosync
+  ignore_errors: true

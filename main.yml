@@ -13,10 +13,11 @@
     - vars/vault.yml
   roles:
     - role: proxmox
-    - role: buluma.bootstrap
+    - role: buluma.roles.bootstrap
     - role: grog.package
-    - role: weareinteractive.users
-    - role: artis3n.tailscale
+    - role: users
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: install_script
 
 - name: setup tailscale server
@@ -28,8 +29,9 @@
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: grog.package
-    - role: artis3n.tailscale
-    - role: weareinteractive.users
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: users
 
   tasks:
     - name: Install iptables-persistent
@@ -63,7 +65,7 @@
     - vars/vault.yml
   roles:
     - role: grog.package
-    - role: weareinteractive.users
+    - role: users
     - role: weareinteractive.environment
     - role: geerlingguy.ntp
     - role: geerlingguy.security
@@ -78,7 +80,7 @@
     - vars/vault.yml
   roles:
     - role: grog.package
-    - role: weareinteractive.users
+    - role: users
     - role: weareinteractive.environment
     - role: geerlingguy.ntp
     - role: geerlingguy.security

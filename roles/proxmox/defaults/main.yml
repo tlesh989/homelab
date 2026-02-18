@@ -1,0 +1,23 @@
+---
+# defaults file for proxmox
+
+# Repository Management
+proxmox_migrate_to_deb822: true
+proxmox_pve_no_subscription: true
+proxmox_pve_test: false
+proxmox_ceph_repo: true # Squid for PVE 9, Reef for PVE 8
+
+# Optimizations
+proxmox_remove_nag: true
+
+# High Availability (for single nodes)
+proxmox_disable_ha: true
+
+# Ceph Management
+proxmox_ceph_enabled: false
+
+# Hardware-Specific Optimizations
+proxmox_zfs_arc_limit: true
+proxmox_zfs_arc_max: 0 # 0 means automatic (2GB for <16GB RAM, 4GB for 32GB+)
+proxmox_enable_sriov: true # Intel iGPU SR-IOV (Experimental)
+proxmox_sysctl_optimizations: true

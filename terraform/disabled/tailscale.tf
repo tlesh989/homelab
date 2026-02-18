@@ -1,19 +1,19 @@
 # NOTE: Written for proxmox-telmate provider. Requires rewrite for bpg/proxmox.
 resource "proxmox_lxc" "tailscale" {
-  provider = proxmox-telmate
-  target_node     = "bupu"
-  hostname        = "tailscale"
+  provider    = proxmox-telmate
+  target_node = "bupu"
+  hostname    = "tailscale"
   # ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
   # password        = var.ssh_pass
-  cores           = 1
-  memory          = 2048
-  unprivileged    = false
-  onboot          = true
-  start           = true
-  tags            = "terraform"
+  cores        = 1
+  memory       = 2048
+  unprivileged = false
+  onboot       = true
+  start        = true
+  tags         = "terraform"
   # ssh_public_keys = file("~/.ssh/id_rsa.pub")
 
-  // Terraform will crash without rootfs defined
+  # Terraform will crash without rootfs defined
   rootfs {
     storage = "vm_data"
     size    = "10G"

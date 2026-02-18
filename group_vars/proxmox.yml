@@ -36,5 +36,6 @@ install_script_cron_weekday: "1"
 install_script_cron_job: "{{ install_script_dest }}"
 install_script_cron_enabled: true
 
-# proxmox 
+# proxmox
 proxmox_ceph_disabled: true
+proxmox_disable_ha: false

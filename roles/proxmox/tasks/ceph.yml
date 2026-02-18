@@ -9,6 +9,8 @@
     - ceph-mon.target
     - ceph-mgr.target
     - ceph-mds.target
+  register: ceph_stop_result
+  failed_when: false
 
 - name: Remove ceph config files
   ansible.builtin.file:

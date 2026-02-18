@@ -34,11 +34,13 @@ cd terraform && terraform apply
 ## Architecture
 
 **Hosts** (`hosts` inventory):
+
 - Proxmox hypervisors: tika (.7), bupu (.8), sturm (.9) on 192.168.233.x
 - LXC containers: unifi (.5), tailscale (.21), kaz (.10), plex (.11)
 - Kubernetes VMs provisioned via Terraform on Proxmox
 
 **Ansible structure**:
+
 - `main.yml` — master playbook with per-group play sections
 - `group_vars/` — variable hierarchy: `all.yml` (global) → `{group}.yml` (group-specific)
 - `vars/vault.yml` — encrypted secrets (Ansible Vault)
@@ -46,6 +48,7 @@ cd terraform && terraform apply
 - `requirements.yml` — Galaxy role dependencies (geerlingguy.*, artis3n.tailscale, etc.)
 
 **Terraform structure** (`terraform/`):
+
 - `versions.tf` — providers (bpg/proxmox 0.69.1), Terraform Cloud backend (tlesh-net/homelab)
 - `k8s.tf` — Kubernetes VM definitions
 - `disabled/` — parked/experimental infrastructure code
@@ -53,18 +56,21 @@ cd terraform && terraform apply
 ## Conventions
 
 **Ansible**:
+
 - All tasks must have `name:` fields
 - Use `loop` instead of `with_items` (deprecated)
 - Review `become: true` usage for security implications
 - Galaxy roles installed to `galaxy_roles/` (gitignored)
 
 **Terraform**:
+
 - snake_case for all resource, variable, data source, and output names
 - All variables must have `description` fields
 - Resources should include `tags`
 - Provider versions pinned in `versions.tf`
 
 **General**:
+
 - 2-space indentation (`.editorconfig`)
 - Max line length: 120 characters
 - Git pre-commit hook enforces vault encryption on `vars/vault.yml` and `envrc`
