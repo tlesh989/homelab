@@ -31,12 +31,12 @@
     cmd: >-
       grep -v {{ ansible_facts.distribution_release }}
         /etc/apt/sources.list.d/{{ proxmox_no_sub_repo }}.list
-  register: old_repos
+  register: proxmox_old_repos
   changed_when: false
   failed_when: false
 
 - name: Remove Proxmox VE no subscription repo for older distributions
-  loop: "{{ old_repos.stdout_lines }}"
+  loop: "{{ proxmox_old_repos.stdout_lines }}"
   ansible.builtin.apt_repository:
     filename: "{{ proxmox_no_sub_repo }}"
     repo: "{{ item }}"
@@ -44,19 +44,19 @@
 
 - name: Add proxmoxlib.js path to variable
   ansible.builtin.set_fact:
-    proxmoxlib_path: >-
+    proxmox_lib_path: >-
       /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
 
 - name: Check proxmoxlib.js.bak exists
   ansible.builtin.stat:
-    path: "{{ proxmoxlib_path }}.bak"
-  register: pmx_js_bak
+    path: "{{ proxmox_lib_path }}.bak"
+  register: proxmox_js_bak
 
 - name: Make backup from proxmoxlib.js
-  when: not pmx_js_bak.stat.exists
+  when: not proxmox_js_bak.stat.exists
   ansible.builtin.copy:
-    src: "{{ proxmoxlib_path }}"
-    dest: "{{ proxmoxlib_path }}.bak"
+    src: "{{ proxmox_lib_path }}"
+    dest: "{{ proxmox_lib_path }}.bak"
     remote_src: true
     mode: "644"
 
@@ -95,7 +95,7 @@
             "  setTimeout(() => {observer.disconnect();}, 10000);" \
             "</script>" >> "$MOBILE_TPL"
       fi
-  register: nag_script
+  register: proxmox_nag_script
 
 - name: Configure APT Hook for nag removal
   when: proxmox_remove_nag | bool
@@ -107,7 +107,7 @@
 - name: Run nag removal script
   when:
     - proxmox_remove_nag | bool
-    - nag_script.changed
+    - proxmox_nag_script.changed
   ansible.builtin.command: /usr/local/bin/pve-remove-nag.sh
   changed_when: true
   notify: Restart pveproxy
@@ -159,24 +159,24 @@
 
 - name: Get PCI devices information
   ansible.builtin.command: lspci -nn
-  register: lspci_output
+  register: proxmox_lspci_output
   changed_when: false
   check_mode: false
 
 - name: Extract GPU and Audio device IDs
   ansible.builtin.set_fact:
-    gpu_devices_raw: "{{ lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
-    gpu_vga_id: "{{ lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
-    gpu_audio_id: "{{ lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
-  when: lspci_output.stdout is search('VGA')
+    proxmox_gpu_devices_raw: "{{ proxmox_lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
+    proxmox_gpu_vga_id: "{{ proxmox_lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+    proxmox_gpu_audio_id: "{{ proxmox_lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+  when: proxmox_lspci_output.stdout is search('VGA')
 
 - name: Set combined VFIO IDs
   ansible.builtin.set_fact:
-    vfio_ids: "{{ [gpu_vga_id, gpu_audio_id] | select('defined') | select('ne', '') | join(',') }}"
-  when: gpu_vga_id is defined and gpu_vga_id != ""
+    proxmox_vfio_ids: "{{ [proxmox_gpu_vga_id, proxmox_gpu_audio_id] | select('defined') | select('ne', '') | join(',') }}"
+  when: proxmox_gpu_vga_id is defined and proxmox_gpu_vga_id != ""
 
 - name: Blacklist host GPU drivers
-  when: vfio_ids is defined and vfio_ids != ""
+  when: proxmox_vfio_ids is defined and proxmox_vfio_ids != ""
   ansible.builtin.copy:
     dest: /etc/modprobe.d/blacklist.conf
     content: |
@@ -189,11 +189,11 @@
   notify: Update initramfs
 
 - name: Configure modprobe for GPU passthrough
-  when: vfio_ids is defined and vfio_ids != ""
+  when: proxmox_vfio_ids is defined and proxmox_vfio_ids != ""
   ansible.builtin.copy:
     dest: /etc/modprobe.d/vfio.conf
     content: |
-      options vfio-pci ids={{ vfio_ids }} disable_vga=1
+      options vfio-pci ids={{ proxmox_vfio_ids }} disable_vga=1
       softdep nvidia pre: vfio-pci
       softdep nouveau pre: vfio-pci
       softdep radeon pre: vfio-pci
@@ -217,7 +217,7 @@
   loop:
     - pve-ha-lrm
     - pve-ha-crm
-  ignore_errors: true
+  failed_when: false
 
 - name: Disable corosync (Non-clustered nodes only)
   when:
@@ -227,7 +227,7 @@
     name: corosync
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
 
 - name: Enable High Availability services
   when: not (proxmox_disable_ha | bool)
@@ -239,4 +239,4 @@
     - pve-ha-lrm
     - pve-ha-crm
     - corosync
-  ignore_errors: true
+  failed_when: false

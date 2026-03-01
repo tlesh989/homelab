@@ -1,5 +1,5 @@
 ---
 # defaults file for users
-users: []
+users_list: []
 users_groups: []
 users_ssh_exclusive: false

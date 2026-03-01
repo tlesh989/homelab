@@ -1,8 +1,8 @@
 ---
 ansible_python_interpreter: auto_silent
 
-# weareinteractive.users
-users:
+# users role
+users_list:
   - username: "{{ vault_username }}"
     password: "{{ lookup('env', 'MKPASSWD_USER') }}"
     shell: /bin/bash
