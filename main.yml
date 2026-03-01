@@ -1,0 +1,88 @@
+---
+- name: initial setup
+  hosts: all
+  tasks:
+    - name: linux/macos find current user home directory
+      ansible.builtin.set_fact:
+        my_home: "{{ lookup('env', 'HOME') }}"
+
+- name: setup proxmox hosts
+  hosts: proxmox
+  become: true
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: proxmox
+    - role: buluma.roles.bootstrap
+    - role: grog.package
+    - role: users
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: install_script
+
+- name: setup tailscale server
+  hosts: tailscale
+  become: true
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: grog.package
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: users
+
+  tasks:
+    - name: Install iptables-persistent
+      ansible.builtin.apt:
+        name: iptables-persistent
+        state: present
+
+    - name: Enable IP forwarding
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        sysctl_set: true
+
+    - name: Allow IP masquerading
+      ansible.builtin.iptables:
+        table: nat
+        chain: POSTROUTING
+        jump: MASQUERADE
+      notify: Save iptables rules
+
+  handlers:
+    - name: Save iptables rules
+      ansible.builtin.command: netfilter-persistent save
+      changed_when: true
+
+- name: setup docker server
+  hosts: kaz
+  become: true
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: grog.package
+    - role: users
+    - role: weareinteractive.environment
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: geerlingguy.docker
+    - role: geerlingguy.pip
+    - role: shelleg.ansible_role_portainer
+
+- name: setup plex server
+  hosts: plex
+  become: true
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: grog.package
+    - role: users
+    - role: weareinteractive.environment
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: geerlingguy.pip
+    - role: joenyland.plexmediaserver

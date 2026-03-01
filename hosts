@@ -1,0 +1,32 @@
+[tika]
+tika.tlesh.xyz ansible_host=192.168.233.7
+
+[bupu]
+bupu.tlesh.xyz ansible_host=192.168.233.8
+
+[sturm]
+sturm.tlesh.xyz ansible_host=192.168.233.9
+
+[tailscale]
+tailscale.tlesh.xyz ansible_host=192.168.233.21
+
+[kaz]
+kaz.tlesh.xyz ansible_host=192.168.233.10
+
+[plex]
+plex.tlesh.xyz ansible_host=192.168.233.11
+
+[proxmox:children]
+tika
+bupu
+sturm
+
+[lxc:children]
+tailscale
+plex
+
+[proxmox:vars]
+ansible_ssh_user=root
+
+[lxc:vars]
+ansible_ssh_user=root

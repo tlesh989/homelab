@@ -1,0 +1,103 @@
+---
+# tasks file for hardware-specific optimizations
+- name: Install microcode updates
+  ansible.builtin.apt:
+    name: "{{ (ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0) | ternary('intel-microcode', 'amd64-microcode') }}"
+    state: present
+  when: ansible_facts.processor | list | intersect(['GenuineIntel', 'AuthenticAMD']) | length > 0
+  notify: Update initramfs
+
+- name: Set ZFS ARC Limit
+  when:
+    - proxmox_zfs_arc_limit | bool
+    - "'zfs' in ansible_facts.mounts | map(attribute='fstype') | list"
+  block:
+    - name: Calculate automatic ZFS ARC limit
+      ansible.builtin.set_fact:
+        zfs_arc_calculated_max: "{{ (ansible_facts.memtotal_mb >= 30000) | ternary(4294967296, 2147483648) }}"
+      when: proxmox_zfs_arc_max | int == 0
+
+    - name: Use manual ZFS ARC limit
+      ansible.builtin.set_fact:
+        zfs_arc_calculated_max: "{{ proxmox_zfs_arc_max }}"
+      when: proxmox_zfs_arc_max | int > 0
+
+    - name: Configure ZFS ARC max size
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/zfs.conf
+        content: "options zfs zfs_arc_max={{ zfs_arc_calculated_max }}\n"
+        mode: "0644"
+      notify: Update initramfs
+
+- name: Sysctl Optimizations
+  when: proxmox_sysctl_optimizations | bool
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_file: /etc/sysctl.d/99-proxmox-optimizations.conf
+  loop:
+    - { name: "vm.swappiness", value: "10" }
+    - { name: "fs.file-max", value: "524288" }
+    - { name: "net.core.somaxconn", value: "1024" }
+
+- name: Performance Governor for N100
+  when:
+    - ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0
+    - "'N100' in (ansible_facts.processor_vcpus_model | default(''))"
+  ansible.builtin.lineinfile:
+    path: /etc/default/cpufrequtils
+    line: 'GOVERNOR="performance"'
+    create: true
+    mode: "0644"
+  ignore_errors: true
+
+- name: Intel iGPU SR-IOV (Experimental)
+  when:
+    - proxmox_enable_sriov | bool
+    - ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0
+  block:
+    - name: Install SR-IOV dependencies
+      ansible.builtin.apt:
+        name:
+          - dkms
+          - git
+          - "proxmox-headers-{{ ansible_facts.kernel }}"
+        state: present
+
+    - name: Clone i915-sriov-dkms repository
+      ansible.builtin.git:
+        repo: https://github.com/strongtz/i915-sriov-dkms.git
+        dest: /usr/src/i915-sriov-dkms
+        version: master
+      register: sriov_repo
+
+    - name: Check if i915-sriov-dkms is already installed
+      ansible.builtin.shell: dkms status | grep i915-sriov-dkms
+      register: dkms_status
+      failed_when: false
+      changed_when: false
+
+    - name: Install i915-sriov-dkms driver
+      ansible.builtin.shell: |
+        dkms add .
+        dkms install -m i915-sriov-dkms -v $(cat VERSION)
+      args:
+        chdir: /usr/src/i915-sriov-dkms
+      when: dkms_status.rc != 0 or (sriov_repo.changed | default(false))
+      notify: Update initramfs
+
+    - name: Configure SR-IOV Kernel Parameters
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((?!.*i915\.enable_guc).*)"\s*$'
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 i915.enable_guc=3 i915.max_vfs=7"'
+        backrefs: true
+      notify: Update grub
+
+    - name: Load i915 module with SR-IOV support
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/i915.conf
+        content: "options i915 enable_guc=3 max_vfs=7\n"
+        mode: "0644"
+      notify: Update initramfs

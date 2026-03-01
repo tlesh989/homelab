@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: tlesh989
+  description: Run custom install scripts on Proxmox hosts
+  license: MIT
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+
+dependencies: []

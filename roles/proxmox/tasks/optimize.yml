@@ -1,0 +1,242 @@
+# https://github.com/dronenb/ansible-role-proxmox
+---
+# tasks file for proxmox
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Remove Proxmox enterprise repo from apt
+  loop:
+    - /etc/apt/sources.list.d/pve-enterprise.list
+    - /etc/apt/sources.list.d/pve-enterprise.list.dpkg-dist
+    - /etc/apt/sources.list.d/ceph.list
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+
+- name: Variabilize Proxmox no-sub repo
+  ansible.builtin.set_fact:
+    proxmox_no_sub_repo: pve-install-repo
+
+- name: Add Proxmox VE no subscription repo
+  ansible.builtin.apt_repository:
+    filename: "{{ proxmox_no_sub_repo }}"
+    repo: >-
+      deb http://download.proxmox.com/debian/pve
+        {{ ansible_facts.distribution_release }} pve-no-subscription
+    state: present
+
+- name: Find Proxmox VE no sub repos for older distributions
+  ansible.builtin.command:
+    cmd: >-
+      grep -v {{ ansible_facts.distribution_release }}
+        /etc/apt/sources.list.d/{{ proxmox_no_sub_repo }}.list
+  register: old_repos
+  changed_when: false
+  failed_when: false
+
+- name: Remove Proxmox VE no subscription repo for older distributions
+  loop: "{{ old_repos.stdout_lines }}"
+  ansible.builtin.apt_repository:
+    filename: "{{ proxmox_no_sub_repo }}"
+    repo: "{{ item }}"
+    state: absent
+
+- name: Add proxmoxlib.js path to variable
+  ansible.builtin.set_fact:
+    proxmoxlib_path: >-
+      /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+
+- name: Check proxmoxlib.js.bak exists
+  ansible.builtin.stat:
+    path: "{{ proxmoxlib_path }}.bak"
+  register: pmx_js_bak
+
+- name: Make backup from proxmoxlib.js
+  when: not pmx_js_bak.stat.exists
+  ansible.builtin.copy:
+    src: "{{ proxmoxlib_path }}"
+    dest: "{{ proxmoxlib_path }}.bak"
+    remote_src: true
+    mode: "644"
+
+- name: Create robust nag removal script
+  when: proxmox_remove_nag | bool
+  ansible.builtin.copy:
+    dest: /usr/local/bin/pve-remove-nag.sh
+    mode: "0755"
+    content: |
+      #!/bin/sh
+      WEB_JS=/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+      if [ -s "$WEB_JS" ] && ! grep -q NoMoreNagging "$WEB_JS"; then
+          echo "Patching Web UI nag..."
+          sed -i -e "/data\.status/ s/!//" -e "/data\.status/ s/active/NoMoreNagging/" "$WEB_JS"
+      fi
+
+      MOBILE_TPL=/usr/share/pve-yew-mobile-gui/index.html.tpl
+      MARKER="<!-- MANAGED BLOCK FOR MOBILE NAG -->"
+      if [ -f "$MOBILE_TPL" ] && ! grep -q "$MARKER" "$MOBILE_TPL"; then
+          echo "Patching Mobile UI nag..."
+          printf "%s\n" \
+            "$MARKER" \
+            "<script>" \
+            "  function removeSubscriptionElements() {" \
+            "    const dialogs = document.querySelectorAll('dialog.pwt-outer-dialog');" \
+            "    dialogs.forEach(dialog => {" \
+            "      const text = (dialog.textContent || '').toLowerCase();" \
+            "      if (text.includes('subscription')) {" \
+            "        dialog.remove();" \
+            "      }" \
+            "    });" \
+            "  }" \
+            "  const observer = new MutationObserver(removeSubscriptionElements);" \
+            "  observer.observe(document.body, { childList: true, subtree: true });" \
+            "  removeSubscriptionElements();" \
+            "  setTimeout(() => {observer.disconnect();}, 10000);" \
+            "</script>" >> "$MOBILE_TPL"
+      fi
+  register: nag_script
+
+- name: Configure APT Hook for nag removal
+  when: proxmox_remove_nag | bool
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/no-nag-script
+    content: 'DPkg::Post-Invoke { "/usr/local/bin/pve-remove-nag.sh"; };'
+    mode: "0644"
+
+- name: Run nag removal script
+  when:
+    - proxmox_remove_nag | bool
+    - nag_script.changed
+  ansible.builtin.command: /usr/local/bin/pve-remove-nag.sh
+  changed_when: true
+  notify: Restart pveproxy
+
+- name: Enable IOMMU (Intel)
+  when: >-
+    ansible_facts.processor |
+      list |
+      intersect(['GenuineIntel']) |
+      length > 0
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
+    line: >-
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
+      intel_pstate=disable nofb nomodeset video=efifb:off
+      systemd.unified_cgroup_hierarchy=1"
+    state: present
+  notify: Update grub
+
+- name: Enable IOMMU (AMD)
+  when: >-
+    ansible_facts.processor |
+      list |
+      intersect(['AuthenticAMD']) |
+      length > 0
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
+    line: >-
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
+      kvm.ignore_msrs=1 kvm.report_ignored_msrs=0 nofb nomodeset video=efifb:off
+      systemd.unified_cgroup_hierarchy=1"
+    state: present
+  notify: Update grub
+
+- name: Configure AMD CPU power states
+  when: >-
+    ansible_facts.processor |
+      list |
+      intersect(['AuthenticAMD']) |
+      length > 0
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    search_string: GRUB_CMDLINE_LINUX
+    line: 'GRUB_CMDLINE_LINUX="processor.max_cstate=1 amd_idle.max_cstate=1"'
+    state: present
+  notify: Update grub
+
+- name: Get PCI devices information
+  ansible.builtin.command: lspci -nn
+  register: lspci_output
+  changed_when: false
+  check_mode: false
+
+- name: Extract GPU and Audio device IDs
+  ansible.builtin.set_fact:
+    gpu_devices_raw: "{{ lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
+    gpu_vga_id: "{{ lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+    gpu_audio_id: "{{ lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+  when: lspci_output.stdout is search('VGA')
+
+- name: Set combined VFIO IDs
+  ansible.builtin.set_fact:
+    vfio_ids: "{{ [gpu_vga_id, gpu_audio_id] | select('defined') | select('ne', '') | join(',') }}"
+  when: gpu_vga_id is defined and gpu_vga_id != ""
+
+- name: Blacklist host GPU drivers
+  when: vfio_ids is defined and vfio_ids != ""
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/blacklist.conf
+    content: |
+      blacklist nouveau
+      blacklist nvidia
+      blacklist nvidiafb
+      blacklist amdgpu
+      blacklist radeon
+    mode: "0644"
+  notify: Update initramfs
+
+- name: Configure modprobe for GPU passthrough
+  when: vfio_ids is defined and vfio_ids != ""
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/vfio.conf
+    content: |
+      options vfio-pci ids={{ vfio_ids }} disable_vga=1
+      softdep nvidia pre: vfio-pci
+      softdep nouveau pre: vfio-pci
+      softdep radeon pre: vfio-pci
+      softdep amdgpu pre: vfio-pci
+      options kvm ignore_msrs=1
+      options kvm report_ignored_msrs=0
+    mode: "0644"
+  notify: Update initramfs
+
+- name: Check for Proxmox Cluster configuration
+  ansible.builtin.stat:
+    path: /etc/pve/corosync.conf
+  register: proxmox_cluster_conf
+
+- name: Disable HA Manager services
+  when: proxmox_disable_ha | bool
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - pve-ha-lrm
+    - pve-ha-crm
+  ignore_errors: true
+
+- name: Disable corosync (Non-clustered nodes only)
+  when:
+    - proxmox_disable_ha | bool
+    - not proxmox_cluster_conf.stat.exists
+  ansible.builtin.systemd:
+    name: corosync
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Enable High Availability services
+  when: not (proxmox_disable_ha | bool)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - pve-ha-lrm
+    - pve-ha-crm
+    - corosync
+  ignore_errors: true

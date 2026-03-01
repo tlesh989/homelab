@@ -1,0 +1,22 @@
+---
+- name: Manage Proxmox Repositories
+  ansible.builtin.include_tasks: repos.yml
+
+- name: Optimize Proxmox VE
+  ansible.builtin.include_tasks: optimize.yml
+
+- name: Hardware-Specific Optimizations
+  ansible.builtin.include_tasks: hardware.yml
+
+- name: Check ceph status
+  ansible.builtin.shell: pveceph status 2>&1 | grep -v "not initialized"
+  register: pveceph_status
+  ignore_errors: true
+  changed_when: false
+
+- name: Disable Ceph
+  ansible.builtin.include_tasks: ceph.yml
+  when:
+    - proxmox_ceph_disabled is true
+    - pveceph_status.rc == 0
+    - "'binary not installed' not in pveceph_status.stdout"

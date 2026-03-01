@@ -1,0 +1,15 @@
+---
+# handlers file for proxmox
+- name: Restart pveproxy
+  ansible.builtin.service:
+    name: pveproxy
+    state: restarted
+
+- name: Update grub
+  ansible.builtin.command:
+    cmd: /usr/sbin/update-grub
+  changed_when: true
+
+- name: Update initramfs
+  ansible.builtin.command: update-initramfs -u
+  changed_when: true

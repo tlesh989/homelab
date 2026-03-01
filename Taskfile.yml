@@ -1,0 +1,89 @@
+---
+version: "3"
+
+vars:
+  PLAYBOOK: main.yml
+
+tasks:
+  default:
+    desc: List all available tasks
+    silent: true
+    cmds:
+      - task --list-all
+      - |
+        echo ""
+        echo "-------------------------------------------------------"
+        echo " Usage Hints:"
+        echo "  - Pass extra args:  task <target> -- --check"
+        echo "  - Limit hosts:      task <target> -- --limit <host>"
+        echo "  - Debug output:     task <target> -- -vvv"
+        echo "-------------------------------------------------------"
+
+  # Internal helper for running playbooks
+  ansible:
+    internal: true
+    cmds:
+      - ansible-playbook -b {{.PLAYBOOK}} --limit {{.LIMIT}} {{.CLI_ARGS}}
+
+  reqs:
+    desc: Install Ansible Galaxy requirements
+    cmds:
+      - ansible-galaxy install -r requirements.yml --force-with-deps --ignore-errors
+
+  proxmox:
+    desc: Run Ansible playbook for Proxmox hosts
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+
+  tailscale:
+    desc: Run Ansible playbook for Tailscale hosts
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+
+  plex:
+    desc: Run Ansible playbook for Plex hosts
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+
+  ping:
+    desc: Test connectivity to all hosts
+    cmds:
+      - ansible all -m ping --ask-pass
+
+  check:
+    desc: Dry-run for all hosts
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--ask-pass --check {{.CLI_ARGS}}" }
+
+  syntax:
+    desc: Check playbook syntax
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--syntax-check" }
+
+  lint:
+    desc: Lint the project
+    cmds:
+      - ansible-lint .
+
+  vault_pass:
+    desc: Read vault password from 1Password
+    cmds:
+      - op read op://CLI/HOMELAB_VAULT_PASS/password > .vault_pass
+      - chmod 600 .vault_pass
+
+  decrypt:
+    desc: Decrypt vault files
+    cmds:
+      - ansible-vault decrypt vars/vault.yml
+      - ansible-vault decrypt envrc --output .envrc
+
+  encrypt:
+    desc: Encrypt vault files
+    cmds:
+      - ansible-vault encrypt vars/vault.yml
+      - ansible-vault encrypt .envrc --output envrc
