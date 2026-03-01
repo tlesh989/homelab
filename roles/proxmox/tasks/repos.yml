@@ -1,13 +1,13 @@
 ---
 - name: Detect Proxmox VE version
   ansible.builtin.command: pveversion
-  register: pve_version_raw
+  register: proxmox_pve_version_raw
   changed_when: false
   check_mode: false
 
 - name: Set Proxmox version facts
   ansible.builtin.set_fact:
-    pve_major_version: "{{ (pve_version_raw.stdout | regex_search('pve-manager/(\\d+)', '\\1'))[0] | default('9') }}"
+    proxmox_pve_major_version: "{{ (proxmox_pve_version_raw.stdout | regex_search('pve-manager/(\\d+)', '\\1'))[0] | default('9') }}"
 
 - name: Disable legacy sources (.list)
   when: proxmox_migrate_to_deb822 | bool
@@ -16,28 +16,28 @@
       ansible.builtin.find:
         paths: /etc/apt/sources.list.d/
         patterns: "*.list"
-      register: legacy_list_files
+      register: proxmox_legacy_list_files
 
     - name: Rename legacy .list files to .bak
       ansible.builtin.command:
         cmd: "mv {{ item.path }} {{ item.path }}.bak"
         creates: "{{ item.path }}.bak"
         removes: "{{ item.path }}"
-      loop: "{{ legacy_list_files.files }}"
-      when: legacy_list_files.matched > 0
+      loop: "{{ proxmox_legacy_list_files.files }}"
+      when: proxmox_legacy_list_files.matched > 0
 
     - name: Check if /etc/apt/sources.list exists
       ansible.builtin.stat:
         path: /etc/apt/sources.list
-      register: sources_list_stat
+      register: proxmox_sources_list_stat
 
     - name: Disable entries in /etc/apt/sources.list
       ansible.builtin.replace:
         path: /etc/apt/sources.list
         regexp: "^(\\s*deb )"
         replace: "# Disabled by Ansible - \\1"
-      register: sources_list_disable
-      when: sources_list_stat.stat.exists
+      register: proxmox_sources_list_disable
+      when: proxmox_sources_list_stat.stat.exists
 
 - name: Configure deb822 sources
   when: proxmox_migrate_to_deb822 | bool
@@ -96,7 +96,7 @@
         dest: /etc/apt/sources.list.d/ceph.sources
         content: |
           Types: deb
-          URIs: http://download.proxmox.com/debian/ceph-{{ (pve_major_version == '9') | ternary('squid', 'reef') }}
+          URIs: http://download.proxmox.com/debian/ceph-{{ (proxmox_pve_major_version == '9') | ternary('squid', 'reef') }}
           Suites: {{ ansible_facts.distribution_release }}
           Components: no-subscription
           Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg

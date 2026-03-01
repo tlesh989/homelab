@@ -20,8 +20,8 @@
     # Password must be pre-hashed (e.g., SHA-512) using mkpasswd or python -c 'import crypt; ...'
     password: "{{ item.password | default(omit) }}"
     state: present
-  loop: "{{ users }}"
-  when: users | length > 0
+  loop: "{{ users_list }}"
+  when: users_list | length > 0
 
 - name: Manage SSH authorized keys
   ansible.posix.authorized_key:
@@ -29,8 +29,8 @@
     key: "{{ item.authorized_keys | join('\n') }}"
     state: present
     exclusive: "{{ users_ssh_exclusive | default(false) }}"
-  loop: "{{ users }}"
+  loop: "{{ users_list }}"
   when:
-    - users | length > 0
+    - users_list | length > 0
     - item.authorized_keys is defined
     - item.authorized_keys | length > 0

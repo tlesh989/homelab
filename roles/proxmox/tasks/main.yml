@@ -9,14 +9,16 @@
   ansible.builtin.include_tasks: hardware.yml
 
 - name: Check ceph status
-  ansible.builtin.shell: pveceph status 2>&1 | grep -v "not initialized"
-  register: pveceph_status
-  ignore_errors: true
+  ansible.builtin.shell:
+    cmd: set -o pipefail && pveceph status 2>&1 | grep -v "not initialized"
+    executable: /bin/bash
+  register: proxmox_pveceph_status
+  failed_when: false
   changed_when: false
 
 - name: Disable Ceph
   ansible.builtin.include_tasks: ceph.yml
   when:
     - proxmox_ceph_disabled is true
-    - pveceph_status.rc == 0
-    - "'binary not installed' not in pveceph_status.stdout"
+    - proxmox_pveceph_status.rc == 0
+    - "'binary not installed' not in proxmox_pveceph_status.stdout"
