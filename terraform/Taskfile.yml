@@ -16,10 +16,11 @@ tasks:
     desc: Format, validate, and plan Terraform changes
     cmds:
       - terraform fmt .
-      - terraform validate .
-      - doppler run --name-transformer tf-var -- terraform plan
+      - terraform validate
+      - terraform plan --out=tfplan
 
   apply:
     desc: Apply Terraform changes
     cmds:
-      - terraform apply -auto-approve
+      - terraform apply tfplan
+      - rm tfplan
