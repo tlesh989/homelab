@@ -34,6 +34,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [proxmox_virtual_environment_container.glance](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |

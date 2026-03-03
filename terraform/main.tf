@@ -169,6 +169,56 @@ resource "proxmox_virtual_environment_container" "tailscale" {
   ]
 }
 
+resource "proxmox_virtual_environment_container" "glance" {
+  node_name    = "bupu"
+  vm_id        = 104
+  unprivileged = true
+
+  disk {
+    datastore_id = "vm_data"
+    size         = 2
+  }
+
+  initialization {
+    hostname = "glance"
+
+    ip_config {
+      ipv4 {
+        address = "192.168.233.22/24"
+        gateway = "192.168.233.1"
+      }
+    }
+  }
+
+  memory {
+    dedicated = 512
+    swap      = 0
+  }
+
+  network_interface {
+    bridge      = "vmbr0"
+    enabled     = true
+    firewall    = true
+    mac_address = "BC:24:11:A2:3C:44"
+    name        = "eth0"
+  }
+
+  operating_system {
+    template_file_id = proxmox_virtual_environment_download_file.ubuntu_22_04_template.id
+    type             = "ubuntu"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      operating_system[0].template_file_id,
+    ]
+  }
+
+  tags = [
+    "terraform",
+  ]
+}
+
 resource "proxmox_virtual_environment_vm" "ubuntu_cloud" {
   node_name = "bupu"
   vm_id     = 901
