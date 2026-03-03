@@ -86,3 +86,15 @@
     - role: geerlingguy.security
     - role: geerlingguy.pip
     - role: joenyland.plexmediaserver
+
+- name: setup glance server
+  hosts: glance
+  become: true
+  vars_files:
+    - vars/vault.yml
+  roles:
+    - role: grog.package
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: users
+    - role: glance
