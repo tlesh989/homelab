@@ -15,7 +15,7 @@ tasks:
   ci:
     desc: Run init, fmt, and validate (CI)
     cmds:
-      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }} terraform init -backend=false'
+      - terraform init -backend=false
       - terraform fmt -check -recursive
       - terraform validate
 
