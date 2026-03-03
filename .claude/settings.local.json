@@ -19,7 +19,8 @@
       "Bash(ansible-lint .:*)",
       "Bash(ansible-lint:*)",
       "Bash(task:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(markdownlint:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
