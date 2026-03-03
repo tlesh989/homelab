@@ -176,7 +176,7 @@ resource "proxmox_virtual_environment_container" "glance" {
 
   disk {
     datastore_id = "vm_data"
-    size         = 2
+    size         = 8
   }
 
   initialization {
