@@ -16,6 +16,9 @@ kaz.tlesh.xyz ansible_host=192.168.233.10
 [plex]
 plex.tlesh.xyz ansible_host=192.168.233.11
 
+[glance]
+glance.tlesh.xyz ansible_host=192.168.233.22
+
 [proxmox:children]
 tika
 bupu
@@ -24,6 +27,7 @@ sturm
 [lxc:children]
 tailscale
 plex
+glance
 
 [proxmox:vars]
 ansible_ssh_user=root

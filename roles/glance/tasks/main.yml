@@ -1,0 +1,82 @@
+---
+# roles/glance/tasks/main.yml
+
+- name: Get latest Glance release info from GitHub
+  ansible.builtin.uri:
+    url: >-
+      {{ 'https://api.github.com/repos/glanceapp/glance/releases/latest'
+         if glance_version == 'latest'
+         else 'https://api.github.com/repos/glanceapp/glance/releases/tags/' + glance_version }}
+    return_content: true
+  register: glance_release
+
+- name: Assert Glance asset was found in release
+  ansible.builtin.assert:
+    that: >-
+      glance_release.json.assets
+      | selectattr('name', 'equalto', 'glance-linux-amd64.tar.gz')
+      | list | length > 0
+    fail_msg: >-
+      Could not find glance-linux-amd64.tar.gz in release
+      {{ glance_release.json.tag_name }}. Check the GitHub release assets.
+
+- name: Set Glance download URL and target version
+  ansible.builtin.set_fact:
+    glance_download_url: >-
+      {{ glance_release.json.assets
+         | selectattr('name', 'equalto', 'glance-linux-amd64.tar.gz')
+         | map(attribute='browser_download_url')
+         | first }}
+    glance_target_version: "{{ glance_release.json.tag_name }}"
+
+- name: Read currently installed Glance version
+  ansible.builtin.slurp:
+    src: "{{ glance_install_dir }}/.version"
+  register: glance_installed_version
+  ignore_errors: true
+
+- name: Create Glance install directory
+  ansible.builtin.file:
+    path: "{{ glance_install_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Download and extract Glance binary
+  ansible.builtin.unarchive:
+    src: "{{ glance_download_url }}"
+    dest: "{{ glance_install_dir }}"
+    remote_src: true
+  when: >-
+    glance_installed_version is failed or
+    (glance_installed_version.content | b64decode | trim) != glance_target_version
+  notify: Restart glance
+
+- name: Write installed version marker
+  ansible.builtin.copy:
+    content: "{{ glance_target_version }}"
+    dest: "{{ glance_install_dir }}/.version"
+    mode: "0644"
+  when: >-
+    glance_installed_version is failed or
+    (glance_installed_version.content | b64decode | trim) != glance_target_version
+
+- name: Template Glance config
+  ansible.builtin.template:
+    src: glance.yml.j2
+    dest: "{{ glance_install_dir }}/glance.yml"
+    mode: "0644"
+  notify: Restart glance
+
+- name: Template Glance systemd service
+  ansible.builtin.template:
+    src: glance.service.j2
+    dest: /etc/systemd/system/glance.service
+    mode: "0644"
+  notify: Restart glance
+
+- name: Enable and start Glance service
+  ansible.builtin.systemd:
+    name: glance
+    state: started
+    enabled: true
+    daemon_reload: true

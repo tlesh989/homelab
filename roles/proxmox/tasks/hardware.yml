@@ -14,18 +14,18 @@
   block:
     - name: Calculate automatic ZFS ARC limit
       ansible.builtin.set_fact:
-        zfs_arc_calculated_max: "{{ (ansible_facts.memtotal_mb >= 30000) | ternary(4294967296, 2147483648) }}"
+        proxmox_zfs_arc_calculated_max: "{{ (ansible_facts.memtotal_mb >= 30000) | ternary(4294967296, 2147483648) }}"
       when: proxmox_zfs_arc_max | int == 0
 
     - name: Use manual ZFS ARC limit
       ansible.builtin.set_fact:
-        zfs_arc_calculated_max: "{{ proxmox_zfs_arc_max }}"
+        proxmox_zfs_arc_calculated_max: "{{ proxmox_zfs_arc_max }}"
       when: proxmox_zfs_arc_max | int > 0
 
     - name: Configure ZFS ARC max size
       ansible.builtin.copy:
         dest: /etc/modprobe.d/zfs.conf
-        content: "options zfs zfs_arc_max={{ zfs_arc_calculated_max }}\n"
+        content: "options zfs zfs_arc_max={{ proxmox_zfs_arc_calculated_max }}\n"
         mode: "0644"
       notify: Update initramfs
 
@@ -50,7 +50,7 @@
     line: 'GOVERNOR="performance"'
     create: true
     mode: "0644"
-  ignore_errors: true
+  failed_when: false
 
 - name: Intel iGPU SR-IOV (Experimental)
   when:
@@ -70,11 +70,13 @@
         repo: https://github.com/strongtz/i915-sriov-dkms.git
         dest: /usr/src/i915-sriov-dkms
         version: master
-      register: sriov_repo
+      register: proxmox_sriov_repo
 
     - name: Check if i915-sriov-dkms is already installed
-      ansible.builtin.shell: dkms status | grep i915-sriov-dkms
-      register: dkms_status
+      ansible.builtin.shell:
+        cmd: set -o pipefail && dkms status | grep i915-sriov-dkms
+        executable: /bin/bash
+      register: proxmox_dkms_status
       failed_when: false
       changed_when: false
 
@@ -84,7 +86,8 @@
         dkms install -m i915-sriov-dkms -v $(cat VERSION)
       args:
         chdir: /usr/src/i915-sriov-dkms
-      when: dkms_status.rc != 0 or (sriov_repo.changed | default(false))
+      when: proxmox_dkms_status.rc != 0 or (proxmox_sriov_repo.changed | default(false))
+      changed_when: true
       notify: Update initramfs
 
     - name: Configure SR-IOV Kernel Parameters

@@ -1,0 +1,11 @@
+[Unit]
+Description=Glance Dashboard
+After=network.target
+
+[Service]
+ExecStart={{ glance_install_dir }}/glance --config {{ glance_install_dir }}/glance.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,8 @@
 ---
 main_gid: "1001"
 
-# weareinteractive.users
-users:
+# users role
+users_list:
   - username: "moby"
     name: Docker User
     group: "moby"

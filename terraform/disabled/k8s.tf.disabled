@@ -50,8 +50,6 @@ resource "proxmox_virtual_environment_vm" "k8s_master" {
       password = random_password.ubuntu_vm_password.result
       username = "ubuntu"
     }
-
-    user_data_file_id = proxmox_virtual_environment_file.cloud_config.id
   }
 
   network_device {

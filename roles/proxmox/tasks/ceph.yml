@@ -9,7 +9,7 @@
     - ceph-mon.target
     - ceph-mgr.target
     - ceph-mds.target
-  register: ceph_stop_result
+  register: proxmox_ceph_stop_result
   failed_when: false
 
 - name: Remove ceph config files
@@ -23,8 +23,8 @@
 
 - name: Purge Ceph settings and services
   ansible.builtin.command: pveceph purge
-  register: purge_result
-  changed_when: purge_result.rc == 0
+  register: proxmox_purge_result
+  changed_when: proxmox_purge_result.rc == 0
 
 - name: Clean up Ceph packages
   ansible.builtin.package:
