@@ -63,7 +63,7 @@ cd terraform && task apply  # Apply changes
 Skills (invoke with `/skill-name`):
 
 - `/deploy <target>` — safe two-step deploy: dry-run first, apply only on confirmation. Targets: `proxmox`, `tailscale`, `plex`, `glance`
-- `/pr [message]` — commit, push, and open a PR against `dev` in one shot
+- `/ship [message]` — commit, push, and open a PR against `dev` in one shot
 
 Hooks (auto-run on file edits via `.claude/settings.json`):
 
