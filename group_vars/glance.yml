@@ -1,0 +1,3 @@
+---
+# Glance LXC container
+# Inherits base package list and NTP config from group_vars/lxc.yml
