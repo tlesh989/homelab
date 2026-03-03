@@ -48,6 +48,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
 
+  glance:
+    desc: Run Ansible playbook for Glance host
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+
   ping:
     desc: Test connectivity to all hosts
     cmds:
