@@ -1,0 +1,26 @@
+---
+version: "3"
+
+tasks:
+  default:
+    desc: Run formatting, validation, and plan
+    cmds:
+      - task: test
+
+  init:
+    desc: Initialize Terraform
+    cmds:
+      - terraform init
+
+  test:
+    desc: Format, validate, and plan Terraform changes
+    cmds:
+      - terraform fmt .
+      - terraform validate
+      - terraform plan --out=tfplan
+
+  apply:
+    desc: Apply Terraform changes
+    cmds:
+      - terraform apply tfplan
+      - rm tfplan
