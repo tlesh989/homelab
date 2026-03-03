@@ -3,9 +3,16 @@ fail_fast: false
 minimum_pre_commit_version: "4.1.0"
 
 repos:
+  - repo: https://github.com/pre-commit/sync-pre-commit-deps
+    rev: v0.0.3
+    hooks:
+      - id: sync-pre-commit-deps
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      - id: no-commit-to-branch
+        args: ["--branch", "main"]
       - id: check-added-large-files
         args: ["--maxkb=500"]
       - id: check-case-conflict
@@ -49,7 +56,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v26.1.1
+    rev: v26.2.0
     hooks:
       - id: ansible-lint
         args:
@@ -57,7 +64,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
         args:
@@ -65,18 +72,25 @@ repos:
         files: \.(md|markdown)$
         stages: [pre-commit]
 
-  - repo: local
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
     hooks:
-      - id: check-ansible-vault
-        name: Check Ansible Vault Encryption
-        entry: |
-          bash -c 'for file in "$@"; do
-            if ! grep -q "\$ANSIBLE_VAULT;" "$file"; then
-              echo "ERROR: $file is not encrypted! Run \"task encrypt\" and try again."
-              exit 1
-            fi
-          done' --
-        language: system
-        files: ^(vars/vault\.yml|envrc)$
-        pass_filenames: true
-        stages: [pre-push]
+      - id: codespell
+        stages: [pre-commit]
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.44.0
+    hooks:
+      - id: typos
+        stages: [pre-commit]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        stages: [pre-commit]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.11
+    hooks:
+      - id: actionlint

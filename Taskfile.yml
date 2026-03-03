@@ -24,7 +24,7 @@ tasks:
   ansible:
     internal: true
     cmds:
-      - ansible-playbook -b {{.PLAYBOOK}} --limit {{.LIMIT}} {{.CLI_ARGS}}
+      - doppler run -- ansible-playbook -b {{.PLAYBOOK}} --limit {{.LIMIT}} {{.CLI_ARGS}}
 
   reqs:
     desc: Install Ansible Galaxy requirements
@@ -76,21 +76,3 @@ tasks:
     desc: Lint the project
     cmds:
       - ansible-lint .
-
-  vault_pass:
-    desc: Read vault password from Doppler
-    cmds:
-      - doppler secrets get ANSIBLE_VAULT --plain > .vault_pass
-      - chmod 600 .vault_pass
-
-  decrypt:
-    desc: Decrypt vault files
-    cmds:
-      - ansible-vault decrypt vars/vault.yml
-      - ansible-vault decrypt envrc --output .envrc
-
-  encrypt:
-    desc: Encrypt vault files
-    cmds:
-      - ansible-vault encrypt vars/vault.yml
-      - ansible-vault encrypt .envrc --output envrc

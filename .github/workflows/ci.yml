@@ -2,38 +2,40 @@ name: CI Source of Truth
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
   validate:
-    name: Validate and Protect
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.14'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible ansible-lint pre-commit
-
       - name: Install Task
         uses: go-task/setup-task@v1
         with:
-          version: 3.x
+          version: latest
 
-      - name: Ansible Syntax Check
-        run: task syntax
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: latest
+
+      - name: Terraform Provider Cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v3
 
       - name: Terraform Validate
-        run: terraform -chdir=terraform init -backend=false && terraform -chdir=terraform validate
-
-      - name: Enforce Ansible Vault Protection
-        run: pre-commit run check-ansible-vault --all-files
+        working-directory: ./terraform
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+        run: task ci

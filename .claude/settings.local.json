@@ -12,7 +12,14 @@
       "Bash(terraform init:*)",
       "Bash(terraform validate:*)",
       "Bash(terraform plan:*)",
-      "Bash(terraform fmt:*)"
+      "Bash(terraform fmt:*)",
+      "WebFetch(domain:community-scripts.github.io)",
+      "Bash(git:*)",
+      "Bash(ansible-playbook:*)",
+      "Bash(ansible-lint .:*)",
+      "Bash(ansible-lint:*)",
+      "Bash(task:*)",
+      "Bash(gh pr:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
