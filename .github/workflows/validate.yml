@@ -1,4 +1,4 @@
-name: CI Source of Truth
+name: validate
 
 on:
   push:
@@ -33,11 +33,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-terraform-
 
-      - name: Install Doppler CLI
-        uses: dopplerhq/cli-action@v3
-
       - name: Terraform Validate
         working-directory: ./terraform
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
         run: task ci
