@@ -1,24 +1,13 @@
 ---
 name: vault
-description: "Safely decrypt, edit, and re-encrypt Ansible Vault files"
+description: "DEPRECATED: Ansible Vault and 1Password have been decommissioned. All secrets are now managed via Doppler."
 user-invocable: true
 ---
 
-# Vault Skill
+# Vault Skill — DEPRECATED
 
-Safely work with encrypted Ansible Vault files. Ensures files are always re-encrypted before finishing.
+Ansible Vault and 1Password CLI integration have been decommissioned.
 
-## Steps
+All secrets are now managed via **Doppler**. The `task` commands automatically inject secrets via `doppler run`.
 
-1. Run `task vault_pass` to ensure `.vault_pass` exists (fetches from 1Password)
-2. Run `task decrypt` to decrypt `vars/vault.yml` and `.envrc`
-3. Make the requested edits to `vars/vault.yml` or `.envrc`
-4. Run `task encrypt` to re-encrypt both files
-5. Verify encryption: `head -1 vars/vault.yml` should show `$ANSIBLE_VAULT;`
-
-## Rules
-
-- NEVER leave vault files decrypted — always re-encrypt before finishing
-- NEVER commit decrypted vault files
-- If any step fails, attempt to re-encrypt before reporting the error
-- The PreToolUse hook blocks direct edits to these files — you MUST use `task decrypt` first and `task encrypt` after
+**To delete this skill:** `rm -rf .claude/skills/vault`

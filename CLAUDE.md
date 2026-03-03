@@ -21,6 +21,7 @@ task reqs                   # Install Ansible Galaxy dependencies
 task proxmox                # Proxmox hypervisors
 task tailscale              # Tailscale subnet router
 task plex                   # Plex media server
+task glance                 # Glance dashboard
 
 # Dry-run / validation
 task check                  # Dry-run check mode for ALL hosts
@@ -55,3 +56,15 @@ cd terraform && task apply  # Apply changes
   - Uses Doppler CLI to run `task syntax`.
   - Terraform `init` and `validate`.
 - **`tailscale.yml`**: Syncs Tailscale ACLs.
+- Branch model: `dev` → `main`
+
+## Claude Code
+
+Skills (invoke with `/skill-name`):
+
+- `/deploy <target>` — safe two-step deploy: dry-run first, apply only on confirmation. Targets: `proxmox`, `tailscale`, `plex`, `glance`
+
+Hooks (auto-run on file edits via `.claude/settings.json`):
+
+- Blocks direct edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`
+- Runs yamllint on all YAML edits

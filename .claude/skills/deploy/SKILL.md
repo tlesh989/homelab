@@ -14,7 +14,7 @@ Run a safe two-step deploy: dry-run first, then apply only if the user confirms.
 
 ## Steps
 
-1. Validate that `{{target}}` is one of: proxmox, tailscale, plex, kaz
+1. Validate that `{{target}}` is one of: proxmox, tailscale, plex, glance
 2. Run `task {{target}} -- --check` to perform a dry-run
 3. Show the user the output and ask for explicit confirmation before proceeding
 4. Only if the user confirms, run `task {{target}}` to apply
