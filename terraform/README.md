@@ -18,12 +18,14 @@ pveum aclmod / -user terraform-prov@pve -role TerraformProv
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~>1.14.0 |
+| <a name="requirement_doppler"></a> [doppler](#requirement\_doppler) | 1.21.1 |
 | <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox) | 0.97.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
+| <a name="provider_doppler"></a> [doppler](#provider\_doppler) | 1.21.1 |
 | <a name="provider_proxmox"></a> [proxmox](#provider\_proxmox) | 0.97.1 |
 
 ## Modules
@@ -40,6 +42,7 @@ No modules.
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_download_file.ubuntu_22_04_template](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_download_file) | resource |
 | [proxmox_virtual_environment_vm.ubuntu_cloud](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_vm) | resource |
+| [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.1/docs/data-sources/secrets) | data source |
 | [proxmox_virtual_environment_vm.ubuntu_cloud](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/data-sources/virtual_environment_vm) | data source |
 
 ## Inputs
@@ -47,8 +50,6 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_default_node_name"></a> [default\_node\_name](#input\_default\_node\_name) | The default Proxmox node to deploy resources on. | `string` | `"bupu"` | no |
-| <a name="input_pm_api_password"></a> [pm\_api\_password](#input\_pm\_api\_password) | The password for the Proxmox VE API. | `string` | n/a | yes |
-| <a name="input_pm_api_user"></a> [pm\_api\_user](#input\_pm\_api\_user) | The username for the Proxmox VE API. | `string` | n/a | yes |
 
 ## Outputs
 

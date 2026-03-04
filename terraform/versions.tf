@@ -9,6 +9,11 @@ terraform {
   }
 
   required_providers {
+    doppler = {
+      source  = "DopplerHQ/doppler"
+      version = "1.21.1"
+    }
+
     proxmox = {
       source  = "bpg/proxmox"
       version = "0.97.1"
@@ -18,8 +23,8 @@ terraform {
 
 provider "proxmox" {
   endpoint = "https://192.168.233.7:8006/"
-  username = var.pm_api_user
-  password = var.pm_api_password
+  username = nonsensitive(data.doppler_secrets.this.map.PM_API_USER)
+  password = data.doppler_secrets.this.map.PM_API_PASSWORD
   insecure = true
 }
 
