@@ -31,7 +31,7 @@ tasks:
     cmds:
       - terraform fmt -check -recursive
       - terraform validate
-      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform plan --out=tfplan.out'
+      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform plan -out=tfplan.out'
 
   apply:
     desc: Apply Terraform changes with confirmation
