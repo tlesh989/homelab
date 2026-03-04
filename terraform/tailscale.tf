@@ -1,34 +1,33 @@
-resource "proxmox_virtual_environment_container" "glance" {
-  node_name    = "bupu"
-  vm_id        = 104
-  unprivileged = true
+resource "proxmox_virtual_environment_container" "tailscale" {
+  node_name    = "tika"
+  vm_id        = 101
+  unprivileged = false
 
   disk {
     datastore_id = "vm_data"
-    size         = 8
+    size         = 10
   }
 
   initialization {
-    hostname = "glance"
+    hostname = "tailscale"
 
     ip_config {
       ipv4 {
-        address = "192.168.233.22/24"
-        gateway = "192.168.233.1"
+        address = "dhcp"
       }
     }
   }
 
   memory {
-    dedicated = 512
+    dedicated = 2048
     swap      = 0
   }
 
   network_interface {
     bridge      = "vmbr0"
     enabled     = true
-    firewall    = true
-    mac_address = "BC:24:11:A2:3C:44"
+    firewall    = false
+    mac_address = "EA:31:E7:19:05:63"
     name        = "eth0"
   }
 
