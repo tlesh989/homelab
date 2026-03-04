@@ -129,14 +129,12 @@ dmypy.json
 .pyre/
 
 # Secrets
-.envrc
 .vault_pass
 *.tfvars
 
 # Ansible
 .ansible
 galaxy_roles/
-
 
 user-data
 *.log
