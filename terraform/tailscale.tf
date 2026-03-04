@@ -16,6 +16,11 @@ resource "proxmox_virtual_environment_container" "tailscale" {
         address = "dhcp"
       }
     }
+
+    user_account {
+      keys     = [file("~/.ssh/id_ed25519_tlesh.pub")]
+      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+    }
   }
 
   memory {
