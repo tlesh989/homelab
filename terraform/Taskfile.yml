@@ -36,5 +36,5 @@ tasks:
   apply:
     desc: Apply Terraform changes with confirmation
     cmds:
-      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform apply tfplan.out
+      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform apply tfplan.out'
       - rm -f tfplan.out
