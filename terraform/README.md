@@ -40,8 +40,9 @@ No modules.
 | [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_download_file.ubuntu_22_04_template](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_download_file) | resource |
-| [proxmox_virtual_environment_vm.ubuntu_cloud](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_vm) | resource |
+| [proxmox_virtual_environment_download_file.ubuntu_24_04_cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_download_file) | resource |
+| [proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_download_file) | resource |
+| [proxmox_virtual_environment_storage_nfs.proxmox_nfs](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/resources/virtual_environment_storage_nfs) | resource |
 | [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.1/docs/data-sources/secrets) | data source |
 | [proxmox_virtual_environment_vm.ubuntu_cloud](https://registry.terraform.io/providers/bpg/proxmox/0.97.1/docs/data-sources/virtual_environment_vm) | data source |
 
