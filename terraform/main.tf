@@ -1,8 +1,28 @@
-resource "proxmox_virtual_environment_download_file" "ubuntu_22_04_template" {
+resource "proxmox_virtual_environment_storage_nfs" "proxmox_nfs" {
+  nodes = ["bupu"]
+  id    = "proxmox-nfs"
+
+  server = "192.168.233.6"
+  export = "/volume1/proxmox_nfs"
+
+  content = ["backup", "images", "import", "iso", "rootdir", "snippets", "vztmpl"]
+  # shared  = true
+}
+
+resource "proxmox_virtual_environment_download_file" "ubuntu_24_04_lxc_template" {
   content_type = "vztmpl"
-  datastore_id = "local"
+  datastore_id = proxmox_virtual_environment_storage_nfs.proxmox_nfs.id
   node_name    = "bupu"
-  url          = "https://download.proxmox.com/images/system/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
+  url          = "https://download.proxmox.com/images/system/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+  overwrite    = true
+}
+
+resource "proxmox_virtual_environment_download_file" "ubuntu_24_04_cloud_image" {
+  content_type = "iso"
+  datastore_id = proxmox_virtual_environment_storage_nfs.proxmox_nfs.id
+  node_name    = "bupu"
+  url          = "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+  overwrite    = true
 }
 
 resource "proxmox_virtual_environment_container" "pi_hole" {
@@ -53,7 +73,7 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu_22_04_template.id
+    template_file_id = proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template.id
     type             = "ubuntu"
   }
 
@@ -105,7 +125,7 @@ resource "proxmox_virtual_environment_container" "plex" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu_22_04_template.id
+    template_file_id = proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template.id
     type             = "ubuntu"
   }
 
@@ -154,7 +174,7 @@ resource "proxmox_virtual_environment_container" "tailscale" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu_22_04_template.id
+    template_file_id = proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template.id
     type             = "ubuntu"
   }
 
@@ -204,7 +224,7 @@ resource "proxmox_virtual_environment_container" "glance" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu_22_04_template.id
+    template_file_id = proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template.id
     type             = "ubuntu"
   }
 
@@ -217,9 +237,4 @@ resource "proxmox_virtual_environment_container" "glance" {
   tags = [
     "terraform",
   ]
-}
-
-resource "proxmox_virtual_environment_vm" "ubuntu_cloud" {
-  node_name = "bupu"
-  vm_id     = 901
 }

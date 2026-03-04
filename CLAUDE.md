@@ -44,7 +44,8 @@ cd terraform && task apply  # Apply changes
 
 - **Naming**:
   - Files/Folders: `kebab-case`.
-  - Terraform Resources: `snake_case`.
+  - Terraform Resource Labels: `snake_case` (e.g., `proxmox_nfs`).
+  - Infrastructure IDs: `kebab-case` (e.g., `storage_id = "proxmox-nfs"`).
   - Resource Prefixes: `sa-`, `sneg-`, `lb-`, `vpc-`, `db-`.
 - **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`.
 - **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
