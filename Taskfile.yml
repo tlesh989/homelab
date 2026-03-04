@@ -35,36 +35,36 @@ tasks:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   plex:
     desc: Run Ansible playbook for Plex hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "--ask-pass {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts
     cmds:
-      - ansible all -m ping --ask-pass
+      - ansible all -m ping
 
   check:
     desc: Dry-run for all hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--ask-pass --check {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--check {{.CLI_ARGS}}" }
 
   syntax:
     desc: Check playbook syntax
