@@ -3,6 +3,10 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
   vm_id        = 102
   unprivileged = true
 
+  features {
+    nesting = true
+  }
+
   console {
     enabled   = true
     tty_count = 2
@@ -33,7 +37,7 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+      password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
 
@@ -58,6 +62,7 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
   lifecycle {
     ignore_changes = [
       operating_system[0].template_file_id,
+      initialization[0].user_account,
     ]
   }
 }

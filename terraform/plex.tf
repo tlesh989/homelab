@@ -3,6 +3,10 @@ resource "proxmox_virtual_environment_container" "plex" {
   vm_id        = 103
   unprivileged = false
 
+  features {
+    nesting = true
+  }
+
   cpu {
     architecture = "amd64"
     cores        = 3
@@ -26,7 +30,7 @@ resource "proxmox_virtual_environment_container" "plex" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+      password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
 
@@ -51,6 +55,7 @@ resource "proxmox_virtual_environment_container" "plex" {
   lifecycle {
     ignore_changes = [
       operating_system[0].template_file_id,
+      initialization[0].user_account,
     ]
   }
 
