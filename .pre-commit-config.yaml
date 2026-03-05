@@ -12,7 +12,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: no-commit-to-branch
-        args: ["--branch", "main"]
+        args: ["--branch", "main", "--branch", "dev"]
       - id: check-added-large-files
         args: ["--maxkb=500"]
       - id: check-case-conflict
@@ -56,7 +56,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v26.2.0
+    rev: v26.3.0
     hooks:
       - id: ansible-lint
         args:
@@ -73,7 +73,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         stages: [pre-commit]

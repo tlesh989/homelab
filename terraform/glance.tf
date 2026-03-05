@@ -3,6 +3,10 @@ resource "proxmox_virtual_environment_container" "glance" {
   vm_id        = 104
   unprivileged = true
 
+  features {
+    nesting = true
+  }
+
   disk {
     datastore_id = "vm_data"
     size         = 8
@@ -20,7 +24,7 @@ resource "proxmox_virtual_environment_container" "glance" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+      password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
 
@@ -45,6 +49,7 @@ resource "proxmox_virtual_environment_container" "glance" {
   lifecycle {
     ignore_changes = [
       operating_system[0].template_file_id,
+      initialization[0].user_account,
     ]
   }
 
