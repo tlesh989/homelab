@@ -3,8 +3,14 @@ name: Sync Tailscale ACLs
 on:
   push:
     branches: [ "main", "dev" ]
+    paths:
+      - 'tailscale/policy.hujson'
+      - '.github/workflows/tailscale.yml'
   pull_request:
     branches: [ "main", "dev" ]
+    paths:
+      - 'tailscale/policy.hujson'
+      - '.github/workflows/tailscale.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
