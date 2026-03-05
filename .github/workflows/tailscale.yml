@@ -28,18 +28,8 @@ jobs:
           restore-keys: |
             version-cache.json-
 
-      - name: Deploy ACL
-        if: github.event_name == 'push'
-        id: deploy-acl
-        uses: tailscale/gitops-acl-action@v1
-        with:
-          policy-file: tailscale/policy.hujson
-          api-key: ${{ secrets.TS_API_KEY }}
-          tailnet: ${{ secrets.TS_TAILNET }}
-          action: apply
-
       - name: Test ACL
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         id: test-acl
         uses: tailscale/gitops-acl-action@v1
         with:
@@ -47,3 +37,13 @@ jobs:
           api-key: ${{ secrets.TS_API_KEY }}
           tailnet: ${{ secrets.TS_TAILNET }}
           action: test
+
+      - name: Deploy ACL
+        if: github.event_name == 'push' && github.ref_name == 'main'
+        id: deploy-acl
+        uses: tailscale/gitops-acl-action@v1
+        with:
+          policy-file: tailscale/policy.hujson
+          api-key: ${{ secrets.TS_API_KEY }}
+          tailnet: ${{ secrets.TS_TAILNET }}
+          action: apply
