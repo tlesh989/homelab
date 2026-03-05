@@ -1,25 +1,46 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "baseBranches": ["dev"],
-  "schedule": ["before 9am on monday"],
+  "extends": [
+    "config:recommended"
+  ],
+  "baseBranchPatterns": [
+    "dev"
+  ],
+  "schedule": [
+    "before 9am on monday"
+  ],
   "packageRules": [
     {
       "description": "Group minor and patch updates for Terraform providers",
-      "matchManagers": ["terraform"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "terraform"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "terraform minor/patch"
     },
     {
       "description": "Group minor and patch updates for Ansible Galaxy roles",
-      "matchManagers": ["ansible-galaxy"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "ansible-galaxy"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "ansible-galaxy minor/patch"
     },
     {
       "description": "Group minor and patch updates for GitHub Actions",
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "github-actions minor/patch"
     }
   ]
