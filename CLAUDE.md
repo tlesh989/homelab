@@ -19,7 +19,7 @@ This repository contains the infrastructure-as-code and configuration management
   - **NEVER** commit directly to `dev` or `main`.
   - Always work in `feature/*`, `chore/*`, `hotfix/*`, or `bugfix/*` branches.
   - Changes must be merged into `dev` via Pull Request.
-  - Automated automation handles merging `dev` into `main`.
+  - Automated workflows handle merging `dev` into `main`.
 - **Source Control**: Do not stage or commit changes unless specifically requested. Use standard commit messages (e.g., `feat: ...`, `fix: ...`, `chore: ...`).
 - **Stability & Uptime**: Prioritize system reliability above all.
 
