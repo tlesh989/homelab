@@ -1,0 +1,34 @@
+name: Dev to Main PR
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create or Update PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if an open PR from dev to main already exists
+          existing_pr=$(gh pr list --state open --base main --head dev --json number --jq '.[0].number')
+
+          if [ -z "$existing_pr" ]; then
+            echo "Creating new PR from dev to main"
+            gh pr create \
+              --base main \
+              --head dev \
+              --title "🚀 Release: Merge dev into main" \
+              --body "This is an automated PR to merge development changes into the production branch (main)."
+          else
+            echo "PR already exists: #$existing_pr. GitHub will automatically update it with new commits."
+          fi
