@@ -15,13 +15,16 @@ This repository contains the infrastructure-as-code and configuration management
 
 ## Engineering Standards
 
+- **Stability & Uptime**: Prioritize system reliability above all.
+- **KISS**: Keep It Simple, Stupid. Avoid over-engineering.
+- **Doppler First**: All secrets come from Doppler. Never hardcode or use local vault files.
+- **Proactive SRE**: Anticipate networking, IAM, and observability needs.
 - **Gitflow**:
   - **NEVER** commit directly to `dev` or `main`.
   - Always work in `feature/*`, `chore/*`, `hotfix/*`, or `bugfix/*` branches.
   - Changes must be merged into `dev` via Pull Request.
   - Automated workflows handle merging `dev` into `main`.
 - **Source Control**: Do not stage or commit changes unless specifically requested. Use standard commit messages (e.g., `feat: ...`, `fix: ...`, `chore: ...`).
-- **Stability & Uptime**: Prioritize system reliability above all.
 
 ## Common Commands
 

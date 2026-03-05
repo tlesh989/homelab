@@ -64,13 +64,26 @@ jobs:
         run: |
           pip install ansible ansible-lint
 
+      - name: Cache Ansible Galaxy Roles/Collections
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.ansible/roles
+            ~/.ansible/collections
+          key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-ansible-galaxy-
+
+      - name: Install Ansible Galaxy Dependencies
+        run: |
+          ansible-galaxy install -r requirements.yml
+
       - name: Ansible Lint
         run: task lint
 
       - name: Ansible Syntax Check
-        # Skipping syntax check if it requires doppler secrets unless we have them
-        # Alternatively, we could mock the secrets or just run ansible-playbook --syntax-check directly
         run: |
-          # If syntax check requires doppler, we might need DOPPLER_TOKEN
-          # For now, we'll try running it directly to avoid doppler requirement for syntax check
-          ansible-playbook --syntax-check main.yml
+          # Use mock vault password to bypass password prompt during syntax check
+          echo "dummy" > .vault_pass
+          ansible-playbook --syntax-check main.yml --vault-password-file .vault_pass
+          rm .vault_pass
