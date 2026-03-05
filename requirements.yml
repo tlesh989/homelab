@@ -24,10 +24,10 @@ roles:
 
 collections:
   - name: community.general
-    version: "12.3.0"
+    version: "12.4.0"
   - name: ansible.posix
     version: "2.1.0"
   - name: artis3n.tailscale
-    version: "1.2.0"
+    version: "1.2.1"
   - name: buluma.roles
     version: "2.0.2"

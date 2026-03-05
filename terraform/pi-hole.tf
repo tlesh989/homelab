@@ -30,6 +30,11 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
         gateway = "192.168.233.1"
       }
     }
+
+    user_account {
+      keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+    }
   }
 
   memory {
