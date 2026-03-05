@@ -84,7 +84,7 @@ cd terraform && task test   # Format and Validate
   3. Open a PR to merge into `dev`.
   4. Never commit directly to `dev` or `main`.
 - **Automation**:
-  - `ci.yml`: Runs on push/PR to `dev`. Uses Doppler CLI for syntax and validation.
+  - `ci.yml`: Runs on push/PR to `dev` and `main`. Runs Terraform `task ci` and Ansible `ansible-playbook --syntax-check` without Doppler.
   - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
   - `tailscale.yml`: Syncs Tailscale ACLs.
 
