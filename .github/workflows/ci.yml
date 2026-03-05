@@ -12,7 +12,35 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Job to detect which files changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform: ${{ steps.filter.outputs.terraform }}
+      ansible: ${{ steps.filter.outputs.ansible }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+              - '.github/workflows/ci.yml'
+            ansible:
+              - 'main.yml'
+              - 'roles/**'
+              - 'requirements.yml'
+              - 'group_vars/**'
+              - 'vars/**'
+              - 'hosts'
+              - 'ansible.cfg'
+              - 'Taskfile.yml'
+              - '.github/workflows/ci.yml'
+
   validate-terraform:
+    needs: changes
+    if: needs.changes.outputs.terraform == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,6 +75,8 @@ jobs:
         run: task ci
 
   validate-ansible:
+    needs: changes
+    if: needs.changes.outputs.ansible == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
