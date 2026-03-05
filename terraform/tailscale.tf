@@ -18,7 +18,7 @@ resource "proxmox_virtual_environment_container" "tailscale" {
     }
 
     user_account {
-      keys     = [file("~/.ssh/id_ed25519_tlesh.pub")]
+      keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
       password = data.doppler_secrets.this.map.ROOT_PASSWORD
     }
   }

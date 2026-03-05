@@ -12,7 +12,7 @@ resource "proxmox_lxc" "plex_server" {
   start           = true
   full            = true
   tags            = "terraform"
-  ssh_public_keys = file("~/.ssh/id_rsa.pub")
+  ssh_public_keys = nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)
 
   features {
     mount = "nfs"
