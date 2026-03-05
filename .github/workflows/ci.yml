@@ -1,0 +1,125 @@
+---
+name: CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job to detect which files changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform: ${{ steps.filter.outputs.terraform }}
+      ansible: ${{ steps.filter.outputs.ansible }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+              - '.github/workflows/ci.yml'
+            ansible:
+              - 'main.yml'
+              - 'roles/**'
+              - 'requirements.yml'
+              - 'group_vars/**'
+              - 'vars/**'
+              - 'hosts'
+              - 'ansible.cfg'
+              - 'Taskfile.yml'
+              - '.github/workflows/ci.yml'
+
+  validate-terraform:
+    needs: changes
+    if: needs.changes.outputs.terraform == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Task
+        uses: go-task/setup-task@v1
+
+      - name: Create Terraform plugin cache directory
+        run: mkdir -p ~/.terraform.d/plugin-cache
+
+      - name: Cache Terraform providers
+        uses: actions/cache@v5
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: >-
+            ${{ runner.os }}-terraform-providers-
+            ${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-providers-
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_TOKEN }} # doppler github sync
+          terraform_wrapper: false
+        env:
+          TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
+
+      - name: Terraform Validate
+        working-directory: ./terraform
+        run: task ci
+
+  validate-ansible:
+    needs: changes
+    if: needs.changes.outputs.ansible == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Task
+        uses: go-task/setup-task@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Ansible and Lint
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Cache Ansible Galaxy Roles/Collections
+        uses: actions/cache@v5
+        with:
+          path: |
+            galaxy_roles
+            galaxy_collections
+            collections
+          key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-ansible-galaxy-
+
+      - name: Install Ansible Galaxy Dependencies
+        run: |
+          ansible-galaxy install -r requirements.yml -p galaxy_roles
+          ansible-galaxy collection install -r requirements.yml -p galaxy_collections
+
+      - name: Ansible Lint
+        run: task lint
+
+      - name: Ansible Syntax Check
+        env:
+          ANSIBLE_ROLES_PATH: ./galaxy_roles:./roles
+          ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
+        run: |
+          # Use mock vault password to bypass password prompt during syntax check
+          echo "dummy" > .vault_pass
+          ansible-playbook --syntax-check main.yml --vault-password-file .vault_pass
+          rm .vault_pass

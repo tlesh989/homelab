@@ -13,12 +13,18 @@ This repository contains the infrastructure-as-code and configuration management
 - **Automation:** [Task](https://taskfile.dev/) for orchestrating operations.
 - **Environment:** Running on MacBook Air M4 (Arm64).
 
-## Core Principles (Senior SRE/DevOps)
+## Engineering Standards
 
 - **Stability & Uptime**: Prioritize system reliability above all.
 - **KISS**: Keep It Simple, Stupid. Avoid over-engineering.
 - **Doppler First**: All secrets come from Doppler. Never hardcode or use local vault files.
 - **Proactive SRE**: Anticipate networking, IAM, and observability needs.
+- **Gitflow**:
+  - **NEVER** commit directly to `dev` or `main`.
+  - Always work in `feature/*`, `chore/*`, `hotfix/*`, or `bugfix/*` branches.
+  - Changes must be merged into `dev` via Pull Request.
+  - Automated workflows handle merging `dev` into `main`.
+- **Source Control**: Do not stage or commit changes unless specifically requested. Use standard commit messages (e.g., `feat: ...`, `fix: ...`, `chore: ...`).
 
 ## Common Commands
 
@@ -66,11 +72,24 @@ cd terraform && task test   # Format and Validate
 - **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
 - **General**: 2-space indentation, max 120 chars line length.
 
-## CI/CD
+## Gitflow & CI/CD
 
-- **`ci.yml`**: Runs on push/PR to `main`. Uses Doppler CLI for syntax and validation.
-- **`tailscale.yml`**: Syncs Tailscale ACLs.
-- **Branch model**: `dev` → `main`.
+- **Working Branch**: `dev`. This is the default branch for all active development.
+- **Production Branch**: `main`. This branch represents the current production state.
+- **Branch Naming**:
+  - `feature/*` — New features or improvements.
+  - `bugfix/*` — Fixes for bugs in `dev`.
+  - `chore/*` — Maintenance tasks, dependencies, etc.
+  - `hotfix/*` — Urgent fixes aimed at `main` (but still merged through `dev`).
+- **Workflow**:
+  1. Create a branch from `dev` (e.g., `feature/my-cool-feature`).
+  2. Commit changes to the feature branch.
+  3. Open a PR to merge into `dev`.
+  4. Never commit directly to `dev` or `main`.
+- **Automation**:
+  - `ci.yml`: Runs on push/PR to `dev` and `main`. Runs Terraform `task ci` and Ansible `ansible-playbook --syntax-check` without Doppler.
+  - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
+  - `tailscale.yml`: Syncs Tailscale ACLs.
 
 ## Model-Specific Skills & Hooks
 
