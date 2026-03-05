@@ -11,7 +11,7 @@ resource "proxmox_lxc" "tailscale" {
   onboot       = true
   start        = true
   tags         = "terraform"
-  # ssh_public_keys = file("~/.ssh/id_rsa.pub")
+  #ssh_public_keys = nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)
 
   # Terraform will crash without rootfs defined
   rootfs {

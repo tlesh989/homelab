@@ -8,8 +8,7 @@ users_list:
     shell: /bin/bash
     users_group: "{{ vault_username }}"
     authorized_keys:
-      - "{{ lookup('file', my_home ~ '/.ssh/id_rsa.pub') }}"
-      - "{{ lookup('file', my_home ~ '/.ssh/id_rsa2022.pub') }}"
+      - "{{ lookup('file', my_home ~ '/.ssh/id_ed25519_tlesh.pub') }}"
 
 # grog.package
 package_list:
