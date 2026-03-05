@@ -64,6 +64,7 @@
         "minor",
         "patch"
       ],
+      "groupName": "pre-commit minor/patch",
       "automerge": true
     }
   ]
