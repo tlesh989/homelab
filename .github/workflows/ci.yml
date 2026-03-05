@@ -70,6 +70,7 @@ jobs:
           path: |
             galaxy_roles
             galaxy_collections
+            collections
           key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml') }}
           restore-keys: |
             ${{ runner.os }}-ansible-galaxy-
@@ -83,6 +84,9 @@ jobs:
         run: task lint
 
       - name: Ansible Syntax Check
+        env:
+          ANSIBLE_ROLES_PATH: ./galaxy_roles:./roles
+          ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
         run: |
           # Use mock vault password to bypass password prompt during syntax check
           echo "dummy" > .vault_pass

@@ -14,7 +14,7 @@
   roles:
     - role: proxmox
     - role: buluma.roles.bootstrap
-    - role: grog.package
+    - role: GROG.package
     - role: users
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
@@ -28,7 +28,7 @@
   roles:
     - role: geerlingguy.ntp
     - role: geerlingguy.security
-    - role: grog.package
+    - role: GROG.package
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
     - role: users
@@ -64,7 +64,7 @@
   vars_files:
     - vars/vault.yml
   roles:
-    - role: grog.package
+    - role: GROG.package
     - role: users
     - role: weareinteractive.environment
     - role: geerlingguy.ntp
@@ -79,7 +79,7 @@
   vars_files:
     - vars/vault.yml
   roles:
-    - role: grog.package
+    - role: GROG.package
     - role: users
     - role: weareinteractive.environment
     - role: geerlingguy.ntp
@@ -93,7 +93,7 @@
   vars_files:
     - vars/vault.yml
   roles:
-    - role: grog.package
+    - role: GROG.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: users

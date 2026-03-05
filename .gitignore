@@ -140,3 +140,4 @@ user-data
 *.log
 .vscode
 packer/http/autoinstall-user-data
+galaxy_collections/
