@@ -22,7 +22,7 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     hostname = "pi-hole"
 
     dns {
-      domain = "127.0.0.1"
+      domain = "tlesh.xyz"
       servers = [
         "1.1.1.1",
       ]
