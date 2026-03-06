@@ -21,6 +21,13 @@ resource "proxmox_virtual_environment_container" "plex" {
   initialization {
     hostname = "plex"
 
+    dns {
+      domain = "tlesh.xyz"
+      servers = [
+        "1.1.1.1",
+      ]
+    }
+
     ip_config {
       ipv4 {
         address = "192.168.233.12/24"
