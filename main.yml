@@ -1,4 +1,7 @@
 ---
+- name: bootstrap all hosts
+  import_playbook: bootstrap.yml
+
 - name: initial setup
   hosts: all
   tasks:
@@ -9,8 +12,6 @@
 - name: setup proxmox hosts
   hosts: proxmox
   become: true
-  vars_files:
-    - vars/vault.yml
   roles:
     - role: proxmox
     - role: buluma.roles.bootstrap
@@ -23,8 +24,6 @@
 - name: setup tailscale server
   hosts: tailscale
   become: true
-  vars_files:
-    - vars/vault.yml
   roles:
     - role: geerlingguy.ntp
     - role: geerlingguy.security
@@ -61,8 +60,6 @@
 - name: setup docker server
   hosts: kaz
   become: true
-  vars_files:
-    - vars/vault.yml
   roles:
     - role: GROG.package
     - role: users
@@ -76,8 +73,6 @@
 - name: setup plex server
   hosts: plex
   become: true
-  vars_files:
-    - vars/vault.yml
   roles:
     - role: GROG.package
     - role: users
@@ -90,8 +85,6 @@
 - name: setup glance server
   hosts: glance
   become: true
-  vars_files:
-    - vars/vault.yml
   roles:
     - role: GROG.package
     - role: geerlingguy.ntp

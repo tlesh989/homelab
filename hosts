@@ -28,9 +28,3 @@ sturm
 tailscale
 plex
 glance
-
-[proxmox:vars]
-ansible_ssh_user=root
-
-[lxc:vars]
-ansible_ssh_user=root
