@@ -1,1 +1,38 @@
 ---
+- name: Create user account
+  ansible.builtin.user:
+    name: "{{ lookup('env', 'SSH_USER') }}"
+    shell: /bin/bash
+    password: "{{ lookup('env', 'SSH_USER_PASS') | password_hash('sha512') }}"
+    groups: sudo
+    append: true
+    state: present
+
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ lookup('env', 'SSH_USER') }}"
+    content: "{{ lookup('env', 'SSH_USER') }} ALL=(ALL) NOPASSWD: ALL\n"
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: Install SSH authorized key
+  ansible.posix.authorized_key:
+    user: "{{ lookup('env', 'SSH_USER') }}"
+    key: "{{ lookup('env', 'SSH_PUBLIC_KEY') }}"
+    state: present
+
+- name: Disable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+  notify: Restart sshd
+
+- name: Disable SSH root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: Restart sshd
