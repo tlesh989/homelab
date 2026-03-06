@@ -1,11 +1,11 @@
 ---
 ansible_python_interpreter: auto_silent
-ansible_ssh_user: "{{ lookup('env', 'SSH_USER') }}"
+ansible_user: "{{ lookup('env', 'SSH_USER') }}"
 
 # users role
 users_list:
   - username: "{{ lookup('env', 'SSH_USER') }}"
-    password: "{{ lookup('env', 'SSH_USER_PASS') | password_hash('sha512') }}"
+    password: "{{ lookup('env', 'SSH_USER_PASS') | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
     shell: /bin/bash
     users_group: "{{ lookup('env', 'SSH_USER') }}"
     authorized_keys:
