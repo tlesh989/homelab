@@ -31,6 +31,11 @@ tasks:
     cmds:
       - ansible-galaxy install -r requirements.yml --force-with-deps --ignore-errors
 
+  bootstrap:
+    desc: Bootstrap new servers (run once on fresh deployments)
+    cmds:
+      - doppler run -- ansible-playbook bootstrap.yml {{.CLI_ARGS}}
+
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:

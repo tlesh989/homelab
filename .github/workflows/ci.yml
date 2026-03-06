@@ -36,7 +36,6 @@ jobs:
               - 'roles/**'
               - 'requirements.yml'
               - 'group_vars/**'
-              - 'vars/**'
               - 'hosts'
               - 'ansible.cfg'
               - 'Taskfile.yml'
@@ -123,7 +122,4 @@ jobs:
           ANSIBLE_ROLES_PATH: ./galaxy_roles:./roles
           ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
         run: |
-          # Use mock vault password to bypass password prompt during syntax check
-          echo "dummy" > .vault_pass
-          ansible-playbook --syntax-check main.yml --vault-password-file .vault_pass
-          rm .vault_pass
+          ansible-playbook --syntax-check main.yml
