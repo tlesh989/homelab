@@ -1,3 +1,0 @@
----
-vault_username: "{{ lookup('env', 'VAULT_USERNAME') }}"
-vault_nfs_server: "{{ lookup('env', 'VAULT_NFS_SERVER') }}"
