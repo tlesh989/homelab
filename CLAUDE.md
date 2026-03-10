@@ -91,13 +91,20 @@ cd terraform && task test   # Format and Validate
   - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
   - `tailscale.yml`: Syncs Tailscale ACLs.
 
+## MCP Tool Usage
+
+- **Context7**: Always use the `context7` MCP to look up documentation, API references, module options, provider schemas, and configuration examples — for Ansible modules, Terraform providers (`bpg/proxmox`, `hashicorp/*`), Doppler, Tailscale, or any library. Do this proactively without waiting to be asked.
+- **GitHub**: Use the `github` MCP to read issues, check CI status, view PR comments, and manage pull requests in this repo.
+
 ## Model-Specific Skills & Hooks
 
 ### Claude Code
 
 - `/deploy <target>` — dry-run first, apply on confirmation.
 - `/ship [message]` — commit, push, and open a PR against `dev`.
-- Hooks: Blocks edits to secrets, runs yamllint on YAML edits.
+- `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
+- Hooks: Blocks edits to secrets, runs yamllint on YAML edits, `terraform fmt` on `.tf` edits, `ansible-lint` on role/playbook edits.
+- Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes.
 
 ### Gemini CLI
 
