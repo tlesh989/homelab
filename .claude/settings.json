@@ -20,6 +20,16 @@
             "type": "command",
             "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ext=path.rsplit('.',1)[-1] if '.' in path else ''; sys.exit(0) if ext not in ('yml','yaml') else None; yamllint=shutil.which('yamllint'); sys.exit(0) if not yamllint else None; r=subprocess.run([yamllint,'-d','relaxed',path],capture_output=True,text=True); print(r.stdout) if r.stdout else None; print(r.stderr) if r.stderr else None; sys.exit(0)\"",
             "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); sys.exit(0) if not path.endswith('.tf') else None; tf=shutil.which('terraform'); sys.exit(0) if not tf else None; subprocess.run([tf,'fmt',path],capture_output=True)\"",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ansible_paths=['roles/','group_vars/','main.yml','bootstrap.yml']; sys.exit(0) if not any(p in path for p in ansible_paths) else None; lint=shutil.which('ansible-lint'); sys.exit(0) if not lint else None; r=subprocess.run([lint,'--profile','min',path],capture_output=True,text=True); print(r.stdout) if r.stdout else None; sys.exit(0)\"",
+            "timeout": 15000
           }
         ]
       }
