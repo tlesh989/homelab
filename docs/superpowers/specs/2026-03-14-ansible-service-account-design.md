@@ -202,7 +202,7 @@ roles:
 setup:
   desc: Provision local Ansible SSH key from Doppler (run once on fresh checkout)
   cmds:
-    - doppler run -- sh -c 'mkdir -p ~/.ssh && echo "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'
+    - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'
 ```
 
 `mkdir -p ~/.ssh` ensures the directory exists on a fresh Mac before the key is written.
@@ -251,6 +251,9 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
    task ping
    # Expected: ansible@<host> | SUCCESS
    ```
+   Note: at this point `group_vars/all.yml` has not yet been deployed — `task ping` still
+   uses `SSH_USER` from the current branch. The purpose of this step is to manually confirm
+   SSH key auth works: `ssh -i ~/.ssh/ansible_ed25519 ansible@bupu.tlesh.xyz echo ok`
 
 7. **Deploy the code change** (new branch → PR → merge to dev):
    ```bash
