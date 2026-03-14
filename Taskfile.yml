@@ -31,6 +31,11 @@ tasks:
     cmds:
       - ansible-galaxy install -r requirements.yml --force-with-deps --ignore-errors
 
+  setup:
+    desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
+    cmds:
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'
+
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
     cmds:
@@ -41,6 +46,12 @@ tasks:
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+
+  r8152:
+    desc: Install Realtek r8152 DKMS driver on Proxmox hosts
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}" }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts

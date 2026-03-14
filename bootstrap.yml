@@ -23,16 +23,9 @@
     ansible_become_exe: "su -"
     ansible_become_pass: "{{ lookup('env', 'BOOTSTRAP_PASS') }}"
   tasks:
-    - name: Check if ansible user already exists
-      ansible.builtin.command: getent passwd ansible
-      register: bootstrap_ansible_user_check
-      failed_when: false
-      changed_when: false
-
     - name: Create ansible service account
       ansible.builtin.include_role:
         name: ansible-user
-      when: bootstrap_ansible_user_check.rc != 0
 
 - name: Bootstrap LXC and VM hosts — create ansible service account
   hosts: lxc:kaz
@@ -44,13 +37,6 @@
     ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519"
     ansible_become_method: sudo
   tasks:
-    - name: Check if ansible user already exists
-      ansible.builtin.command: getent passwd ansible
-      register: bootstrap_ansible_user_check
-      failed_when: false
-      changed_when: false
-
     - name: Create ansible service account
       ansible.builtin.include_role:
         name: ansible-user
-      when: bootstrap_ansible_user_check.rc != 0
