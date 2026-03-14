@@ -17,12 +17,14 @@
   become: true
   vars:
     ansible_user: tommy
-    ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519"
     ansible_become: true
     ansible_become_method: su
     ansible_become_exe: "su -"
     ansible_become_pass: "{{ lookup('env', 'BOOTSTRAP_PASS') }}"
   tasks:
+    - name: Clear unreachable state from previous play
+      ansible.builtin.meta: clear_host_errors
+
     - name: Create ansible service account
       ansible.builtin.include_role:
         name: ansible-user
@@ -34,9 +36,11 @@
   become: true
   vars:
     ansible_user: tommy
-    ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519"
     ansible_become_method: sudo
   tasks:
+    - name: Clear unreachable state from previous play
+      ansible.builtin.meta: clear_host_errors
+
     - name: Create ansible service account
       ansible.builtin.include_role:
         name: ansible-user
