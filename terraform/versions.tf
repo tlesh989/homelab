@@ -22,7 +22,7 @@ terraform {
 }
 
 provider "proxmox" {
-  endpoint = "https://192.168.233.7:8006/"
+  endpoint = "https://192.168.233.9:8006/"
   username = nonsensitive(data.doppler_secrets.this.map.PM_API_USER)
   password = data.doppler_secrets.this.map.PM_API_PASSWORD
   insecure = true
