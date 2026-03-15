@@ -1,70 +1,66 @@
-<!-- Source of truth: CLAUDE.md — keep this file in sync -->
-# Homelab Infrastructure Management
+<!-- Single source of truth: CLAUDE.md — this file is a PR-review-focused summary -->
+# Homelab — Copilot PR Review Guide
 
-## Core Principles (Senior SRE/DevOps)
+> For full project context, architecture, and conventions, read **[CLAUDE.md](../CLAUDE.md)** at the repo root.
 
-- **Stability & Uptime**: Prioritize system reliability above all.
-- **KISS**: Keep It Simple, Stupid. Avoid over-engineering.
-- **Doppler First**: All secrets come from Doppler. Never hardcode or use local vault files.
-- **Proactive SRE**: Anticipate networking, IAM, and observability needs.
+## What This Repo Is
 
-## Common Commands
+Personal homelab IaC and configuration management. Proxmox VE hypervisors (`tika`, `bupu`, `sturm`) hosting LXC containers and VMs, provisioned with Terraform (`bpg/proxmox` provider, Terraform Cloud state) and configured with Ansible. Secrets are managed exclusively via **Doppler**.
 
-All workflow commands use [Task](https://taskfile.dev/) (`Taskfile.yml`) and **Doppler**:
+---
 
-```bash
-task                        # List all available tasks
-task reqs                   # Install Ansible Galaxy dependencies
+## PR Review Checklist
 
-# Deploy to host groups (Secrets handled by Task + Doppler)
-task proxmox                # Proxmox hypervisors
-task tailscale              # Tailscale subnet router
-task plex                   # Plex media server
-task glance                 # Glance dashboard
+When reviewing a pull request, flag anything that violates the following:
 
-# Dry-run / validation
-task check                  # Dry-run check mode for ALL hosts
-task syntax                 # Check playbook syntax
-task lint                   # Run ansible-lint
-task ping                   # Test connectivity to all hosts
+### Secrets & Security
+- **No hardcoded secrets** — credentials, tokens, IPs, passwords must come from Doppler, never inline
+- No `.envrc`, `.tfvars`, or `vars/vault.yml` files with secret values committed
+- Ansible `no_log: true` on tasks that print sensitive output
 
-# Terraform (from terraform/ directory — still requires doppler run for native commands if not using task)
-cd terraform && task        # fmt + validate + plan
-cd terraform && task apply  # Apply changes
-```
+### Gitflow
+- PRs must target `dev`, **never `main`**
+- Branch names must follow: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`
+- Commits must use conventional prefixes: `feat:`, `fix:`, `chore:`, `refactor:`, etc.
 
-## Architecture
+### Ansible
+- Every task must have a `name:` field
+- Shell/command tasks must use `set -o pipefail` and `executable: /bin/bash`
+- Prefer `failed_when:` over `ignore_errors: true`
+- Use `ansible.builtin.*` FQCNs (not short module names)
+- `become: true` only where strictly necessary — flag unexpected privilege escalation
+- Handlers should be used for service restarts and initramfs updates, not inline tasks
 
-- **Ansible**: `main.yml` is the master playbook. `group_vars/` for hierarchy. Custom roles in `roles/`.
-- **Terraform**: Located in `terraform/`. Uses Terraform Cloud for state management.
-- **Inventory**: Managed in `hosts` file.
+### Terraform
+- All `variable` and `output` blocks must have a `description`
+- Provider versions must be pinned in `versions.tf`
+- Resource labels: `snake_case`; infrastructure IDs: `kebab-case`
+- No inline sensitive values; use `var.*` referencing Doppler-injected variables
 
-**Hosts:**
+### General Code Quality
+- 2-space indentation, 120-char line limit
+- File and folder names: `kebab-case`
+- No dead code, unused variables, or commented-out blocks left in
+- KISS — flag over-engineering or unnecessary abstraction
 
-- Proxmox hypervisors: tika (.7), bupu (.8), sturm (.9) on 192.168.233.x
-- LXC containers: tailscale (.21), plex (.11), glance (.22), kaz (.10 — Docker host)
-- Kubernetes VMs provisioned via Terraform on Proxmox
+### CI Compatibility
+- YAML changes must be valid (`yamllint`)
+- Ansible changes must pass `ansible-lint` and `ansible-playbook --syntax-check`
+- Terraform changes must pass `terraform fmt -check` and `terraform validate`
+- These checks run automatically in `ci.yml` — PRs must not break them
 
-## Secrets Management
+---
 
-- **Source of Truth**: All secrets are stored in **Doppler**.
-- **Usage**: `doppler run -- <command>` (handled automatically via `task` commands).
-- Ansible Vault and 1Password have been decommissioned.
+## What to Approve Without Concern
 
-## Conventions
+- Dependency bumps via Renovate (automated, tested by CI)
+- `docs/` and `tailscale/policy.hujson` changes (low blast radius)
+- Formatting-only commits that pass lint
 
-- **Naming**:
-  - Files/Folders: `kebab-case`.
-  - Terraform Resources: `snake_case`.
-  - Resource Prefixes: `sa-`, `sneg-`, `lb-`, `vpc-`, `db-`.
-- **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`.
-- **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
-- **General**: 2-space indentation, max 120 chars line length.
+## What to Flag / Block
 
-## CI/CD
-
-- **`ci.yml`**: Runs on push/PR to `main`.
-  - Uses Doppler CLI to run `task syntax`.
-  - Terraform `init` and `validate`.
-- **`tailscale.yml`**: Syncs Tailscale ACLs.
-- Branch model: `dev` → `main`
+- Any secret or credential in plaintext
+- Direct commits or merges targeting `main`
+- Tasks that reboot, reinitialize, or wipe state without a guard condition
+- Removing idempotency protections (e.g., dropping `when:` guards, `creates:`, `stat` checks)
+- DKMS or kernel module changes without a `failed_when:` on the running kernel
