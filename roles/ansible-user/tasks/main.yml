@@ -1,0 +1,45 @@
+---
+# tasks file for ansible-user — create and maintain ansible service account
+
+- name: Create ansible group
+  ansible.builtin.group:
+    name: "{{ ansible_service_group }}"
+    state: present
+
+- name: Create ansible user
+  ansible.builtin.user:
+    name: "{{ ansible_service_user }}"
+    group: "{{ ansible_service_group }}"
+    shell: "{{ ansible_service_shell }}"
+    home: "{{ ansible_service_home }}"
+    password: "!"
+    create_home: true
+    state: present
+
+- name: Ensure .ssh directory exists for ansible user
+  ansible.builtin.file:
+    path: "{{ ansible_service_home }}/.ssh"
+    state: directory
+    owner: "{{ ansible_service_user }}"
+    group: "{{ ansible_service_group }}"
+    mode: "0700"
+
+- name: Assert ANSIBLE_SSH_PUBLIC_KEY is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'ANSIBLE_SSH_PUBLIC_KEY') != ''
+    fail_msg: "ANSIBLE_SSH_PUBLIC_KEY environment variable is not set — run via 'doppler run' or set it manually"
+
+- name: Deploy ansible SSH public key
+  ansible.posix.authorized_key:
+    user: "{{ ansible_service_user }}"
+    key: "{{ lookup('env', 'ANSIBLE_SSH_PUBLIC_KEY') }}"
+    state: present
+    exclusive: true
+
+- name: Configure NOPASSWD sudo for ansible user
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/{{ ansible_service_user }}
+    content: "{{ ansible_service_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    mode: "0440"
+    validate: visudo -cf %s
