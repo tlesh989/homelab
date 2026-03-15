@@ -6,7 +6,7 @@
   vars:
     ansible_user: root
     ansible_password: "{{ lookup('env', 'ROOT_PASSWORD') }}"
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o PubkeyAuthentication=no -o PreferredAuthentications=password -o KbdInteractiveAuthentication=no -o UserKnownHostsFile=/dev/null"
   roles:
     - role: bootstrap
 
@@ -20,7 +20,7 @@
     ansible_become: true
     ansible_become_method: su
     ansible_become_exe: "su -"
-    ansible_become_pass: "{{ lookup('env', 'BOOTSTRAP_PASS') }}"
+    ansible_become_pass: "{{ lookup('env', 'ROOT_PASSWORD') }}"
   tasks:
     - name: Clear unreachable state from previous play
       ansible.builtin.meta: clear_host_errors
