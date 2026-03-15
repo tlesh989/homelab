@@ -24,6 +24,12 @@
     group: "{{ ansible_service_group }}"
     mode: "0700"
 
+- name: Assert ANSIBLE_SSH_PUBLIC_KEY is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'ANSIBLE_SSH_PUBLIC_KEY') != ''
+    fail_msg: "ANSIBLE_SSH_PUBLIC_KEY environment variable is not set — run via 'doppler run' or set it manually"
+
 - name: Deploy ansible SSH public key
   ansible.posix.authorized_key:
     user: "{{ ansible_service_user }}"
@@ -33,7 +39,7 @@
 
 - name: Configure NOPASSWD sudo for ansible user
   ansible.builtin.copy:
-    dest: /etc/sudoers.d/ansible
+    dest: /etc/sudoers.d/{{ ansible_service_user }}
     content: "{{ ansible_service_user }} ALL=(ALL) NOPASSWD: ALL\n"
     mode: "0440"
     validate: visudo -cf %s

@@ -39,7 +39,7 @@ tasks:
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
     cmds:
-      - doppler run -- ansible-playbook bootstrap.yml {{.CLI_ARGS}}
+      - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
 
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts

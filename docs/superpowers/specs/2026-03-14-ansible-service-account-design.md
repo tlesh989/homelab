@@ -54,20 +54,18 @@ Mac (Claude Code / terminal)
 
 ## Doppler Secrets
 
-Three new keys added to `homelab / main`:
+Two new keys added to `homelab / main`:
 
 | Key | Description |
 |-----|-------------|
 | `ANSIBLE_SSH_PRIVATE_KEY` | Full contents of `ansible_ed25519` private key |
 | `ANSIBLE_SSH_PUBLIC_KEY` | Full contents of `ansible_ed25519.pub` |
-| `BOOTSTRAP_PASS` | Root password — used for `su` escalation on Proxmox nodes during bootstrap only |
+
+`su` escalation on Proxmox nodes reuses the existing `ROOT_PASSWORD` secret — no separate
+bootstrap credential is needed.
 
 The keypair is generated once locally, uploaded to Doppler, then the local files are deleted.
 The private key never touches the repo.
-
-> **Security note:** `BOOTSTRAP_PASS` is only needed during the initial bootstrap run.
-> Once all hosts are bootstrapped and verified, rotate or remove it from Doppler to reduce
-> the ongoing credential exposure surface. Normal playbook runs never use it.
 
 ---
 
@@ -109,35 +107,29 @@ No handlers needed — all tasks use declarative modules.
 Bootstrap connects as `tommy` (SSH key auth) and escalates to root. Two plays handle the
 different escalation methods across the fleet.
 
-### Idempotency gate (bootstrap.yml only)
+No idempotency gate — the role runs unconditionally in both `bootstrap.yml` and `main.yml`.
+Module-level idempotency means it is safe to re-run; it only makes changes when state drifts.
 
-```yaml
-- name: Check if ansible user already exists
-  ansible.builtin.command: getent passwd ansible
-  register: bootstrap_ansible_user_check
-  failed_when: false
-  changed_when: false
-```
-
-If `rc == 0`, the `roles/ansible-user` include is skipped via
-`when: bootstrap_ansible_user_check.rc != 0`. This gate lives **only in bootstrap.yml**
-as a skip optimisation. The same role in `main.yml` runs unconditionally — module-level
-idempotency handles drift correction without a gate.
+Both plays use `tags: [never, bootstrap]` so they are skipped on normal `main.yml` runs
+and only execute when `task bootstrap` explicitly requests them with `--tags bootstrap`.
+Both plays also set `ansible_ssh_private_key_file: ""` to prevent inheriting the ansible
+service key from `group_vars/all.yml` when connecting as `tommy`.
 
 ### Play 1 — Proxmox nodes
 
 ```yaml
 hosts: proxmox
+tags: [never, bootstrap]
 vars:
   ansible_user: tommy
-  ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519"
+  ansible_ssh_private_key_file: ""
   ansible_become: true
   ansible_become_method: su
   ansible_become_exe: "su -"
-  ansible_become_pass: "{{ lookup('env', 'BOOTSTRAP_PASS') }}"
+  ansible_become_pass: "{{ lookup('env', 'ROOT_PASSWORD') }}"
 ```
 
-`tommy` can `su` to root on Proxmox nodes (root password = `BOOTSTRAP_PASS`). The `su`
+`tommy` can `su` to root on Proxmox nodes (root password = `ROOT_PASSWORD`). The `su`
 become method is required because `tommy` has no sudo rights on Proxmox hosts.
 `ansible_become_exe: "su -"` is required — Ansible's default `su` invocation does not
 allocate a login shell and may hang waiting for a prompt over non-interactive SSH.
@@ -146,16 +138,18 @@ allocate a login shell and may hang waiting for a prompt over non-interactive SS
 
 ```yaml
 hosts: lxc:kaz
+tags: [never, bootstrap]
 vars:
   ansible_user: tommy
-  ansible_ssh_private_key_file: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519"
+  ansible_ssh_private_key_file: ""
   ansible_become: true
   ansible_become_method: sudo
 ```
 
 `tommy` already has NOPASSWD sudo on LXC hosts — no password needed.
 
-Both plays include `roles/ansible-user` after the idempotency gate.
+Both plays connect as `tommy` using SSH agent auth (no specific key file) and include
+`roles/ansible-user` unconditionally.
 
 ---
 
@@ -232,10 +226,11 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
    ssh-keygen -t ed25519 -C "ansible service account" -f /tmp/ansible_ed25519 -N ""
    ```
 
-2. **Add three secrets to Doppler** (`homelab / main`):
+2. **Add two secrets to Doppler** (`homelab / main`):
    - `ANSIBLE_SSH_PRIVATE_KEY` → paste contents of `/tmp/ansible_ed25519`
    - `ANSIBLE_SSH_PUBLIC_KEY` → paste contents of `/tmp/ansible_ed25519.pub`
-   - `BOOTSTRAP_PASS` → the root password on your Proxmox nodes
+
+   `ROOT_PASSWORD` is already in Doppler and is reused for `su` escalation on Proxmox nodes.
 
 3. **Delete local key files** — they now live only in Doppler:
    ```bash
@@ -265,8 +260,7 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
    task check
    ```
 
-9. **Remove `BOOTSTRAP_PASS` from Doppler** — it is no longer needed after all hosts
-   are bootstrapped. Rotate or delete it to reduce the credential exposure surface.
+9. **Verify `task check` passes clean** — no failures, ansible-user tasks show `ok` (no change).
 
 ---
 

@@ -3,6 +3,7 @@
   hosts: all
   gather_facts: false
   ignore_unreachable: true
+  tags: [always]
   vars:
     ansible_user: root
     ansible_password: "{{ lookup('env', 'ROOT_PASSWORD') }}"
@@ -15,8 +16,10 @@
   gather_facts: false
   ignore_unreachable: true
   become: true
+  tags: [never, bootstrap]
   vars:
     ansible_user: tommy
+    ansible_ssh_private_key_file: ""
     ansible_become: true
     ansible_become_method: su
     ansible_become_exe: "su -"
@@ -34,8 +37,10 @@
   gather_facts: false
   ignore_unreachable: true
   become: true
+  tags: [never, bootstrap]
   vars:
     ansible_user: tommy
+    ansible_ssh_private_key_file: ""
     ansible_become_method: sudo
   tasks:
     - name: Clear unreachable state from previous play
