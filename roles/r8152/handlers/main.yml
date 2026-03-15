@@ -9,6 +9,6 @@
 
 - name: Update initramfs
   ansible.builtin.shell:
-    cmd: update-initramfs -u -k all
+    cmd: PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin update-initramfs -u -k all
     executable: /bin/bash
   changed_when: true

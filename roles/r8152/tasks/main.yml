@@ -121,21 +121,6 @@
           install r8153_ecm /bin/false
       notify: Update initramfs
 
-    - name: Set USB device to r8152 configuration mode (config 1)
-      ansible.builtin.shell:
-        cmd: |
-          for dev in /sys/bus/usb/devices/*; do
-            vid=$(cat "$dev/idVendor" 2>/dev/null || true)
-            pid=$(cat "$dev/idProduct" 2>/dev/null || true)
-            [ "$vid" = "{{ r8152_usb_vendor }}" ] && [ "$pid" = "{{ r8152_usb_product }}" ] || continue
-            current=$(cat "$dev/bConfigurationValue" 2>/dev/null || echo "0")
-            [ "$current" = "1" ] && continue
-            echo 1 > "$dev/bConfigurationValue" || true
-          done
-        executable: /bin/bash
-      failed_when: false
-      changed_when: false
-
     - name: Bind RTL8156 USB NIC to r8152 driver at runtime
       ansible.builtin.shell:
         cmd: echo "{{ r8152_usb_vendor }} {{ r8152_usb_product }}" > /sys/bus/usb/drivers/r8152/new_id
