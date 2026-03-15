@@ -70,25 +70,20 @@
       register: _r8152_release
       when: r8152_dpkg_check.rc != 0
 
-    - name: Assert r8152 deb asset found in release
+    - name: Assert r8152 release tag resolved
       ansible.builtin.assert:
-        that: >-
-          _r8152_release.json.assets
-          | selectattr('name', 'search', '_' + r8152_deb_arch + '\\.deb$')
-          | list | length > 0
+        that: _r8152_release.json.tag_name is defined and _r8152_release.json.tag_name != ''
         fail_msg: >-
-          Could not find *_{{ r8152_deb_arch }}.deb in release
-          {{ _r8152_release.json.tag_name }}.
+          Could not determine release tag from GitHub API.
           Check https://github.com/awesometic/realtek-r8152-dkms/releases
       when: r8152_dpkg_check.rc != 0
 
     - name: Set .deb download URL fact
       ansible.builtin.set_fact:
         _r8152_deb_url: >-
-          {{ _r8152_release.json.assets
-             | selectattr('name', 'search', '_' + r8152_deb_arch + '\\.deb$')
-             | map(attribute='browser_download_url')
-             | first }}
+          {{ 'https://github.com/awesometic/realtek-r8152-dkms/releases/download/'
+             + _r8152_release.json.tag_name + '/realtek-r8152-dkms_'
+             + _r8152_release.json.tag_name + '_' + r8152_deb_arch + '.deb' }}
       when: r8152_dpkg_check.rc != 0
 
     - name: Download realtek-r8152-dkms .deb package
