@@ -9,7 +9,9 @@
   loop:
     - /etc/apt/sources.list.d/pve-enterprise.list
     - /etc/apt/sources.list.d/pve-enterprise.list.dpkg-dist
+    - /etc/apt/sources.list.d/pve-enterprise.sources
     - /etc/apt/sources.list.d/ceph.list
+    - /etc/apt/sources.list.d/ceph.sources
     - /etc/apt/sources.list.d/proxmox.sources
   ansible.builtin.file:
     path: "{{ item }}"
