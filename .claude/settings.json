@@ -1,4 +1,8 @@
 {
+  "deniedMcpServers": [
+    { "serverName": "claude_ai_Google_Calendar" },
+    { "serverName": "claude_ai_Gmail" }
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -7,6 +11,16 @@
           {
             "type": "command",
             "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(1) if any(b in path for b in blocked) else sys.exit(0)\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,subprocess; params=json.load(sys.stdin); cmd=params.get('tool_input',{}).get('command',''); sys.exit(0) if 'git commit' not in cmd else None; r=subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True); branch=r.stdout.strip(); print(f'BLOCKED: direct commits to {branch} are not allowed. Use a feature/* branch.') if branch in ('dev','main') else None; sys.exit(2) if branch in ('dev','main') else sys.exit(0)\"",
             "timeout": 5000
           }
         ]
@@ -23,7 +37,7 @@
           },
           {
             "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); sys.exit(0) if not path.endswith('.tf') else None; tf=shutil.which('terraform'); sys.exit(0) if not tf else None; subprocess.run([tf,'fmt',path],capture_output=True)\"",
+            "command": "python3 -c \"import sys,json,subprocess,shutil,os; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); sys.exit(0) if not path.endswith('.tf') else None; tf=shutil.which('terraform'); sys.exit(0) if not tf else None; subprocess.run([tf,'fmt',path],capture_output=True); tf_dir=os.path.dirname(os.path.abspath(path)); r=subprocess.run([tf,'validate'],capture_output=True,text=True,cwd=tf_dir); print('terraform validate:\\n'+r.stdout+r.stderr) if r.returncode!=0 else None; sys.exit(0)\"",
             "timeout": 10000
           },
           {
