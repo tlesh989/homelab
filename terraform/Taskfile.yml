@@ -15,9 +15,9 @@ tasks:
   ci:
     desc: Run init, fmt, and validate (CI)
     cmds:
-      - terraform init -backend=false
+      - terraform init -backend=false -input=false
       - terraform fmt -check -recursive
-      - terraform validate
+      - terraform validate -no-color
 
   test:
     desc: Run init, fmt, and validate
