@@ -18,9 +18,15 @@
 - name: Install and configure r8152 DKMS driver
   when: r8152_usb_check.rc == 0
   block:
-    - name: Check if realtek-r8152-dkms is already installed
+    - name: Check if realtek-r8152-dkms is already installed at target version
       ansible.builtin.shell:
-        cmd: set -o pipefail && dpkg -l realtek-r8152-dkms 2>/dev/null | grep -E '^ii'
+        cmd: |
+          set -o pipefail
+          installed=$(dpkg-query -W -f='${Version}' realtek-r8152-dkms 2>/dev/null) || exit 1
+          [ -z "$installed" ] && exit 1
+          {% if r8152_deb_version != 'latest' %}
+          echo "$installed" | grep -qF "{{ r8152_deb_version }}"
+          {% endif %}
         executable: /bin/bash
       register: r8152_dpkg_check
       failed_when: false
@@ -145,15 +151,22 @@
       when: r8152_blacklist_modules | bool
       notify: Update initramfs
 
+    - name: Remove blacklist when r8152_blacklist_modules is disabled
+      ansible.builtin.file:
+        path: /etc/modprobe.d/99-rtl815x-usb-blacklist.conf
+        state: absent
+      when: not (r8152_blacklist_modules | bool)
+      notify: Update initramfs
+
     - name: Load r8152 kernel module
       community.general.modprobe:
         name: r8152
         state: present
-      failed_when: false
 
     - name: Bind RTL8156 USB NIC to r8152 driver at runtime
       ansible.builtin.shell:
         cmd: echo "{{ r8152_usb_vendor }} {{ r8152_usb_product }}" > /sys/bus/usb/drivers/r8152/new_id
         executable: /bin/bash
-      failed_when: false
-      changed_when: false
+      register: _r8152_bind
+      failed_when: _r8152_bind.rc != 0 and 'File exists' not in _r8152_bind.stderr
+      changed_when: _r8152_bind.rc == 0
