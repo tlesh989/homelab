@@ -1,0 +1,6 @@
+---
+# handlers file for r8152
+- name: Reload udev rules
+  ansible.builtin.command:
+    cmd: udevadm control --reload-rules
+  changed_when: true

@@ -1,0 +1,10 @@
+---
+# defaults file for r8152
+
+# Use "latest" to track HEAD, or pin to a specific git tag (e.g. "v2.18.1")
+r8152_version: latest
+r8152_repo: https://github.com/wget/realtek-r8152-linux
+
+# Target USB device — RTL8156-based USB NIC
+r8152_usb_vendor: "0bda"
+r8152_usb_product: "8157"

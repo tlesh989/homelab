@@ -1,0 +1,102 @@
+---
+# tasks file for r8152 — Realtek out-of-tree DKMS driver for RTL8156-based USB NICs
+
+- name: Check for RTL8156 USB NIC
+  ansible.builtin.shell:
+    cmd: set -o pipefail && lsusb | grep -i "{{ r8152_usb_vendor }}:{{ r8152_usb_product }}"
+    executable: /bin/bash
+  register: r8152_usb_check
+  failed_when: false
+  changed_when: false
+
+- name: Install and configure r8152 DKMS driver
+  when: r8152_usb_check.rc == 0
+  block:
+    - name: Install r8152 build dependencies
+      ansible.builtin.apt:
+        name:
+          - dkms
+          - git
+          - build-essential
+          - "proxmox-headers-{{ ansible_facts.kernel }}"
+        state: present
+
+    - name: Clone r8152 repository to staging directory
+      ansible.builtin.git:
+        repo: "{{ r8152_repo }}"
+        dest: /tmp/r8152-staging
+        version: "{{ 'HEAD' if r8152_version == 'latest' else r8152_version }}"
+        force: true
+      register: r8152_git
+
+    - name: Read r8152 PACKAGE_VERSION from dkms.conf
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          grep '^PACKAGE_VERSION=' /tmp/r8152-staging/dkms.conf |
+          cut -d= -f2 | tr -d '"'
+        executable: /bin/bash
+      register: r8152_pkg_version
+      changed_when: false
+
+    - name: Set r8152 version fact
+      ansible.builtin.set_fact:
+        _r8152_ver: "{{ r8152_pkg_version.stdout | trim }}"
+
+    - name: Create DKMS source directory for r8152-{{ _r8152_ver }}
+      ansible.builtin.file:
+        path: "/usr/src/r8152-{{ _r8152_ver }}"
+        state: directory
+        mode: "0755"
+
+    - name: Sync r8152 source into DKMS source directory  # noqa: no-handler
+      ansible.builtin.shell:
+        cmd: cp -a /tmp/r8152-staging/. /usr/src/r8152-{{ _r8152_ver }}/
+        executable: /bin/bash
+      when: r8152_git.changed
+      changed_when: true
+
+    - name: Check DKMS status for r8152/{{ _r8152_ver }}
+      ansible.builtin.shell:
+        cmd: set -o pipefail && dkms status | grep "^r8152/{{ _r8152_ver }}"
+        executable: /bin/bash
+      register: r8152_dkms_status
+      failed_when: false
+      changed_when: false
+
+    - name: Install r8152 via DKMS
+      ansible.builtin.shell: |
+        dkms add /usr/src/r8152-{{ _r8152_ver }}
+        dkms install r8152/{{ _r8152_ver }} --force
+      args:
+        executable: /bin/bash
+      when: r8152_dkms_status.rc != 0 or r8152_git.changed
+      changed_when: true
+
+    - name: Bind RTL8156 USB NIC to r8152 driver at runtime
+      ansible.builtin.shell:
+        cmd: echo "{{ r8152_usb_vendor }} {{ r8152_usb_product }}" > /sys/bus/usb/drivers/r8152/new_id
+        executable: /bin/bash
+      failed_when: false
+      changed_when: false
+
+    - name: Deploy udev rule for RTL8156 — unbind cdc_ncm, bind r8152
+      ansible.builtin.copy:
+        dest: /etc/udev/rules.d/50-r8152-rtl8156.rules
+        mode: "0644"
+        content: |
+          # RTL8156-based USB NIC ({{ r8152_usb_vendor }}:{{ r8152_usb_product }})
+          # Force binding to r8152 instead of cdc_ncm.
+          # Per-device override — cdc_ncm remains available for other devices.
+
+          # Add RTL8156 USB ID to r8152 driver's recognised device list
+          ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", \
+            ATTR{idVendor}=="{{ r8152_usb_vendor }}", ATTR{idProduct}=="{{ r8152_usb_product }}", \
+            RUN+="/bin/sh -c 'echo {{ r8152_usb_vendor }} {{ r8152_usb_product }} > /sys/bus/usb/drivers/r8152/new_id 2>/dev/null || true'"
+
+          # Unbind RTL8156 USB interface from cdc_ncm if it claimed the device
+          ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", \
+            ATTR{../idVendor}=="{{ r8152_usb_vendor }}", ATTR{../idProduct}=="{{ r8152_usb_product }}", \
+            DRIVER=="cdc_ncm", \
+            RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_ncm/unbind 2>/dev/null || true'"
+      notify: Reload udev rules
