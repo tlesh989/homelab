@@ -14,7 +14,6 @@
   become: true
   roles:
     - role: proxmox
-    - role: buluma.roles.bootstrap
     - role: GROG.package
     - role: users
     - role: artis3n.tailscale.machine
