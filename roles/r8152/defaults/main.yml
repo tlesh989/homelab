@@ -9,3 +9,7 @@ r8152_usb_product: "8157"
 # or pin to a specific version (e.g. "2.20.1-1")
 r8152_deb_version: latest
 r8152_deb_arch: amd64
+
+# Set to false to skip blacklisting cdc_ncm/cdc_ether system-wide
+# (e.g. if other USB networking devices are present on the host)
+r8152_blacklist_modules: true
