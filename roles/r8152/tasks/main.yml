@@ -1,0 +1,168 @@
+---
+# tasks file for r8152 — Realtek out-of-tree DKMS driver for RTL8156-based USB NICs
+
+- name: Check for RTL8156 USB NIC via sysfs
+  ansible.builtin.shell:
+    cmd: |
+      for f in /sys/bus/usb/devices/*/idVendor; do
+        [ "$(cat "$f" 2>/dev/null)" = "{{ r8152_usb_vendor }}" ] || continue
+        dir=$(dirname "$f")
+        [ "$(cat "$dir/idProduct" 2>/dev/null)" = "{{ r8152_usb_product }}" ] && exit 0
+      done
+      exit 1
+    executable: /bin/bash
+  register: r8152_usb_check
+  failed_when: false
+  changed_when: false
+
+- name: Install and configure r8152 DKMS driver
+  when: r8152_usb_check.rc == 0
+  block:
+    - name: Check if realtek-r8152-dkms is already installed at target version
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          installed=$(dpkg-query -W -f='${Version}' realtek-r8152-dkms 2>/dev/null) || exit 1
+          [ -z "$installed" ] && exit 1
+          {% if r8152_deb_version != 'latest' %}
+          echo "$installed" | grep -qF "{{ r8152_deb_version }}"
+          {% endif %}
+        executable: /bin/bash
+      register: r8152_dpkg_check
+      failed_when: false
+      changed_when: false
+
+    - name: Get list of installed Proxmox kernel versions
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          dpkg -l 'pve-kernel-[0-9]*' 2>/dev/null
+          | awk '/^ii/ {print $2}'
+          | sed 's/pve-kernel-//'
+        executable: /bin/bash
+      register: _r8152_installed_kernels
+      changed_when: false
+      failed_when: false
+
+    - name: Install headers for all installed Proxmox kernels
+      ansible.builtin.apt:
+        name: "proxmox-headers-{{ item }}"
+        state: present
+        update_cache: false
+      loop: "{{ _r8152_installed_kernels.stdout_lines }}"
+      failed_when: false
+
+    - name: Install DKMS build toolchain
+      ansible.builtin.apt:
+        name:
+          - dkms
+          - build-essential
+        state: present
+        update_cache: false
+
+    - name: Fetch realtek-r8152-dkms release info from GitHub
+      ansible.builtin.uri:
+        url: >-
+          {{ 'https://api.github.com/repos/awesometic/realtek-r8152-dkms/releases/latest'
+             if r8152_deb_version == 'latest'
+             else 'https://api.github.com/repos/awesometic/realtek-r8152-dkms/releases/tags/' + r8152_deb_version }}
+        return_content: true
+      register: _r8152_release
+      when: r8152_dpkg_check.rc != 0
+
+    - name: Assert r8152 release tag resolved
+      ansible.builtin.assert:
+        that: _r8152_release.json.tag_name is defined and _r8152_release.json.tag_name != ''
+        fail_msg: >-
+          Could not determine release tag from GitHub API.
+          Check https://github.com/awesometic/realtek-r8152-dkms/releases
+      when: r8152_dpkg_check.rc != 0
+
+    - name: Set .deb download URL fact
+      ansible.builtin.set_fact:
+        _r8152_deb_url: >-
+          {{ 'https://github.com/awesometic/realtek-r8152-dkms/releases/download/'
+             + _r8152_release.json.tag_name + '/realtek-r8152-dkms_'
+             + _r8152_release.json.tag_name + '_' + r8152_deb_arch + '.deb' }}
+      when: r8152_dpkg_check.rc != 0
+
+    - name: Download realtek-r8152-dkms .deb package
+      ansible.builtin.get_url:
+        url: "{{ _r8152_deb_url }}"
+        dest: /tmp/realtek-r8152-dkms.deb
+        mode: "0644"
+        checksum: "{{ r8152_deb_checksum | default('') }}"
+      when: r8152_dpkg_check.rc != 0
+
+    - name: Install realtek-r8152-dkms .deb package
+      ansible.builtin.apt:
+        deb: /tmp/realtek-r8152-dkms.deb
+        state: present
+      when: r8152_dpkg_check.rc != 0
+
+    - name: Build DKMS module for all kernels with available headers
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          VER=$(dkms status | grep realtek-r8152 | awk -F'[/, ]' '{print $2}' | head -1)
+          [ -z "$VER" ] && exit 0
+          RUNNING_KVER=$(uname -r)
+          INSTALLED=0
+          for kver in $(ls /lib/modules); do
+            [ -d "/lib/modules/$kver/build" ] || continue
+            dkms status "realtek-r8152/$VER" -k "$kver" 2>/dev/null | grep -q installed && continue
+            dkms build "realtek-r8152/$VER" -k "$kver" 2>/dev/null \
+              || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
+            dkms install "realtek-r8152/$VER" -k "$kver" 2>/dev/null \
+              || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
+            INSTALLED=$((INSTALLED + 1))
+          done
+          echo "installed=$INSTALLED"
+        executable: /bin/bash
+      register: _r8152_dkms_build
+      when: r8152_dpkg_check.rc != 0
+      changed_when: "'installed=0' not in _r8152_dkms_build.stdout"
+
+    - name: Remove conflicting manual udev rule
+      ansible.builtin.file:
+        path: /etc/udev/rules.d/50-r8152-rtl8156.rules
+        state: absent
+      notify: Reload udev rules
+
+    - name: Blacklist competing USB NIC drivers
+      ansible.builtin.copy:
+        dest: /etc/modprobe.d/99-rtl815x-usb-blacklist.conf
+        mode: "0644"
+        content: |
+          # Prevent generic/alternate drivers from binding RTL815x USB NICs
+          # NOTE: disables cdc_ncm/cdc_ether system-wide — set
+          # r8152_blacklist_modules: false if other USB networking devices are needed
+          blacklist cdc_ncm
+          blacklist cdc_ether
+          blacklist r8153_ecm
+          # Block explicit module loading attempts
+          install cdc_ncm /bin/false
+          install cdc_ether /bin/false
+          install r8153_ecm /bin/false
+      when: r8152_blacklist_modules | bool
+      notify: Update initramfs
+
+    - name: Remove blacklist when r8152_blacklist_modules is disabled
+      ansible.builtin.file:
+        path: /etc/modprobe.d/99-rtl815x-usb-blacklist.conf
+        state: absent
+      when: not (r8152_blacklist_modules | bool)
+      notify: Update initramfs
+
+    - name: Load r8152 kernel module
+      community.general.modprobe:
+        name: r8152
+        state: present
+
+    - name: Bind RTL8156 USB NIC to r8152 driver at runtime
+      ansible.builtin.shell:
+        cmd: echo "{{ r8152_usb_vendor }} {{ r8152_usb_product }}" > /sys/bus/usb/drivers/r8152/new_id
+        executable: /bin/bash
+      register: _r8152_bind
+      failed_when: _r8152_bind.rc != 0 and 'File exists' not in _r8152_bind.stderr
+      changed_when: _r8152_bind.rc == 0

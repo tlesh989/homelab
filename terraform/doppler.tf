@@ -1,1 +1,4 @@
-data "doppler_secrets" "this" {}
+data "doppler_secrets" "this" {
+  project = "homelab"
+  config  = "main"
+}

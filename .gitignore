@@ -141,3 +141,7 @@ user-data
 .vscode
 packer/http/autoinstall-user-data
 galaxy_collections/
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db

@@ -14,17 +14,20 @@
   become: true
   roles:
     - role: proxmox
-    - role: buluma.roles.bootstrap
     - role: GROG.package
     - role: users
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
     - role: install_script
+    - role: r8152
+      tags: [r8152]
+    - role: ansible-user
 
 - name: setup tailscale server
   hosts: tailscale
   become: true
   roles:
+    - role: ansible-user
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: GROG.package
@@ -61,6 +64,7 @@
   hosts: kaz
   become: true
   roles:
+    - role: ansible-user
     - role: GROG.package
     - role: users
     - role: weareinteractive.environment
@@ -74,6 +78,7 @@
   hosts: plex
   become: true
   roles:
+    - role: ansible-user
     - role: GROG.package
     - role: users
     - role: weareinteractive.environment
@@ -86,6 +91,7 @@
   hosts: glance
   become: true
   roles:
+    - role: ansible-user
     - role: GROG.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security

@@ -1,0 +1,7 @@
+---
+# defaults file for ansible-user
+
+ansible_service_user: ansible
+ansible_service_group: ansible
+ansible_service_shell: /bin/bash
+ansible_service_home: /home/ansible

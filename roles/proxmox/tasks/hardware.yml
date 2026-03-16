@@ -82,9 +82,12 @@
 
     - name: Install i915-sriov-dkms driver
       ansible.builtin.shell: |
-        dkms add .
-        dkms install -m i915-sriov-dkms -v $(cat VERSION)
+        set -o pipefail
+        VER=$(grep '^PACKAGE_VERSION=' /usr/src/i915-sriov-dkms/dkms.conf | cut -d= -f2 | tr -d '"')
+        dkms add -m i915-sriov-dkms -v "$VER" || true
+        dkms install -m i915-sriov-dkms -v "$VER"
       args:
+        executable: /bin/bash
         chdir: /usr/src/i915-sriov-dkms
       when: proxmox_dkms_status.rc != 0 or (proxmox_sriov_repo.changed | default(false))
       changed_when: true

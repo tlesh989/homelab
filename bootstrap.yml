@@ -3,9 +3,49 @@
   hosts: all
   gather_facts: false
   ignore_unreachable: true
+  tags: [always]
   vars:
     ansible_user: root
     ansible_password: "{{ lookup('env', 'ROOT_PASSWORD') }}"
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o PubkeyAuthentication=no -o PreferredAuthentications=password -o KbdInteractiveAuthentication=no -o UserKnownHostsFile=/dev/null"
   roles:
     - role: bootstrap
+
+- name: Bootstrap Proxmox nodes — create ansible service account
+  hosts: proxmox
+  gather_facts: false
+  ignore_unreachable: true
+  become: true
+  tags: [never, bootstrap]
+  vars:
+    ansible_user: tommy
+    ansible_ssh_private_key_file: null
+    ansible_become: true
+    ansible_become_method: su
+    ansible_become_exe: "su -"
+    ansible_become_pass: "{{ lookup('env', 'ROOT_PASSWORD') }}"
+  tasks:
+    - name: Clear unreachable state from previous play
+      ansible.builtin.meta: clear_host_errors
+
+    - name: Create ansible service account
+      ansible.builtin.include_role:
+        name: ansible-user
+
+- name: Bootstrap LXC and VM hosts — create ansible service account
+  hosts: lxc:kaz
+  gather_facts: false
+  ignore_unreachable: true
+  become: true
+  tags: [never, bootstrap]
+  vars:
+    ansible_user: tommy
+    ansible_ssh_private_key_file: null
+    ansible_become_method: sudo
+  tasks:
+    - name: Clear unreachable state from previous play
+      ansible.builtin.meta: clear_host_errors
+
+    - name: Create ansible service account
+      ansible.builtin.include_role:
+        name: ansible-user

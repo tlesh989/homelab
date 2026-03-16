@@ -2,8 +2,8 @@ resource "proxmox_virtual_environment_storage_nfs" "proxmox_nfs" {
   nodes = ["bupu", "sturm", "tika"]
   id    = "proxmox-nfs"
 
-  server = "192.168.233.6"
-  export = "/volume1/proxmox_nfs"
+  server = "192.168.220.6"
+  export = "/mnt/wayreth/proxmox-nfs"
 
   content = ["backup", "images", "import", "iso", "rootdir", "snippets", "vztmpl"]
 }
