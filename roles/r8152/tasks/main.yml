@@ -91,6 +91,7 @@
         url: "{{ _r8152_deb_url }}"
         dest: /tmp/realtek-r8152-dkms.deb
         mode: "0644"
+        checksum: "{{ r8152_deb_checksum | default('') }}"
       when: r8152_dpkg_check.rc != 0
 
     - name: Install realtek-r8152-dkms .deb package

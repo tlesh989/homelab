@@ -7,8 +7,11 @@ r8152_usb_product: "8157"
 
 # Use "latest" to auto-fetch from awesometic GitHub releases,
 # or pin to a specific version (e.g. "2.20.1-1")
+# For production use, pin r8152_deb_version and set r8152_deb_checksum
+# to verify integrity: e.g. "sha256:abc123..."
 r8152_deb_version: latest
 r8152_deb_arch: amd64
+r8152_deb_checksum: ""
 
 # Set to false to skip blacklisting cdc_ncm/cdc_ether system-wide
 # (e.g. if other USB networking devices are present on the host)
