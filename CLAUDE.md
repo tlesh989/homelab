@@ -61,6 +61,8 @@ cd terraform && task test   # Format and Validate
 - **Tailscale**: ACL/policy configuration in `tailscale/`.
 - **Docs**: Architectural design and migration plans in `docs/plans/`.
 
+> **Vault**: `vars/vault.yml` exists as a legacy artifact only. Do NOT use `vault_pass`, `decrypt`, or `encrypt` tasks — they have been removed. All secrets go through Doppler.
+
 ## Conventions
 
 - **Naming**:
@@ -87,9 +89,13 @@ cd terraform && task test   # Format and Validate
   3. Open a PR to merge into `dev`.
   4. Never commit directly to `dev` or `main`.
 - **Automation**:
-  - `ci.yml`: Runs on push/PR to `dev` and `main`. Runs Terraform `task ci` and Ansible `ansible-playbook --syntax-check` without Doppler.
+  - `ci.yml`: Runs on push/PR to `dev` and `main`. Runs Terraform `task ci` and Ansible `ansible-playbook --syntax-check` without Doppler. (Ansible Vault is decommissioned — vault checks in CI are no-ops.)
   - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
   - `tailscale.yml`: Syncs Tailscale ACLs.
+
+## Key Files to Keep in Sync
+
+- `.github/copilot-instructions.md` — PR-review-focused summary for GitHub Copilot. Update it when conventions or CI checks change.
 
 ## MCP Tool Usage
 
