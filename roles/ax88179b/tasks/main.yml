@@ -1,0 +1,114 @@
+---
+# tasks file for ax88179b — ASIX AX88179B out-of-tree DKMS driver
+
+- name: Get list of installed Proxmox kernel versions
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      dpkg -l 'pve-kernel-[0-9]*' 2>/dev/null
+      | awk '/^ii/ {print $2}'
+      | sed 's/pve-kernel-//'
+    executable: /bin/bash
+  register: _ax88179b_installed_kernels
+  changed_when: false
+  failed_when: false
+
+- name: Install headers for all installed Proxmox kernels
+  ansible.builtin.apt:
+    name: "proxmox-headers-{{ item }}"
+    state: present
+    update_cache: false
+  loop: "{{ _ax88179b_installed_kernels.stdout_lines }}"
+  failed_when: false
+
+- name: Install DKMS build toolchain
+  ansible.builtin.apt:
+    name:
+      - dkms
+      - build-essential
+    state: present
+    update_cache: false
+
+- name: Check if DKMS module already registered
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      dkms status | grep -q "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}"
+    executable: /bin/bash
+  register: ax88179b_dkms_check
+  failed_when: false
+  changed_when: false
+
+- name: Install ax88179b DKMS module
+  when: ax88179b_dkms_check.rc != 0
+  block:
+    - name: Download ASIX driver tarball
+      ansible.builtin.get_url:
+        url: "{{ ax88179b_download_url }}"
+        dest: /tmp/asix-ax88179b.tar.bz2
+        mode: "0644"
+
+    - name: Create DKMS source directory
+      ansible.builtin.file:
+        path: "/usr/src/{{ ax88179b_dkms_name }}-{{ ax88179b_driver_version }}"
+        state: directory
+        mode: "0755"
+
+    - name: Extract ASIX driver tarball
+      ansible.builtin.unarchive:
+        src: /tmp/asix-ax88179b.tar.bz2
+        dest: "/usr/src/{{ ax88179b_dkms_name }}-{{ ax88179b_driver_version }}"
+        remote_src: true
+        extra_opts:
+          - "--strip-components=1"
+
+    - name: Template dkms.conf into source directory
+      ansible.builtin.template:
+        src: dkms.conf.j2
+        dest: "/usr/src/{{ ax88179b_dkms_name }}-{{ ax88179b_driver_version }}/dkms.conf"
+        mode: "0644"
+
+    - name: Build and install DKMS module for all kernels
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" 2>/dev/null \
+            | grep -q . \
+            || dkms add -m {{ ax88179b_dkms_name }} -v {{ ax88179b_driver_version }}
+          RUNNING_KVER=$(uname -r)
+          INSTALLED=0
+          for kver in $(ls /lib/modules); do
+            [ -d "/lib/modules/$kver/build" ] || continue
+            dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+              2>/dev/null | grep -q installed && continue
+            dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+              2>/dev/null \
+              || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
+            dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+              2>/dev/null \
+              || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
+            INSTALLED=$((INSTALLED + 1))
+          done
+          echo "installed=$INSTALLED"
+        executable: /bin/bash
+      register: _ax88179b_dkms_build
+      changed_when: "'installed=0' not in _ax88179b_dkms_build.stdout"
+      notify: Load ax_usb_nic module
+
+- name: Load ax_usb_nic at boot via /etc/modules
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: ax_usb_nic
+    create: true
+    mode: "0644"
+
+- name: Install udev fallback rule for AX88179B
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/50-ax88179b.rules
+    mode: "0644"
+    content: |
+      # Unbind cdc_ncm if it claims the AX88179B before ax_usb_nic loads, then bind ax_usb_nic.
+      # Primary fix is /etc/modules loading ax_usb_nic early; this rule is a fallback.
+      # Device: ASIX AX88179B (0b95:1790) — do NOT expand to other USB IDs.
+      ACTION=="bind", SUBSYSTEM=="usb", ATTR{idVendor}=="0b95", ATTR{idProduct}=="1790", DRIVER=="cdc_ncm", RUN+="/bin/sh -c 'echo $kernel > /sys/bus/usb/drivers/cdc_ncm/unbind; echo $kernel > /sys/bus/usb/drivers/ax_usb_nic/bind'"
+  notify: Reload udev rules
