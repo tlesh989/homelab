@@ -77,7 +77,9 @@
             || dkms add -m {{ ax88179b_dkms_name }} -v {{ ax88179b_driver_version }}
           RUNNING_KVER=$(uname -r)
           INSTALLED=0
-          for kver in $(ls /lib/modules); do
+          for kver in /lib/modules/*/; do
+            kver="${kver%/}"
+            kver="${kver##*/}"
             [ -d "/lib/modules/$kver/build" ] || continue
             dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
               2>/dev/null | grep -q installed && continue
@@ -92,6 +94,7 @@
           echo "installed=$INSTALLED"
         executable: /bin/bash
       register: _ax88179b_dkms_build
+      failed_when: _ax88179b_dkms_build.rc != 0
       changed_when: "'installed=0' not in _ax88179b_dkms_build.stdout"
       notify: Load ax_usb_nic module
 
