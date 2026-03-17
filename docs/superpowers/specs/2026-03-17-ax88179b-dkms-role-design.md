@@ -108,8 +108,9 @@ Register result as `ax88179b_dkms_check`. Steps 4–7 are skipped when `rc == 0`
 `ansible.builtin.unarchive` (with `remote_src: true`) →
 `/usr/src/{{ ax88179b_dkms_name }}-{{ ax88179b_driver_version }}/`
 
-The tarball likely extracts into a subdirectory; use `extra_opts` to strip the top-level dir, or
-assert the final path exists after extraction.
+The ASIX 3.5.0 tarball extracts into a top-level subdirectory (e.g. `ASIX_USB_NIC_Linux_Driver_v3.5.0/`).
+Use `extra_opts: ['--strip-components=1']` to flatten into the target path, or inspect the tarball
+on first run and pin the exact directory name here before merging.
 
 ### 6. Template `dkms.conf`
 
@@ -120,10 +121,15 @@ assert the final path exists after extraction.
 Shell block matching `r8152` pattern: iterate all `/lib/modules/<kver>` entries that have a `build/`
 symlink, skip versions already installed, fail hard if the running kernel's build fails.
 
+`dkms add` is idempotent-guarded: check `dkms status` first and only add if not already registered.
+The build loop emits `installed=N` so `changed_when` can detect real work vs. no-op re-runs.
+
 ```bash
 set -o pipefail
-dkms add -m {{ ax88179b_dkms_name }} -v {{ ax88179b_driver_version }}
+dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" 2>/dev/null | grep -q . \
+  || dkms add -m {{ ax88179b_dkms_name }} -v {{ ax88179b_driver_version }}
 RUNNING_KVER=$(uname -r)
+INSTALLED=0
 for kver in $(ls /lib/modules); do
   [ -d "/lib/modules/$kver/build" ] || continue
   dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
@@ -132,10 +138,12 @@ for kver in $(ls /lib/modules); do
     || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
   dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" 2>/dev/null \
     || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
+  INSTALLED=$((INSTALLED + 1))
 done
+echo "installed=$INSTALLED"
 ```
 
-`changed_when: true` (installation is not idempotent to detect).
+`changed_when: "'installed=0' not in _ax88179b_dkms_build.stdout"` (mirrors r8152 pattern).
 Entire block: `when: ax88179b_dkms_check.rc != 0`
 
 ### 8. Add `ax_usb_nic` to `/etc/modules`
@@ -145,7 +153,8 @@ early at boot, winning the device binding race against `cdc_ncm`.
 
 ### 9. Udev fallback rule
 
-Write `/etc/udev/rules.d/50-ax88179b.rules` via `ansible.builtin.copy`:
+Write `/etc/udev/rules.d/50-ax88179b.rules` via `ansible.builtin.copy`. The `copy` task notifies
+the `Reload udev rules` handler — udev is only reloaded when the rules file actually changes.
 
 ```
 # Unbind cdc_ncm if it claims the AX88179B before ax_usb_nic, then bind ax_usb_nic.
@@ -157,18 +166,22 @@ Design rationale: device-specific (does not affect other CDC devices), no initra
 survives kernel upgrades. Do NOT blacklist `cdc_ncm` system-wide — it would break USB tethering and
 other CDC-class devices.
 
-### 10. Reload udev
+### 10. Notify handler — load module for current boot
 
-`ansible.builtin.command`: `udevadm control --reload-rules && udevadm trigger`
-`changed_when: true`
-
-### 11. Notify handler — load module for current boot
-
-Notifies the `Load ax_usb_nic module` handler.
+Notifies the `Load ax_usb_nic module` handler (e.g. after DKMS install or first run).
 
 ## `handlers/main.yml`
 
+Two handlers — udev reload is triggered by the rules file `copy` task; modprobe is triggered after
+DKMS install to activate the module for the current boot without rebooting.
+
 ```yaml
+- name: Reload udev rules
+  ansible.builtin.shell:
+    cmd: udevadm control --reload-rules && udevadm trigger
+    executable: /bin/bash
+  changed_when: true
+
 - name: Load ax_usb_nic module
   community.general.modprobe:
     name: ax_usb_nic
