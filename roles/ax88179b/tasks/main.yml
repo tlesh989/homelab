@@ -47,6 +47,7 @@
         url: "{{ ax88179b_download_url }}"
         dest: /tmp/asix-ax88179b.tar.bz2
         mode: "0644"
+        checksum: "{{ ax88179b_tarball_checksum | default('') }}"
 
     - name: Create DKMS source directory
       ansible.builtin.file:
@@ -101,7 +102,7 @@
 - name: Load ax_usb_nic at boot via /etc/modules
   ansible.builtin.lineinfile:
     path: /etc/modules
-    line: ax_usb_nic
+    line: "{{ ax88179b_module_name }}"
     create: true
     mode: "0644"
 
@@ -113,5 +114,5 @@
       # Unbind cdc_ncm if it claims the AX88179B before ax_usb_nic loads, then bind ax_usb_nic.
       # Primary fix is /etc/modules loading ax_usb_nic early; this rule is a fallback.
       # Device: ASIX AX88179B (0b95:1790) — do NOT expand to other USB IDs.
-      ACTION=="bind", SUBSYSTEM=="usb", ATTR{idVendor}=="0b95", ATTR{idProduct}=="1790", DRIVER=="cdc_ncm", RUN+="/bin/sh -c 'echo $kernel > /sys/bus/usb/drivers/cdc_ncm/unbind; echo $kernel > /sys/bus/usb/drivers/ax_usb_nic/bind'"
+      ACTION=="bind", SUBSYSTEM=="usb", ATTR{idVendor}=="0b95", ATTR{idProduct}=="1790", DRIVER=="cdc_ncm", RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_ncm/unbind; echo %k > /sys/bus/usb/drivers/ax_usb_nic/bind'"
   notify: Reload udev rules

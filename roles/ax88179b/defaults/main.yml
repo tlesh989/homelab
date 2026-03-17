@@ -10,3 +10,5 @@ ax88179b_dkms_name: "asix-ax88179"
 ax88179b_module_name: "ax_usb_nic"
 ax88179b_usb_vendor: "0b95"
 ax88179b_usb_product: "1790"
+# Set to a sha256 checksum (e.g. "sha256:abc123...") to verify tarball integrity
+ax88179b_tarball_checksum: ""

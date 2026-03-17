@@ -9,5 +9,5 @@
 
 - name: Load ax_usb_nic module
   community.general.modprobe:
-    name: ax_usb_nic
+    name: "{{ ax88179b_module_name }}"
     state: present
