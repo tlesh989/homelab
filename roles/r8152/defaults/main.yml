@@ -16,3 +16,7 @@ r8152_deb_checksum: ""
 # Set to false to skip blacklisting cdc_ncm/cdc_ether system-wide
 # (e.g. if other USB networking devices are present on the host)
 r8152_blacklist_modules: true
+
+# NOTE: RTL815[2,3,5,6]-based adapters (0bda:815x) may also need a udev rule to switch
+# the USB device out of CDC mode (bConfigurationValue=3 → 1) before r8152 binds.
+# See: https://www.apalrd.net/posts/2023/network_realtek8156/
