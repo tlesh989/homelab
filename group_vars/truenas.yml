@@ -2,3 +2,14 @@
 # group_vars for truenas host
 # All connection variables are in roles/truenas/defaults/main.yml
 # Override here if needed (e.g., different API URL)
+
+# NFS shares
+truenas_nfs_shares:
+  - dataset: "tank/media/plex"
+    comment: "Plex media library"
+    hosts:
+      - "192.168.233.7"   # tika
+      - "192.168.233.8"   # bupu
+      - "192.168.233.9"   # sturm
+    maproot_user: "root"
+    maproot_group: "wheel"
