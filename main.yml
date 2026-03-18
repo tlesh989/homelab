@@ -26,6 +26,11 @@
       tags: [r8152]
     - role: ansible-user
 
+- name: configure truenas
+  hosts: truenas
+  roles:
+    - role: truenas
+
 - name: setup tailscale server
   hosts: tailscale
   become: true
