@@ -8,11 +8,5 @@ pihole_dns2: "1.0.0.1"
 # Admin web interface password — pulled from Doppler
 pihole_admin_password: "{{ lookup('env', 'PIHOLE_ADMIN_PASSWORD') }}"
 
-# Local network CIDR — used for rev DNS and query logging
-pihole_local_cidr: "192.168.233.0/24"
-
 # Pi-hole install dir
 pihole_install_dir: /etc/pihole
-
-# Whether to skip the web interface install (lighttpd)
-pihole_skip_web: false

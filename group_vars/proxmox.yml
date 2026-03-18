@@ -44,3 +44,4 @@ proxmox_storage_mtu: 9000
 # Shared iSCSI storage variables (mirrors truenas role defaults)
 truenas_iscsi_portal_ip: "192.168.220.6"
 truenas_iscsi_target_name: "proxmox"
+truenas_lvm_vg_name: "pve-iscsi"

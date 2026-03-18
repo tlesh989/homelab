@@ -23,3 +23,6 @@ truenas_iscsi_extent_comment: "proxmox shared storage"
 # Node that creates the VG (other nodes discover it via shared LVM metadata)
 truenas_lvm_primary_node: "sturm"
 truenas_lvm_vg_name: "pve-iscsi"
+
+# TLS verification for REST API calls — set to false for self-signed certs
+truenas_validate_certs: false

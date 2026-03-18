@@ -34,6 +34,25 @@
   become: true
   delegate_to: "{{ truenas_lvm_primary_node }}"
 
+- name: Check if LVM PV already exists on iSCSI device
+  ansible.builtin.shell:
+    cmd: "pvs {{ _truenas_iscsi_dev }} 2>/dev/null"
+    executable: /bin/bash
+  register: _truenas_pv_check
+  changed_when: false
+  failed_when: false
+  become: true
+  delegate_to: "{{ truenas_lvm_primary_node }}"
+
+- name: Create LVM PV on iSCSI device
+  ansible.builtin.shell:
+    cmd: "pvcreate {{ _truenas_iscsi_dev }}"
+    executable: /bin/bash
+  when: _truenas_pv_check.rc != 0
+  changed_when: true
+  become: true
+  delegate_to: "{{ truenas_lvm_primary_node }}"
+
 - name: Check if LVM VG already exists
   ansible.builtin.shell:
     cmd: "vgdisplay {{ truenas_lvm_vg_name }} 2>/dev/null"
@@ -44,12 +63,9 @@
   become: true
   delegate_to: "{{ truenas_lvm_primary_node }}"
 
-- name: Create LVM PV and VG on iSCSI LUN
+- name: Create LVM VG on iSCSI PV
   ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail &&
-      pvcreate "{{ _truenas_iscsi_dev }}" &&
-      vgcreate "{{ truenas_lvm_vg_name }}" "{{ _truenas_iscsi_dev }}"
+    cmd: "vgcreate {{ truenas_lvm_vg_name }} {{ _truenas_iscsi_dev }}"
     executable: /bin/bash
   when: _truenas_vg_check.rc != 0
   changed_when: true

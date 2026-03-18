@@ -12,5 +12,6 @@
     body:
       service: "iscsitarget"
     status_code: [200, 201]
-    validate_certs: false
+    validate_certs: "{{ truenas_validate_certs }}"
+  no_log: true
   changed_when: true

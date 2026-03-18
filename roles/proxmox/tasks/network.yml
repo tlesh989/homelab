@@ -16,8 +16,9 @@
 - name: Set vmbr1 MTU to {{ proxmox_storage_mtu }}
   ansible.builtin.shell:
     cmd: >-
+      set -o pipefail &&
       pvesh set /nodes/{{ ansible_hostname }}/network/vmbr1
-      -mtu {{ proxmox_storage_mtu }}
+      --mtu {{ proxmox_storage_mtu }}
     executable: /bin/bash
   when: _proxmox_vmbr1_mtu.stdout | trim != proxmox_storage_mtu | string
   changed_when: true
