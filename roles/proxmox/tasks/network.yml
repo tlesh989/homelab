@@ -12,6 +12,11 @@
   changed_when: false
   failed_when: false
 
+- name: Initialize vmbr1 config facts to safe defaults
+  ansible.builtin.set_fact:
+    _proxmox_vmbr1_mtu: ""
+    _proxmox_vmbr1_ports: ""
+
 - name: Set vmbr1 config facts
   ansible.builtin.set_fact:
     _proxmox_vmbr1_mtu: "{{ (_proxmox_vmbr1_config.stdout | from_json).get('mtu', '') | string }}"
