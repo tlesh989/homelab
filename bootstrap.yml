@@ -18,7 +18,7 @@
   become: true
   tags: [never, bootstrap]
   vars:
-    ansible_user: tommy
+    ansible_user: "{{ lookup('env', 'SSH_USER') }}"
     ansible_ssh_private_key_file: null
     ansible_become: true
     ansible_become_method: su
@@ -39,7 +39,7 @@
   become: true
   tags: [never, bootstrap]
   vars:
-    ansible_user: tommy
+    ansible_user: "{{ lookup('env', 'SSH_USER') }}"
     ansible_ssh_private_key_file: null
     ansible_become_method: sudo
   tasks:
