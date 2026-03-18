@@ -24,6 +24,19 @@
   when: netdata_role == "child"
   notify: Restart Netdata
 
+- name: Configure Netdata stream acceptance on parent
+  ansible.builtin.blockinfile:
+    path: /etc/netdata/stream.conf
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED PARENT STREAM ACCEPTANCE"
+    block: |
+      [API]
+      enabled = yes
+      allow from = 192.168.233.*
+  become: true
+  when: netdata_role == "parent"
+  notify: Restart Netdata
+
 - name: Ensure Netdata is enabled and started
   ansible.builtin.systemd:
     name: netdata

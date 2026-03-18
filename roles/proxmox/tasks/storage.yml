@@ -60,7 +60,11 @@
       --nodes bupu,sturm,tika
     executable: /bin/bash
   when: _proxmox_lvm_storage.rc != 0
-  changed_when: true
+  register: _proxmox_lvm_register
+  changed_when: _proxmox_lvm_register.rc == 0
+  failed_when:
+    - _proxmox_lvm_register.rc != 0
+    - "'is not online' not in (_proxmox_lvm_register.stderr | default(''))"
 
 - name: Deploy multipath configuration
   ansible.builtin.copy:
