@@ -17,8 +17,8 @@
       pvesh create /storage
       --storage truenas-iscsi
       --type iscsi
-      --portal 192.168.220.6
-      --target iqn.2005-10.org.freenas.ctl:proxmox
+      --portal {{ truenas_iscsi_portal_ip }}
+      --target iqn.2005-10.org.freenas.ctl:{{ truenas_iscsi_target_name }}
       --nodes bupu,sturm,tika
     executable: /bin/bash
   when: _proxmox_iscsi_storage.stdout == ""

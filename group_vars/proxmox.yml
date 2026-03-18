@@ -40,3 +40,7 @@ install_script_cron_enabled: true
 proxmox_ceph_disabled: true
 proxmox_disable_ha: false
 proxmox_storage_mtu: 9000
+
+# Shared iSCSI storage variables (mirrors truenas role defaults)
+truenas_iscsi_portal_ip: "192.168.220.6"
+truenas_iscsi_target_name: "proxmox"

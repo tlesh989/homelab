@@ -28,7 +28,10 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     }
 
     user_account {
-      keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      keys = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      # PM_API_PASSWORD reused for container root password (project-wide convention).
+      # initialization[0].user_account is in ignore_changes — only applied at initial creation.
+      # TODO: consider using a dedicated PIHOLE_ROOT_PASSWORD secret
       password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
