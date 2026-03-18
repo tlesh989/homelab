@@ -8,6 +8,9 @@
 - name: Hardware-Specific Optimizations
   ansible.builtin.include_tasks: hardware.yml
 
+- name: Configure network interfaces
+  ansible.builtin.include_tasks: network.yml
+
 - name: Check ceph status
   ansible.builtin.shell:
     cmd: set -o pipefail && pveceph status 2>&1 | grep -v "not initialized"
