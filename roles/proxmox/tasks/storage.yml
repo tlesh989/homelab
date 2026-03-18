@@ -1,0 +1,47 @@
+---
+# tasks file for proxmox — storage backend registration
+# Note: bpg/proxmox provider does not support iSCSI/LVM storage resources in 0.98.1
+# Using pvesh CLI to register storage backends idempotently.
+
+- name: Check if iSCSI storage backend exists
+  ansible.builtin.shell:
+    cmd: "pvesh get /storage/truenas-iscsi --output-format json 2>/dev/null || echo ''"
+    executable: /bin/bash
+  register: _proxmox_iscsi_storage
+  changed_when: false
+  failed_when: false
+
+- name: Register iSCSI storage backend
+  ansible.builtin.shell:
+    cmd: >-
+      pvesh create /storage
+      --storage truenas-iscsi
+      --type iscsi
+      --portal 192.168.220.6
+      --target iqn.2005-10.org.freenas.ctl:proxmox
+      --nodes bupu,sturm,tika
+    executable: /bin/bash
+  when: _proxmox_iscsi_storage.stdout == ""
+  changed_when: true
+
+- name: Check if LVM storage backend exists
+  ansible.builtin.shell:
+    cmd: "pvesh get /storage/truenas-lvm --output-format json 2>/dev/null || echo ''"
+    executable: /bin/bash
+  register: _proxmox_lvm_storage
+  changed_when: false
+  failed_when: false
+
+- name: Register LVM storage backend
+  ansible.builtin.shell:
+    cmd: >-
+      pvesh create /storage
+      --storage truenas-lvm
+      --type lvm
+      --vgname pve-iscsi
+      --shared 1
+      --content rootdir,images
+      --nodes bupu,sturm,tika
+    executable: /bin/bash
+  when: _proxmox_lvm_storage.stdout == ""
+  changed_when: true
