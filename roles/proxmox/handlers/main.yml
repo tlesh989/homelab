@@ -23,3 +23,9 @@
   ansible.builtin.systemd:
     name: multipathd
     state: restarted
+
+- name: Restart pve-ha-lrm
+  ansible.builtin.systemd:
+    name: pve-ha-lrm
+    state: restarted
+  become: true
