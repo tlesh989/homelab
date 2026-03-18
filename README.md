@@ -23,7 +23,7 @@ Personal homelab infrastructure managed as code — three Proxmox nodes running 
 ## Tech Stack
 
 - **Provisioning**: [Terraform](https://www.terraform.io/) with [`bpg/proxmox`](https://github.com/bpg/terraform-provider-proxmox) provider; state in Terraform Cloud
-- **Configuration**: [Ansible](https://www.ansible.com/) with custom roles
+- **Configuration**: [Ansible](https://docs.ansible.com/) with custom roles
 - **Secrets**: [Doppler](https://www.doppler.com/) — all secrets injected at runtime, nothing stored locally
 - **Automation**: [Task](https://taskfile.dev/) for orchestrating all operations
 - **Networking**: Tailscale for remote access; VLAN 233 (`192.168.233.0/24`) for homelab traffic
