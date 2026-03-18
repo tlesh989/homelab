@@ -1,0 +1,235 @@
+---
+# tasks file for truenas — iSCSI portal, target, extent, and service
+
+# ── Portal ──────────────────────────────────────────────────────────────────
+
+- name: Get existing iSCSI portals
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/portal"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+    validate_certs: false
+    status_code: 200
+  register: _truenas_portals
+  changed_when: false
+
+- name: Create iSCSI portal
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/portal"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      listen:
+        - ip: "{{ truenas_iscsi_portal_ip }}"
+          port: "{{ truenas_iscsi_portal_port }}"
+      comment: "{{ truenas_iscsi_portal_comment }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: _truenas_portal_create
+  when: >-
+    _truenas_portals.json
+    | selectattr('comment', 'equalto', truenas_iscsi_portal_comment)
+    | list | length == 0
+  changed_when: true
+
+- name: Set portal ID fact
+  ansible.builtin.set_fact:
+    _truenas_portal_id: >-
+      {{
+        (_truenas_portals.json
+        | selectattr('comment', 'equalto', truenas_iscsi_portal_comment)
+        | list | first).id
+        if (_truenas_portals.json
+            | selectattr('comment', 'equalto', truenas_iscsi_portal_comment)
+            | list | length > 0)
+        else _truenas_portal_create.json.id
+      }}
+
+# ── Target ───────────────────────────────────────────────────────────────────
+
+- name: Get existing iSCSI targets
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/target"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+    validate_certs: false
+    status_code: 200
+  register: _truenas_targets
+  changed_when: false
+
+- name: Create iSCSI target
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/target"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: "{{ truenas_iscsi_target_name }}"
+      alias: "{{ truenas_iscsi_target_name }}"
+      mode: "ISCSI"
+    validate_certs: false
+    status_code: [200, 201]
+  register: _truenas_target_create
+  when: >-
+    _truenas_targets.json
+    | selectattr('name', 'equalto', truenas_iscsi_target_name)
+    | list | length == 0
+  changed_when: true
+
+- name: Set target ID fact
+  ansible.builtin.set_fact:
+    _truenas_target_id: >-
+      {{
+        (_truenas_targets.json
+        | selectattr('name', 'equalto', truenas_iscsi_target_name)
+        | list | first).id
+        if (_truenas_targets.json
+            | selectattr('name', 'equalto', truenas_iscsi_target_name)
+            | list | length > 0)
+        else _truenas_target_create.json.id
+      }}
+
+# ── Extent ───────────────────────────────────────────────────────────────────
+
+- name: Get existing iSCSI extents
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/extent"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+    validate_certs: false
+    status_code: 200
+  register: _truenas_extents
+  changed_when: false
+
+- name: Create iSCSI extent
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/extent"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: "{{ truenas_iscsi_extent_name }}"
+      type: "DISK"
+      disk: "{{ truenas_iscsi_extent_disk }}"
+      blocksize: "{{ truenas_iscsi_extent_blocksize }}"
+      comment: "{{ truenas_iscsi_extent_comment }}"
+    validate_certs: false
+    status_code: [200, 201]
+  register: _truenas_extent_create
+  when: >-
+    _truenas_extents.json
+    | selectattr('name', 'equalto', truenas_iscsi_extent_name)
+    | list | length == 0
+  changed_when: true
+
+- name: Set extent ID fact
+  ansible.builtin.set_fact:
+    _truenas_extent_id: >-
+      {{
+        (_truenas_extents.json
+        | selectattr('name', 'equalto', truenas_iscsi_extent_name)
+        | list | first).id
+        if (_truenas_extents.json
+            | selectattr('name', 'equalto', truenas_iscsi_extent_name)
+            | list | length > 0)
+        else _truenas_extent_create.json.id
+      }}
+
+# ── Target ↔ Extent association ───────────────────────────────────────────────
+
+- name: Get existing iSCSI target-extent associations
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/targetextent"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+    validate_certs: false
+    status_code: 200
+  register: _truenas_targetextents
+  changed_when: false
+
+- name: Associate target with extent (LUN 0)
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/iscsi/targetextent"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      target: "{{ _truenas_target_id }}"
+      extent: "{{ _truenas_extent_id }}"
+      lunid: 0
+    validate_certs: false
+    status_code: [200, 201]
+  when: >-
+    _truenas_targetextents.json
+    | selectattr('target', 'equalto', _truenas_target_id | int)
+    | selectattr('extent', 'equalto', _truenas_extent_id | int)
+    | list | length == 0
+  changed_when: true
+
+# ── iSCSI Service ─────────────────────────────────────────────────────────────
+
+- name: Get iSCSI service state
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/service"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+    validate_certs: false
+    status_code: 200
+  register: _truenas_services
+  changed_when: false
+
+- name: Enable iSCSI service at boot
+  ansible.builtin.uri:
+    url: >-
+      {{ truenas_api_url }}/service/id/{{
+        (_truenas_services.json
+        | selectattr('service', 'equalto', 'iscsitarget')
+        | list | first).id
+      }}
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      enable: true
+    validate_certs: false
+    status_code: 200
+  when: >-
+    not (_truenas_services.json
+    | selectattr('service', 'equalto', 'iscsitarget')
+    | list | first).enable
+  changed_when: true
+  notify: Start iSCSI service
+
+- name: Start iSCSI service if not running
+  ansible.builtin.uri:
+    url: "{{ truenas_api_url }}/service/start"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      service: "iscsitarget"
+    validate_certs: false
+    status_code: [200, 201]
+  when: >-
+    (_truenas_services.json
+    | selectattr('service', 'equalto', 'iscsitarget')
+    | list | first).state != "RUNNING"
+  changed_when: true
