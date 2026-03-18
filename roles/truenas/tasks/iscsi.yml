@@ -26,7 +26,6 @@
     body:
       listen:
         - ip: "{{ truenas_iscsi_portal_ip }}"
-          port: "{{ truenas_iscsi_portal_port }}"
       comment: "{{ truenas_iscsi_portal_comment }}"
     validate_certs: "{{ truenas_validate_certs }}"
     status_code: [200, 201]
@@ -101,38 +100,39 @@
       }}
 
 # ── Target → Portal group association ────────────────────────────────────────
+# TrueNAS SCALE 25.x: /iscsi/targetgroup is gone — groups are embedded in the
+# target object and set via PUT /iscsi/target/id/{id}.
 
-- name: Get existing iSCSI target groups
+- name: Get iSCSI target details
   ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/iscsi/targetgroup"
+    url: "{{ truenas_api_url }}/iscsi/target/id/{{ _truenas_target_id }}"
     method: GET
     headers:
       Authorization: "Bearer {{ truenas_api_key }}"
     validate_certs: "{{ truenas_validate_certs }}"
     status_code: 200
-  register: _truenas_targetgroups
+  register: _truenas_target_detail
   changed_when: false
   no_log: true
 
-- name: Associate target with portal group
+- name: Associate target with portal via groups
   ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/iscsi/targetgroup"
-    method: POST
+    url: "{{ truenas_api_url }}/iscsi/target/id/{{ _truenas_target_id }}"
+    method: PUT
     headers:
       Authorization: "Bearer {{ truenas_api_key }}"
       Content-Type: "application/json"
     body_format: json
     body:
-      target: "{{ _truenas_target_id }}"
-      portal: "{{ _truenas_portal_id }}"
-      initiator: null
-      auth: null
-      authmethod: "NONE"
+      groups:
+        - portal: "{{ _truenas_portal_id }}"
+          initiator: null
+          auth: null
+          authmethod: "NONE"
     validate_certs: "{{ truenas_validate_certs }}"
-    status_code: [200, 201]
+    status_code: 200
   when: >-
-    _truenas_targetgroups.json
-    | selectattr('target', 'equalto', _truenas_target_id | int)
+    (_truenas_target_detail.json.groups | default([]))
     | selectattr('portal', 'equalto', _truenas_portal_id | int)
     | list | length == 0
   changed_when: true
