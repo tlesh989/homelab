@@ -1,0 +1,53 @@
+---
+# tasks file for truenas — LVM VG on iSCSI LUN
+# Runs on the LVM primary node (sturm) only; other nodes discover the VG automatically.
+
+- name: Find iSCSI LUN device path
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      ls /dev/disk/by-path/ |
+      grep "{{ truenas_iscsi_target_name }}" |
+      grep -- "-lun-0$" |
+      head -1
+    executable: /bin/bash
+  register: _truenas_iscsi_device
+  changed_when: false
+  failed_when: false
+  delegate_to: "{{ truenas_lvm_primary_node }}"
+
+- name: Skip LVM setup — iSCSI LUN not visible yet (run after proxmox storage registered)
+  ansible.builtin.debug:
+    msg: >-
+      iSCSI device not found on {{ truenas_lvm_primary_node }}.
+      Run 'task proxmox' first to register iSCSI backend, then re-run 'task truenas'.
+  when: _truenas_iscsi_device.stdout == ""
+
+- name: End play if iSCSI LUN not available
+  ansible.builtin.meta: end_play
+  when: _truenas_iscsi_device.stdout == ""
+
+- name: Set iSCSI device path fact
+  ansible.builtin.set_fact:
+    _truenas_iscsi_dev: "/dev/disk/by-path/{{ _truenas_iscsi_device.stdout | trim }}"
+  delegate_to: "{{ truenas_lvm_primary_node }}"
+
+- name: Check if LVM VG already exists
+  ansible.builtin.shell:
+    cmd: "vgdisplay {{ truenas_lvm_vg_name }} 2>/dev/null"
+    executable: /bin/bash
+  register: _truenas_vg_check
+  changed_when: false
+  failed_when: false
+  delegate_to: "{{ truenas_lvm_primary_node }}"
+
+- name: Create LVM PV and VG on iSCSI LUN
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      pvcreate "{{ _truenas_iscsi_dev }}" &&
+      vgcreate "{{ truenas_lvm_vg_name }}" "{{ _truenas_iscsi_dev }}"
+    executable: /bin/bash
+  when: _truenas_vg_check.rc != 0
+  changed_when: true
+  delegate_to: "{{ truenas_lvm_primary_node }}"
