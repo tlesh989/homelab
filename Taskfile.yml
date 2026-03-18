@@ -77,6 +77,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  pi-hole:
+    desc: Run Ansible playbook for pi-hole host
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   ping:
     desc: Test connectivity to all hosts
     cmds:
