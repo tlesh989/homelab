@@ -66,6 +66,11 @@
     - _proxmox_lvm_register.rc != 0
     - "'is not online' not in (_proxmox_lvm_register.stderr | default(''))"
 
+- name: Install multipath-tools
+  ansible.builtin.apt:
+    name: multipath-tools
+    state: present
+
 - name: Deploy multipath configuration
   ansible.builtin.copy:
     dest: /etc/multipath.conf

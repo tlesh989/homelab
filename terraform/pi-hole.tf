@@ -83,4 +83,6 @@ resource "proxmox_virtual_environment_haresource" "pi_hole" {
   max_restart  = 3
   max_relocate = 3
   group        = proxmox_virtual_environment_hagroup.main.group
+
+  depends_on = [proxmox_virtual_environment_container.pi_hole]
 }

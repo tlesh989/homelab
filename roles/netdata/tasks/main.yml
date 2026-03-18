@@ -18,8 +18,9 @@
     marker: "# {mark} ANSIBLE MANAGED STREAMING"
     block: |
       [stream]
-      enabled = {{ 'yes' if netdata_role == 'child' else 'no' }}
+      enabled = yes
       destination = {{ netdata_parent_host }}:{{ netdata_parent_port }}
+      api key = {{ netdata_stream_api_key }}
   become: true
   when: netdata_role == "child"
   notify: Restart Netdata
@@ -30,7 +31,7 @@
     create: true
     marker: "# {mark} ANSIBLE MANAGED PARENT STREAM ACCEPTANCE"
     block: |
-      [API]
+      [{{ netdata_stream_api_key }}]
       enabled = yes
       allow from = 192.168.233.*
   become: true
@@ -53,9 +54,10 @@
     content: |
       jobs:
         - name: truenas
-          url: https://{{ truenas_host }}
-          token: {{ truenas_api_key_netdata }}
+          url: "https://{{ truenas_host }}"
+          token: "{{ truenas_api_key_netdata }}"
           tls_skip_verify: true
   become: true
   when: netdata_role == "parent"
+  no_log: true
   notify: Restart Netdata

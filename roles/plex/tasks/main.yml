@@ -2,6 +2,16 @@
 # tasks file for plex — installs Plex inside the LXC
 # The /media/plex bind mount is provided by the Proxmox host via Terraform mount_point.
 
+- name: Install Plex prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - ca-certificates
+    state: present
+    update_cache: true
+  become: true
+
 - name: Install Plex Media Server
   ansible.builtin.shell:
     cmd: |

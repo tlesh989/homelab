@@ -3,7 +3,7 @@
 
 - name: Create media dataset
   ansible.builtin.uri:
-    url: "https://{{ ansible_host }}/api/v2.0/pool/dataset"
+    url: "{{ truenas_api_url }}/pool/dataset"
     method: POST
     headers:
       Authorization: "Bearer {{ truenas_api_key }}"
@@ -13,14 +13,15 @@
       type: "FILESYSTEM"
       comments: "{{ item.comment }}"
     status_code: [200, 422]
-    validate_certs: false
+    validate_certs: "{{ truenas_validate_certs }}"
   loop: "{{ truenas_nfs_shares }}"
   loop_control:
     label: "{{ item.dataset }}"
+  no_log: true
 
 - name: Create NFS share
   ansible.builtin.uri:
-    url: "https://{{ ansible_host }}/api/v2.0/sharing/nfs"
+    url: "{{ truenas_api_url }}/sharing/nfs"
     method: POST
     headers:
       Authorization: "Bearer {{ truenas_api_key }}"
@@ -33,14 +34,15 @@
       maproot_group: "{{ item.maproot_group }}"
       enabled: true
     status_code: [200, 422]
-    validate_certs: false
+    validate_certs: "{{ truenas_validate_certs }}"
   loop: "{{ truenas_nfs_shares }}"
   loop_control:
     label: "{{ item.dataset }}"
+  no_log: true
 
 - name: Ensure NFS service is running
   ansible.builtin.uri:
-    url: "https://{{ ansible_host }}/api/v2.0/service/start"
+    url: "{{ truenas_api_url }}/service/start"
     method: POST
     headers:
       Authorization: "Bearer {{ truenas_api_key }}"
@@ -48,4 +50,5 @@
     body:
       service: "nfs"
     status_code: [200]
-    validate_certs: false
+    validate_certs: "{{ truenas_validate_certs }}"
+  no_log: true
