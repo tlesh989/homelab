@@ -109,8 +109,20 @@ cd terraform && task test   # Format and Validate
 - `/deploy <target>` — dry-run first, apply on confirmation.
 - `/ship [message]` — commit, push, and open a PR against `dev`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
-- Hooks: Blocks edits to secrets, runs yamllint on YAML edits, `terraform fmt` on `.tf` edits, `ansible-lint` on role/playbook edits.
+- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
 - Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes.
+
+## Behavior Rules
+
+- **SSH auth failures**: If SSH authentication fails, stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
+- **Before opening a PR**: Always run `coderabbit review --plain --base dev` on committed changes before creating a PR with `/ship`.
+
+## Verification (Definition of Done)
+
+- **Ansible change**: `task syntax` passes, `task lint` passes, `task check` dry-run shows expected changes only.
+- **Terraform change**: `cd terraform && task test` (fmt + validate) passes, `task plan` reviewed before apply.
+- **New service scaffold**: `task check` passes for the new host group, `task ping` confirms connectivity.
+- **PR ready**: CI passes on GitHub, `coderabbit review` clean.
 
 ### Gemini CLI
 

@@ -2,6 +2,7 @@
 name: new-service
 description: Scaffold a new homelab service — Terraform LXC config + Ansible role skeleton
 user-invocable: true
+disable-model-invocation: true
 arguments:
   - name: name
     description: "Service name in kebab-case (e.g. uptime-kuma)"

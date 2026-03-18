@@ -4,7 +4,7 @@ description: "Run Ansible playbook with dry-run verification first"
 user-invocable: true
 arguments:
   - name: target
-    description: "Host group to deploy to (proxmox, tailscale, plex, kaz)"
+    description: "Host group to deploy to (proxmox, tailscale, plex, glance)"
     required: true
 ---
 

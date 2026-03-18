@@ -57,5 +57,5 @@ Run diagnostics on a specified host or service to identify issues.
 ## After Diagnosis
 
 - If connectivity issue: check Tailscale ACLs in `tailscale/policy.hujson`
-- If config drift: run `/drift-detector` or `task check`
+- If config drift: run `task check`
 - If service failed: run `/deploy <target>` to re-apply Ansible role
