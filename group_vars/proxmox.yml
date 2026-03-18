@@ -39,3 +39,4 @@ install_script_cron_enabled: true
 # proxmox
 proxmox_ceph_disabled: true
 proxmox_disable_ha: false
+proxmox_storage_mtu: 9000
