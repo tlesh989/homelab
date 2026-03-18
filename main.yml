@@ -87,13 +87,7 @@
   become: true
   roles:
     - role: ansible-user
-    - role: GROG.package
-    - role: users
-    - role: weareinteractive.environment
-    - role: geerlingguy.ntp
-    - role: geerlingguy.security
-    - role: geerlingguy.pip
-    - role: joenyland.plexmediaserver
+    - role: plex
 
 - name: setup glance server
   hosts: glance

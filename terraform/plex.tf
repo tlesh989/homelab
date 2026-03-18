@@ -7,6 +7,11 @@ resource "proxmox_virtual_environment_container" "plex" {
     nesting = true
   }
 
+  mount_point {
+    path   = "/media/plex"
+    volume = "/mnt/plex-media"
+  }
+
   cpu {
     architecture = "amd64"
     cores        = 3
@@ -64,6 +69,7 @@ resource "proxmox_virtual_environment_container" "plex" {
       node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
+      mount_point,
     ]
   }
 

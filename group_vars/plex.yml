@@ -1,0 +1,2 @@
+---
+plex_render_gid: 104   # update after checking: stat -c '%g' /dev/dri/renderD128 on sturm

@@ -28,3 +28,6 @@
     - proxmox_ceph_disabled is true
     - proxmox_pveceph_status.rc == 0
     - "'binary not installed' not in proxmox_pveceph_status.stdout"
+
+- name: Configure NFS mounts
+  ansible.builtin.include_tasks: nfs-mounts.yml
