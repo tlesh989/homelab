@@ -12,7 +12,7 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -123,3 +123,16 @@ jobs:
           ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
         run: |
           ansible-playbook --syntax-check main.yml
+
+  ci:
+    if: always()
+    needs: [changes, validate-terraform, validate-ansible]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if any job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more jobs failed or were cancelled"
+          exit 1
+      - name: All checks passed or skipped
+        run: echo "All jobs succeeded or were skipped"

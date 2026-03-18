@@ -1,0 +1,14 @@
+---
+# defaults file for ax88179b
+
+# Set to true in group_vars/tika.yml — opt-in so this never runs on bupu or sturm
+ax88179b_enabled: false
+
+ax88179b_driver_version: "3.5.0"
+ax88179b_download_url: "https://www.asix.com.tw/en/support/download/file/2089?time=1773781972531"
+ax88179b_dkms_name: "asix-ax88179"
+ax88179b_module_name: "ax_usb_nic"
+ax88179b_usb_vendor: "0b95"
+ax88179b_usb_product: "1790"
+# Set to a sha256 checksum (e.g. "sha256:abc123...") to verify tarball integrity
+ax88179b_tarball_checksum: ""
