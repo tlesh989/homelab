@@ -51,6 +51,7 @@
     executable: /bin/bash
   when:
     - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_config.stdout | length > 0
     - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   changed_when: true
   notify: Apply network config
