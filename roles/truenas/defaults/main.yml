@@ -8,7 +8,6 @@ truenas_api_key: "{{ lookup('env', 'TRUENAS_API_KEY') }}"
 
 # iSCSI configuration
 truenas_iscsi_portal_ip: "192.168.220.6"
-truenas_iscsi_portal_port: 3260
 truenas_iscsi_portal_comment: "proxmox"
 
 truenas_iscsi_target_name: "proxmox"
