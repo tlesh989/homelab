@@ -5,7 +5,7 @@
 
 # NFS shares
 truenas_nfs_shares:
-  - dataset: "tank/media/plex"
+  - dataset: "wayreth/data/media"
     comment: "Plex media library"
     hosts:
       - "192.168.233.7"   # tika
