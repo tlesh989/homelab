@@ -123,3 +123,17 @@ jobs:
           ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
         run: |
           ansible-playbook --syntax-check main.yml
+
+  ci:
+    if: always()
+    needs: [changes, validate-terraform, validate-ansible]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed or skipped
+        run: |
+          results='${{ toJSON(needs.*.result) }}'
+          if echo "$results" | grep -qE '"(failure|cancelled)"'; then
+            echo "One or more jobs failed or were cancelled"
+            exit 1
+          fi
+          echo "All jobs succeeded or were skipped"
