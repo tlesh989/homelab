@@ -1,0 +1,4 @@
+---
+netdata_role: "parent"        # parent | child
+netdata_parent_host: ""       # set on child nodes
+netdata_parent_port: 19999

@@ -71,6 +71,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  netdata:
+    desc: Deploy Netdata monitoring
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
