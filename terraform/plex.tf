@@ -7,6 +7,11 @@ resource "proxmox_virtual_environment_container" "plex" {
     nesting = true
   }
 
+  device {
+    host_path = "/dev/dri/renderD128"
+    mode      = "0666"
+  }
+
   mount_point {
     path   = "/media/plex"
     volume = "/mnt/plex-media"
@@ -70,6 +75,7 @@ resource "proxmox_virtual_environment_container" "plex" {
       operating_system[0].template_file_id,
       initialization[0].user_account,
       mount_point,
+      device,
     ]
   }
 

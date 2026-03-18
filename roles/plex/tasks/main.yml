@@ -22,3 +22,28 @@
     enabled: true
     state: started
   become: true
+
+# VAAPI hardware transcoding
+
+- name: Install VAAPI drivers in Plex LXC
+  ansible.builtin.apt:
+    name:
+      - vainfo
+      - mesa-va-drivers
+    state: present
+  become: true
+
+- name: Ensure render group exists with correct GID
+  ansible.builtin.group:
+    name: render
+    gid: "{{ plex_render_gid }}"
+    state: present
+  become: true
+
+- name: Add plex user to render group
+  ansible.builtin.user:
+    name: plex
+    groups: render
+    append: true
+  become: true
+  notify: Restart Plex
