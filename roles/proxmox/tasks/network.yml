@@ -1,17 +1,38 @@
 ---
 # tasks file for proxmox — network configuration
 
-- name: Get vmbr1 current MTU
+- name: Get vmbr1 current config
   ansible.builtin.shell:
     cmd: >-
       set -o pipefail &&
       pvesh get /nodes/{{ ansible_hostname }}/network/vmbr1
-      --output-format json |
-      python3 -c "import sys, json; print(json.load(sys.stdin).get('mtu', ''))"
+      --output-format json
     executable: /bin/bash
-  register: _proxmox_vmbr1_mtu
+  register: _proxmox_vmbr1_config
   changed_when: false
   failed_when: false
+
+- name: Set vmbr1 config facts
+  ansible.builtin.set_fact:
+    _proxmox_vmbr1_mtu: "{{ (_proxmox_vmbr1_config.stdout | from_json).get('mtu', '') | string }}"
+    _proxmox_vmbr1_ports: "{{ (_proxmox_vmbr1_config.stdout | from_json).get('bridge_ports', '') }}"
+  when: _proxmox_vmbr1_config.rc == 0
+
+- name: Set MTU on vmbr1 bridge member interfaces first
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      pvesh set /nodes/{{ ansible_hostname }}/network/{{ item }}
+      --type eth
+      --mtu {{ proxmox_storage_mtu }}
+    executable: /bin/bash
+  loop: "{{ _proxmox_vmbr1_ports.split() }}"
+  when:
+    - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_ports | length > 0
+    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
+  changed_when: true
+  notify: Apply network config
 
 - name: Set vmbr1 MTU to {{ proxmox_storage_mtu }}
   ansible.builtin.shell:
@@ -21,10 +42,12 @@
       --type bridge
       --mtu {{ proxmox_storage_mtu }}
     executable: /bin/bash
-  when: _proxmox_vmbr1_mtu.stdout | trim != proxmox_storage_mtu | string
+  when:
+    - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   changed_when: true
   notify: Apply network config
 
 - name: Debug vmbr1 MTU result
   ansible.builtin.debug:
-    msg: "vmbr1 MTU is {{ _proxmox_vmbr1_mtu.stdout | trim }} (target: {{ proxmox_storage_mtu }})"
+    msg: "vmbr1 MTU is {{ _proxmox_vmbr1_mtu | default('unknown') }} (target: {{ proxmox_storage_mtu }})"
