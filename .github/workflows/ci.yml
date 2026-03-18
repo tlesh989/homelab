@@ -129,11 +129,10 @@ jobs:
     needs: [changes, validate-terraform, validate-ansible]
     runs-on: ubuntu-latest
     steps:
-      - name: All checks passed or skipped
+      - name: Fail if any job failed or was cancelled
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: |
-          results='${{ toJSON(needs.*.result) }}'
-          if echo "$results" | grep -qE '"(failure|cancelled)"'; then
-            echo "One or more jobs failed or were cancelled"
-            exit 1
-          fi
-          echo "All jobs succeeded or were skipped"
+          echo "One or more jobs failed or were cancelled"
+          exit 1
+      - name: All checks passed or skipped
+        run: echo "All jobs succeeded or were skipped"
