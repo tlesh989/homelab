@@ -8,7 +8,7 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
   }
 
   disk {
-    datastore_id = "vm_data"
+    datastore_id = "truenas-lvm"
     size         = 8
   }
 
@@ -59,8 +59,28 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
       node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
+      disk,
     ]
   }
 
   tags = ["terraform"]
+}
+
+resource "proxmox_virtual_environment_hagroup" "main" {
+  group   = "main-group"
+  comment = "Primary HA group — prefer sturm, failover to bupu/tika"
+
+  nodes = {
+    sturm = 3
+    bupu  = 2
+    tika  = 1
+  }
+}
+
+resource "proxmox_virtual_environment_haresource" "pi_hole" {
+  resource_id  = "ct:102"
+  state        = "started"
+  max_restart  = 3
+  max_relocate = 3
+  group        = proxmox_virtual_environment_hagroup.main.group
 }
