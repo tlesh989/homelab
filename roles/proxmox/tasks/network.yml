@@ -21,7 +21,9 @@
   ansible.builtin.set_fact:
     _proxmox_vmbr1_mtu: "{{ (_proxmox_vmbr1_config.stdout | from_json).get('mtu', '') | string }}"
     _proxmox_vmbr1_ports: "{{ (_proxmox_vmbr1_config.stdout | from_json).get('bridge_ports', '') }}"
-  when: _proxmox_vmbr1_config.rc == 0
+  when:
+    - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_config.stdout | length > 0
 
 - name: Set MTU on vmbr1 bridge member interfaces first
   ansible.builtin.shell:
