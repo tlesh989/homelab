@@ -6,6 +6,10 @@ resource "proxmox_virtual_environment_storage_nfs" "proxmox_nfs" {
   export = "/mnt/wayreth/proxmox-nfs"
 
   content = ["backup", "images", "import", "iso", "rootdir", "snippets", "vztmpl"]
+
+  lifecycle {
+    ignore_changes = [options]
+  }
 }
 
 resource "proxmox_virtual_environment_download_file" "ubuntu_24_04_lxc_template" {
