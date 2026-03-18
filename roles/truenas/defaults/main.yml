@@ -1,0 +1,28 @@
+---
+# defaults file for truenas
+
+# TrueNAS REST API base URL (LAN interface — accessible from Ansible controller)
+truenas_api_url: "https://192.168.233.6/api/v2.0"
+# TrueNAS API key — injected from Doppler as TRUENAS_API_KEY
+truenas_api_key: "{{ lookup('env', 'TRUENAS_API_KEY') }}"
+
+# iSCSI configuration
+truenas_iscsi_portal_ip: "192.168.220.6"
+truenas_iscsi_portal_port: 3260
+truenas_iscsi_portal_comment: "proxmox"
+
+truenas_iscsi_target_name: "proxmox"
+# Full IQN: iqn.2005-10.org.freenas.ctl:proxmox
+
+truenas_iscsi_extent_name: "proxmox-iscsi"
+truenas_iscsi_extent_disk: "zvol/wayreth/proxmox-iscsi"
+truenas_iscsi_extent_blocksize: 512
+truenas_iscsi_extent_comment: "proxmox shared storage"
+
+# LVM configuration
+# Node that creates the VG (other nodes discover it via shared LVM metadata)
+truenas_lvm_primary_node: "sturm"
+truenas_lvm_vg_name: "pve-iscsi"
+
+# TLS verification for REST API calls — set to false for self-signed certs
+truenas_validate_certs: false

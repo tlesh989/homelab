@@ -26,6 +26,11 @@
       tags: [r8152]
     - role: ansible-user
 
+- name: configure truenas
+  hosts: truenas
+  roles:
+    - role: truenas
+
 - name: setup tailscale server
   hosts: tailscale
   become: true
@@ -100,3 +105,14 @@
     - role: geerlingguy.security
     - role: users
     - role: glance
+
+- name: setup pi-hole server
+  hosts: pi-hole
+  become: true
+  roles:
+    - role: ansible-user
+    - role: GROG.package
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: users
+    - role: pi-hole

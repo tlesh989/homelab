@@ -1,0 +1,8 @@
+---
+# tasks file for truenas
+
+- name: Configure TrueNAS iSCSI
+  ansible.builtin.include_tasks: iscsi.yml
+
+- name: Create LVM VG on iSCSI LUN
+  ansible.builtin.include_tasks: iscsi_lvm.yml

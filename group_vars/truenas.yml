@@ -1,0 +1,4 @@
+---
+# group_vars for truenas host
+# All connection variables are in roles/truenas/defaults/main.yml
+# Override here if needed (e.g., different API URL)
