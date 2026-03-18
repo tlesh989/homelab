@@ -132,7 +132,7 @@
     validate_certs: "{{ truenas_validate_certs }}"
     status_code: 200
   when: >-
-    _truenas_target_detail.json.groups
+    (_truenas_target_detail.json.groups | default([]))
     | selectattr('portal', 'equalto', _truenas_portal_id | int)
     | list | length == 0
   changed_when: true
