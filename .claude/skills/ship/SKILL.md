@@ -2,6 +2,7 @@
 name: ship
 description: Use when ready to commit, push, and open a pull request in the homelab repo
 user-invocable: true
+disable-model-invocation: true
 arguments:
   - name: message
     description: "Optional commit message override"
@@ -20,7 +21,8 @@ Commit, push, and open a PR against `dev` in one shot.
    - Pre-commit hooks run automatically (markdownlint, ansible-lint, terraform checks)
    - If hooks fail, fix the errors and retry the commit — do NOT skip hooks
 4. Push branch to origin: `git push -u origin <branch>`
-5. Create PR: `gh pr create --base dev --title "<title>" --body "<body>"`
+5. Run CodeRabbit review: `coderabbit review --plain --base dev` — review output and fix any issues before opening the PR
+6. Create PR: `gh pr create --base dev --title "<title>" --body "<body>"`
 
 ## Commit Message Format
 
