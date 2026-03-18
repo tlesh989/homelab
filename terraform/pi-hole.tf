@@ -7,12 +7,6 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     nesting = true
   }
 
-  console {
-    enabled   = true
-    tty_count = 2
-    type      = "tty"
-  }
-
   disk {
     datastore_id = "vm_data"
     size         = 8
@@ -22,10 +16,8 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     hostname = "pi-hole"
 
     dns {
-      domain = "tlesh.xyz"
-      servers = [
-        "1.1.1.1",
-      ]
+      domain  = "tlesh.xyz"
+      servers = ["1.1.1.1"]
     }
 
     ip_config {
@@ -65,4 +57,6 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
       initialization[0].user_account,
     ]
   }
+
+  tags = ["terraform"]
 }
