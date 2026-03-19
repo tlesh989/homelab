@@ -31,3 +31,6 @@
 
 - name: Configure NFS mounts
   ansible.builtin.include_tasks: nfs-mounts.yml
+
+- name: Configure LXC device passthrough
+  ansible.builtin.include_tasks: lxc-devices.yml

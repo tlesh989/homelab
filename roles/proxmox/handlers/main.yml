@@ -29,3 +29,8 @@
     name: pve-ha-lrm
     state: restarted
   become: true
+
+- name: Restart pve-lxc plex
+  ansible.builtin.command:
+    cmd: pct restart 103
+  changed_when: true
