@@ -23,6 +23,7 @@
   ansible.builtin.systemd:
     name: multipathd
     state: restarted
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Restart pve-ha-lrm
   ansible.builtin.systemd:
