@@ -21,3 +21,6 @@ proxmox_zfs_arc_limit: true
 proxmox_zfs_arc_max: 0 # 0 means automatic (2GB for <16GB RAM, 4GB for 32GB+)
 proxmox_enable_sriov: true # Intel iGPU SR-IOV (Experimental)
 proxmox_sysctl_optimizations: true
+
+# Storage network bridge MTU — set to 9000 for jumbo frames on storage VLAN
+proxmox_storage_mtu: 9000

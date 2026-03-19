@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
@@ -18,6 +17,9 @@ concurrency:
 jobs:
   # Job to detect which files changed
   changes:
+    permissions:
+      contents: read
+      pull-requests: read  # required by dorny/paths-filter on pull_request events
     runs-on: ubuntu-latest
     outputs:
       terraform: ${{ steps.filter.outputs.terraform }}
@@ -91,7 +93,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.12'
           cache: 'pip'
 
       - name: Install Ansible and Lint
@@ -127,6 +129,7 @@ jobs:
   ci:
     if: always()
     needs: [changes, validate-terraform, validate-ansible]
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any job failed or was cancelled

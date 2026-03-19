@@ -7,14 +7,8 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     nesting = true
   }
 
-  console {
-    enabled   = true
-    tty_count = 2
-    type      = "tty"
-  }
-
   disk {
-    datastore_id = "vm_data"
+    datastore_id = "truenas-lvm"
     size         = 8
   }
 
@@ -22,10 +16,8 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     hostname = "pi-hole"
 
     dns {
-      domain = "tlesh.xyz"
-      servers = [
-        "1.1.1.1",
-      ]
+      domain  = "tlesh.xyz"
+      servers = ["1.1.1.1"]
     }
 
     ip_config {
@@ -36,7 +28,10 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     }
 
     user_account {
-      keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      keys = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      # PM_API_PASSWORD reused for container root password (project-wide convention).
+      # initialization[0].user_account is in ignore_changes — only applied at initial creation.
+      # TODO: consider using a dedicated PIHOLE_ROOT_PASSWORD secret
       password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
@@ -61,8 +56,16 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
 
   lifecycle {
     ignore_changes = [
+      node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
+      disk,
     ]
   }
+
+  tags = ["terraform"]
 }
+
+# HA group and resource removed — proxmox_virtual_environment_hagroup is not supported
+# in Proxmox VE versions where HA groups have been migrated to rules.
+# Configure pi-hole HA manually: Datacenter → HA → Add (ct:102, group: main-group)

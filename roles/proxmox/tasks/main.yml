@@ -8,6 +8,12 @@
 - name: Hardware-Specific Optimizations
   ansible.builtin.include_tasks: hardware.yml
 
+- name: Configure network interfaces
+  ansible.builtin.include_tasks: network.yml
+
+- name: Configure storage backends
+  ansible.builtin.include_tasks: storage.yml
+
 - name: Check ceph status
   ansible.builtin.shell:
     cmd: set -o pipefail && pveceph status 2>&1 | grep -v "not initialized"
@@ -22,3 +28,9 @@
     - proxmox_ceph_disabled is true
     - proxmox_pveceph_status.rc == 0
     - "'binary not installed' not in proxmox_pveceph_status.stdout"
+
+- name: Configure NFS mounts
+  ansible.builtin.include_tasks: nfs-mounts.yml
+
+- name: Configure LXC device passthrough
+  ansible.builtin.include_tasks: lxc-devices.yml

@@ -1,0 +1,13 @@
+---
+# tasks file for proxmox — LXC device passthrough
+# The bpg/proxmox provider does not support LXC device blocks; configure via lxc.conf directly.
+
+- name: Configure VAAPI device passthrough for Plex LXC (103)
+  ansible.builtin.blockinfile:
+    path: /etc/pve/lxc/103.conf
+    marker: "# {mark} ANSIBLE MANAGED VAAPI"
+    block: |
+      lxc.cgroup2.devices.allow: c 226:128 rwm
+      lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
+  notify: Restart pve-lxc plex
+  when: inventory_hostname == "sturm"

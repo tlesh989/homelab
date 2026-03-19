@@ -26,6 +26,14 @@
       tags: [r8152]
     - role: ansible-user
 
+- name: configure truenas
+  hosts: truenas
+  tasks:
+    - name: Configure TrueNAS (skipped in check mode — REST API calls require live execution)
+      ansible.builtin.include_role:
+        name: truenas
+      when: not ansible_check_mode
+
 - name: setup tailscale server
   hosts: tailscale
   become: true
@@ -84,11 +92,9 @@
     - role: ansible-user
     - role: GROG.package
     - role: users
-    - role: weareinteractive.environment
     - role: geerlingguy.ntp
     - role: geerlingguy.security
-    - role: geerlingguy.pip
-    - role: joenyland.plexmediaserver
+    - role: plex
 
 - name: setup glance server
   hosts: glance
@@ -100,3 +106,29 @@
     - role: geerlingguy.security
     - role: users
     - role: glance
+
+- name: setup netdata parent
+  hosts: netdata
+  become: true
+  roles:
+    - role: ansible-user
+    - role: GROG.package
+    - role: users
+    - role: netdata
+
+- name: setup netdata agents on proxmox nodes
+  hosts: proxmox
+  become: true
+  roles:
+    - role: netdata
+
+- name: setup pi-hole server
+  hosts: pi-hole
+  become: true
+  roles:
+    - role: ansible-user
+    - role: GROG.package
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: users
+    - role: pi-hole

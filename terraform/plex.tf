@@ -1,10 +1,15 @@
 resource "proxmox_virtual_environment_container" "plex" {
-  node_name    = "bupu"
+  node_name    = "sturm"
   vm_id        = 103
   unprivileged = false
 
   features {
     nesting = true
+  }
+
+  mount_point {
+    path   = "/media/plex"
+    volume = "/mnt/plex-media"
   }
 
   cpu {
@@ -61,8 +66,10 @@ resource "proxmox_virtual_environment_container" "plex" {
 
   lifecycle {
     ignore_changes = [
+      node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
+      mount_point,
     ]
   }
 

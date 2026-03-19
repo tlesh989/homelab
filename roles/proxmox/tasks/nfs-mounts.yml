@@ -1,0 +1,25 @@
+---
+# tasks file for proxmox — NFS mounts on Proxmox host
+# Runs on the Proxmox host, NOT inside LXCs.
+# NFS mounts here are passed into LXCs as bind mounts via Terraform mount_point blocks.
+
+- name: Install NFS client on Proxmox host
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+
+- name: Create NFS mount point directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ proxmox_nfs_mounts | default([]) }}"
+
+- name: Configure NFS mounts in fstab (automount, boot-safe)
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    fstype: nfs
+    opts: "{{ item.opts }}"
+    state: present
+  loop: "{{ proxmox_nfs_mounts | default([]) }}"

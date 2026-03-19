@@ -47,6 +47,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  truenas:
+    desc: Configure TrueNAS (iSCSI targets, NFS shares)
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   r8152:
     desc: Install Realtek r8152 DKMS driver on Proxmox hosts
     cmds:
@@ -65,11 +71,23 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  netdata:
+    desc: Deploy Netdata monitoring
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
+
+  pi-hole:
+    desc: Run Ansible playbook for pi-hole host
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts

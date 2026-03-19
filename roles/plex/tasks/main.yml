@@ -1,0 +1,58 @@
+---
+# tasks file for plex — installs Plex inside the LXC
+# The /media/plex bind mount is provided by the Proxmox host via Terraform mount_point.
+
+- name: Install Plex prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - ca-certificates
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install Plex Media Server
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://downloads.plex.tv/plex-keys/PlexSign.key | gpg --dearmor \
+        -o /etc/apt/trusted.gpg.d/plexmediaserver.gpg
+      echo "deb https://downloads.plex.tv/repo/deb public main" \
+        > /etc/apt/sources.list.d/plexmediaserver.list
+      apt-get update -qq
+      apt-get install -y plexmediaserver
+    executable: /bin/bash
+    creates: "/usr/lib/plexmediaserver/Plex Media Server"
+  become: true
+
+- name: Ensure Plex Media Server is enabled and started
+  ansible.builtin.systemd:
+    name: plexmediaserver
+    enabled: true
+    state: started
+  become: true
+
+# VAAPI hardware transcoding
+
+- name: Install VAAPI drivers in Plex LXC
+  ansible.builtin.apt:
+    name:
+      - vainfo
+      - mesa-va-drivers
+    state: present
+  become: true
+
+- name: Ensure render group exists
+  ansible.builtin.group:
+    name: render
+    state: present
+  become: true
+
+- name: Add plex user to render group
+  ansible.builtin.user:
+    name: plex
+    groups: render
+    append: true
+  become: true
+  notify: Restart Plex

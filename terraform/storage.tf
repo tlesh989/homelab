@@ -6,6 +6,13 @@ resource "proxmox_virtual_environment_storage_nfs" "proxmox_nfs" {
   export = "/mnt/wayreth/proxmox-nfs"
 
   content = ["backup", "images", "import", "iso", "rootdir", "snippets", "vztmpl"]
+
+  lifecycle {
+    # bpg/proxmox provider bug: `options` flips between null and a computed value
+    # on every plan, producing a perpetual diff. Ignored until the provider fixes
+    # this. While active, `options` cannot be managed via Terraform.
+    ignore_changes = [options]
+  }
 }
 
 resource "proxmox_virtual_environment_download_file" "ubuntu_24_04_lxc_template" {

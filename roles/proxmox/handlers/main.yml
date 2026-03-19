@@ -13,3 +13,25 @@
 - name: Update initramfs
   ansible.builtin.command: update-initramfs -u
   changed_when: true
+
+- name: Apply network config
+  ansible.builtin.command:
+    cmd: ifreload -a
+  changed_when: true
+
+- name: Restart multipathd
+  ansible.builtin.systemd:
+    name: multipathd
+    state: restarted
+  ignore_errors: ansible_check_mode
+
+- name: Restart pve-ha-lrm
+  ansible.builtin.systemd:
+    name: pve-ha-lrm
+    state: restarted
+  become: true
+
+- name: Restart pve-lxc plex
+  ansible.builtin.command:
+    cmd: pct restart 103
+  changed_when: true

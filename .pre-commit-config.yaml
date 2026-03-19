@@ -42,6 +42,7 @@ repos:
           - --args=--config=__GIT_WORKING_DIR__/terraform/.tflint.hcl
           - --args=--recursive
           - --args=--fix
+        stages: [pre-commit]
       - id: terraform_docs
         args:
           - --hook-config=--path-to-file=README.md
@@ -80,7 +81,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.44.0
+    rev: a8d8e187146634c459c27ade2d3e338569378720  # pinned: v1.44.0 — autoupdate resolves to floating v1 tag
     hooks:
       - id: typos
         stages: [pre-commit]
@@ -95,3 +96,19 @@ repos:
     rev: v1.7.11
     hooks:
       - id: actionlint
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        stages: [pre-commit]
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: "3.2.510"
+    hooks:
+      - id: checkov
+        files: ^terraform/.*\.tf$
+        args:
+          - --quiet
+          - --skip-check CKV_TF_1  # module pinning enforced by tflint instead
+        stages: [pre-commit]

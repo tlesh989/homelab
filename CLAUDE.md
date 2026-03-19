@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) and Gemini CLI when 
 
 ## Project Overview
 
+This is a homelab infrastructure repo using Terraform (Proxmox provider), Ansible roles, and Doppler for secrets. Primary languages are YAML (Ansible), HCL (Terraform), and Markdown. Always check existing patterns in the repo before creating new files.
+
 This repository contains the infrastructure-as-code and configuration management for a personal homelab.
 
 - **Infrastructure:** Proxmox VE hosting LXC containers and VMs across nodes (e.g., `bupu`, `sturm`, `tika`).
@@ -46,6 +48,10 @@ task syntax                 # Check playbook syntax
 task lint                   # Run ansible-lint
 task ping                   # Test connectivity to all hosts
 
+# Bootstrap a new LXC container (first-time only — creates ansible service account)
+# Doppler sets SSH_USER=tommy locally, so must override with ansible_user=root
+doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
+
 # Terraform (from terraform/ directory)
 cd terraform && task        # fmt + validate + plan
 cd terraform && task init   # Initialize with Doppler secrets
@@ -74,6 +80,13 @@ cd terraform && task test   # Format and Validate
 - **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
 - **General**: 2-space indentation, max 120 chars line length.
 
+## Git Workflow
+
+- Always create a feature branch before committing changes. Never commit directly to `dev` or `main` branches.
+- When creating PRs, always branch from `dev` (not `main`) unless explicitly told otherwise.
+- Use Gitflow-style branch naming: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`.
+- Before making any changes: 1) check which branch you are on and create a feature branch from `dev` if needed, 2) review existing patterns in the directory you will modify, 3) list your plan and wait for explicit approval before editing files.
+
 ## Gitflow & CI/CD
 
 - **Working Branch**: `dev`. This is the default branch for all active development.
@@ -93,9 +106,17 @@ cd terraform && task test   # Format and Validate
   - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
   - `tailscale.yml`: Syncs Tailscale ACLs.
 
+## Code Editing Rules
+
+- When using the Edit tool with `replace_all` or broad replacements, verify that variable name substitutions don't collide with similarly-named variables (e.g., replacing `users` should not affect `users_groups` or `users_ssh_exclusive`).
+
 ## Key Files to Keep in Sync
 
 - `.github/copilot-instructions.md` — PR-review-focused summary for GitHub Copilot. Update it when conventions or CI checks change.
+
+## Claude Configuration
+
+- For MCP server configurations, use `.claude/settings.json` (project-level) not `~/.claude/settings.json` (global) unless the user specifies otherwise.
 
 ## MCP Tool Usage
 
@@ -109,8 +130,20 @@ cd terraform && task test   # Format and Validate
 - `/deploy <target>` — dry-run first, apply on confirmation.
 - `/ship [message]` — commit, push, and open a PR against `dev`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
-- Hooks: Blocks edits to secrets, runs yamllint on YAML edits, `terraform fmt` on `.tf` edits, `ansible-lint` on role/playbook edits.
+- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
 - Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes.
+
+## Behavior Rules
+
+- **SSH auth failures**: If SSH authentication fails, stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
+- **Before opening a PR**: Always run `coderabbit review --plain --base dev` on committed changes before creating a PR with `/ship`.
+
+## Verification (Definition of Done)
+
+- **Ansible change**: `task syntax` passes, `task lint` passes, `task check` dry-run shows expected changes only.
+- **Terraform change**: `cd terraform && task test` (fmt + validate) passes, `task plan` reviewed before apply.
+- **New service scaffold**: `task check` passes for the new host group, `task ping` confirms connectivity.
+- **PR ready**: CI passes on GitHub, `coderabbit review` clean.
 
 ### Gemini CLI
 
