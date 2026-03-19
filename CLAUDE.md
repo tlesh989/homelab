@@ -84,7 +84,7 @@ cd terraform && task test   # Format and Validate
 
 - Always create a feature branch before committing changes. Never commit directly to `dev` or `main` branches.
 - When creating PRs, always branch from `dev` (not `main`) unless explicitly told otherwise.
-- Use conventional branch naming: `feat/`, `fix/`, `chore/` prefixes.
+- Use Gitflow-style branch naming: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`.
 - Before making any changes: 1) check which branch you are on and create a feature branch from `dev` if needed, 2) review existing patterns in the directory you will modify, 3) list your plan and wait for explicit approval before editing files.
 
 ## Gitflow & CI/CD

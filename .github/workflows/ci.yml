@@ -17,6 +17,9 @@ concurrency:
 jobs:
   # Job to detect which files changed
   changes:
+    permissions:
+      contents: read
+      pull-requests: read  # required by dorny/paths-filter on pull_request events
     runs-on: ubuntu-latest
     outputs:
       terraform: ${{ steps.filter.outputs.terraform }}
