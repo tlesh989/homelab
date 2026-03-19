@@ -97,3 +97,50 @@ pages:
               - go-gitea/gitea
               - immich-app/immich
               - syncthing/syncthing
+
+  - name: Infrastructure
+    columns:
+      - size: full
+        widgets:
+          - type: monitor
+            title: Services
+            cache: 1m
+            sites:
+              - title: tika
+                url: https://{{ hostvars['tika.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: bupu
+                url: https://{{ hostvars['bupu.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: sturm
+                url: https://{{ hostvars['sturm.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: TrueNAS
+                url: https://{{ hostvars['ansalon'].ansible_host }}
+                icon: si:truenas
+                allow-insecure: true
+              - title: Netdata
+                url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999
+                icon: si:netdata
+              - title: Pi-hole
+                url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}/admin
+                icon: si:pihole
+
+          - type: custom-api
+            title: Netdata
+            cache: 1m
+            url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999/api/v1/info
+            template: |
+              {% raw %}<div class="flex gap-2 items-center">
+                <span>{{ len .JSON.mirrored_hosts }} nodes monitored</span>
+                {{ if gt .JSON.alarms.critical 0 }}
+                <span class="color-negative">{{ .JSON.alarms.critical }} critical</span>
+                {{ else if gt .JSON.alarms.warning 0 }}
+                <span class="color-highlight">{{ .JSON.alarms.warning }} warning</span>
+                {{ else }}
+                <span class="color-positive">No active alerts</span>
+                {{ end }}
+              </div>{% endraw %}
