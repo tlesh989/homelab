@@ -9,6 +9,7 @@
          else 'https://api.github.com/repos/glanceapp/glance/releases/tags/' + glance_version }}
     return_content: true
   register: glance_release
+  when: not ansible_check_mode
 
 - name: Assert Glance asset was found in release
   ansible.builtin.assert:
@@ -19,6 +20,7 @@
     fail_msg: >-
       Could not find glance-linux-amd64.tar.gz in release
       {{ glance_release.json.tag_name }}. Check the GitHub release assets.
+  when: not ansible_check_mode
 
 - name: Set Glance download URL and target version
   ansible.builtin.set_fact:
@@ -28,6 +30,7 @@
          | map(attribute='browser_download_url')
          | first }}
     glance_target_version: "{{ glance_release.json.tag_name }}"
+  when: not ansible_check_mode
 
 - name: Read currently installed Glance version
   ansible.builtin.slurp:
@@ -47,8 +50,9 @@
     dest: "{{ glance_install_dir }}"
     remote_src: true
   when: >-
+    not ansible_check_mode and (
     glance_installed_version is failed or
-    (glance_installed_version.content | b64decode | trim) != glance_target_version
+    (glance_installed_version.content | b64decode | trim) != glance_target_version)
   notify: Restart glance
 
 - name: Write installed version marker
@@ -57,8 +61,9 @@
     dest: "{{ glance_install_dir }}/.version"
     mode: "0644"
   when: >-
+    not ansible_check_mode and (
     glance_installed_version is failed or
-    (glance_installed_version.content | b64decode | trim) != glance_target_version
+    (glance_installed_version.content | b64decode | trim) != glance_target_version)
 
 - name: Template Glance config
   ansible.builtin.template:
