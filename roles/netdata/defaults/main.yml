@@ -1,0 +1,6 @@
+---
+netdata_role: "parent"        # parent | child
+netdata_parent_host: ""       # set on child nodes
+netdata_parent_port: 19999
+# Shared UUID for child→parent streaming auth — injected from Doppler as NETDATA_STREAM_API_KEY
+netdata_stream_api_key: "{{ lookup('env', 'NETDATA_STREAM_API_KEY') }}"

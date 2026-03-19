@@ -18,3 +18,19 @@
   ansible.builtin.command:
     cmd: ifreload -a
   changed_when: true
+
+- name: Restart multipathd
+  ansible.builtin.systemd:
+    name: multipathd
+    state: restarted
+
+- name: Restart pve-ha-lrm
+  ansible.builtin.systemd:
+    name: pve-ha-lrm
+    state: restarted
+  become: true
+
+- name: Restart pve-lxc plex
+  ansible.builtin.command:
+    cmd: pct restart 103
+  changed_when: true

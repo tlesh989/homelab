@@ -1,0 +1,6 @@
+---
+# NFS mounts for this Proxmox node
+proxmox_nfs_mounts:
+  - src: "192.168.233.6:/mnt/wayreth/data/media"
+    path: "/mnt/plex-media"
+    opts: "_netdev,x-systemd.automount,rw,hard,intr,rsize=131072,wsize=131072,timeo=600"

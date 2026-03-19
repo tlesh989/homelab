@@ -6,3 +6,6 @@
 
 - name: Create LVM VG on iSCSI LUN
   ansible.builtin.include_tasks: iscsi_lvm.yml
+
+- name: Configure NFS shares
+  ansible.builtin.include_tasks: nfs.yml

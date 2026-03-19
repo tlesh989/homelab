@@ -107,3 +107,30 @@
         content: "options i915 enable_guc=3 max_vfs=7\n"
         mode: "0644"
       notify: Update initramfs
+
+# Proxmox HA — software watchdog (softdog)
+
+- name: Load softdog kernel module persistently
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/softdog.conf
+    content: "softdog\n"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Load softdog module immediately
+  community.general.modprobe:
+    name: softdog
+    state: present
+  become: true
+
+- name: Configure Proxmox HA watchdog
+  ansible.builtin.lineinfile:
+    path: /etc/default/pve-ha-manager
+    regexp: "^WATCHDOG_MODULE="
+    line: "WATCHDOG_MODULE=softdog"
+    create: true
+    mode: "0644"
+  become: true
+  notify: Restart pve-ha-lrm

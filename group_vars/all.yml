@@ -47,12 +47,3 @@ security_fail2ban_enabled: false
 security_sudoers_passwordless:
   - "{{ lookup('env', 'SSH_USER') }}"
 
-# ironicbadger.docker_compose_generator
-appdata_path: /opt/appdata
-global_env_vars:
-  - "PUID={{ main_uid }}"
-  - "PGID={{ main_gid }}"
-  - "TZ={{ ntp_timezone }}"
-docker_compose_generator_uid: "{{ main_uid }}"
-docker_compose_generator_gid: "{{ main_gid }}"
-docker_compose_generator_output_path: "/home/{{ lookup('env', 'SSH_USER') }}"

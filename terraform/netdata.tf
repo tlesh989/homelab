@@ -1,41 +1,30 @@
-resource "proxmox_virtual_environment_container" "plex" {
+resource "proxmox_virtual_environment_container" "netdata" {
   node_name    = "sturm"
-  vm_id        = 103
-  unprivileged = false
+  vm_id        = 105
+  unprivileged = true
+
+  description = "Netdata monitoring parent"
 
   features {
     nesting = true
   }
 
-  mount_point {
-    path   = "/media/plex"
-    volume = "/mnt/plex-media"
-  }
-
-  cpu {
-    architecture = "amd64"
-    cores        = 3
-    units        = 1024
-  }
-
   disk {
     datastore_id = "vm_data"
-    size         = 100
+    size         = 8
   }
 
   initialization {
-    hostname = "plex"
+    hostname = "netdata"
 
     dns {
-      domain = "tlesh.xyz"
-      servers = [
-        "1.1.1.1",
-      ]
+      domain  = "tlesh.xyz"
+      servers = ["1.1.1.1"]
     }
 
     ip_config {
       ipv4 {
-        address = "192.168.233.12/24"
+        address = "192.168.233.23/24"
         gateway = "192.168.233.1"
       }
     }
@@ -47,15 +36,15 @@ resource "proxmox_virtual_environment_container" "plex" {
   }
 
   memory {
-    dedicated = 12288
+    dedicated = 512
     swap      = 0
   }
 
   network_interface {
     bridge      = "vmbr0"
     enabled     = true
-    firewall    = false
-    mac_address = "BC:24:11:74:AB:1A"
+    firewall    = true
+    mac_address = "BC:24:11:A2:3C:55"
     name        = "eth0"
   }
 
@@ -69,11 +58,8 @@ resource "proxmox_virtual_environment_container" "plex" {
       node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
-      mount_point,
     ]
   }
 
-  tags = [
-    "terraform",
-  ]
+  tags = ["terraform"]
 }

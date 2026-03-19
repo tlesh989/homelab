@@ -1,0 +1,63 @@
+---
+# tasks file for netdata
+
+- name: Install Netdata via kickstart script
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      wget -O /tmp/netdata-kickstart.sh https://get.netdata.cloud/kickstart.sh
+      bash /tmp/netdata-kickstart.sh --non-interactive --stable-channel 2>&1
+    executable: /bin/bash
+    creates: /usr/sbin/netdata
+  become: true
+
+- name: Configure Netdata streaming (child to parent)
+  ansible.builtin.blockinfile:
+    path: /etc/netdata/stream.conf
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED STREAMING"
+    block: |
+      [stream]
+      enabled = yes
+      destination = {{ netdata_parent_host }}:{{ netdata_parent_port }}
+      api key = {{ netdata_stream_api_key }}
+  become: true
+  when: netdata_role == "child"
+  notify: Restart Netdata
+
+- name: Configure Netdata stream acceptance on parent
+  ansible.builtin.blockinfile:
+    path: /etc/netdata/stream.conf
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED PARENT STREAM ACCEPTANCE"
+    block: |
+      [{{ netdata_stream_api_key }}]
+      enabled = yes
+      allow from = 192.168.233.*
+  become: true
+  when: netdata_role == "parent"
+  notify: Restart Netdata
+
+- name: Ensure Netdata is enabled and started
+  ansible.builtin.systemd:
+    name: netdata
+    enabled: true
+    state: started
+  become: true
+
+- name: Configure TrueNAS go.d collector
+  ansible.builtin.copy:
+    dest: /etc/netdata/go.d/truenas.conf
+    owner: netdata
+    group: netdata
+    mode: "0640"
+    content: |
+      jobs:
+        - name: truenas
+          url: "https://{{ truenas_host }}"
+          token: "{{ truenas_api_key_netdata }}"
+          tls_skip_verify: true
+  become: true
+  when: netdata_role == "parent"
+  no_log: true
+  notify: Restart Netdata

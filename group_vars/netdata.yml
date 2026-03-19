@@ -1,0 +1,4 @@
+---
+netdata_role: "parent"
+truenas_host: "192.168.233.6"
+truenas_api_key_netdata: "{{ lookup('env', 'TRUENAS_API_KEY') }}"

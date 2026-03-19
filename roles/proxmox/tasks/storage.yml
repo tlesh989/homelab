@@ -60,4 +60,38 @@
       --nodes bupu,sturm,tika
     executable: /bin/bash
   when: _proxmox_lvm_storage.rc != 0
-  changed_when: true
+  register: _proxmox_lvm_register
+  changed_when: _proxmox_lvm_register.rc == 0
+  failed_when:
+    - _proxmox_lvm_register.rc != 0
+    - "'is not online' not in (_proxmox_lvm_register.stderr | default(''))"
+
+- name: Install multipath-tools
+  ansible.builtin.apt:
+    name: multipath-tools
+    state: present
+
+- name: Deploy multipath configuration
+  ansible.builtin.copy:
+    dest: /etc/multipath.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      defaults {
+        path_grouping_policy failover
+        failback immediate
+      }
+      blacklist {
+        devnode "^(sd[a-z]|nvme[0-9]+n[0-9]+)$"
+      }
+      blacklist_exceptions {
+        property "SCSI_IDENT_.*"
+      }
+  notify: Restart multipathd
+
+- name: Ensure multipathd is enabled and running
+  ansible.builtin.systemd:
+    name: multipathd
+    enabled: true
+    state: started
