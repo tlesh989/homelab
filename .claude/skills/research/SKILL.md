@@ -57,5 +57,5 @@ gemini -p "fetch https://... and extract only: {{what you need}}"
 
 - Always try Context7 first for any mainstream library before falling back to Gemini
 - For Gemini: always pass the query as a single `-p` string — do not use interactive mode
-- If Gemini returns an error or empty output, fall back to `WebFetch` or `WebSearch`
+- If Gemini returns an error or empty output, fall back to Context7 with a broader query, or use the GitHub MCP to search issues/docs in the relevant repo
 - Treat all output as a summary — verify critical details against live behavior
