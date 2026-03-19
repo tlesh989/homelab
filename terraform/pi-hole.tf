@@ -66,23 +66,6 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
   tags = ["terraform"]
 }
 
-resource "proxmox_virtual_environment_hagroup" "main" {
-  group   = "main-group"
-  comment = "Primary HA group — prefer sturm, failover to bupu/tika"
-
-  nodes = {
-    sturm = 3
-    bupu  = 2
-    tika  = 1
-  }
-}
-
-resource "proxmox_virtual_environment_haresource" "pi_hole" {
-  resource_id  = "ct:102"
-  state        = "started"
-  max_restart  = 3
-  max_relocate = 3
-  group        = proxmox_virtual_environment_hagroup.main.group
-
-  depends_on = [proxmox_virtual_environment_container.pi_hole]
-}
+# HA group and resource removed — proxmox_virtual_environment_hagroup is not supported
+# in Proxmox VE versions where HA groups have been migrated to rules.
+# Configure pi-hole HA manually: Datacenter → HA → Add (ct:102, group: main-group)
