@@ -10,6 +10,7 @@
     executable: /bin/bash
     creates: /usr/sbin/netdata
   become: true
+  when: not ansible_check_mode
 
 - name: Configure Netdata streaming (child to parent)
   ansible.builtin.blockinfile:
@@ -23,6 +24,7 @@
       api key = {{ netdata_stream_api_key }}
   become: true
   when: netdata_role == "child"
+  no_log: true
   notify: Restart Netdata
 
 - name: Configure Netdata stream acceptance on parent
@@ -36,6 +38,7 @@
       allow from = 192.168.233.*
   become: true
   when: netdata_role == "parent"
+  no_log: true
   notify: Restart Netdata
 
 - name: Ensure Netdata is enabled and started
@@ -43,7 +46,7 @@
     name: netdata
     enabled: true
     state: started
-  ignore_errors: "{{ ansible_check_mode }}"
+  ignore_errors: ansible_check_mode
   become: true
 
 - name: Configure TrueNAS go.d collector

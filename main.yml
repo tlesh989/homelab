@@ -90,6 +90,10 @@
   become: true
   roles:
     - role: ansible-user
+    - role: GROG.package
+    - role: users
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
     - role: plex
 
 - name: setup glance server
