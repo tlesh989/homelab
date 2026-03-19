@@ -9,6 +9,7 @@
          else 'https://api.github.com/repos/glanceapp/glance/releases/tags/' + glance_version }}
     return_content: true
   register: glance_release
+  when: not ansible_check_mode
 
 - name: Assert Glance asset was found in release
   ansible.builtin.assert:
