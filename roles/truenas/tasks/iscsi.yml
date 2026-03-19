@@ -126,8 +126,8 @@
     body:
       groups:
         - portal: "{{ _truenas_portal_id }}"
-          initiator: null
-          auth: null
+          initiator:
+          auth:
           authmethod: "NONE"
     validate_certs: "{{ truenas_validate_certs }}"
     status_code: 200
