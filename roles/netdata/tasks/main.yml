@@ -43,6 +43,7 @@
     name: netdata
     enabled: true
     state: started
+  ignore_errors: "{{ ansible_check_mode }}"
   become: true
 
 - name: Configure TrueNAS go.d collector
