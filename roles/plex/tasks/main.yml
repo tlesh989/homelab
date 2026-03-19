@@ -23,7 +23,7 @@
       apt-get update -qq
       apt-get install -y plexmediaserver
     executable: /bin/bash
-    creates: '/usr/lib/plexmediaserver/Plex Media Server'
+    creates: "/usr/lib/plexmediaserver/Plex Media Server"
   become: true
 
 - name: Ensure Plex Media Server is enabled and started
@@ -43,10 +43,9 @@
     state: present
   become: true
 
-- name: Ensure render group exists with correct GID
+- name: Ensure render group exists
   ansible.builtin.group:
     name: render
-    gid: "{{ plex_render_gid }}"
     state: present
   become: true
 

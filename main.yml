@@ -28,8 +28,11 @@
 
 - name: configure truenas
   hosts: truenas
-  roles:
-    - role: truenas
+  tasks:
+    - name: Configure TrueNAS (skipped in check mode — REST API calls require live execution)
+      ansible.builtin.include_role:
+        name: truenas
+      when: not ansible_check_mode
 
 - name: setup tailscale server
   hosts: tailscale
@@ -87,6 +90,10 @@
   become: true
   roles:
     - role: ansible-user
+    - role: GROG.package
+    - role: users
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
     - role: plex
 
 - name: setup glance server
