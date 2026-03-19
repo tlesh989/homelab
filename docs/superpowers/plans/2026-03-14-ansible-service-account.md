@@ -17,6 +17,7 @@
 ## Chunk 1: `roles/ansible-user`
 
 **Files:**
+
 - Create: `roles/ansible-user/defaults/main.yml`
 - Create: `roles/ansible-user/tasks/main.yml`
 - Create: `roles/ansible-user/handlers/main.yml`
@@ -26,6 +27,7 @@
 ### Task 1: Role defaults
 
 **Files:**
+
 - Create: `roles/ansible-user/defaults/main.yml`
 
 - [ ] **Step 1: Create directory structure**
@@ -61,6 +63,7 @@ Expected: `playbook: main.yml` with no errors.
 ### Task 2: Role tasks
 
 **Files:**
+
 - Create: `roles/ansible-user/tasks/main.yml`
 
 - [ ] **Step 1: Write tasks**
@@ -146,6 +149,7 @@ git commit -m "feat: add roles/ansible-user for service account management"
 ## Chunk 2: `bootstrap.yml` Redesign
 
 **Files:**
+
 - Modify: `bootstrap.yml`
 
 **Context:** Existing `bootstrap.yml` has one play connecting as `root` + `ROOT_PASSWORD` with `ignore_unreachable: true`. It runs `buluma.roles.bootstrap` for fresh OS setup. We append two new plays that connect as `tommy` (SSH key) and escalate via `su` (Proxmox) or `sudo` (LXC) to create the ansible user. For existing hosts where root SSH is disabled, Play 1 fails silently; Plays 2/3 handle them.
@@ -155,6 +159,7 @@ git commit -m "feat: add roles/ansible-user for service account management"
 ### Task 3: Append ansible-user bootstrap plays
 
 **Files:**
+
 - Modify: `bootstrap.yml`
 
 - [ ] **Step 1: Append Proxmox play**
@@ -236,6 +241,7 @@ git commit -m "feat: add ansible service account bootstrap plays to bootstrap.ym
 ## Chunk 3: Wire Up — group_vars, main.yml, Taskfile
 
 **Files:**
+
 - Modify: `group_vars/all.yml`
 - Modify: `main.yml`
 - Modify: `Taskfile.yml`
@@ -249,6 +255,7 @@ git commit -m "feat: add ansible service account bootstrap plays to bootstrap.ym
 ### Task 4: Update `group_vars/all.yml`
 
 **Files:**
+
 - Modify: `group_vars/all.yml`
 
 - [ ] **Step 1: Switch ansible_user and add key file**
@@ -288,6 +295,7 @@ git commit -m "feat: switch ansible_user to ansible service account"
 ### Task 5: Add `roles/ansible-user` to every play in `main.yml`
 
 **Files:**
+
 - Modify: `main.yml`
 
 The role is added to every play for self-healing. It runs as `ansible` (which has NOPASSWD sudo) and is fully idempotent — module-level idempotency means no `when` guard is needed.
@@ -401,6 +409,7 @@ git commit -m "feat: add ansible-user role to all plays for self-healing"
 ### Task 6: Update `Taskfile.yml`
 
 **Files:**
+
 - Modify: `Taskfile.yml`
 
 - [ ] **Step 1: Add `setup` task**

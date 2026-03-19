@@ -18,6 +18,7 @@ cd terraform && doppler run -- terraform plan -detailed-exitcode 2>&1
 ```
 
 Interpret exit codes:
+
 - `0` — no drift
 - `1` — error (report it)
 - `2` — drift detected (summarize changes)
@@ -49,12 +50,15 @@ Cross-reference against: `terraform/plex.tf`, `terraform/pi-hole.tf`, `terraform
 Report findings in two categories:
 
 **Drift Detected** (state differs from code):
+
 - Resource/host, what changed, severity (breaking vs cosmetic)
 
 **Clean** (no drift):
+
 - Confirm which components were checked and are in sync
 
 **Errors/Unreachable**:
+
 - Any hosts or resources that couldn't be checked
 
 End with a recommendation: safe to deploy, needs investigation, or manual remediation required.

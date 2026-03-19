@@ -46,6 +46,7 @@
 ### Task 1: Add `proxmox_storage_mtu` variable
 
 **Files:**
+
 - Modify: `roles/proxmox/defaults/main.yml`
 - Modify: `group_vars/proxmox.yml`
 
@@ -54,6 +55,7 @@
 - [ ] **Step 1.2: Add default to `roles/proxmox/defaults/main.yml`**
 
 Append:
+
 ```yaml
 # Storage network bridge MTU — set to 9000 for jumbo frames on storage VLAN
 proxmox_storage_mtu: 9000
@@ -64,6 +66,7 @@ proxmox_storage_mtu: 9000
 - [ ] **Step 1.4: Add to `group_vars/proxmox.yml`**
 
 Append:
+
 ```yaml
 proxmox_storage_mtu: 9000
 ```
@@ -80,6 +83,7 @@ git commit -m "feat(proxmox): add proxmox_storage_mtu variable (9000)"
 ### Task 2: Create `roles/proxmox/tasks/network.yml`
 
 **Files:**
+
 - Create: `roles/proxmox/tasks/network.yml`
 - Modify: `roles/proxmox/tasks/main.yml`
 
@@ -119,6 +123,7 @@ git commit -m "feat(proxmox): add proxmox_storage_mtu variable (9000)"
 - [ ] **Step 2.2: Add handler to `roles/proxmox/handlers/main.yml`**
 
 Read the file first, then append:
+
 ```yaml
 - name: Apply network config
   ansible.builtin.command:
@@ -129,6 +134,7 @@ Read the file first, then append:
 - [ ] **Step 2.3: Read `roles/proxmox/tasks/main.yml` and add include**
 
 Add after the existing includes (before the Ceph block):
+
 ```yaml
 - name: Configure network interfaces
   ansible.builtin.include_tasks: network.yml
@@ -139,6 +145,7 @@ Add after the existing includes (before the Ceph block):
 ```bash
 task syntax
 ```
+
 Expected: no errors.
 
 - [ ] **Step 2.5: Dry-run against proxmox hosts**
@@ -163,6 +170,7 @@ git commit -m "feat(proxmox): set vmbr1 MTU to 9000 for iSCSI storage network"
 ### Task 3: Scaffold `roles/truenas`
 
 **Files:**
+
 - Create: `roles/truenas/defaults/main.yml`
 - Create: `roles/truenas/tasks/main.yml`
 - Create: `roles/truenas/handlers/main.yml`
@@ -235,6 +243,7 @@ git commit -m "feat(truenas): scaffold truenas role"
 ### Task 4: Create `roles/truenas/tasks/iscsi.yml`
 
 **Files:**
+
 - Create: `roles/truenas/tasks/iscsi.yml`
 
 - [ ] **Step 4.1: Create `roles/truenas/tasks/iscsi.yml`**
@@ -482,6 +491,7 @@ git commit -m "feat(truenas): scaffold truenas role"
 ```bash
 task syntax
 ```
+
 Expected: no errors.
 
 - [ ] **Step 4.3: Commit**
@@ -498,6 +508,7 @@ git commit -m "feat(truenas): configure iSCSI portal, target, extent, and servic
 ### Task 5: Add TrueNAS to inventory and wire into main.yml
 
 **Files:**
+
 - Modify: `hosts`
 - Create: `group_vars/truenas.yml`
 - Modify: `main.yml`
@@ -506,6 +517,7 @@ git commit -m "feat(truenas): configure iSCSI portal, target, extent, and servic
 - [ ] **Step 5.1: Add truenas group to `hosts`**
 
 Append to `hosts`:
+
 ```ini
 [truenas]
 ansalon ansible_host=192.168.233.6 ansible_connection=local
@@ -525,6 +537,7 @@ Note: `ansible_connection=local` — the truenas role uses `ansible.builtin.uri`
 - [ ] **Step 5.3: Read `main.yml` and add truenas play**
 
 Add after the `setup proxmox hosts` play:
+
 ```yaml
 - name: configure truenas
   hosts: truenas
@@ -535,6 +548,7 @@ Add after the `setup proxmox hosts` play:
 - [ ] **Step 5.4: Add `truenas` task to `Taskfile.yml`**
 
 Add after the `proxmox` task:
+
 ```yaml
   truenas:
     desc: Configure TrueNAS (iSCSI targets, NFS shares)
@@ -571,9 +585,11 @@ git commit -m "feat(truenas): add to inventory and main.yml playbook"
 ### Task 6: Create `terraform/iscsi.tf`
 
 **Files:**
+
 - Create: `terraform/iscsi.tf`
 
 **Important:** Before writing, use Context7 to look up the exact bpg/proxmox resources:
+
 - Search for `proxmox_virtual_environment_storage_iscsi`
 - Search for `proxmox_virtual_environment_storage_lvm`
 
@@ -617,6 +633,7 @@ resource "proxmox_virtual_environment_storage_lvm" "truenas_lvm" {
 ```
 
 **Fallback if provider lacks iSCSI/LVM resources:** Add these storage backends via Ansible `pvesh` commands in a new `roles/proxmox/tasks/storage.yml`. Skip the Terraform approach and document the pvesh commands:
+
 ```bash
 # iSCSI backend
 pvesh create /storage --storage truenas-iscsi --type iscsi \
@@ -634,6 +651,7 @@ pvesh create /storage --storage truenas-lvm --type lvm \
 ```bash
 cd terraform && task
 ```
+
 Expected: format check passes, validate passes, plan shows new storage resources.
 
 - [ ] **Step 6.4: Commit**
@@ -652,6 +670,7 @@ This task runs **after** `task truenas` (TrueNAS iSCSI configured) and **after**
 ### Task 7: Create LVM VG on the shared iSCSI LUN
 
 **Files:**
+
 - Create: `roles/truenas/tasks/iscsi_lvm.yml`
 - Modify: `roles/truenas/tasks/main.yml`
 
@@ -660,10 +679,12 @@ The LVM VG needs to be created **once**, on one node (sturm). Other nodes auto-d
 - [ ] **Step 7.1: Discover the iSCSI device path on sturm**
 
 SSH in to verify the LUN is visible after iSCSI backend is applied:
+
 ```bash
 ssh -i ~/.ssh/ansible_ed25519 ansible@sturm \
   'sudo ls /dev/disk/by-path/ | grep iqn.2005-10.org.freenas'
 ```
+
 Expected: something like `ip-192.168.220.6:3260-iscsi-iqn.2005-10.org.freenas.ctl:proxmox-lun-0`
 
 - [ ] **Step 7.2: Create `roles/truenas/tasks/iscsi_lvm.yml`**
@@ -727,6 +748,7 @@ Expected: something like `ip-192.168.220.6:3260-iscsi-iqn.2005-10.org.freenas.ct
 - [ ] **Step 7.3: Add LVM variables to `roles/truenas/defaults/main.yml`**
 
 Append:
+
 ```yaml
 # LVM configuration
 # Node that creates the VG (other nodes discover it via shared LVM metadata)
