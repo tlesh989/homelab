@@ -222,6 +222,7 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
 > and the SSH key is local — causing playbook failures across the fleet.
 
 1. **Generate the ansible SSH keypair** on your Mac:
+
    ```bash
    ssh-keygen -t ed25519 -C "ansible service account" -f /tmp/ansible_ed25519 -N ""
    ```
@@ -233,6 +234,7 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
    `ROOT_PASSWORD` is already in Doppler and is reused for `su` escalation on Proxmox nodes.
 
 3. **Delete local key files** — they now live only in Doppler:
+
    ```bash
    rm /tmp/ansible_ed25519 /tmp/ansible_ed25519.pub
    ```
@@ -242,20 +244,24 @@ this replaces it with Doppler injection so `BOOTSTRAP_PASS` is available to the 
 5. **Run `task bootstrap`** — creates the `ansible` user on all existing hosts
 
 6. **Verify** all hosts respond as the `ansible` user:
+
    ```bash
    task ping
    # Expected: ansible@<host> | SUCCESS
    ```
+
    Note: at this point `group_vars/all.yml` has not yet been deployed — `task ping` still
    uses `SSH_USER` from the current branch. The purpose of this step is to manually confirm
    SSH key auth works: `ssh -i ~/.ssh/ansible_ed25519 ansible@bupu.tlesh.xyz echo ok`
 
 7. **Deploy the code change** (new branch → PR → merge to dev):
+
    ```bash
    task ship "feat: add ansible service account with non-interactive auth"
    ```
 
 8. **Run a full dry-run** to confirm normal playbook flow works end-to-end:
+
    ```bash
    task check
    ```

@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
@@ -91,7 +90,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.12'
           cache: 'pip'
 
       - name: Install Ansible and Lint
@@ -127,6 +126,7 @@ jobs:
   ci:
     if: always()
     needs: [changes, validate-terraform, validate-ansible]
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
       - name: Fail if any job failed or was cancelled
