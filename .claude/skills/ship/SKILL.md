@@ -126,12 +126,15 @@ PR base is always `dev`. Never open directly against `main`.
 
 ## Post-PR: Copilot Review
 
-After creating the PR:
-- Extract PR number from `gh pr create` output
-- Poll `gh api repos/tlesh989/homelab/pulls/<PR>/reviews` every 15 seconds (up to 3 minutes) until a `Copilot` review appears
-- Fetch inline comments: `gh api repos/tlesh989/homelab/pulls/<PR>/comments` — display grouped by file
-- If Copilot raises valid issues: fix them and push before declaring done
-- If no review after 3 minutes: report it and move on
+After creating the PR, do a single check after ~30 seconds:
+```bash
+sleep 30
+gh api repos/tlesh989/homelab/pulls/<PR>/reviews
+gh api repos/tlesh989/homelab/pulls/<PR>/comments
+```
+- If a Copilot review is present: display inline comments grouped by file and fix any valid issues
+- If no review yet: report the PR URL and tell the user to check Copilot feedback once it arrives
+- Never poll in a loop — Copilot reviews can take several minutes and blocking the session for that is worse than handing off
 
 ## Commit Message Format
 
