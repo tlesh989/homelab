@@ -1,0 +1,12 @@
+---
+- name: Install Docker
+  ansible.builtin.import_tasks: docker.yml
+
+- name: Create directories
+  ansible.builtin.import_tasks: directories.yml
+
+- name: Mount NFS media share
+  ansible.builtin.import_tasks: nfs.yml
+
+- name: Deploy Docker Compose stack
+  ansible.builtin.import_tasks: compose.yml

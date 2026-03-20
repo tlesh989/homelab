@@ -1,0 +1,22 @@
+---
+- name: Deploy gluetun secrets env file
+  ansible.builtin.template:
+    src: gluetun.env.j2
+    dest: "{{ arr_config_path }}/compose/gluetun.env"
+    mode: "0600"
+    owner: root
+    group: root
+  notify: restart arr stack
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ arr_config_path }}/compose/docker-compose.yml"
+    mode: "0640"
+  notify: restart arr stack
+
+- name: Start arr Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ arr_config_path }}/compose"
+    state: present
+    pull: always

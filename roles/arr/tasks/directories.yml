@@ -1,0 +1,19 @@
+---
+- name: Create download staging directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  loop:
+    - "{{ arr_downloads_path }}/incomplete"
+    - "{{ arr_downloads_path }}/complete"
+    - "{{ arr_config_path }}/compose"
+    - "{{ arr_config_path }}/gluetun"
+    - "{{ arr_config_path }}/qbittorrent"
+    - "{{ arr_config_path }}/sonarr"
+    - "{{ arr_config_path }}/radarr"
+    - "{{ arr_config_path }}/prowlarr"
+    - "{{ arr_config_path }}/bazarr"
+    - "{{ arr_config_path }}/overseerr"
