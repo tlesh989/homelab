@@ -31,7 +31,7 @@
     dest: /etc/apt/apt.conf.d/52unattended-upgrades-plex
     content: |
       Unattended-Upgrade::Origins-Pattern {
-          "origin=plexmediaserver";
+          "site=downloads.plex.tv";
       };
     mode: "0644"
   become: true
