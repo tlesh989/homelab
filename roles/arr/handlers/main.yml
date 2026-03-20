@@ -4,3 +4,4 @@
     project_src: "{{ arr_config_path }}/compose"
     state: restarted
   listen: restart arr stack
+  when: not ansible_check_mode

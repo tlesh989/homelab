@@ -24,3 +24,4 @@
     project_src: "{{ arr_config_path }}/compose"
     state: present
     pull: missing
+  when: not ansible_check_mode

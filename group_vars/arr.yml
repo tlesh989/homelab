@@ -1,7 +1,9 @@
 ---
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+
 # NFS mount for media library
-arr_nfs_server: "{{ hostvars['ansalon'].ansible_host }}"
-arr_nfs_export: /mnt/main/media  # verify exact export path from TrueNAS
+arr_nfs_server: 192.168.220.6
+arr_nfs_export: /mnt/wayreth/data/media
 arr_media_path: /data/media
 
 # Timezone — update to match your local timezone

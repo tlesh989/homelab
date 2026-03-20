@@ -124,14 +124,28 @@ PR base is always `dev`. Never open directly against `main`.
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-## Post-PR: Copilot Review
+## Post-PR: Review Collection
 
-After creating the PR:
+After creating the PR, run CodeRabbit immediately (it takes ~60s), then poll for Copilot in parallel so both reviews are ready together.
+
+### Step 1 — Run CodeRabbit (start immediately after PR creation)
+```bash
+coderabbit review --plain --base dev
+```
+This takes ~60 seconds. Run it right after `gh pr create` so it finishes around the same time as Copilot.
+
+### Step 2 — Poll for Copilot review (while CodeRabbit runs)
 - Extract PR number from `gh pr create` output
 - Poll `gh api repos/tlesh989/homelab/pulls/<PR>/reviews` every 15 seconds (up to 3 minutes) until a `Copilot` review appears
-- Fetch inline comments: `gh api repos/tlesh989/homelab/pulls/<PR>/comments` — display grouped by file
-- If Copilot raises valid issues: fix them and push before declaring done
-- If no review after 3 minutes: report it and move on
+- Copilot typically finishes within ~5 minutes of PR creation
+
+### Step 3 — Process both reviews together
+Once CodeRabbit output is available AND Copilot review is in:
+- Fetch Copilot inline comments: `gh api repos/tlesh989/homelab/pulls/<PR>/comments`
+- Display all feedback grouped by reviewer and file
+- Triage: apply valid issues, skip style preferences or YAGNI suggestions
+- Fix, commit, and push any accepted changes before declaring done
+- If no Copilot review after 3 minutes: process CodeRabbit alone and move on
 
 ## Commit Message Format
 
