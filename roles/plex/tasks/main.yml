@@ -30,9 +30,8 @@
   ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/52unattended-upgrades-plex
     content: |
-      Unattended-Upgrade::Origins-Pattern {
-          "site=downloads.plex.tv";
-      };
+      // Append Plex repo to unattended-upgrades (:: syntax extends the list, does not replace)
+      Unattended-Upgrade::Origins-Pattern:: "site=downloads.plex.tv";
     mode: "0644"
   become: true
 
