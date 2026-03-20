@@ -1,4 +1,15 @@
 ---
+- name: Deploy watchtower env file
+  ansible.builtin.template:
+    src: watchtower.env.j2
+    dest: "{{ arr_config_path }}/compose/watchtower.env"
+    mode: "0600"
+    owner: root
+    group: root
+  notify: restart arr stack
+  no_log: true
+  diff: false
+
 - name: Deploy gluetun secrets env file
   ansible.builtin.template:
     src: gluetun.env.j2

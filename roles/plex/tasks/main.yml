@@ -26,6 +26,16 @@
   become: true
 
 
+- name: Enable unattended upgrades for Plex apt repo
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/52unattended-upgrades-plex
+    content: |
+      Unattended-Upgrade::Origins-Pattern {
+          "origin=plexmediaserver";
+      };
+    mode: "0644"
+  become: true
+
 - name: Install Plex prerequisites
   ansible.builtin.apt:
     name:
