@@ -145,3 +145,6 @@ galaxy_collections/
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Superpowers runtime artifacts
+.superpowers/

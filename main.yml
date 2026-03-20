@@ -123,6 +123,7 @@
     - role: ansible-user
     - role: GROG.package
     - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: arr
 
 - name: setup netdata agents on proxmox nodes
