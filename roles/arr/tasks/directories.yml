@@ -25,4 +25,26 @@
     - "{{ arr_config_path }}/radarr"
     - "{{ arr_config_path }}/prowlarr"
     - "{{ arr_config_path }}/bazarr"
-    - "{{ arr_config_path }}/overseerr"
+    - "{{ arr_config_path }}/seerr"
+
+- name: Migrate overseerr config to seerr if needed
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      src="{{ arr_config_path }}/overseerr"
+      dst="{{ arr_config_path }}/seerr"
+      if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ] && [ -z "$(ls -A "$dst" 2>/dev/null)" ]; then
+        cp -a "$src/." "$dst/"
+      fi
+    executable: /bin/bash
+  changed_when: false
+  become: true
+
+- name: Ensure seerr config dir is owned by node user (UID 1000)
+  ansible.builtin.file:
+    path: "{{ arr_config_path }}/seerr"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    recurse: true
+  become: true
