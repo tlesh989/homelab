@@ -12,11 +12,13 @@
   ansible.builtin.template:
     src: docker-compose.yml.j2
     dest: "{{ arr_config_path }}/compose/docker-compose.yml"
-    mode: "0640"
+    owner: root
+    group: root
+    mode: "0644"
   notify: restart arr stack
 
 - name: Start arr Docker Compose stack
   community.docker.docker_compose_v2:
     project_src: "{{ arr_config_path }}/compose"
     state: present
-    pull: always
+    pull: missing
