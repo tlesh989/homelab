@@ -2,12 +2,14 @@
 # Managed by Ansible — do not edit manually
 services:
   gluetun:
-    image: qdm12/gluetun:latest
+    image: ghcr.io/qdm12/gluetun:latest
     container_name: gluetun
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+    security_opt:
+      - apparmor=unconfined
     ports:
       - "{{ arr_qbittorrent_port }}:{{ arr_qbittorrent_port }}"
     env_file:
@@ -23,6 +25,8 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     network_mode: "service:gluetun"
+    security_opt:
+      - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
@@ -38,6 +42,8 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
+    security_opt:
+      - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
@@ -53,6 +59,8 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
+    security_opt:
+      - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
@@ -68,6 +76,8 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
+    security_opt:
+      - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
@@ -81,6 +91,8 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
+    security_opt:
+      - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
@@ -95,6 +107,8 @@ services:
   overseerr:
     image: sctx/overseerr:latest
     container_name: overseerr
+    security_opt:
+      - apparmor=unconfined
     environment:
       TZ: "{{ arr_timezone }}"
     volumes:
@@ -106,6 +120,8 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
+    security_opt:
+      - apparmor=unconfined
     environment:
       TZ: "{{ arr_timezone }}"
     ports:

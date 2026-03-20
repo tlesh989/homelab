@@ -35,6 +35,12 @@ resource "proxmox_virtual_environment_container" "arr" {
       }
     }
 
+    ip_config {
+      ipv4 {
+        address = "192.168.220.24/24"
+      }
+    }
+
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
       password = data.doppler_secrets.this.map.PM_API_PASSWORD
@@ -52,6 +58,14 @@ resource "proxmox_virtual_environment_container" "arr" {
     firewall    = true
     mac_address = "BC:24:11:C3:7D:55"
     name        = "eth0"
+  }
+
+  network_interface {
+    bridge      = "vmbr1"
+    enabled     = true
+    firewall    = false
+    mac_address = "BC:24:11:C3:7D:56"
+    name        = "eth1"
   }
 
   operating_system {
