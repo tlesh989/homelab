@@ -131,3 +131,19 @@ services:
     ports:
       - "{{ arr_flaresolverr_port }}:8191"
     restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - "{{ arr_config_path }}/compose/watchtower.env"
+    environment:
+      TZ: "{{ arr_timezone }}"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 3 * * *"
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+    restart: unless-stopped
