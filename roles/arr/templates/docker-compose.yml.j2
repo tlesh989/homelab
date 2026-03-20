@@ -24,8 +24,8 @@ services:
     container_name: qbittorrent
     network_mode: "service:gluetun"
     environment:
-      PUID: "1000"
-      PGID: "1000"
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
       TZ: "{{ arr_timezone }}"
       WEBUI_PORT: "{{ arr_qbittorrent_port }}"
     volumes:
@@ -39,8 +39,8 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     environment:
-      PUID: "1000"
-      PGID: "1000"
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
       TZ: "{{ arr_timezone }}"
     volumes:
       - "{{ arr_config_path }}/sonarr:/config"
@@ -54,8 +54,8 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
-      PUID: "1000"
-      PGID: "1000"
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
       TZ: "{{ arr_timezone }}"
     volumes:
       - "{{ arr_config_path }}/radarr:/config"
@@ -69,8 +69,8 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
-      PUID: "1000"
-      PGID: "1000"
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
       TZ: "{{ arr_timezone }}"
     volumes:
       - "{{ arr_config_path }}/prowlarr:/config"
@@ -82,8 +82,8 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     environment:
-      PUID: "1000"
-      PGID: "1000"
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
       TZ: "{{ arr_timezone }}"
     volumes:
       - "{{ arr_config_path }}/bazarr:/config"

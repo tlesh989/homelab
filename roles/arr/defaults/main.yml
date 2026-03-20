@@ -13,4 +13,8 @@ arr_overseerr_port: 5055
 arr_flaresolverr_port: 8191
 
 # NFS mount options
-arr_nfs_mount_opts: rw,noatime,nfsvers=4.1,soft,timeo=30
+arr_nfs_mount_opts: rw,noatime,nfsvers=4.1,soft,timeo=30,_netdev,x-systemd.automount
+
+# Container user/group (linuxserver PUID/PGID)
+arr_puid: "1000"
+arr_pgid: "1000"

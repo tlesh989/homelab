@@ -7,6 +7,8 @@
     owner: root
     group: root
   notify: restart arr stack
+  no_log: true
+  diff: false
 
 - name: Deploy docker-compose.yml
   ansible.builtin.template:

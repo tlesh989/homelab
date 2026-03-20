@@ -4,11 +4,20 @@
     path: "{{ item }}"
     state: directory
     mode: "0755"
-    owner: root
-    group: root
+    owner: "{{ arr_puid }}"
+    group: "{{ arr_pgid }}"
   loop:
     - "{{ arr_downloads_path }}/incomplete"
     - "{{ arr_downloads_path }}/complete"
+
+- name: Create arr config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ arr_puid }}"
+    group: "{{ arr_pgid }}"
+  loop:
     - "{{ arr_config_path }}/compose"
     - "{{ arr_config_path }}/gluetun"
     - "{{ arr_config_path }}/qbittorrent"
