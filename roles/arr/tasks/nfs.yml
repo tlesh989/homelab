@@ -1,0 +1,19 @@
+---
+- name: Install NFS client
+  ansible.builtin.package:
+    name: nfs-common
+    state: present
+
+- name: Create NFS mount point
+  ansible.builtin.file:
+    path: "{{ arr_media_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Mount TrueNAS NFS media share
+  ansible.posix.mount:
+    path: "{{ arr_media_path }}"
+    src: "{{ arr_nfs_server }}:{{ arr_nfs_export }}"
+    fstype: nfs
+    opts: "{{ arr_nfs_mount_opts }}"
+    state: mounted

@@ -1,0 +1,20 @@
+---
+# Storage paths
+arr_downloads_path: /data/downloads
+arr_config_path: /opt/arr/config
+
+# Ports
+arr_qbittorrent_port: 8080
+arr_sonarr_port: 8989
+arr_radarr_port: 7878
+arr_prowlarr_port: 9696
+arr_bazarr_port: 6767
+arr_overseerr_port: 5055
+arr_flaresolverr_port: 8191
+
+# NFS mount options
+arr_nfs_mount_opts: rw,noatime,nfsvers=4.1,soft,timeo=30,_netdev,x-systemd.automount
+
+# Container user/group (linuxserver PUID/PGID)
+arr_puid: "1000"
+arr_pgid: "1000"

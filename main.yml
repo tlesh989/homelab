@@ -116,6 +116,16 @@
     - role: users
     - role: netdata
 
+- name: setup arr stack
+  hosts: arr
+  become: true
+  roles:
+    - role: ansible-user
+    - role: GROG.package
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: arr
+
 - name: setup netdata agents on proxmox nodes
   hosts: proxmox
   become: true

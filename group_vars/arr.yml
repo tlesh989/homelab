@@ -1,0 +1,8 @@
+---
+# NFS mount for media library
+arr_nfs_server: "{{ hostvars['ansalon'].ansible_host }}"
+arr_nfs_export: /mnt/main/media  # verify exact export path from TrueNAS
+arr_media_path: /data/media
+
+# Timezone — update to match your local timezone
+arr_timezone: America/Detroit
