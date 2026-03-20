@@ -108,15 +108,16 @@ services:
       - "{{ arr_bazarr_port }}:6767"
     restart: unless-stopped
 
-  overseerr:
-    image: sctx/overseerr:latest
-    container_name: overseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
     security_opt:
       - apparmor=unconfined
     environment:
       TZ: "{{ arr_timezone }}"
     volumes:
-      - "{{ arr_config_path }}/overseerr:/app/config"
+      - "{{ arr_config_path }}/seerr:/app/config"
     ports:
       - "{{ arr_overseerr_port }}:5055"
     restart: unless-stopped
