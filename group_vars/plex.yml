@@ -1,1 +1,5 @@
 ---
+# NFS mount for media library (storage network)
+plex_nfs_server: 192.168.220.6
+plex_nfs_export: /mnt/wayreth/data/media
+plex_media_path: /data/media
