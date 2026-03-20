@@ -135,11 +135,12 @@ pages:
             url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999/api/v1/info
             template: |
               {% raw %}<div class="flex gap-2 items-center">
-                <span>{{ len .JSON.mirrored_hosts }} nodes monitored</span>
-                {{ if gt .JSON.alarms.critical 0 }}
-                <span class="color-negative">{{ .JSON.alarms.critical }} critical</span>
-                {{ else if gt .JSON.alarms.warning 0 }}
-                <span class="color-highlight">{{ .JSON.alarms.warning }} warning</span>
+                {{ $nodes := .JSON.Array "mirrored_hosts" }}
+                <span>{{ len $nodes }} nodes monitored</span>
+                {{ if gt (.JSON.Int "alarms.critical") 0 }}
+                <span class="color-negative">{{ .JSON.Int "alarms.critical" }} critical</span>
+                {{ else if gt (.JSON.Int "alarms.warning") 0 }}
+                <span class="color-highlight">{{ .JSON.Int "alarms.warning" }} warning</span>
                 {{ else }}
                 <span class="color-positive">No active alerts</span>
                 {{ end }}
