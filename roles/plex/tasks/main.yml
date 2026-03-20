@@ -6,6 +6,7 @@
   ansible.builtin.apt:
     name: nfs-common
     state: present
+    update_cache: true
   become: true
 
 - name: Create NFS mount point
