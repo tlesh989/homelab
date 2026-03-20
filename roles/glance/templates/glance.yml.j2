@@ -129,22 +129,22 @@ pages:
                 url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}/admin
                 icon: si:pihole
               - title: Overseerr
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_overseerr_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:5055
                 icon: si:overseerr
               - title: Sonarr
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_sonarr_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8989
                 icon: si:sonarr
               - title: Radarr
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_radarr_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:7878
                 icon: si:radarr
               - title: Prowlarr
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_prowlarr_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:9696
                 icon: si:prowlarr
               - title: qBittorrent
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_qbittorrent_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8080
                 icon: si:qbittorrent
               - title: Bazarr
-                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_bazarr_port }}
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:6767
                 icon: si:bazarr
 
           - type: custom-api
