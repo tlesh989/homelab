@@ -128,6 +128,24 @@ pages:
               - title: Pi-hole
                 url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}/admin
                 icon: si:pihole
+              - title: Overseerr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_overseerr_port }}
+                icon: si:overseerr
+              - title: Sonarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_sonarr_port }}
+                icon: si:sonarr
+              - title: Radarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_radarr_port }}
+                icon: si:radarr
+              - title: Prowlarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_prowlarr_port }}
+                icon: si:prowlarr
+              - title: qBittorrent
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_qbittorrent_port }}
+                icon: si:qbittorrent
+              - title: Bazarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_bazarr_port }}
+                icon: si:bazarr
 
           - type: custom-api
             title: Netdata

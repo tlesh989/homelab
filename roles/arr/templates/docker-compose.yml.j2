@@ -143,7 +143,6 @@ services:
       - "{{ arr_config_path }}/compose/watchtower.env"
     environment:
       TZ: "{{ arr_timezone }}"
-      DOCKER_API_VERSION: "1.41"
       WATCHTOWER_CLEANUP: "true"
       WATCHTOWER_SCHEDULE: "0 0 3 * * *"
       WATCHTOWER_NOTIFICATIONS: shoutrrr
