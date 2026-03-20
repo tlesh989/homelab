@@ -30,14 +30,16 @@
 - name: Migrate overseerr config to seerr if needed
   ansible.builtin.shell:
     cmd: |
-      set -e
+      set -eo pipefail
       src="{{ arr_config_path }}/overseerr"
       dst="{{ arr_config_path }}/seerr"
       if [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ] && [ -z "$(ls -A "$dst" 2>/dev/null)" ]; then
         cp -a "$src/." "$dst/"
+        echo "migrated_overseerr_to_seerr"
       fi
     executable: /bin/bash
-  changed_when: false
+  register: arr_overseerr_to_seerr_migration
+  changed_when: '"migrated_overseerr_to_seerr" in arr_overseerr_to_seerr_migration.stdout'
   become: true
 
 - name: Ensure seerr config dir is owned by node user (UID 1000)
