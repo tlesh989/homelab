@@ -1,5 +1,9 @@
 ---
 # Managed by Ansible — do not edit manually
+# Note: all services include `security_opt: apparmor=unconfined` because this stack runs inside an
+# unprivileged LXC container. Docker cannot load the docker-default AppArmor profile in that context
+# (apparmor_parser requires policy admin privileges), causing all containers to fail on startup.
+# This applies to every container, not just gluetun. See /etc/pve/lxc/106.conf for related LXC config.
 services:
   gluetun:
     image: ghcr.io/qdm12/gluetun:latest
