@@ -25,6 +25,9 @@ glance.tlesh.xyz ansible_host=192.168.233.22
 [netdata]
 netdata.tlesh.xyz ansible_host=192.168.233.23
 
+[arr]
+arr.tlesh.xyz ansible_host=192.168.233.24
+
 [truenas]
 ansalon ansible_host=192.168.233.6 ansible_connection=local ansible_become=false
 
