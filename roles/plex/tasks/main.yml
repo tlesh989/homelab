@@ -1,6 +1,29 @@
 ---
 # tasks file for plex — installs Plex inside the LXC
-# The /media/plex bind mount is provided by the Proxmox host via Terraform mount_point.
+# Media is served via NFS from TrueNAS over the storage network (eth1, 192.168.220.x).
+
+- name: Install NFS client
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+  become: true
+
+- name: Create NFS mount point
+  ansible.builtin.file:
+    path: "{{ plex_media_path }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Mount TrueNAS NFS media share
+  ansible.posix.mount:
+    path: "{{ plex_media_path }}"
+    src: "{{ plex_nfs_server }}:{{ plex_nfs_export }}"
+    fstype: nfs
+    opts: defaults,_netdev,noatime
+    state: mounted
+  become: true
+
 
 - name: Install Plex prerequisites
   ansible.builtin.apt:
