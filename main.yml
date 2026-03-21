@@ -140,3 +140,11 @@
     - role: geerlingguy.security
     - role: users
     - role: pi-hole
+
+- name: setup uptime-kuma server
+  hosts: uptime-kuma
+  become: true
+  roles:
+    - role: ansible-user
+    - role: GROG.package
+    - role: uptime-kuma
