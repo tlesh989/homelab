@@ -1,0 +1,13 @@
+---
+# Managed by Ansible — do not edit manually
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - "{{ uptime_kuma_data_path }}:/app/data"
+    ports:
+      - "{{ uptime_kuma_port }}:3001"
+    restart: unless-stopped

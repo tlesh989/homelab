@@ -1,0 +1,8 @@
+---
+- name: Create uptime-kuma data directory
+  ansible.builtin.file:
+    path: "{{ uptime_kuma_data_path }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
