@@ -41,6 +41,14 @@ tasks:
     cmds:
       - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
 
+  bootstrap-lxc:
+    desc: Bootstrap a new LXC container (run once — pass hostname as argument, e.g. task bootstrap-lxc -- uptime-kuma.tlesh.xyz)
+    preconditions:
+      - sh: '[ -n "{{.CLI_ARGS}}" ]'
+        msg: "Usage: task bootstrap-lxc -- <hostname>"
+    cmds:
+      - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap --limit "{{.CLI_ARGS}}" -e "ansible_user=root"
+
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
