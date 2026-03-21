@@ -42,11 +42,11 @@
   changed_when: '"migrated_overseerr_to_seerr" in arr_overseerr_to_seerr_migration.stdout'
   become: true
 
-- name: Ensure seerr config dir is owned by node user (UID 1000)
+- name: Ensure seerr config dir is owned by arr user
   ansible.builtin.file:
     path: "{{ arr_config_path }}/seerr"
     state: directory
-    owner: "1000"
-    group: "1000"
+    owner: "{{ arr_puid }}"
+    group: "{{ arr_pgid }}"
     recurse: true
   become: true

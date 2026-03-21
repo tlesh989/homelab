@@ -120,7 +120,7 @@ services:
     volumes:
       - "{{ arr_config_path }}/seerr:/app/config"
     ports:
-      - "{{ arr_overseerr_port }}:5055"
+      - "{{ arr_seerr_port }}:5055"
     restart: unless-stopped
 
   flaresolverr:
