@@ -2,3 +2,4 @@
 uptime_kuma_base_path: /opt/uptime-kuma
 uptime_kuma_data_path: /opt/uptime-kuma/data
 uptime_kuma_port: 3001
+uptime_kuma_timezone: America/Detroit

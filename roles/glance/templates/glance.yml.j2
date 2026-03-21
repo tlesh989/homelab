@@ -122,6 +122,9 @@ pages:
                 url: https://{{ hostvars['ansalon'].ansible_host }}
                 icon: si:truenas
                 allow-insecure: true
+              - title: Uptime Kuma
+                url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
+                icon: si:uptimekuma
               - title: Netdata
                 url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999
                 icon: si:netdata

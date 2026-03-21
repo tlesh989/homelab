@@ -14,3 +14,11 @@
     mode: "0755"
     owner: root
     group: root
+
+- name: Create uptime-kuma compose directory
+  ansible.builtin.file:
+    path: "{{ uptime_kuma_base_path }}/compose"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
