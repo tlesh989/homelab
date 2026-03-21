@@ -16,6 +16,7 @@ services:
       - apparmor=unconfined
     ports:
       - "{{ arr_qbittorrent_port }}:{{ arr_qbittorrent_port }}"
+      - "8000:8000"
     env_file:
       - "{{ arr_config_path }}/compose/gluetun.env"
     environment:
@@ -119,7 +120,7 @@ services:
     volumes:
       - "{{ arr_config_path }}/seerr:/app/config"
     ports:
-      - "{{ arr_overseerr_port }}:5055"
+      - "{{ arr_seerr_port }}:5055"
     restart: unless-stopped
 
   flaresolverr:

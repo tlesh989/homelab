@@ -83,6 +83,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "arr", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  uptime-kuma:
+    desc: Deploy Uptime Kuma monitoring server
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
