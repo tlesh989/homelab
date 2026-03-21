@@ -105,7 +105,7 @@ resource "proxmox_virtual_environment_container" "uptime_kuma" {
     bridge      = "vmbr0"
     enabled     = true
     firewall    = true
-    mac_address = "BC:24:11:A2:3F:11"  # replace with chosen unused MAC
+    mac_address = "BC:24:11:A2:3F:11"
     name        = "eth0"
   }
 
@@ -263,7 +263,7 @@ services:
     restart: unless-stopped
 ```
 
-> `security_opt: apparmor=unconfined` is required for all Docker containers in unprivileged LXC containers — see note in arr's docker-compose.yml.j2.
+> `security_opt: apparmor=unconfined` is required for all Docker containers in unprivileged LXC containers. Docker attempts to load the `docker-default` AppArmor profile on startup, which fails under LXC confinement (`apparmor_parser` requires policy admin privileges). This disables AppArmor for the container — a documented tradeoff. See the comment block in `roles/arr/templates/docker-compose.yml.j2` for full context.
 
 - [ ] **Step 7: Create handler**
 

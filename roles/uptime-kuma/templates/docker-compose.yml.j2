@@ -1,5 +1,8 @@
 ---
 # Managed by Ansible — do not edit manually
+# Note: security_opt: apparmor=unconfined is required because this container runs inside an
+# unprivileged LXC container. Docker cannot load the docker-default AppArmor profile in that context
+# (apparmor_parser requires policy admin privileges), causing the container to fail on startup.
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
