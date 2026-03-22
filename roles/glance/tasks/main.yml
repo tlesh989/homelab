@@ -65,6 +65,36 @@
     glance_installed_version is failed or
     (glance_installed_version.content | b64decode | trim) != glance_target_version)
 
+- name: Create TLS cert directory
+  ansible.builtin.file:
+    path: "{{ glance_tls_cert_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: Issue Tailscale TLS certificate for Glance
+  ansible.builtin.command:
+    cmd: >-
+      tailscale cert
+      --cert-file {{ glance_tls_cert_dir }}/glance.crt
+      --key-file {{ glance_tls_cert_dir }}/glance.key
+      {{ glance_hostname }}
+  args:
+    creates: "{{ glance_tls_cert_dir }}/glance.crt"
+  notify: Restart glance
+
+- name: Configure weekly cert renewal cron
+  ansible.builtin.cron:
+    name: Renew Glance Tailscale TLS certificate
+    minute: "0"
+    hour: "0"
+    weekday: "0"
+    job: >-
+      tailscale cert
+      --cert-file {{ glance_tls_cert_dir }}/glance.crt
+      --key-file {{ glance_tls_cert_dir }}/glance.key
+      {{ glance_hostname }}
+      && systemctl restart glance
+
 - name: Template Glance config
   ansible.builtin.template:
     src: glance.yml.j2

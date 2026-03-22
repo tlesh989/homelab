@@ -3,4 +3,6 @@
 
 glance_version: latest
 glance_install_dir: /opt/glance
-glance_port: 8080
+glance_port: 443
+glance_hostname: glance.dunker-hops.ts.net
+glance_tls_cert_dir: /opt/glance/certs

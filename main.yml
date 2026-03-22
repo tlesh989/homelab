@@ -104,6 +104,8 @@
     - role: GROG.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: users
     - role: glance
 

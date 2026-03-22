@@ -1,5 +1,8 @@
 server:
   port: {{ glance_port }}
+  tls:
+    cert-file: {{ glance_tls_cert_dir }}/glance.crt
+    key-file: {{ glance_tls_cert_dir }}/glance.key
 
 pages:
   - name: Home
