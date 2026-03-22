@@ -137,11 +137,11 @@ Replace with:
             limit: 10
             collapse-after: 3
             feeds:
-              - url: https://feeds.apnews.com/rss/apf-topnews
-                title: AP News
-              - url: https://feeds.reuters.com/reuters/topNews
-                title: Reuters
-              - url: https://feeds.arstechnica.com/arstechnica/index
+              - url: https://feeds.bbci.co.uk/news/rss.xml
+                title: BBC News
+              - url: https://feeds.npr.org/1001/rss.xml
+                title: NPR
+              - url: https://feeds.arstechnica.com/arstechnica/index.rss
                 title: Ars Technica
 
 ```
@@ -186,8 +186,6 @@ Replace with:
             feeds:
               - url: https://www.theverge.com/rss/index.xml
                 title: The Verge
-              - url: https://www.anthropic.com/rss.xml
-                title: Anthropic
               - url: https://simonwillison.net/atom/everything/
                 title: Simon Willison
               - url: https://www.latent.space/feed
@@ -206,8 +204,6 @@ Replace with:
                 title: selfh.st
               - url: https://www.reddit.com/r/homelab/.rss
                 title: r/homelab
-              - url: https://www.linuxserver.io/blog/feed
-                title: LinuxServer.io
 
           - type: rss
             title: Gaming
@@ -218,8 +214,6 @@ Replace with:
             feeds:
               - url: https://www.pcgamer.com/rss/
                 title: PC Gamer
-              - url: https://feeds.ign.com/ign/articles
-                title: IGN
               - url: https://www.reddit.com/r/Borderlands4/.rss
                 title: r/Borderlands4
               - url: https://www.reddit.com/r/gaming/.rss
@@ -236,8 +230,6 @@ Replace with:
                 title: r/3Dprinting
               - url: https://www.reddit.com/r/fermentation/.rss
                 title: r/fermentation
-              - url: https://www.instructables.com/projects.rss
-                title: Instructables
               - url: https://makezine.com/feed/
                 title: Make Magazine
 
@@ -290,6 +282,7 @@ Continue the center column with the Reddit group widget and the YouTube video gr
 
           - type: videos
             style: grid-cards
+            cache: 1h
             collapse-after-rows: 3
             channels:
               - UCYeiozh-4QwuC1sjgCmB92w  # DevOps Toolbox
@@ -364,8 +357,6 @@ Replace with:
                 title: Fatherly
               - url: https://www.thekitchn.com/main.rss
                 title: The Kitchn
-              - url: https://www.mayoclinic.org/rss/all-health-information-topics.rss
-                title: Mayo Clinic
               - url: https://www.reddit.com/r/Parenting/.rss
                 title: r/Parenting
 

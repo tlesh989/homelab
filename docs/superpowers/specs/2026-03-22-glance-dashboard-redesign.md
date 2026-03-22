@@ -32,7 +32,7 @@ Weather moves from the right column to the left column. The releases widget is r
 |---|---|
 | Calendar | `first-day-of-week: sunday` ← change from `monday` |
 | Weather | Frankenmuth, MI — imperial, 12h (unchanged, moved from right column) |
-| Breaking News RSS | `style: vertical-list`, `cache: 1h`, `collapse-after: 3` — AP News, Reuters, Ars Technica |
+| Breaking News RSS | `style: vertical-list`, `cache: 1h`, `collapse-after: 3` — BBC News, NPR, Ars Technica |
 
 ### Center Column (full)
 
@@ -40,10 +40,10 @@ Weather moves from the right column to the left column. The releases widget is r
 |---|---|
 | Search | Kagi (unchanged) |
 | Hacker News | Solo widget, no group wrapper (lobsters removed) |
-| Tech & AI RSS | `style: horizontal-cards`, `cache: 1h`, `limit: 20`, `collapse-after: 5` — The Verge, Anthropic blog, Simon Willison, Latent Space, r/ClaudeAI |
-| Homelab RSS | `style: horizontal-cards`, `cache: 2h`, `limit: 15`, `collapse-after: 5` — selfh.st, r/homelab, LinuxServer.io blog |
-| Gaming RSS | `style: horizontal-cards`, `cache: 2h`, `limit: 15`, `collapse-after: 5` — PC Gamer, IGN, r/Borderlands4, r/gaming |
-| DIY/Making RSS | `style: horizontal-cards`, `cache: 6h`, `limit: 15`, `collapse-after: 5` — r/3Dprinting, r/fermentation, Instructables, Make Magazine |
+| Tech & AI RSS | `style: horizontal-cards`, `cache: 1h`, `limit: 20`, `collapse-after: 5` — The Verge, Simon Willison, Latent Space, r/ClaudeAI |
+| Homelab RSS | `style: horizontal-cards`, `cache: 2h`, `limit: 15`, `collapse-after: 5` — selfh.st, r/homelab |
+| Gaming RSS | `style: horizontal-cards`, `cache: 2h`, `limit: 15`, `collapse-after: 5` — PC Gamer, r/Borderlands4, r/gaming |
+| DIY/Making RSS | `style: horizontal-cards`, `cache: 6h`, `limit: 15`, `collapse-after: 5` — r/3Dprinting, r/fermentation, Make Magazine |
 | Deals & Outdoor RSS | `style: horizontal-cards`, `cache: 1h`, `limit: 15`, `collapse-after: 5` — Slickdeals, r/deals, r/frugalmalefashion, Gear Junkie |
 | Reddit group | `cache: 30m`, `show-thumbnails: true` — r/technology + r/selfhosted (r/homelab covered by Homelab RSS row above) |
 | YouTube | `style: grid-cards`, `collapse-after-rows: 3` |
@@ -53,7 +53,7 @@ Weather moves from the right column to the left column. The releases widget is r
 | Widget | Config |
 |---|---|
 | Markets | SPY, BTC-USD, NVDA, AAPL, MSFT (unchanged) |
-| Parenting/Health RSS | `style: vertical-list`, `cache: 12h`, `collapse-after: 5` — Fatherly, The Kitchn, Mayo Clinic, r/Parenting |
+| Parenting/Health RSS | `style: vertical-list`, `cache: 12h`, `collapse-after: 5` — Fatherly, The Kitchn, r/Parenting |
 
 ## YouTube Channels
 
@@ -88,6 +88,8 @@ All IDs confirmed from user-edited template file.
 
 ## Implementation Notes
 
+- BBC News and NPR used for Breaking News instead of AP/Reuters (DNS resolution failures during verification)
+- Several planned feeds omitted due to failed URL verification: Anthropic RSS (404), LinuxServer.io blog (404), IGN (501), Instructables (404), Mayo Clinic (404)
 - Reddit RSS feeds use `.rss` suffix: `https://www.reddit.com/r/<subreddit>/.rss`
 - Gear Junkie feed URL: `https://gearjunkie.com/feed`
 - All other RSS feed URLs must be validated during implementation (Reuters, Mayo Clinic, Make Magazine, LinuxServer.io blog are known to change)

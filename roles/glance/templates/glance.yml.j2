@@ -22,6 +22,7 @@ pages:
             cache: 1h
             limit: 10
             collapse-after: 3
+            # Note: AP News and Reuters omitted — DNS resolution failure during URL verification; replaced with BBC and NPR
             feeds:
               - url: https://feeds.bbci.co.uk/news/rss.xml
                 title: BBC News
@@ -46,6 +47,7 @@ pages:
             cache: 1h
             limit: 20
             collapse-after: 5
+            # Note: Anthropic RSS omitted — returned 404 during URL verification
             feeds:
               - url: https://www.theverge.com/rss/index.xml
                 title: The Verge
@@ -62,6 +64,7 @@ pages:
             cache: 2h
             limit: 15
             collapse-after: 5
+            # Note: LinuxServer.io blog omitted — returned 404 during URL verification
             feeds:
               - url: https://selfh.st/rss/
                 title: selfh.st
@@ -74,6 +77,7 @@ pages:
             cache: 2h
             limit: 15
             collapse-after: 5
+            # Note: IGN omitted — returned 501 during URL verification
             feeds:
               - url: https://www.pcgamer.com/rss/
                 title: PC Gamer
@@ -88,6 +92,7 @@ pages:
             cache: 6h
             limit: 15
             collapse-after: 5
+            # Note: Instructables omitted — returned 404 during URL verification
             feeds:
               - url: https://www.reddit.com/r/3Dprinting/.rss
                 title: r/3Dprinting
@@ -173,6 +178,7 @@ pages:
             cache: 12h
             limit: 15
             collapse-after: 5
+            # Note: Mayo Clinic omitted — returned 404 during URL verification
             feeds:
               - url: https://www.fatherly.com/feed/
                 title: Fatherly
