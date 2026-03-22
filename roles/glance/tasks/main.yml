@@ -78,8 +78,7 @@
       --cert-file {{ glance_tls_cert_dir }}/glance.crt
       --key-file {{ glance_tls_cert_dir }}/glance.key
       {{ glance_hostname }}
-  args:
-    creates: "{{ glance_tls_cert_dir }}/glance.crt"
+  changed_when: false
   notify: Restart glance
 
 - name: Configure weekly cert renewal cron
