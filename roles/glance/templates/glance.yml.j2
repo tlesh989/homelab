@@ -3,8 +3,7 @@ server:
 
 pages:
   - name: Home
-    # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
-    # hide-desktop-navigation: true
+    full-width: true
     columns:
       - size: small
         widgets:
@@ -16,20 +15,31 @@ pages:
             units: imperial
             hour-format: 12h
 
+          - type: markets
+            markets:
+              - symbol: SPY
+                name: S&P 500
+              - symbol: BTC-USD
+                name: Bitcoin
+              - symbol: NVDA
+                name: NVIDIA
+              - symbol: AAPL
+                name: Apple
+              - symbol: MSFT
+                name: Microsoft
+
           - type: rss
-            title: Breaking News
+            title: Parenting & Health
             style: vertical-list
-            cache: 1h
-            limit: 10
-            collapse-after: 3
-            # Note: AP News and Reuters omitted — DNS resolution failure during URL verification; replaced with BBC and NPR
+            cache: 12h
+            limit: 15
+            collapse-after: 5
+            # Note: Mayo Clinic omitted — returned 404 during URL verification
             feeds:
-              - url: https://feeds.bbci.co.uk/news/rss.xml
-                title: BBC News
-              - url: https://feeds.npr.org/1001/rss.xml
-                title: NPR
-              - url: https://feeds.arstechnica.com/arstechnica/index.rss
-                title: Ars Technica
+              - url: https://www.fatherly.com/feed/
+                title: Fatherly
+              - url: https://www.thekitchn.com/main.rss
+                title: The Kitchn
 
       - size: full
         widgets:
@@ -39,14 +49,28 @@ pages:
             autofocus: true
             placeholder: Search Kagi...
 
-          - type: hacker-news
+          - type: group
+            widgets:
+              - type: hacker-news
+
+              - type: rss
+                title: Breaking News
+                style: vertical-list
+                cache: 1h
+                limit: 10
+                collapse-after: 3
+                feeds:
+                  - url: https://feeds.npr.org/1001/rss.xml
+                    title: NPR
+                  - url: https://feeds.arstechnica.com/arstechnica/index.rss
+                    title: Ars Technica
 
           - type: rss
             title: Tech & AI
-            style: horizontal-cards
+            style: vertical-list
             cache: 1h
             limit: 20
-            collapse-after: 5
+            collapse-after: 7
             # Note: Anthropic RSS omitted — returned 404 during URL verification
             feeds:
               - url: https://www.theverge.com/rss/index.xml
@@ -55,65 +79,49 @@ pages:
                 title: Simon Willison
               - url: https://www.latent.space/feed
                 title: Latent Space
-              - url: https://www.reddit.com/r/ClaudeAI/.rss
-                title: r/ClaudeAI
 
           - type: rss
             title: Homelab
-            style: horizontal-cards
+            style: vertical-list
             cache: 2h
             limit: 15
-            collapse-after: 5
+            collapse-after: 7
             # Note: LinuxServer.io blog omitted — returned 404 during URL verification
             feeds:
               - url: https://selfh.st/rss/
                 title: selfh.st
-              - url: https://www.reddit.com/r/homelab/.rss
-                title: r/homelab
 
           - type: rss
             title: Gaming
-            style: horizontal-cards
+            style: vertical-list
             cache: 2h
             limit: 15
-            collapse-after: 5
+            collapse-after: 7
             # Note: IGN omitted — returned 501 during URL verification
             feeds:
               - url: https://www.pcgamer.com/rss/
                 title: PC Gamer
-              - url: https://www.reddit.com/r/Borderlands4/.rss
-                title: r/Borderlands4
-              - url: https://www.reddit.com/r/gaming/.rss
-                title: r/gaming
 
           - type: rss
             title: DIY & Making
-            style: horizontal-cards
+            style: vertical-list
             cache: 6h
             limit: 15
-            collapse-after: 5
+            collapse-after: 7
             # Note: Instructables omitted — returned 404 during URL verification
             feeds:
-              - url: https://www.reddit.com/r/3Dprinting/.rss
-                title: r/3Dprinting
-              - url: https://www.reddit.com/r/fermentation/.rss
-                title: r/fermentation
               - url: https://makezine.com/feed/
                 title: Make Magazine
 
           - type: rss
             title: Deals & Outdoor
-            style: horizontal-cards
+            style: vertical-list
             cache: 1h
             limit: 15
-            collapse-after: 5
+            collapse-after: 7
             feeds:
               - url: https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1
                 title: Slickdeals
-              - url: https://www.reddit.com/r/deals/.rss
-                title: r/deals
-              - url: https://www.reddit.com/r/frugalmalefashion/.rss
-                title: r/frugalmalefashion
               - url: https://gearjunkie.com/feed
                 title: Gear Junkie
 
@@ -125,6 +133,33 @@ pages:
                 show-thumbnails: true
               - type: reddit
                 subreddit: selfhosted
+                show-thumbnails: true
+              - type: reddit
+                subreddit: ClaudeAI
+                show-thumbnails: true
+              - type: reddit
+                subreddit: homelab
+                show-thumbnails: true
+              - type: reddit
+                subreddit: gaming
+                show-thumbnails: true
+              - type: reddit
+                subreddit: Borderlands4
+                show-thumbnails: true
+              - type: reddit
+                subreddit: 3Dprinting
+                show-thumbnails: true
+              - type: reddit
+                subreddit: fermentation
+                show-thumbnails: true
+              - type: reddit
+                subreddit: deals
+                show-thumbnails: true
+              - type: reddit
+                subreddit: frugalmalefashion
+                show-thumbnails: true
+              - type: reddit
+                subreddit: Parenting
                 show-thumbnails: true
 
           - type: videos
@@ -156,36 +191,6 @@ pages:
               - UCfQgsKhHjSyRLOp9mnffqVg  # RP Strength
               - UCFHZHhZaH7Rc_FOMIzUziJA  # Rick Shiels Golf
               - UCHnyfMqiRRG1u-2MsSQLbXA  # Veritasium
-
-      - size: small
-        widgets:
-          - type: markets
-            markets:
-              - symbol: SPY
-                name: S&P 500
-              - symbol: BTC-USD
-                name: Bitcoin
-              - symbol: NVDA
-                name: NVIDIA
-              - symbol: AAPL
-                name: Apple
-              - symbol: MSFT
-                name: Microsoft
-
-          - type: rss
-            title: Parenting & Health
-            style: vertical-list
-            cache: 12h
-            limit: 15
-            collapse-after: 5
-            # Note: Mayo Clinic omitted — returned 404 during URL verification
-            feeds:
-              - url: https://www.fatherly.com/feed/
-                title: Fatherly
-              - url: https://www.thekitchn.com/main.rss
-                title: The Kitchn
-              - url: https://www.reddit.com/r/Parenting/.rss
-                title: r/Parenting
 
   - name: Infrastructure
     columns:
