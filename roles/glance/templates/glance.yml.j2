@@ -51,8 +51,6 @@ pages:
 
           - type: group
             widgets:
-              - type: hacker-news
-
               - type: rss
                 title: Breaking News
                 style: vertical-list
@@ -65,53 +63,46 @@ pages:
                   - url: https://feeds.arstechnica.com/arstechnica/index.rss
                     title: Ars Technica
 
-          - type: rss
-            title: Tech & AI
-            style: vertical-list
-            cache: 1h
-            limit: 20
-            collapse-after: 7
-            # Note: Anthropic RSS omitted — returned 404 during URL verification
-            feeds:
-              - url: https://www.theverge.com/rss/index.xml
-                title: The Verge
-              - url: https://simonwillison.net/atom/everything/
-                title: Simon Willison
-              - url: https://www.latent.space/feed
-                title: Latent Space
+              - type: hacker-news
 
-          - type: rss
-            title: Homelab
-            style: vertical-list
-            cache: 2h
-            limit: 15
-            collapse-after: 7
-            # Note: LinuxServer.io blog omitted — returned 404 during URL verification
-            feeds:
-              - url: https://selfh.st/rss/
-                title: selfh.st
+          - type: group
+            widgets:
+              - type: rss
+                title: Tech & AI
+                style: vertical-list
+                cache: 1h
+                limit: 20
+                collapse-after: 7
+                # Note: Anthropic RSS omitted — returned 404 during URL verification
+                feeds:
+                  - url: https://www.theverge.com/rss/index.xml
+                    title: The Verge
+                  - url: https://simonwillison.net/atom/everything/
+                    title: Simon Willison
+                  - url: https://www.latent.space/feed
+                    title: Latent Space
 
-          - type: rss
-            title: Gaming
-            style: vertical-list
-            cache: 2h
-            limit: 15
-            collapse-after: 7
-            # Note: IGN omitted — returned 501 during URL verification
-            feeds:
-              - url: https://www.pcgamer.com/rss/
-                title: PC Gamer
+              - type: rss
+                title: Gaming
+                style: vertical-list
+                cache: 2h
+                limit: 15
+                collapse-after: 7
+                # Note: IGN omitted — returned 501 during URL verification
+                feeds:
+                  - url: https://www.pcgamer.com/rss/
+                    title: PC Gamer
 
-          - type: rss
-            title: DIY & Making
-            style: vertical-list
-            cache: 6h
-            limit: 15
-            collapse-after: 7
-            # Note: Instructables omitted — returned 404 during URL verification
-            feeds:
-              - url: https://makezine.com/feed/
-                title: Make Magazine
+              - type: rss
+                title: DIY & Making
+                style: vertical-list
+                cache: 6h
+                limit: 15
+                collapse-after: 7
+                # Note: Instructables omitted — returned 404 during URL verification
+                feeds:
+                  - url: https://makezine.com/feed/
+                    title: Make Magazine
 
           - type: rss
             title: Deals & Outdoor
@@ -126,6 +117,7 @@ pages:
                 title: Gear Junkie
 
           - type: group
+            title: Reddit — Tech
             cache: 30m
             widgets:
               - type: reddit
@@ -140,12 +132,22 @@ pages:
               - type: reddit
                 subreddit: homelab
                 show-thumbnails: true
+
+          - type: group
+            title: Reddit — Gaming
+            cache: 30m
+            widgets:
               - type: reddit
                 subreddit: gaming
                 show-thumbnails: true
               - type: reddit
                 subreddit: Borderlands4
                 show-thumbnails: true
+
+          - type: group
+            title: Reddit — Lifestyle
+            cache: 30m
+            widgets:
               - type: reddit
                 subreddit: 3Dprinting
                 show-thumbnails: true
