@@ -15,6 +15,7 @@ tasks:
         echo ""
         echo "-------------------------------------------------------"
         echo " Usage Hints:"
+        echo "  - Generic deploy:   task deploy -- <group> [--check]"
         echo "  - Pass extra args:  task <target> -- --check"
         echo "  - Limit hosts:      task <target> -- --limit <host>"
         echo "  - Debug output:     task <target> -- -vvv"
@@ -34,7 +35,7 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'  # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
@@ -42,12 +43,20 @@ tasks:
       - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
 
   bootstrap-lxc:
-    desc: Bootstrap a new LXC container (run once — pass hostname as argument, e.g. task bootstrap-lxc -- uptime-kuma.tlesh.xyz)
+    desc: "Bootstrap a new LXC (run once). Usage: task bootstrap-lxc -- <hostname>"
     preconditions:
       - sh: '[ -n "{{.CLI_ARGS}}" ]'
         msg: "Usage: task bootstrap-lxc -- <hostname>"
     cmds:
       - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap --limit "{{.CLI_ARGS}}" -e "ansible_user=root"
+
+  deploy:
+    desc: "Deploy to any Ansible host group (usage: task deploy -- <group> [extra-args])"
+    preconditions:
+      - sh: '[ -n "{{.CLI_ARGS}}" ]'
+        msg: "Usage: task deploy -- <group> [extra-args]  e.g. task deploy -- glance --check"
+    cmds:
+      - doppler run -- ansible-playbook -b main.yml --limit {{.CLI_ARGS}}
 
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
