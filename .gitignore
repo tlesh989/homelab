@@ -148,3 +148,4 @@ galaxy_collections/
 
 # Superpowers runtime artifacts
 .superpowers/
+.beads/
