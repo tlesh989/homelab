@@ -67,8 +67,8 @@
 
 - name: Configure Tailscale HTTPS serve for Glance
   ansible.builtin.command:
-    cmd: tailscale serve --bg http://127.0.0.1:{{ glance_port }}
-  changed_when: false
+    cmd: tailscale serve --yes --bg http://127.0.0.1:{{ glance_port }}
+  changed_when: true
   when: not ansible_check_mode
 
 - name: Template Glance config
