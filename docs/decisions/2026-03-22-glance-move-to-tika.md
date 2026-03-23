@@ -12,7 +12,7 @@ Tailscale requires `/dev/net/tun`, which is unavailable in unprivileged LXC cont
 
 ## What Changed
 
-- `terraform/glance.tf`: `node_name` changed from `sturm` to `tika`, `unprivileged` changed from `true` to `false`, `node_name` removed from `lifecycle.ignore_changes`
+- `terraform/glance.tf`: `node_name` changed from `sturm` to `tika`, `unprivileged` changed from `true` to `false`
 - `/etc/pve/lxc/104.conf` on tika: added `lxc.cgroup2.devices.allow: c 10:200 rwm` and `lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file`
 - Doppler `SSH_PUBLIC_KEY` updated to `ansible_ed25519` public key (was personal `tlesh@tlesh.com` key — mismatch with `ansible_ssh_private_key_file` in `group_vars/all.yml`)
 
