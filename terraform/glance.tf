@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_container" "glance" {
-  node_name    = "sturm"
+  node_name    = "tika"
   vm_id        = 104
-  unprivileged = true
+  unprivileged = false
 
   features {
     nesting = true
@@ -55,7 +55,6 @@ resource "proxmox_virtual_environment_container" "glance" {
 
   lifecycle {
     ignore_changes = [
-      node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
     ]
