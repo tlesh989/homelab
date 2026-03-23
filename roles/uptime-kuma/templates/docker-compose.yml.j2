@@ -5,7 +5,7 @@
 # (apparmor_parser requires policy admin privileges), causing the container to fail on startup.
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:2
     container_name: uptime-kuma
     security_opt:
       - apparmor=unconfined
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   watchtower:
-    image: ghcr.io/nicholas-fedor/watchtower:latest
+    image: ghcr.io/nicholas-fedor/watchtower:1.14.4
     container_name: watchtower
     security_opt:
       - apparmor=unconfined
