@@ -109,6 +109,37 @@ services:
       - "{{ arr_bazarr_port }}:6767"
     restart: unless-stopped
 
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:3.1.0
+    container_name: lidarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/lidarr:/config"
+      - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_lidarr_port }}:8686"
+    restart: unless-stopped
+
+  beets:
+    image: lscr.io/linuxserver/beets:2.7.1
+    container_name: beets
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/beets:/config"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    restart: unless-stopped
+
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr

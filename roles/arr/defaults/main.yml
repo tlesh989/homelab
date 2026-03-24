@@ -1,6 +1,7 @@
 ---
 # Storage paths
 arr_downloads_path: /data/downloads
+arr_media_path: /data/media
 arr_config_path: /opt/arr/config
 
 # Ports
@@ -11,6 +12,7 @@ arr_prowlarr_port: 9696
 arr_bazarr_port: 6767
 arr_seerr_port: 5055
 arr_flaresolverr_port: 8191
+arr_lidarr_port: 8686
 
 # NFS mount options
 arr_nfs_mount_opts: rw,noatime,nfsvers=4.1,soft,timeo=30,_netdev,x-systemd.automount

@@ -35,7 +35,7 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'  # noqa yaml[line-length]
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
@@ -62,25 +62,37 @@ tasks:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   truenas:
     desc: Configure TrueNAS (iSCSI targets, NFS shares)
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   r8152:
     desc: Install Realtek r8152 DKMS driver on Proxmox hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}" }
+        vars:
+          {
+            PLAYBOOK: "main.yml",
+            LIMIT: "proxmox",
+            CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}",
+          }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          {
+            PLAYBOOK: "main.yml",
+            LIMIT: "tailscale",
+            CLI_ARGS: "{{.CLI_ARGS}}",
+          }
 
   plex:
     desc: Run Ansible playbook for Plex hosts
@@ -92,7 +104,12 @@ tasks:
     desc: Deploy Netdata monitoring
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          {
+            PLAYBOOK: "main.yml",
+            LIMIT: "netdata,proxmox",
+            CLI_ARGS: "{{.CLI_ARGS}}",
+          }
 
   arr:
     desc: Deploy arr media stack
@@ -100,23 +117,37 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "arr", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  beets-import:
+    desc: Run beets music import on the arr host (tags high-confidence, sweeps rest to music-review)
+    cmds:
+      - >-
+        doppler run -- ansible arr -b -m shell -a
+        "docker exec beets beet import -q /data/media/unprocessed/music && mv_log=/tmp/beets-import-mv.log && if [ -n \"$(find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -print -quit)\" ]; then find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv {} /data/media/unprocessed/music-review/ \\; 2>\"$mv_log\"; mv_rc=$?; if [ $mv_rc -ne 0 ]; then echo \"beets-import: mv failures detected (see $mv_log)\"; cat \"$mv_log\"; exit $mv_rc; fi; if [ -s \"$mv_log\" ]; then echo \"beets-import: mv warnings logged to $mv_log\"; cat \"$mv_log\"; fi; else echo \"beets-import: no leftover entries to move\"; fi"
+
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          {
+            PLAYBOOK: "main.yml",
+            LIMIT: "uptime-kuma",
+            CLI_ARGS: "{{.CLI_ARGS}}",
+          }
 
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   pi-hole:
     desc: Run Ansible playbook for pi-hole host
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars:
+          { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts
