@@ -105,7 +105,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec beets beet import -q /data/media/unprocessed/music && find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv {} /data/media/unprocessed/music-review/ \; 2>/dev/null || true"
+        "docker exec beets beet import -q /data/media/unprocessed/music && (find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv {} /data/media/unprocessed/music-review/ \; 2>/dev/null || true)"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server

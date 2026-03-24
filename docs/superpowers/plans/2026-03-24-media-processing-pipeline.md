@@ -4,7 +4,7 @@
 
 **Goal:** Add Lidarr and beets to the arr stack and create the directory structure for a semi-automated TV/movie/music processing pipeline.
 
-**Architecture:** Two new Docker containers (Lidarr, beets) are added to the existing arr Docker Compose stack on LXC 106 (bupu). New `unprocessed/` drop-zone directories are created under the shared TrueNAS NFS mount. A `beets-import` Taskfile task triggers remote tag processing. Glance already has the Lidarr monitor entry (committed separately).
+**Architecture:** Two new Docker containers (Lidarr, beets) are added to the existing arr Docker Compose stack on LXC 106 (bupu). New `unprocessed/` drop-zone directories are created under the shared TrueNAS NFS mount. A `beets-import` Taskfile task triggers remote tag processing. Glance is updated in this PR with the Lidarr monitor entry.
 
 **Tech Stack:** Ansible, Jinja2 templates, Docker Compose, beets (MusicBrainz), Lidarr (linuxserver)
 
@@ -73,6 +73,8 @@
 - [ ] **Step 1: Add media root dirs, unprocessed tree, and config dirs**
 
   Append to the existing config directories loop in `roles/arr/tasks/directories.yml`. The file currently has two tasks: download staging dirs and arr config dirs. Add two new tasks after the existing ones.
+
+  Ensure this task file runs after `roles/arr/tasks/nfs.yml` in `roles/arr/tasks/main.yml` so directories are created on the mounted share (not hidden under the pre-mount local path).
 
   Note: do **not** add `become: true` — the existing tasks in this file omit it, and the NFS mount is accessible to the Ansible service account without privilege escalation.
 
@@ -223,7 +225,7 @@
 
   ```yaml
     lidarr:
-      image: lscr.io/linuxserver/lidarr:2
+      image: lscr.io/linuxserver/lidarr:3.1.0
       container_name: lidarr
       security_opt:
         - apparmor=unconfined
@@ -246,7 +248,7 @@
 
   ```yaml
     beets:
-      image: lscr.io/linuxserver/beets:2
+      image: lscr.io/linuxserver/beets:2.7.1
       container_name: beets
       security_opt:
         - apparmor=unconfined
@@ -309,7 +311,7 @@
       cmds:
         - >-
           doppler run -- ansible arr -b -m shell -a
-          "docker exec beets beet import -q /data/media/unprocessed/music && find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv {} /data/media/unprocessed/music-review/ \; 2>/dev/null || true"
+          "docker exec beets beet import -q /data/media/unprocessed/music && (find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv {} /data/media/unprocessed/music-review/ \; 2>/dev/null || true)"
   ```
 
 - [ ] **Step 2: Verify task appears in task list**

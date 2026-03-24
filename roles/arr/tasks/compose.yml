@@ -28,6 +28,7 @@
     mode: "0644"
     owner: "{{ arr_puid }}"
     group: "{{ arr_pgid }}"
+  notify: restart arr stack
 
 - name: Deploy docker-compose.yml
   ansible.builtin.template:

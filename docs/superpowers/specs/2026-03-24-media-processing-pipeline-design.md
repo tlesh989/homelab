@@ -91,10 +91,11 @@ You drop files into unprocessed/tv/ or unprocessed/movies/
 
 ## Ansible Changes
 
-### `group_vars/arr.yml`
-Add:
+### `group_vars/arr.yml` (optional override)
+`arr_lidarr_port` is defined in `roles/arr/defaults/main.yml` with default `8686`.
+Only add an override in `group_vars/arr.yml` if you want Lidarr to listen on a non-default port, for example:
 ```yaml
-arr_lidarr_port: 8686
+arr_lidarr_port: 8868
 ```
 
 ### `roles/arr/defaults/main.yml`
