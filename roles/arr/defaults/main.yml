@@ -1,6 +1,7 @@
 ---
 # Storage paths
 arr_downloads_path: /data/downloads
+arr_media_path: /data/media
 arr_config_path: /opt/arr/config
 
 # Ports

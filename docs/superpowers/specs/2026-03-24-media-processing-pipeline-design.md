@@ -51,8 +51,8 @@ All directories live under the TrueNAS NFS export `wayreth/data/media`, mounted 
 ### New
 | Service | Image | Port | Role |
 |---------|-------|------|------|
-| Lidarr | `lscr.io/linuxserver/lidarr:2` | 8686 | Music library management |
-| Beets | `lscr.io/linuxserver/beets:2` | — | Music tag repair via MusicBrainz |
+| Lidarr | `lscr.io/linuxserver/lidarr:3.1.0` | 8686 | Music library management |
+| Beets | `lscr.io/linuxserver/beets:2.7.1` | — | Music tag repair via MusicBrainz |
 
 ---
 
