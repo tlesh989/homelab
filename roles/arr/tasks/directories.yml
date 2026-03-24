@@ -26,6 +26,8 @@
     - "{{ arr_config_path }}/prowlarr"
     - "{{ arr_config_path }}/bazarr"
     - "{{ arr_config_path }}/seerr"
+    - "{{ arr_config_path }}/lidarr"
+    - "{{ arr_config_path }}/beets"
 
 - name: Migrate overseerr config to seerr if needed
   ansible.builtin.shell:
@@ -50,3 +52,29 @@
     group: "{{ arr_pgid }}"
     recurse: true
   become: true
+
+- name: Create media library root directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ arr_puid }}"
+    group: "{{ arr_pgid }}"
+  loop:
+    - "{{ arr_media_path }}/tv"
+    - "{{ arr_media_path }}/movies"
+    - "{{ arr_media_path }}/music"
+
+- name: Create unprocessed drop-zone directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ arr_puid }}"
+    group: "{{ arr_pgid }}"
+  loop:
+    - "{{ arr_media_path }}/unprocessed/tv"
+    - "{{ arr_media_path }}/unprocessed/movies"
+    - "{{ arr_media_path }}/unprocessed/music"
+    - "{{ arr_media_path }}/unprocessed/music-ready"
+    - "{{ arr_media_path }}/unprocessed/music-review"
