@@ -4,6 +4,8 @@ version: "3"
 vars:
   PLAYBOOK: main.yml
   LIMIT: all
+  ARR_MEDIA_PATH:
+    sh: "awk -F': ' '/^arr_media_path:/ {print $2}' group_vars/arr.yml"
 
 tasks:
   default:
@@ -122,7 +124,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec beets beet import -q /data/media/unprocessed/music && find /data/media/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv '{}' /data/media/unprocessed/music-review/ \; || true"
+        "docker exec beets beet import -q {{.ARR_MEDIA_PATH}}/unprocessed/music && find {{.ARR_MEDIA_PATH}}/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv '{}' {{.ARR_MEDIA_PATH}}/unprocessed/music-review/ \; || true"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server

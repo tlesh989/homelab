@@ -259,7 +259,7 @@
 
   ```yaml
   beets:
-    image: lscr.io/linuxserver/beets:2.7.1
+    image: lscr.io/linuxserver/beets:2.7.1-ls319
     container_name: beets
     security_opt:
       - apparmor=unconfined
