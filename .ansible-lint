@@ -2,6 +2,7 @@
 exclude_paths:
   - .github
   - .ansibles
+  - .serena
   - galaxy_roles
   - galaxy_collections
 
