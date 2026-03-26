@@ -131,6 +131,7 @@ cd terraform && task test   # Format and Validate
 - `/ship [message]` — commit, push, and open a PR against `dev`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
 - Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` + `validate` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
+- Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes (idempotency, naming, secret hygiene).
 
 ## Behavior Rules
 
