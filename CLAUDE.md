@@ -153,6 +153,6 @@ cd terraform && task test   # Format and Validate
 
 ## RTK (Rust Token Killer)
 
-Always prefix shell commands with `rtk` for 60-90% token savings — it passes through unchanged if no filter exists, so it's always safe. Works with `&&` chains too: `rtk git add . && rtk git commit -m "msg" && rtk git push`.
+RTK is an optional external CLI for reducing token usage when running shell commands via AI tools. This repository does **not** require RTK and does **not** configure or install it; if you don't have `rtk` installed in your environment, just run commands normally without any `rtk` prefix.
 
-Key meta commands: `rtk gain` (savings analytics), `rtk discover` (missed opportunities), `rtk proxy <cmd>` (raw output). Run `rtk --help` for the full command reference.
+If RTK **is** installed in your local environment, you may prefix shell commands with `rtk` for potential token savings. It works with `&&` chains too, for example: `rtk git add . && rtk git commit -m "msg" && rtk git push`. Helpful meta commands include: `rtk gain` (savings analytics), `rtk discover` (missed opportunities), and `rtk proxy <cmd>` (raw output). Run `rtk --help` for the full command reference.

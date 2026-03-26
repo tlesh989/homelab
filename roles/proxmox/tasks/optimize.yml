@@ -168,9 +168,12 @@
 
 - name: Extract GPU and Audio device IDs
   ansible.builtin.set_fact:
-    proxmox_gpu_devices_raw: "{{ proxmox_lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
-    proxmox_gpu_vga_id: "{{ proxmox_lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
-    proxmox_gpu_audio_id: "{{ proxmox_lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
+    proxmox_gpu_devices_raw: "{{ proxmox_lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\\
+      [\\]]', '') | list }}"
+    proxmox_gpu_vga_id: "{{ proxmox_lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':')
+      }}"
+    proxmox_gpu_audio_id: "{{ proxmox_lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':')
+      }}"
   when: proxmox_lspci_output.stdout is search('VGA')
 
 - name: Set combined VFIO IDs
