@@ -20,7 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Check if an open PR from dev to main already exists
-          existing_pr=$(gh pr list --state open --base main --head dev --json number --jq '.[0].number')
+          existing_pr=$(gh pr list --state open --base main --head dev --json number --jq '.[0].number // empty')
 
           if [ -z "$existing_pr" ]; then
             echo "Creating new PR from dev to main"
