@@ -30,7 +30,7 @@ Plex detects new file (library auto-scan) → adds to library
 qBittorrent continues seeding from /data/downloads/complete/
 until ratio ≥ 2  OR  seeding time ≥ 48 hours, whichever comes first
          ↓
-qBittorrent auto-pauses torrent; arr app removes it and deletes local file
+qBittorrent auto-stops torrent; arr app removes it and deletes local file
 ```
 
 **Key point:** `/data/downloads` is on the local 100 GB LXC disk; `/data/media` is the TrueNAS NFS mount. Because they're different filesystems, hardlinking is not possible — arr apps always **copy** when importing from downloads. The original file stays in downloads while seeding continues.
@@ -67,15 +67,13 @@ Default: `admin` / `adminadmin` — change immediately.
 
 | Setting | Value |
 |---------|-------|
-| Default save path | `/data/downloads/incomplete` |
+| Default save path | `/data/downloads/complete` |
 | Keep incomplete torrents in | `/data/downloads/incomplete` |
-| Copy .torrent files to | (leave blank) |
-| Automatically add torrent labels | (handled per-category by arr apps) |
+| Default Torrent Management Mode | `Automatic` |
 
 Enable: **"Keep incomplete torrents in:"** and set it to `/data/downloads/incomplete`.
-Enable: **"Move completed downloads to:"** → `/data/downloads/complete`
 
-This ensures actively-downloading files stay in `incomplete/` and are moved to `complete/` only when 100% done.
+This ensures actively-downloading files stay in `incomplete/` and are moved to `complete/` only when 100% done. In qBittorrent 4.6+ the old "Move completed downloads to:" field is gone — setting the **Default save path** to `complete/` with **Automatic** torrent management achieves the same result.
 
 ### Configure seeding limits
 
@@ -85,16 +83,16 @@ This ensures actively-downloading files stay in `incomplete/` and are moved to `
 |---------|-------|
 | Seeding goals — Share ratio limit | `2.0` |
 | Seeding goals — Seeding time limit | `2880` minutes (= 48 hours) |
-| Condition | **"then"** → select **Pause torrent** |
+| Condition | **"then"** → select **Stop torrent** |
 
-Check **both** boxes so the rule fires on whichever limit is reached first (ratio ≥ 2 **or** 48 hours, not and). Set the action to **"Pause torrent"** — this signals to the arr apps that seeding is done, which triggers them to clean up the download.
+Check **both** boxes so the rule fires on whichever limit is reached first (ratio ≥ 2 **or** 48 hours, not and). Set the action to **"Stop torrent"** — this signals to the arr apps that seeding is done, which triggers them to clean up the download.
 
-> **Why "Pause" and not "Remove"?**
-> The arr apps (Sonarr/Radarr/Lidarr) poll qBittorrent and handle removal themselves. Setting qBittorrent to "Remove" can race with the arr app's cleanup logic and leave orphaned entries. "Pause" is the safe default.
+> **Why "Stop" and not "Remove"?**
+> The arr apps (Sonarr/Radarr/Lidarr) poll qBittorrent and handle removal themselves. Setting qBittorrent to "Remove" can race with the arr app's cleanup logic and leave orphaned entries. "Stop" (called "Pause" in qBittorrent versions before 4.6) is the safe default.
 
-### Enable categories (optional but recommended)
+### Categories
 
-The arr apps will create their own categories (`sonarr`, `radarr`, `lidarr`) automatically when they first connect. You don't need to create these manually.
+The arr apps create their own categories (`sonarr`, `radarr`, `lidarr`) automatically on their first grab. No manual setup required in qBittorrent.
 
 ---
 
@@ -143,7 +141,7 @@ Open Sonarr at `http://arr.tlesh.xyz:8989`.
 | Recent Priority | Last |
 | Older Priority | Last |
 
-Enable: **"Remove Completed"** — this tells Sonarr to remove the torrent from qBittorrent (and delete the local file) once the download is imported **and** seeding has finished (i.e., qBittorrent has paused it per your seeding limits).
+Enable: **"Remove Completed"** — this tells Sonarr to remove the torrent from qBittorrent (and delete the local file) once the download is imported **and** seeding has finished (i.e., qBittorrent has stopped it per your seeding limits).
 
 ### Root folder
 
@@ -446,8 +444,8 @@ After a download completes and is imported to the Plex library:
 
 - qBittorrent continues seeding the original file from `/data/downloads/complete/`
 - Seeding stops when **ratio ≥ 2** or **48 hours** elapses, whichever comes first
-- qBittorrent pauses the torrent
-- Sonarr/Radarr/Lidarr detect the paused state on their next poll and trigger cleanup: the torrent is removed from qBittorrent and the local file in `complete/` is deleted
+- qBittorrent stops the torrent
+- Sonarr/Radarr/Lidarr detect the stopped state on their next poll and trigger cleanup: the torrent is removed from qBittorrent and the local file in `complete/` is deleted
 - The Plex library copy in `/data/media/` is unaffected — it was copied, not moved
 
 ---
