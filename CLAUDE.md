@@ -130,8 +130,7 @@ cd terraform && task test   # Format and Validate
 - `/deploy <target>` — dry-run first, apply on confirmation.
 - `/ship [message]` — commit, push, and open a PR against `dev`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
-- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
-- Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes.
+- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` + `validate` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
 
 ## Behavior Rules
 
@@ -150,3 +149,9 @@ cd terraform && task test   # Format and Validate
 - Uses the `Research -> Strategy -> Execution` lifecycle.
 - Prioritizes `Taskfile.yml` for all execution.
 - Respects `GEMINI.md` (now symlinked to this file).
+
+## RTK (Rust Token Killer)
+
+Always prefix shell commands with `rtk` for 60-90% token savings — it passes through unchanged if no filter exists, so it's always safe. Works with `&&` chains too: `rtk git add . && rtk git commit -m "msg" && rtk git push`.
+
+Key meta commands: `rtk gain` (savings analytics), `rtk discover` (missed opportunities), `rtk proxy <cmd>` (raw output). Run `rtk --help` for the full command reference.
