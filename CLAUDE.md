@@ -130,8 +130,8 @@ cd terraform && task test   # Format and Validate
 - `/deploy <target>` — dry-run first, apply on confirmation.
 - `/ship [message]` — commit, push, and open a PR against `dev`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
-- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
-- Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes.
+- Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` + `validate` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
+- Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes (idempotency, naming, secret hygiene).
 
 ## Behavior Rules
 
@@ -150,3 +150,9 @@ cd terraform && task test   # Format and Validate
 - Uses the `Research -> Strategy -> Execution` lifecycle.
 - Prioritizes `Taskfile.yml` for all execution.
 - Respects `GEMINI.md` (now symlinked to this file).
+
+## RTK (Rust Token Killer)
+
+RTK is an optional external CLI for reducing token usage when running shell commands via AI tools. This repository does **not** require RTK and does **not** configure or install it; if you don't have `rtk` installed in your environment, just run commands normally without any `rtk` prefix.
+
+If RTK **is** installed in your local environment, you may prefix shell commands with `rtk` for potential token savings. It works with `&&` chains too, for example: `rtk git add . && rtk git commit -m "msg" && rtk git push`. Helpful meta commands include: `rtk gain` (savings analytics), `rtk discover` (missed opportunities), and `rtk proxy <cmd>` (raw output). Run `rtk --help` for the full command reference.
