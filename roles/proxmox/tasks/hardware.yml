@@ -2,7 +2,8 @@
 # tasks file for hardware-specific optimizations
 - name: Install microcode updates
   ansible.builtin.apt:
-    name: "{{ (ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0) | ternary('intel-microcode', 'amd64-microcode') }}"
+    name: "{{ (ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0) | ternary('intel-microcode', 'amd64-microcode')
+      }}"
     state: present
   when: ansible_facts.processor | list | intersect(['GenuineIntel', 'AuthenticAMD']) | length > 0
   notify: Update initramfs

@@ -1,4 +1,8 @@
 {
+  "statusLine": {
+    "type": "command",
+    "command": "bash /Users/tommy/repos/tlesh/homelab/.claude/statusline-command.sh"
+  },
   "deniedMcpServers": [
     { "serverName": "claude_ai_Google_Calendar" },
     { "serverName": "claude_ai_Gmail" }
@@ -42,7 +46,7 @@
           },
           {
             "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ansible_paths=['roles/','group_vars/','main.yml','bootstrap.yml']; sys.exit(0) if not any(p in path for p in ansible_paths) else None; lint=shutil.which('ansible-lint'); sys.exit(0) if not lint else None; r=subprocess.run([lint,'--profile','min',path],capture_output=True,text=True); print(r.stdout) if r.stdout else None; sys.exit(0)\"",
+            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ansible_paths=['roles/','group_vars/','main.yml','bootstrap.yml']; sys.exit(0) if not any(p in path for p in ansible_paths) else None; task=shutil.which('task'); sys.exit(0) if not task else None; r=subprocess.run([task,'lint'],capture_output=True,text=True); print(r.stdout) if r.stdout else None; sys.exit(0)\"",
             "timeout": 15000
           }
         ]

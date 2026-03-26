@@ -4,3 +4,4 @@
 glance_version: latest
 glance_install_dir: /opt/glance
 glance_port: 8080
+glance_hostname: glance.dunker-hops.ts.net

@@ -2,8 +2,11 @@
 exclude_paths:
   - .github
   - .ansibles
+  - .serena
   - galaxy_roles
   - galaxy_collections
 
 skip_list:
   - "name[casing]"
+  - "var-naming[no-role-prefix]" # intentional: pihole_* matches upstream, ansible_service_* matches service account role
+  - "yaml[line-length]" # unfixable: Jinja2 regex expressions and content blocks cannot be split

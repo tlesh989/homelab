@@ -65,6 +65,12 @@
     glance_installed_version is failed or
     (glance_installed_version.content | b64decode | trim) != glance_target_version)
 
+- name: Configure Tailscale HTTPS serve for Glance
+  ansible.builtin.command:
+    cmd: tailscale serve --yes --bg http://127.0.0.1:{{ glance_port }}
+  changed_when: true
+  when: not ansible_check_mode
+
 - name: Template Glance config
   ansible.builtin.template:
     src: glance.yml.j2

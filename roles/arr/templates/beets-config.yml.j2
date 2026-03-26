@@ -1,0 +1,10 @@
+# Managed by Ansible — do not edit manually
+directory: {{ arr_media_path }}/unprocessed/music-ready
+library: /config/musiclibrary.db
+
+import:
+  move: yes
+  quiet: yes
+  log: /config/import.log
+
+plugins: fetchart embedart

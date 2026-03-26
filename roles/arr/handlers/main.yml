@@ -1,0 +1,7 @@
+---
+- name: Restart arr stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ arr_config_path }}/compose"
+    state: restarted
+  listen: restart arr stack
+  when: not ansible_check_mode

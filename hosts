@@ -25,6 +25,12 @@ glance.tlesh.xyz ansible_host=192.168.233.22
 [netdata]
 netdata.tlesh.xyz ansible_host=192.168.233.23
 
+[arr]
+arr.tlesh.xyz ansible_host=192.168.233.24
+
+[uptime-kuma]
+uptime-kuma.tlesh.xyz ansible_host=192.168.233.16
+
 [truenas]
 ansalon ansible_host=192.168.233.6 ansible_connection=local ansible_become=false
 
@@ -39,3 +45,5 @@ plex
 glance
 pi-hole
 netdata
+arr
+uptime-kuma

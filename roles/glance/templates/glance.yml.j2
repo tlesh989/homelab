@@ -3,76 +3,17 @@ server:
 
 pages:
   - name: Home
-    # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
-    # hide-desktop-navigation: true
+    full-width: true
     columns:
       - size: small
         widgets:
           - type: calendar
-            first-day-of-week: monday
+            first-day-of-week: sunday
 
-          - type: rss
-            limit: 10
-            collapse-after: 3
-            cache: 12h
-            feeds:
-              - url: https://selfh.st/rss/
-                title: selfh.st
-                limit: 4
-              - url: https://ciechanow.ski/atom.xml
-              - url: https://www.joshwcomeau.com/rss.xml
-                title: Josh Comeau
-              - url: https://samwho.dev/rss.xml
-              - url: https://ishadeed.com/feed.xml
-                title: Ahmad Shadeed
-
-          - type: twitch-channels
-            channels:
-              - theprimeagen
-              - j_blow
-              - giantwaffle
-              - cohhcarnage
-              - christitustech
-              - EJ_SA
-
-      - size: full
-        widgets:
-          - type: search
-            search-engine: kagi
-            new-tab: true
-            autofocus: true
-            placeholder: Search Kagi...
-
-          - type: group
-            widgets:
-              - type: hacker-news
-              - type: lobsters
-
-          - type: videos
-            channels:
-              - UCXuqSBlHAVE6Xw-yeJA0Tunw # Linus Tech Tips
-              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
-              - UCsBjURrPoezykLs9EqgamOA # Fireship
-              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
-
-          - type: group
-            widgets:
-              - type: reddit
-                subreddit: technology
-                show-thumbnails: true
-              - type: reddit
-                subreddit: selfhosted
-                show-thumbnails: true
-
-      - size: small
-        widgets:
           - type: weather
             location: Frankenmuth, Michigan, United States
-            units: imperial # alternatively "imperial"
-            hour-format: 12h # alternatively "24h"
-            # Optionally hide the location from being displayed in the widget
-            # hide-location: true
+            units: imperial
+            hour-format: 12h
 
           - type: markets
             markets:
@@ -87,13 +28,240 @@ pages:
               - symbol: MSFT
                 name: Microsoft
 
-          - type: releases
-            cache: 1d
-            # Without authentication the Github API allows for up to 60 requests per hour. You can create a
-            # read-only token from your Github account settings and use it here to increase the limit.
-            # token: ...
-            repositories:
-              - glanceapp/glance
-              - go-gitea/gitea
-              - immich-app/immich
-              - syncthing/syncthing
+          - type: rss
+            title: Parenting & Health
+            style: vertical-list
+            cache: 12h
+            limit: 15
+            collapse-after: 5
+            # Note: Mayo Clinic omitted — returned 404 during URL verification
+            feeds:
+              - url: https://www.fatherly.com/feed/
+                title: Fatherly
+              - url: https://www.thekitchn.com/main.rss
+                title: The Kitchn
+
+      - size: full
+        widgets:
+          - type: search
+            search-engine: kagi
+            new-tab: true
+            autofocus: true
+            placeholder: Search Kagi...
+
+          - type: group
+            widgets:
+              - type: rss
+                title: Breaking News
+                style: vertical-list
+                cache: 1h
+                limit: 10
+                collapse-after: 3
+                feeds:
+                  - url: https://feeds.npr.org/1001/rss.xml
+                    title: NPR
+                  - url: https://feeds.arstechnica.com/arstechnica/index.rss
+                    title: Ars Technica
+
+              - type: hacker-news
+
+          - type: group
+            widgets:
+              - type: rss
+                title: Tech & AI
+                style: vertical-list
+                cache: 1h
+                limit: 20
+                collapse-after: 7
+                # Note: Anthropic RSS omitted — returned 404 during URL verification
+                feeds:
+                  - url: https://www.theverge.com/rss/index.xml
+                    title: The Verge
+                  - url: https://simonwillison.net/atom/everything/
+                    title: Simon Willison
+                  - url: https://www.latent.space/feed
+                    title: Latent Space
+
+              - type: rss
+                title: Gaming
+                style: vertical-list
+                cache: 2h
+                limit: 15
+                collapse-after: 7
+                # Note: IGN omitted — returned 501 during URL verification
+                feeds:
+                  - url: https://www.pcgamer.com/rss/
+                    title: PC Gamer
+
+              - type: rss
+                title: DIY & Making
+                style: vertical-list
+                cache: 6h
+                limit: 15
+                collapse-after: 7
+                # Note: Instructables omitted — returned 404 during URL verification
+                feeds:
+                  - url: https://makezine.com/feed/
+                    title: Make Magazine
+
+          - type: rss
+            title: Deals & Outdoor
+            style: vertical-list
+            cache: 1h
+            limit: 15
+            collapse-after: 7
+            feeds:
+              - url: https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1
+                title: Slickdeals
+              - url: https://gearjunkie.com/feed
+                title: Gear Junkie
+
+          - type: group
+            title: Reddit — Tech
+            cache: 30m
+            widgets:
+              - type: reddit
+                subreddit: technology
+                show-thumbnails: true
+              - type: reddit
+                subreddit: selfhosted
+                show-thumbnails: true
+              - type: reddit
+                subreddit: ClaudeAI
+                show-thumbnails: true
+              - type: reddit
+                subreddit: homelab
+                show-thumbnails: true
+
+          - type: group
+            title: Reddit — Gaming
+            cache: 30m
+            widgets:
+              - type: reddit
+                subreddit: gaming
+                show-thumbnails: true
+              - type: reddit
+                subreddit: Borderlands4
+                show-thumbnails: true
+
+          - type: group
+            title: Reddit — Lifestyle
+            cache: 30m
+            widgets:
+              - type: reddit
+                subreddit: 3Dprinting
+                show-thumbnails: true
+              - type: reddit
+                subreddit: fermentation
+                show-thumbnails: true
+              - type: reddit
+                subreddit: deals
+                show-thumbnails: true
+              - type: reddit
+                subreddit: frugalmalefashion
+                show-thumbnails: true
+              - type: reddit
+                subreddit: Parenting
+                show-thumbnails: true
+
+          - type: videos
+            style: grid-cards
+            cache: 1h
+            collapse-after-rows: 3
+            channels:
+              - UCYeiozh-4QwuC1sjgCmB92w  # DevOps Toolbox
+              - UC6gdCj56YK5KxiFf3WSOLtA  # Dr. Will Bulsiewicz (Gut Health MD)
+              - UCoy6cTJ7Tg0dqS-DI-_REsA  # Chase AI
+              - UCcjhYlL1WRBjKaJsMH_h7Lg  # Epicurious
+              - UCsBjURrPoezykLs9EqgamOA  # Fireship
+              - UCkVfrGwV-iG9bSsgCbrNPxQ  # Better Stack
+              - UCHkYOD-3fZbuGhwsADBd9ZQ  # Lawrence Systems
+              - UCxAS_aK7sS2x_bqnlJHDSHw  # America's Test Kitchen
+              - UC9x0AN7BWHpCDHSm9NiJFJQ  # NetworkChuck
+              - UChBEbMKI1eCcejTtmI32UEw  # Joshua Weissman
+              - UCDq5v10l4wkV5-ZBIJJFbzQ  # Ethan Chlebowski
+              - UCAuUUnT6oDeKwE6v1NGQxug  # TED
+              - UCR-DXc1voovS8nhAvccRZhg  # Jeff Geerling
+              - UCsooa4yRKGN_zEE8iknghZA  # TED-Ed
+              - UCftwRNsjfRo08xYE31tkiyw  # WIRED
+              - UCOk-gHyjcWZNj3Br4oxwh0A  # Techno Tim
+              - UCn5fhcGRrCvrmFibPbT6q1A  # Brian Lagerstrom
+              - UCxQbYGpbdrh-b2ND-AfIybg  # Maker's Muse
+              - UCb8Rde3uRL1ohROUVg46h1A  # Thomas Sanladerer
+              - UC2C_jShtL725hvbm1arSV9w  # CGP Grey
+              - UCzH5n3Ih5kgQoiDAQt2FwLw  # LifebyMikeG
+              - UCfQgsKhHjSyRLOp9mnffqVg  # RP Strength
+              - UCFHZHhZaH7Rc_FOMIzUziJA  # Rick Shiels Golf
+              - UCHnyfMqiRRG1u-2MsSQLbXA  # Veritasium
+
+  - name: Infrastructure
+    columns:
+      - size: full
+        widgets:
+          - type: monitor
+            title: Services
+            cache: 1m
+            sites:
+              - title: tika
+                url: https://{{ hostvars['tika.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: bupu
+                url: https://{{ hostvars['bupu.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: sturm
+                url: https://{{ hostvars['sturm.tlesh.xyz'].ansible_host }}:8006
+                icon: si:proxmox
+                allow-insecure: true
+              - title: TrueNAS
+                url: https://{{ hostvars['ansalon'].ansible_host }}
+                icon: si:truenas
+                allow-insecure: true
+              - title: Uptime Kuma
+                url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
+                icon: si:uptimekuma
+              - title: Netdata
+                url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999
+                icon: si:netdata
+              - title: Pi-hole
+                url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}/admin
+                icon: si:pihole
+              - title: Seerr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:5055
+                icon: si:seerr
+              - title: Sonarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8989
+                icon: si:sonarr
+              - title: Radarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:7878
+                icon: si:radarr
+              - title: Prowlarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:9696
+                icon: si:prowlarr
+              - title: qBittorrent
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8080
+                icon: si:qbittorrent
+              - title: Bazarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:6767
+                icon: si:bazarr
+              - title: Lidarr
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8686
+                icon: si:lidarr
+
+          - type: custom-api
+            title: Netdata
+            cache: 1m
+            url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999/api/v1/info
+            template: |
+              {% raw %}<div class="flex gap-2 items-center">
+                {{ $nodes := .JSON.Array "mirrored_hosts" }}
+                <span>{{ len $nodes }} nodes monitored</span>
+                {{ if gt (.JSON.Int "alarms.critical") 0 }}
+                <span class="color-negative">{{ .JSON.Int "alarms.critical" }} critical</span>
+                {{ else if gt (.JSON.Int "alarms.warning") 0 }}
+                <span class="color-highlight">{{ .JSON.Int "alarms.warning" }} warning</span>
+                {{ else }}
+                <span class="color-positive">No active alerts</span>
+                {{ end }}
+              </div>{% endraw %}

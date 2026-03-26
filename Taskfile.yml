@@ -4,6 +4,8 @@ version: "3"
 vars:
   PLAYBOOK: main.yml
   LIMIT: all
+  ARR_MEDIA_PATH:
+    sh: "awk -F': ' '/^arr_media_path:/ {print $2}' group_vars/arr.yml"
 
 tasks:
   default:
@@ -15,6 +17,7 @@ tasks:
         echo ""
         echo "-------------------------------------------------------"
         echo " Usage Hints:"
+        echo "  - Generic deploy:   task deploy -- <group> [--check]"
         echo "  - Pass extra args:  task <target> -- --check"
         echo "  - Limit hosts:      task <target> -- --limit <host>"
         echo "  - Debug output:     task <target> -- -vvv"
@@ -34,12 +37,29 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519'
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 &&
+        chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
     cmds:
       - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
+
+  bootstrap-lxc:
+    desc: "Bootstrap a new LXC (run once). Usage: task bootstrap-lxc -- <hostname>"
+    preconditions:
+      - sh: '[ -n "{{.CLI_ARGS}}" ]'
+        msg: "Usage: task bootstrap-lxc -- <hostname>"
+    cmds:
+      - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap --limit "{{.CLI_ARGS}}" -e "ansible_user=root"
+
+  deploy:
+    desc: "Deploy to any Ansible host group (usage: task deploy -- <group> [extra-args])"
+    preconditions:
+      - sh: '[ -n "{{.CLI_ARGS}}" ]'
+        msg: "Usage: task deploy -- <group> [extra-args]  e.g. task deploy -- glance --check"
+    cmds:
+      - doppler run -- ansible-playbook -b main.yml --limit {{.CLI_ARGS}}
 
   proxmox:
     desc: Run Ansible playbook for Proxmox hosts
@@ -76,6 +96,26 @@ tasks:
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+
+  arr:
+    desc: Deploy arr media stack
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "arr", CLI_ARGS: "{{.CLI_ARGS}}" }
+
+  beets-import:
+    desc: Run beets music import on the arr host (tags high-confidence, sweeps rest to music-review)
+    cmds:
+      - >-
+        doppler run -- ansible arr -b -m shell -a
+        "docker exec beets beet import -q {{.ARR_MEDIA_PATH}}/unprocessed/music && find {{.ARR_MEDIA_PATH}}/unprocessed/music
+        -mindepth 1 -maxdepth 1 -exec mv '{}' {{.ARR_MEDIA_PATH}}/unprocessed/music-review/ \; || true"
+
+  uptime-kuma:
+    desc: Deploy Uptime Kuma monitoring server
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   glance:
     desc: Run Ansible playbook for Glance host

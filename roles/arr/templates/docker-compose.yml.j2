@@ -1,0 +1,182 @@
+---
+# Managed by Ansible — do not edit manually
+# Note: all services include `security_opt: apparmor=unconfined` because this stack runs inside an
+# unprivileged LXC container. Docker cannot load the docker-default AppArmor profile in that context
+# (apparmor_parser requires policy admin privileges), causing all containers to fail on startup.
+# This applies to every container, not just gluetun. See /etc/pve/lxc/106.conf for related LXC config.
+services:
+  gluetun:
+    image: ghcr.io/qdm12/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    security_opt:
+      - apparmor=unconfined
+    ports:
+      - "{{ arr_qbittorrent_port }}:{{ arr_qbittorrent_port }}"
+      - "8000:8000"
+    env_file:
+      - "{{ arr_config_path }}/compose/gluetun.env"
+    environment:
+      VPN_SERVICE_PROVIDER: protonvpn
+      VPN_TYPE: wireguard
+    volumes:
+      - "{{ arr_config_path }}/gluetun:/gluetun"
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+      WEBUI_PORT: "{{ arr_qbittorrent_port }}"
+    volumes:
+      - "{{ arr_config_path }}/qbittorrent:/config"
+      - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/sonarr:/config"
+      - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_sonarr_port }}:8989"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/radarr:/config"
+      - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_radarr_port }}:7878"
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/prowlarr:/config"
+    ports:
+      - "{{ arr_prowlarr_port }}:9696"
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/bazarr:/config"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_bazarr_port }}:6767"
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:3.1.0
+    container_name: lidarr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/lidarr:/config"
+      - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_lidarr_port }}:8686"
+    restart: unless-stopped
+
+  beets:
+    image: lscr.io/linuxserver/beets:2.7.1-ls319
+    container_name: beets
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/beets:/config"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    restart: unless-stopped
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      TZ: "{{ arr_timezone }}"
+    volumes:
+      - "{{ arr_config_path }}/seerr:/app/config"
+    ports:
+      - "{{ arr_seerr_port }}:5055"
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      TZ: "{{ arr_timezone }}"
+    ports:
+      - "{{ arr_flaresolverr_port }}:8191"
+    restart: unless-stopped
+
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    container_name: watchtower
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - "{{ arr_config_path }}/compose/watchtower.env"
+    environment:
+      TZ: "{{ arr_timezone }}"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 3 * * *"
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+    restart: unless-stopped

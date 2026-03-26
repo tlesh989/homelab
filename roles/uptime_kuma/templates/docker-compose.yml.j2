@@ -1,0 +1,32 @@
+---
+# Managed by Ansible — do not edit manually
+# Note: security_opt: apparmor=unconfined is required because this container runs inside an
+# unprivileged LXC container. Docker cannot load the docker-default AppArmor profile in that context
+# (apparmor_parser requires policy admin privileges), causing the container to fail on startup.
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - "{{ uptime_kuma_data_path }}:/app/data"
+    ports:
+      - "{{ uptime_kuma_port }}:3001"
+    restart: unless-stopped
+
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:1.14.4
+    container_name: watchtower
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - "{{ uptime_kuma_base_path }}/compose/watchtower.env"
+    environment:
+      TZ: "{{ uptime_kuma_timezone }}"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 3 * * *"
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+    restart: unless-stopped

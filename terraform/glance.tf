@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_container" "glance" {
-  node_name    = "sturm"
+  node_name    = "tika"
   vm_id        = 104
-  unprivileged = true
+  unprivileged = false
 
   features {
     nesting = true
