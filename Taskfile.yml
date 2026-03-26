@@ -37,7 +37,8 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 &&
+        chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
@@ -64,37 +65,25 @@ tasks:
     desc: Run Ansible playbook for Proxmox hosts
     cmds:
       - task: ansible
-        vars:
-          { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   truenas:
     desc: Configure TrueNAS (iSCSI targets, NFS shares)
     cmds:
       - task: ansible
-        vars:
-          { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   r8152:
     desc: Install Realtek r8152 DKMS driver on Proxmox hosts
     cmds:
       - task: ansible
-        vars:
-          {
-            PLAYBOOK: "main.yml",
-            LIMIT: "proxmox",
-            CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}",
-          }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}" }
 
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
       - task: ansible
-        vars:
-          {
-            PLAYBOOK: "main.yml",
-            LIMIT: "tailscale",
-            CLI_ARGS: "{{.CLI_ARGS}}",
-          }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "tailscale", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   plex:
     desc: Run Ansible playbook for Plex hosts
@@ -106,12 +95,7 @@ tasks:
     desc: Deploy Netdata monitoring
     cmds:
       - task: ansible
-        vars:
-          {
-            PLAYBOOK: "main.yml",
-            LIMIT: "netdata,proxmox",
-            CLI_ARGS: "{{.CLI_ARGS}}",
-          }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   arr:
     desc: Deploy arr media stack
@@ -124,32 +108,26 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec beets beet import -q {{.ARR_MEDIA_PATH}}/unprocessed/music && find {{.ARR_MEDIA_PATH}}/unprocessed/music -mindepth 1 -maxdepth 1 -exec mv '{}' {{.ARR_MEDIA_PATH}}/unprocessed/music-review/ \; || true"
+        "docker exec beets beet import -q {{.ARR_MEDIA_PATH}}/unprocessed/music && find {{.ARR_MEDIA_PATH}}/unprocessed/music
+        -mindepth 1 -maxdepth 1 -exec mv '{}' {{.ARR_MEDIA_PATH}}/unprocessed/music-review/ \; || true"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
     cmds:
       - task: ansible
-        vars:
-          {
-            PLAYBOOK: "main.yml",
-            LIMIT: "uptime-kuma",
-            CLI_ARGS: "{{.CLI_ARGS}}",
-          }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   glance:
     desc: Run Ansible playbook for Glance host
     cmds:
       - task: ansible
-        vars:
-          { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   pi-hole:
     desc: Run Ansible playbook for pi-hole host
     cmds:
       - task: ansible
-        vars:
-          { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts

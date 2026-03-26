@@ -24,7 +24,7 @@
       tags: [ax88179b]
     - role: r8152
       tags: [r8152]
-    - role: ansible-user
+    - role: ansible_user
 
 - name: configure truenas
   hosts: truenas
@@ -38,7 +38,7 @@
   hosts: tailscale
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: GROG.package
@@ -75,7 +75,7 @@
   hosts: kaz
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: users
     - role: weareinteractive.environment
@@ -89,7 +89,7 @@
   hosts: plex
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: users
     - role: geerlingguy.ntp
@@ -100,7 +100,7 @@
   hosts: glance
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security
@@ -113,7 +113,7 @@
   hosts: netdata
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: users
     - role: netdata
@@ -122,7 +122,7 @@
   hosts: arr
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: arr
 
@@ -136,17 +136,17 @@
   hosts: pi-hole
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: users
-    - role: pi-hole
+    - role: pi_hole
 
 - name: setup uptime-kuma server
   hosts: uptime-kuma
   become: true
   roles:
-    - role: ansible-user
+    - role: ansible_user
     - role: GROG.package
-    - role: uptime-kuma
+    - role: uptime_kuma

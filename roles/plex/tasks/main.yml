@@ -25,7 +25,6 @@
     state: mounted
   become: true
 
-
 - name: Enable unattended upgrades for Plex apt repo
   ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/52unattended-upgrades-plex

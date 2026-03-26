@@ -7,7 +7,8 @@
 
 - name: Set Proxmox version facts
   ansible.builtin.set_fact:
-    proxmox_pve_major_version: "{{ (proxmox_pve_version_raw.stdout | regex_search('pve-manager/(\\d+)', '\\1'))[0] | default('9') }}"
+    proxmox_pve_major_version: "{{ (proxmox_pve_version_raw.stdout | regex_search('pve-manager/(\\d+)', '\\1'))[0] | default('9')
+      }}"
 
 - name: Disable legacy sources (.list)
   when: proxmox_migrate_to_deb822 | bool
