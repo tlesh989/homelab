@@ -30,7 +30,7 @@
 
     - name: Create ansible service account
       ansible.builtin.include_role:
-        name: ansible-user
+        name: ansible_user
 
 - name: Bootstrap LXC and VM hosts — create ansible service account
   hosts: lxc:kaz
@@ -48,4 +48,4 @@
 
     - name: Create ansible service account
       ansible.builtin.include_role:
-        name: ansible-user
+        name: ansible_user

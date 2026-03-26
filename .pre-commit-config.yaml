@@ -71,7 +71,7 @@ repos:
         args:
           - --fix
         files: \.(md|markdown)$
-        exclude: ^docs/plans/
+        exclude: ^docs/
         stages: [pre-commit]
 
   - repo: https://github.com/codespell-project/codespell
@@ -81,7 +81,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/crate-ci/typos
-    rev: a8d8e187146634c459c27ade2d3e338569378720  # pinned: v1.44.0 — autoupdate resolves to floating v1 tag
+    rev: a8d8e187146634c459c27ade2d3e338569378720 # pinned: v1.44.0 — autoupdate resolves to floating v1 tag
     hooks:
       - id: typos
         stages: [pre-commit]
@@ -110,5 +110,5 @@ repos:
         files: ^terraform/.*\.tf$
         args:
           - --quiet
-          - --skip-check CKV_TF_1  # module pinning enforced by tflint instead
+          - --skip-check CKV_TF_1 # module pinning enforced by tflint instead
         stages: [pre-commit]

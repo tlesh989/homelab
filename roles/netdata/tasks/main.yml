@@ -16,6 +16,7 @@
   ansible.builtin.blockinfile:
     path: /etc/netdata/stream.conf
     create: true
+    mode: "0640"
     marker: "# {mark} ANSIBLE MANAGED STREAMING"
     block: |
       [stream]
@@ -31,6 +32,7 @@
   ansible.builtin.blockinfile:
     path: /etc/netdata/stream.conf
     create: true
+    mode: "0640"
     marker: "# {mark} ANSIBLE MANAGED PARENT STREAM ACCEPTANCE"
     block: |
       [{{ netdata_stream_api_key }}]

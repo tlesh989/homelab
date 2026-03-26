@@ -121,7 +121,7 @@ cd terraform && task test   # Format and Validate
 ## MCP Tool Usage
 
 - **Context7**: Always use the `context7` MCP to look up documentation, API references, module options, provider schemas, and configuration examples — for Ansible modules, Terraform providers (`bpg/proxmox`, `hashicorp/*`), Doppler, Tailscale, or any library. Do this proactively without waiting to be asked.
-- **GitHub**: Use the `github` MCP to read issues, check CI status, view PR comments, and manage pull requests in this repo.
+- **GitHub**: Use the `gh` CLI (not an MCP) for all GitHub operations — reading issues, checking CI status, viewing PR comments, and managing pull requests.
 
 ## Model-Specific Skills & Hooks
 
