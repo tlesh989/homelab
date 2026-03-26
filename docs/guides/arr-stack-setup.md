@@ -141,7 +141,7 @@ Open Sonarr at `http://arr.tlesh.xyz:8989`.
 | Recent Priority | Last |
 | Older Priority | Last |
 
-Enable: **"Remove Completed"** — this tells Sonarr to remove the torrent from qBittorrent (and delete the local file) once the download is imported **and** seeding has finished (i.e., qBittorrent has paused it per your seeding limits).
+Enable: **"Remove Completed"** — this tells Sonarr to remove the torrent from qBittorrent (and delete the local file) once the download is imported **and** seeding has finished (i.e., qBittorrent has stopped it per your seeding limits).
 
 ### Root folder
 
