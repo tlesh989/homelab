@@ -116,7 +116,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        "docker exec -u 1000:1000 filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --action MOVE --conflict skip -non-strict
@@ -127,7 +127,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        "docker exec -u 1000:1000 filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --db TheMovieDB --format '{n} ({y})'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --action MOVE --conflict skip -non-strict
