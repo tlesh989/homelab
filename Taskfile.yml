@@ -140,6 +140,7 @@ tasks:
         doppler run -- ansible arr -b -m shell -a
         'find {{.ARR_MEDIA_PATH}}/unprocessed/movies -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.m4v" -o -iname "*.mkv" -o -iname "*.avi" \)
         | while read f; do dir="${f%.*}"; mkdir -p "$dir"; mv "$f" "$dir/"; done'
+      - doppler run -- ansible arr -b -m shell -a "chown -R {{.ARR_PUID}}:{{.ARR_PGID}} {{.ARR_MEDIA_PATH}}/unprocessed/movies"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
