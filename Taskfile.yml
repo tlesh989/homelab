@@ -119,7 +119,8 @@ tasks:
         "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
-        --action MOVE --conflict skip -non-strict --def xattr=n"
+        --action MOVE --conflict skip -non-strict --def xattr=n
+        --log-file /data/filebot.log"
 
   filebot-rename-movies:
     desc: Rename movie files in unprocessed/movies/ using TheMovieDB (run before Radarr manual import)
@@ -129,7 +130,8 @@ tasks:
         "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --db TheMovieDB --format '{n} ({y})'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
-        --action MOVE --conflict skip -non-strict --def xattr=n"
+        --action MOVE --conflict skip -non-strict --def xattr=n
+        --log-file /data/filebot.log"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
