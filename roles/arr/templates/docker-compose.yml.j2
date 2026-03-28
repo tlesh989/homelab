@@ -140,6 +140,21 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     restart: unless-stopped
 
+  filebot:
+    image: rednoah/filebot
+    container_name: filebot
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+    volumes:
+      - "{{ arr_config_path }}/filebot:/data"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    entrypoint: ["sleep"]
+    command: ["infinity"]
+    restart: unless-stopped
+
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr
