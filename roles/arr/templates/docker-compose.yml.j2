@@ -148,6 +148,7 @@ services:
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
+      FILEBOT_OPTS: "-Dnet.filebot.xattr.enable=false"
     volumes:
       - "{{ arr_config_path }}/filebot:/data"
       - "{{ arr_media_path }}:{{ arr_media_path }}"

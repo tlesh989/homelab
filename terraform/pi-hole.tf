@@ -1,5 +1,5 @@
 resource "proxmox_virtual_environment_container" "pi_hole" {
-  node_name    = "sturm"
+  node_name    = "tika"
   vm_id        = 102
   unprivileged = true
 
@@ -56,7 +56,6 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
 
   lifecycle {
     ignore_changes = [
-      node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
       disk,
