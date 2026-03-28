@@ -118,7 +118,8 @@ tasks:
         doppler run -- ansible arr -b -m shell -a
         "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
-        --action rename --conflict skip -non-strict"
+        --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        --action MOVE --conflict skip -non-strict --def xattr=n"
 
   filebot-rename-movies:
     desc: Rename movie files in unprocessed/movies/ using TheMovieDB (run before Radarr manual import)
@@ -127,7 +128,8 @@ tasks:
         doppler run -- ansible arr -b -m shell -a
         "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --db TheMovieDB --format '{n} ({y})'
-        --action rename --conflict skip -non-strict"
+        --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        --action MOVE --conflict skip -non-strict --def xattr=n"
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
