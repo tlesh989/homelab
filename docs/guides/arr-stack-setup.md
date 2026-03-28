@@ -437,7 +437,7 @@ Uptime Kuma uses an unofficial WebSocket API that can't be automated from Ansibl
 
 > **FileBot license:** On first use, FileBot may prompt for a license. Activate it inside the container:
 > `docker exec -it filebot filebot --license` and follow the prompts. The license is stored in
-> `{{ arr_config_path }}/filebot` and persists across restarts.
+> `/opt/arr/config/filebot` (i.e. `arr_config_path/filebot`) and persists across restarts.
 
 ### New music files you already have
 

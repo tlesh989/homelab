@@ -141,14 +141,13 @@ services:
     restart: unless-stopped
 
   filebot:
-    image: rednoah/filebot
+    image: rednoah/filebot:5.1.5
     container_name: filebot
     security_opt:
       - apparmor=unconfined
     environment:
       PUID: "{{ arr_puid }}"
       PGID: "{{ arr_pgid }}"
-      TZ: "{{ arr_timezone }}"
     volumes:
       - "{{ arr_config_path }}/filebot:/data"
       - "{{ arr_media_path }}:{{ arr_media_path }}"
