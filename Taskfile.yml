@@ -111,6 +111,24 @@ tasks:
         "docker exec beets beet import -q {{.ARR_MEDIA_PATH}}/unprocessed/music && find {{.ARR_MEDIA_PATH}}/unprocessed/music
         -mindepth 1 -maxdepth 1 -exec mv '{}' {{.ARR_MEDIA_PATH}}/unprocessed/music-review/ \; || true"
 
+  filebot-rename-tv:
+    desc: Rename TV files in unprocessed/tv/ using TheTVDB (run before Sonarr manual import)
+    cmds:
+      - >-
+        doppler run -- ansible arr -b -m shell -a
+        "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
+        --action rename --conflict skip -non-strict"
+
+  filebot-rename-movies:
+    desc: Rename movie files in unprocessed/movies/ using TheMovieDB (run before Radarr manual import)
+    cmds:
+      - >-
+        doppler run -- ansible arr -b -m shell -a
+        "docker exec filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        --db TheMovieDB --format '{n} ({y})'
+        --action rename --conflict skip -non-strict"
+
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
     cmds:

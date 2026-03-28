@@ -426,9 +426,18 @@ Uptime Kuma uses an unofficial WebSocket API that can't be automated from Ansibl
 ### New TV or movie files you already have
 
 1. Copy files to `/data/media/unprocessed/tv/` or `unprocessed/movies/` (accessible from Mac via NFS or SCP)
-2. Open Sonarr or Radarr → **Manual Import** → select the unprocessed directory
-3. Review matches, correct any errors, confirm
-4. Files are moved to `tv/` or `movies/` and Plex is notified
+2. *(Optional but recommended for poorly-named files)* Run FileBot to normalize names first:
+   ```bash
+   task filebot-rename-tv      # fixes TV file names using TheTVDB
+   task filebot-rename-movies  # fixes movie file names using TheMovieDB
+   ```
+3. Open Sonarr or Radarr → **Manual Import** → select the unprocessed directory
+4. Review matches, correct any errors, confirm
+5. Files are moved to `tv/` or `movies/` and Plex is notified
+
+> **FileBot license:** On first use, FileBot may prompt for a license. Activate it inside the container:
+> `docker exec -it filebot filebot --license` and follow the prompts. The license is stored in
+> `{{ arr_config_path }}/filebot` and persists across restarts.
 
 ### New music files you already have
 
