@@ -120,22 +120,22 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS='-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp' filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
-        --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
+        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        --db TheTVDB --format "{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}"
         --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --action MOVE --conflict skip -non-strict
-        --log-file /data/filebot.log || true"
+        --log-file /data/filebot.log; ec=$?; [ $ec -le 2 ]'
 
   filebot-rename-movies:
     desc: Rename movie files in unprocessed/movies/ using TheMovieDB (run before Radarr manual import)
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS='-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp' filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
-        --db TheMovieDB --format '{n} ({y})'
+        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        --db TheMovieDB --format "{n} ({y})"
         --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --action MOVE --conflict skip -non-strict
-        --log-file /data/filebot.log || true"
+        --log-file /data/filebot.log; ec=$?; [ $ec -le 2 ]'
 
   uptime-kuma:
     desc: Deploy Uptime Kuma monitoring server
