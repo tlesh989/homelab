@@ -6,6 +6,10 @@ vars:
   LIMIT: all
   ARR_MEDIA_PATH:
     sh: "awk -F': ' '/^arr_media_path:/ {print $2}' group_vars/arr.yml"
+  ARR_PUID:
+    sh: "awk -F': ' '/^arr_puid:/ {print $2}' roles/arr/defaults/main.yml"
+  ARR_PGID:
+    sh: "awk -F': ' '/^arr_pgid:/ {print $2}' roles/arr/defaults/main.yml"
 
 tasks:
   default:
@@ -116,7 +120,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec -u 1000:1000 filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        "docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --db TheTVDB --format '{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --action MOVE --conflict skip -non-strict
@@ -127,7 +131,7 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        "docker exec -u 1000:1000 filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        "docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --db TheMovieDB --format '{n} ({y})'
         --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --action MOVE --conflict skip -non-strict
