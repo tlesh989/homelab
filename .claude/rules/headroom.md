@@ -12,4 +12,4 @@ Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending e
 ## Startup
 
 - Terminal 1: `headroom proxy --llmlingua-device cpu`
-- Terminal 2: `set ANTHROPIC_BASE_URL=http://127.0.0.1:8787` (then start CC)
+- Terminal 2: `export ANTHROPIC_BASE_URL=http://127.0.0.1:8787` (then start CC)
