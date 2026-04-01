@@ -12,10 +12,7 @@ five_resets=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 cwd="${cwd/#$HOME/\~}"
 
 # Git branch (skip optional locks)
-_cwd_abs="${cwd/#\~/$HOME}"
-if [ -n "$_cwd_abs" ] && [ -d "$_cwd_abs" ]; then
-  git_branch=$(GIT_OPTIONAL_LOCKS=0 git -C "$_cwd_abs" rev-parse --abbrev-ref HEAD 2>/dev/null)
-fi
+git_branch=$(GIT_OPTIONAL_LOCKS=0 git -C "${cwd/#\~/$HOME}" rev-parse --abbrev-ref HEAD 2>/dev/null)
 
 parts=""
 
