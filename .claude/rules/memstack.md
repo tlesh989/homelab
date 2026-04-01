@@ -55,7 +55,7 @@ Complete the current task fully before starting a new one. If a task reveals sub
 
 ## Deprecated Skills — Do Not Activate
 
-Skills marked `deprecated: true` (Seal, Deploy, Monitor) are replaced by deterministic hooks in `.claude/hooks/`. Never follow their protocols manually — the hooks fire automatically on the correct CC lifecycle events. Only read deprecated skill files if debugging hook behavior.
+Skills marked `deprecated: true` (Seal, Deploy, Monitor) are replaced by deterministic hooks registered in `~/.claude/settings.json`. Never follow their protocols manually — the hooks fire automatically on the correct CC lifecycle events. Only read deprecated skill files if debugging hook behavior.
 
 ## Skill Chain
 

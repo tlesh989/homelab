@@ -1,6 +1,6 @@
 # Headroom — Context Compression Proxy
 
-Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending effective context window. Auto-started by the session-start hook if installed.
+Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending effective context window. Can be auto-started by a session-start hook if configured in `~/.claude/settings.json`.
 
 ## Troubleshooting
 
