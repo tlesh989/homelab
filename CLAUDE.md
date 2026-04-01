@@ -79,6 +79,8 @@ cd terraform && task test   # Format and Validate
 - **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`.
 - **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
 - **General**: 2-space indentation, max 120 chars line length.
+- **Shell filename loops**: Always use `find -print0 | while IFS= read -r -d "" f; do ...` — never plain `while read f` (breaks on spaces/special chars in media filenames). **This pattern is Bash-specific (`read -d`); ensure it runs under Bash (e.g., `#!/usr/bin/env bash`, `bash -lc`, or Ansible `executable: /bin/bash`).**
+- **Service user file creation**: Any Taskfile task or Ansible step that creates dirs/files for a service user must include `chown -R <puid>:<pgid> <path>` immediately after.
 
 ## Git Workflow
 
