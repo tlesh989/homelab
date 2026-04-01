@@ -28,7 +28,13 @@ Auto-detect type from changes: new files = `feat`, modifications = `fix`/`refact
 
 ## Build Before Push
 
-Always run `npm run build` (or equivalent) and verify it passes before any `git push`. If the build fails, fix the errors before pushing. Never use `--no-verify` to skip checks.
+Before any `git push`, run the relevant validation checks for this repo:
+
+- `task lint` + `task syntax` (Ansible changes)
+- `cd terraform && task test` (Terraform changes)
+- `task ci` (CI dry-run, no Doppler)
+
+Never use `--no-verify` to skip hooks. If a `package.json` exists, also run `npm run build`.
 
 ## No Secrets in Git
 
