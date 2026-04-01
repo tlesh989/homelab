@@ -41,8 +41,7 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 &&
-        chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
+      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
@@ -120,7 +119,8 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/tv
+        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r
+        {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --db TheTVDB --format "{n}/Season {s.pad(2)}/{n} - {s00e00} - {t}"
         --output {{.ARR_MEDIA_PATH}}/unprocessed/tv
         --action MOVE --conflict skip -non-strict
@@ -131,15 +131,17 @@ tasks:
     cmds:
       - >-
         doppler run -- ansible arr -b -m shell -a
-        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r {{.ARR_MEDIA_PATH}}/unprocessed/movies
+        'docker exec -u {{.ARR_PUID}}:{{.ARR_PGID}} -e FILEBOT_OPTS="-Dnet.filebot.xattr.enable=false -Djava.util.prefs.userRoot=/tmp" filebot filebot -rename -r
+        {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --db TheMovieDB --format "{n} ({y})"
         --output {{.ARR_MEDIA_PATH}}/unprocessed/movies
         --action MOVE --conflict skip -non-strict
         --log-file /data/filebot.log; ec=$?; [ $ec -le 2 ]'
       - >-
         doppler run -- ansible arr -b -m shell -a
-        'find {{.ARR_MEDIA_PATH}}/unprocessed/movies -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.m4v" -o -iname "*.mkv" -o -iname "*.avi" \) -print0
-        | while IFS= read -r -d "" f; do dir="${f%.*}"; mkdir -p "$dir"; mv "$f" "$dir/"; done'
+        'bash -c "set -o pipefail; find {{.ARR_MEDIA_PATH}}/unprocessed/movies -maxdepth 1 -type f \( -iname \"*.mp4\" -o -iname \"*.m4v\" -o -iname \"*.mkv\" -o
+        -iname \"*.avi\" \) -print0
+        | while IFS= read -r -d \"\" f; do dir=\"\${f%.*}\"; mkdir -p \"\$dir\"; mv \"\$f\" \"\$dir/\"; done"'
       - doppler run -- ansible arr -b -m shell -a "chown -R {{.ARR_PUID}}:{{.ARR_PGID}} {{.ARR_MEDIA_PATH}}/unprocessed/movies"
 
   uptime-kuma:
