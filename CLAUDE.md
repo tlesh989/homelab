@@ -79,7 +79,9 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 ## Claude Configuration
 
 - MCP server configurations go in `.claude/settings.json` (project-level) unless the user specifies global (`~/.claude/settings.json`).
-- Cross-session memory (decisions, patterns, project state) lives in `~/.claude/projects/-Users-tommy-repos-tlesh-homelab/memory/MEMORY.md`. Check it when resuming work or making architectural decisions.
+- Cross-session memory (decisions, patterns, project state) lives in
+  `~/.claude/projects/<encoded-repo-path>/memory/MEMORY.md`. Check it when resuming work or
+  making architectural decisions.
 
 ## MCP Tool Usage
 
