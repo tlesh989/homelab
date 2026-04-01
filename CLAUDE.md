@@ -4,126 +4,86 @@ This file provides guidance to Claude Code (claude.ai/code) and Gemini CLI when 
 
 ## Project Overview
 
-This is a homelab infrastructure repo using Terraform (Proxmox provider), Ansible roles, and Doppler for secrets. Primary languages are YAML (Ansible), HCL (Terraform), and Markdown. Always check existing patterns in the repo before creating new files.
-
-This repository contains the infrastructure-as-code and configuration management for a personal homelab.
+This is a homelab infrastructure repo using Terraform (Proxmox provider), Ansible roles, and Doppler for secrets. Primary languages are YAML (Ansible), HCL (Terraform), and Markdown. Always check existing patterns before creating new files.
 
 - **Infrastructure:** Proxmox VE hosting LXC containers and VMs across nodes (e.g., `bupu`, `sturm`, `tika`).
-- **Provisioning:** Terraform using the `bpg/proxmox` provider. State is managed in Terraform Cloud (`tlesh-net` organization).
-- **Configuration:** Ansible playbooks and roles for setting up services like Tailscale, Plex, Pi-hole, and Glance.
+- **Provisioning:** Terraform using the `bpg/proxmox` provider — see `terraform/CLAUDE.md` for Terraform-specific guidance.
+- **Configuration:** Ansible playbooks and roles for services like Tailscale, Plex, Pi-hole, and Glance.
 - **Secret Management:** [Doppler](https://www.doppler.com/) for secret injection.
 - **Automation:** [Task](https://taskfile.dev/) for orchestrating operations.
-- **Environment:** Running on MacBook Air M4 (Arm64).
+- **Environment:** MacBook Air M4 (Arm64).
 
 ## Engineering Standards
 
 - **Stability & Uptime**: Prioritize system reliability above all.
-- **KISS**: Keep It Simple, Stupid. Avoid over-engineering.
+- **KISS**: Avoid over-engineering.
 - **Doppler First**: All secrets come from Doppler. Never hardcode or use local vault files.
 - **Proactive SRE**: Anticipate networking, IAM, and observability needs.
-- **Gitflow**:
-  - **NEVER** commit directly to `dev` or `main`.
-  - Always work in `feature/*`, `chore/*`, `hotfix/*`, or `bugfix/*` branches.
-  - Changes must be merged into `dev` via Pull Request.
-  - Automated workflows handle merging `dev` into `main`.
-- **Source Control**: Do not stage or commit changes unless specifically requested. Use standard commit messages (e.g., `feat: ...`, `fix: ...`, `chore: ...`).
+- **Source Control**: Do not stage or commit changes unless specifically requested. Use standard commit messages (`feat:`, `fix:`, `chore:`, etc.).
 
 ## Common Commands
-
-All workflow commands use [Task](https://taskfile.dev/) (`Taskfile.yml`) and **Doppler**:
 
 ```bash
 task                        # List all available tasks
 task reqs                   # Install Ansible Galaxy dependencies
-
-# Deploy to host groups (Secrets handled by Task + Doppler)
-task proxmox                # Proxmox hypervisors
-task tailscale              # Tailscale subnet router
-task plex                   # Plex media server
-task glance                 # Glance dashboard
-
-# Dry-run / validation
+task proxmox                # Deploy Proxmox hypervisors
+task tailscale              # Deploy Tailscale subnet router
+task plex                   # Deploy Plex media server
+task glance                 # Deploy Glance dashboard
 task check                  # Dry-run check mode for ALL hosts
 task syntax                 # Check playbook syntax
 task lint                   # Run ansible-lint
 task ping                   # Test connectivity to all hosts
 
-# Bootstrap a new LXC container (first-time only — creates ansible service account)
+# Bootstrap a new LXC (first-time only — creates ansible service account)
 # Doppler sets SSH_USER=tommy locally, so must override with ansible_user=root
 doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
-
-# Terraform (from terraform/ directory)
-cd terraform && task        # fmt + validate + plan
-cd terraform && task init   # Initialize with Doppler secrets
-cd terraform && task apply  # Apply changes
-cd terraform && task test   # Format and Validate
 ```
 
 ## Architecture & Key Directories
 
-- **Ansible**: `main.yml` is the master playbook. `group_vars/` for hierarchy. Custom roles in `roles/`.
-- **Terraform**: Located in `terraform/`. Configuration is split by service (e.g., `plex.tf`, `pi-hole.tf`).
-- **Inventory**: Managed in `hosts` file.
-- **Tailscale**: ACL/policy configuration in `tailscale/`.
-- **Docs**: Architectural design and migration plans in `docs/plans/`.
+- **Ansible**: `main.yml` master playbook. `group_vars/` for hierarchy. Custom roles in `roles/`.
+- **Inventory**: `hosts` file.
+- **Tailscale**: ACL/policy in `tailscale/`.
+- **Terraform**: `terraform/` — see `terraform/CLAUDE.md`.
+- **Docs**: Plans in `docs/plans/`.
 
-> **Vault**: `vars/vault.yml` has been removed. Do NOT reintroduce it or use `vault_pass`, `decrypt`, or `encrypt` tasks — they have been removed. All secrets go through Doppler.
+> **Vault removed**: `vars/vault.yml` has been removed. Do NOT reintroduce it or use `vault_pass`, `decrypt`, or `encrypt` tasks — all secrets go through Doppler.
 
 ## Conventions
 
-- **Naming**:
-  - Files/Folders: `kebab-case`.
-  - Terraform Resource Labels: `snake_case` (e.g., `proxmox_nfs`).
-  - Infrastructure IDs: `kebab-case` (e.g., `storage_id = "proxmox-nfs"`).
-  - Resource Prefixes: `sa-`, `sneg-`, `lb-`, `vpc-`, `db-`.
+- **Naming**: Files/Folders: `kebab-case`.
 - **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`.
-- **Terraform**: Mandatory `description` on variables/outputs, pin provider versions in `versions.tf`.
 - **General**: 2-space indentation, max 120 chars line length.
-- **Shell filename loops**: Always use `find -print0 | while IFS= read -r -d "" f; do ...` — never plain `while read f` (breaks on spaces/special chars in media filenames). **This pattern is Bash-specific (`read -d`); ensure it runs under Bash (e.g., `#!/usr/bin/env bash`, `bash -lc`, or Ansible `executable: /bin/bash`).**
-- **Service user file creation**: Any Taskfile task or Ansible step that creates dirs/files for a service user must include `chown -R <puid>:<pgid> <path>` immediately after.
-
-## Git Workflow
-
-- Always create a feature branch before committing changes. Never commit directly to `dev` or `main` branches.
-- When creating PRs, always branch from `dev` (not `main`) unless explicitly told otherwise.
-- Use Gitflow-style branch naming: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`.
-- Before making any changes: 1) check which branch you are on and create a feature branch from `dev` if needed, 2) review existing patterns in the directory you will modify, 3) list your plan and wait for explicit approval before editing files.
+- **Shell filename loops**: Always use `find -print0 | while IFS= read -r -d "" f; do ...` — never plain `while read f` (breaks on spaces/special chars). **Bash-specific; ensure Bash is used (`#!/usr/bin/env bash`, `bash -lc`, or Ansible `executable: /bin/bash`).**
+- **Service user file creation**: Any task or Ansible step creating dirs/files for a service user must include `chown -R <puid>:<pgid> <path>` immediately after.
 
 ## Gitflow & CI/CD
 
-- **Working Branch**: `dev`. This is the default branch for all active development.
-- **Production Branch**: `main`. This branch represents the current production state.
-- **Branch Naming**:
-  - `feature/*` — New features or improvements.
-  - `bugfix/*` — Fixes for bugs in `dev`.
-  - `chore/*` — Maintenance tasks, dependencies, etc.
-  - `hotfix/*` — Urgent fixes aimed at `main` (but still merged through `dev`).
-- **Workflow**:
-  1. Create a branch from `dev` (e.g., `feature/my-cool-feature`).
-  2. Commit changes to the feature branch.
-  3. Open a PR to merge into `dev`.
-  4. Never commit directly to `dev` or `main`.
+- **Working Branch**: `dev`. **Production Branch**: `main`.
+- **NEVER** commit directly to `dev` or `main`. Always use `feature/*`, `bugfix/*`, `chore/*`, or `hotfix/*` branches, merged via PR.
+- Before any changes: 1) verify your branch, 2) create a feature branch from `dev` if needed, 3) review existing patterns, 4) list your plan and wait for explicit approval before editing.
 - **Automation**:
-  - `ci.yml`: Runs on push/PR to `dev` and `main`. Runs Terraform `task ci` and Ansible `ansible-playbook --syntax-check` without Doppler. (Ansible Vault is decommissioned — CI does not run any vault checks.)
-  - `dev-to-main-pr.yml`: Automatically creates/updates a PR from `dev` to `main` when `dev` is updated.
+  - `ci.yml`: Runs on push/PR to `dev`/`main`. Runs Terraform `task ci` and Ansible syntax check (no Doppler, no vault).
+  - `dev-to-main-pr.yml`: Auto-creates/updates PR from `dev` → `main` when `dev` is updated.
   - `tailscale.yml`: Syncs Tailscale ACLs.
 
 ## Code Editing Rules
 
-- When using the Edit tool with `replace_all` or broad replacements, verify that variable name substitutions don't collide with similarly-named variables (e.g., replacing `users` should not affect `users_groups` or `users_ssh_exclusive`).
+- When using Edit with `replace_all`, verify substitutions don't collide with similarly-named variables (e.g., `users` vs `users_groups` or `users_ssh_exclusive`).
 
 ## Key Files to Keep in Sync
 
-- `.github/copilot-instructions.md` — PR-review-focused summary for GitHub Copilot. Update it when conventions or CI checks change.
+- `.github/copilot-instructions.md` — Update when conventions or CI checks change.
 
 ## Claude Configuration
 
-- For MCP server configurations, use `.claude/settings.json` (project-level) not `~/.claude/settings.json` (global) unless the user specifies otherwise.
+- MCP server configurations go in `.claude/settings.json` (project-level) unless the user specifies global (`~/.claude/settings.json`).
 
 ## MCP Tool Usage
 
-- **Context7**: Always use the `context7` MCP to look up documentation, API references, module options, provider schemas, and configuration examples — for Ansible modules, Terraform providers (`bpg/proxmox`, `hashicorp/*`), Doppler, Tailscale, or any library. Do this proactively without waiting to be asked.
-- **GitHub**: Use the `gh` CLI (not an MCP) for all GitHub operations — reading issues, checking CI status, viewing PR comments, and managing pull requests.
+- **Context7**: Use proactively for docs, API references, module options, and provider schemas — Ansible modules, Terraform providers (`bpg/proxmox`, `hashicorp/*`), Doppler, Tailscale, or any library. Don't wait to be asked.
+- **GitHub**: Use the `gh` CLI (not an MCP) for all GitHub operations.
 
 ## Model-Specific Skills & Hooks
 
@@ -137,24 +97,21 @@ cd terraform && task test   # Format and Validate
 
 ## Behavior Rules
 
-- **SSH auth failures**: If SSH authentication fails, stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
+- **SSH auth failures**: Stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
 - **Before opening a PR**: Always run `coderabbit review --plain --base dev` on committed changes before creating a PR with `/ship`.
 
 ## Verification (Definition of Done)
 
 - **Ansible change**: `task syntax` passes, `task lint` passes, `task check` dry-run shows expected changes only.
-- **Terraform change**: `cd terraform && task test` (fmt + validate) passes, `task plan` reviewed before apply.
-- **New service scaffold**: `task check` passes for the new host group, `task ping` confirms connectivity.
+- **New service scaffold**: `task check` passes, `task ping` confirms connectivity.
 - **PR ready**: CI passes on GitHub, `coderabbit review` clean.
 
 ### Gemini CLI
 
 - Uses the `Research -> Strategy -> Execution` lifecycle.
 - Prioritizes `Taskfile.yml` for all execution.
-- Respects `GEMINI.md` (now symlinked to this file).
+- Respects `GEMINI.md` (symlinked to this file).
 
-## RTK (Rust Token Killer)
+## RTK
 
-RTK is an optional external CLI for reducing token usage when running shell commands via AI tools. This repository does **not** require RTK and does **not** configure or install it; if you don't have `rtk` installed in your environment, just run commands normally without any `rtk` prefix.
-
-If RTK **is** installed in your local environment, you may prefix shell commands with `rtk` for potential token savings. It works with `&&` chains too, for example: `rtk git add . && rtk git commit -m "msg" && rtk git push`. Helpful meta commands include: `rtk gain` (savings analytics), `rtk discover` (missed opportunities), and `rtk proxy <cmd>` (raw output). Run `rtk --help` for the full command reference.
+RTK is installed globally — prefix shell commands with `rtk` for token savings. Run `rtk gain` for analytics, `rtk discover` for missed opportunities.
