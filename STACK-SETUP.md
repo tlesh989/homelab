@@ -154,7 +154,7 @@ management.
 /memstack-headroom          # Check Headroom proxy status
 ```
 
-**Database CLI:**
+**Database CLI** (user-local, not tracked in this repo — lives in `.claude/db/`):
 
 ```bash
 python .claude/db/memstack-db.py stats       # DB statistics

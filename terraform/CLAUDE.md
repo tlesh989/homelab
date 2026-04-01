@@ -14,9 +14,10 @@ See root `CLAUDE.md` for general project conventions, gitflow rules, and shared 
 Run from the `terraform/` directory:
 
 ```bash
-task        # fmt + validate + plan
+task        # fmt + validate (same as task test)
 task init   # Initialize with Doppler secrets
-task apply  # Apply changes
+task plan   # Generate execution plan (requires init)
+task apply  # Apply plan (requires task plan first)
 task test   # Format and validate only
 task ci     # CI check (no Doppler)
 ```
