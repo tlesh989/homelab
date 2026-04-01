@@ -24,7 +24,7 @@ MemStack v3.2.1 uses **three layers**:
 | **Rules** | Always-on behavioral guidance | Markdown files loaded every session | Echo recall, Diary logging, Work planning, global conventions |
 | **Skills** | Context-aware workflows | `skills/{name}/SKILL.md` — official Anthropic format | Echo, Diary, Work, Project, Scan, Quill, Forge, Sight, Shard |
 
-Hooks **always fire** — deterministic. Rules **always load** — persistent behavioral layer. Skills fire when CC detects matching triggers.
+Hooks **always fire** when configured — deterministic. Rules **always load** — persistent behavioral layer. Skills fire when CC detects matching triggers.
 
 ### Hook Configuration
 
@@ -34,8 +34,8 @@ Hooks are wired in `.claude/settings.json`:
 |-------------|----------|----------|
 | `pre-push.sh` | `PreToolUse` (git push) | Build check, secrets scan, commit format — **blocks push on failure** |
 | `post-commit.sh` | `PostToolUse` (git commit) | Debug artifact scan, secrets check — **warns after commit** |
-| `session-start.sh` | `SessionStart` | **Headroom auto-start** + **CLAUDE.md auto-index** + reports "working" to API |
-| `session-end.sh` | `Stop` | Reports "completed" status to monitoring API |
+| `session-start.sh` | `SessionStart` | **Headroom auto-start** + **CLAUDE.md auto-index** + reports "working" to API (requires hook registration in `~/.claude/settings.json`) |
+| `session-end.sh` | `Stop` | Reports "completed" status to monitoring API (requires hook registration) |
 
 ### Rules Configuration
 
