@@ -28,13 +28,7 @@ Auto-detect type from changes: new files = `feat`, modifications = `fix`/`refact
 
 ## Build Before Push
 
-Before any `git push`, run the relevant validation checks for this repo:
-
-- `task lint` + `task syntax` (Ansible changes)
-- `cd terraform && task test` (Terraform changes)
-- `task ci` (CI dry-run, no Doppler)
-
-Never use `--no-verify` to skip hooks. If a `package.json` exists, also run `npm run build`.
+Always run `npm run build` (or equivalent) and verify it passes before any `git push`. If the build fails, fix the errors before pushing. Never use `--no-verify` to skip checks.
 
 ## No Secrets in Git
 
@@ -55,7 +49,7 @@ Complete the current task fully before starting a new one. If a task reveals sub
 
 ## Deprecated Skills — Do Not Activate
 
-Skills marked `deprecated: true` (Seal, Deploy, Monitor) are replaced by deterministic hooks registered in `~/.claude/settings.json`. Never follow their protocols manually — the hooks fire automatically on the correct CC lifecycle events. Only read deprecated skill files if debugging hook behavior.
+Skills marked `deprecated: true` (Seal, Deploy, Monitor) are replaced by deterministic hooks in `.claude/hooks/`. Never follow their protocols manually — the hooks fire automatically on the correct CC lifecycle events. Only read deprecated skill files if debugging hook behavior.
 
 ## Skill Chain
 

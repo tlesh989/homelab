@@ -154,7 +154,7 @@ management.
 /memstack-headroom          # Check Headroom proxy status
 ```
 
-**Database CLI** (user-local, not tracked in this repo — lives in `.claude/db/`):
+**Database CLI:**
 
 ```bash
 python .claude/db/memstack-db.py stats       # DB statistics
@@ -171,8 +171,8 @@ python .claude/db/memstack-db.py export-md     # Export to markdown
 | Before Write/Edit/Bash | TTS notification | MemStack |
 | Before `git push` | Build check + secrets scan | MemStack |
 | After `git commit` | Debug artifact scan | MemStack |
-| Session start | Headroom auto-start + indexing (when hook configured) | MemStack |
-| Session end | Session reporting (when hook configured) | MemStack |
+| Session start | Headroom auto-start + indexing | MemStack |
+| Session end | Session reporting | MemStack |
 
 ## Configuration Files
 

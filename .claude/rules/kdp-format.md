@@ -332,4 +332,4 @@ Before generating final output:
 ## Level History
 
 - **Lv.1** — Base: Original spec-based formatting guidelines — trim size, fonts, margins, heading hierarchy, page break rules, KDP specifications reference. (Origin: MemStack v2.0–v3.1, Feb 2026)
-- **Lv.2** — Implementation: Added real-world implementation patterns — TWIPS/EMU unit warning, TOC field codes (PAGEREF + hyperlink XML), mirror margins XML, dual output guidance (paperback vs ebook), Markdown table conversion, section break management, pre-export checklist, KDP validation requirements, Kindle Create fallback, margin safety rules, spine text margin rules. (Origin: MemStack v3.2, Feb 2026)
+- **Lv.2** — Implementation: Added real-world implementation patterns — TWIPS/EMU unit warning, TOC field codes (PAGEREF + hyperlink XML), mirror margins XML, dual output guidance (paperback vs ebook), markdown table conversion, section break management, pre-export checklist, KDP validation requirements, Kindle Create fallback, margin safety rules, spine text margin rules. (Origin: MemStack v3.2, Feb 2026)
