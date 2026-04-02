@@ -1,0 +1,17 @@
+# Terraform
+terraform/.terraform/
+**/*.tfstate
+**/*.tfstate.backup
+
+# Ansible Galaxy roles (external, read-only)
+galaxy_roles/
+
+# Docs (reference only, not code)
+docs/
+
+# Packer build artifacts
+packer/
+
+# Python
+__pycache__/
+*.pyc
