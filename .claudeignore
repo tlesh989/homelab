@@ -5,6 +5,7 @@ terraform/.terraform/
 
 # Ansible Galaxy roles (external, read-only)
 galaxy_roles/
+galaxy_collections/
 
 # Docs (reference only, not code)
 docs/
