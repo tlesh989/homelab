@@ -39,3 +39,4 @@ Pick the message based on what just happened:
 - Do not skip notifications. Run them every time.
 - TTS and approval-triggering tool calls must NEVER be in the same response. Two separate steps, two separate responses.
 - For task completion: notification runs AFTER the final output.
+- **macOS dependency**: `Bash(say:*)` must be allowed in `~/.claude/settings.json` (global) for `say` to run without prompting.
