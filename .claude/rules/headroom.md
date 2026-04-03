@@ -4,10 +4,12 @@ Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending e
 
 ## Shell Setup
 
-**Fish** (configured in `~/.config/fish/config.fish`):
+**Fish** (add to `~/.config/fish/config.fish`):
 
 ```fish
-alias claude='ANTHROPIC_BASE_URL=http://127.0.0.1:8787 claude'
+function claude
+    env ANTHROPIC_BASE_URL=http://127.0.0.1:8787 (command -v claude) $argv
+end
 ```
 
 Reload with `source ~/.config/fish/config.fish` or open a new terminal.
