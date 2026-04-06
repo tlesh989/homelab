@@ -183,3 +183,8 @@ tasks:
     desc: Lint the project
     cmds:
       - ansible-lint .
+
+  lint-fix:
+    desc: Use Claude to auto-fix ansible-lint errors across all playbooks
+    cmds:
+      - claude -p "Run ansible-lint on all playbooks, fix any errors, and commit the fixes" --allowedTools "Edit,Read,Bash,Write"

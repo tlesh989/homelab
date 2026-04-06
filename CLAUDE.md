@@ -53,7 +53,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 ## Conventions
 
 - **Naming**: Files/Folders: `kebab-case`.
-- **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`.
+- **Ansible**: Mandatory `name:` fields, use `loop`, review `become: true`. Always include `mode:` parameter (e.g., `mode: '0644'`) on tasks that create or copy files — required by ansible-lint.
 - **General**: 2-space indentation, max 120 chars line length.
 - **Shell filename loops**: Always use `find -print0 | while IFS= read -r -d "" f; do ...` — never plain `while read f` (breaks on spaces/special chars). **Bash-specific; ensure Bash is used (`#!/usr/bin/env bash`, `bash -lc`, or Ansible `executable: /bin/bash`).**
 - **Service user file creation**: Any task or Ansible step creating dirs/files for a service user must include `chown -R <puid>:<pgid> <path>` immediately after.
@@ -62,6 +62,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 
 - **Working Branch**: `dev`. **Production Branch**: `main`.
 - **NEVER** commit directly to `dev` or `main`. Always use `feature/*`, `bugfix/*`, `chore/*`, or `hotfix/*` branches, merged via PR.
+- **Always create feature branches for changes** — never commit directly to `dev` or `main`. Branch from the correct base branch (usually `dev`).
 - Before any changes: 1) verify your branch, 2) create a feature branch from `dev` if needed, 3) review existing patterns, 4) list your plan and wait for explicit approval before editing.
 - **Automation**:
   - `ci.yml`: Runs on push/PR to `dev`/`main`. Runs Terraform `task ci` and Ansible syntax check (no Doppler, no vault).
@@ -71,6 +72,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 ## Code Editing Rules
 
 - When using Edit with `replace_all`, verify substitutions don't collide with similarly-named variables (e.g., `users` vs `users_groups` or `users_ssh_exclusive`).
+- Before removing or modifying references to files/resources, verify they actually exist. Do not assume a reference is dead without checking.
 
 ## Key Files to Keep in Sync
 
@@ -82,11 +84,13 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 - Cross-session memory (decisions, patterns, project state) lives in
   `~/.claude/projects/<encoded-repo-path>/memory/MEMORY.md`. Check it when resuming work or
   making architectural decisions.
+- **Dotfiles/Claude config**: use `~/.claude-personal/` for personal config and `~/.claude/` for work. Always verify `CLAUDE_CONFIG_DIR` before writing config files.
 
 ## MCP Tool Usage
 
 - **Context7**: Use proactively for docs, API references, module options, and provider schemas — Ansible modules, Terraform providers (`bpg/proxmox`, `hashicorp/*`), Doppler, Tailscale, or any library. Don't wait to be asked.
 - **GitHub**: Use the `gh` CLI (not an MCP) for all GitHub operations.
+- **MCP server setup**: Use Docker-based GitHub MCP, not the deprecated `@modelcontextprotocol/server-github`. Place MCP configs in `.claude/settings.json`, not `.claude/mcp.json`.
 
 ## Model-Specific Skills & Hooks
 
@@ -102,6 +106,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 
 - **SSH auth failures**: Stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
 - **Before opening a PR**: Always run `coderabbit review --plain --base dev` on committed changes before creating a PR with `/ship`.
+- **GitHub auth**: `gh` stores credentials in the macOS keychain — they persist across sessions and don't expire mid-session. Set up once with `gh auth login --git-protocol ssh`. Required PAT scopes: `repo`, `admin:org`, `workflow`. To verify: `gh auth status`.
 
 ## Verification (Definition of Done)
 
