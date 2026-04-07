@@ -1,14 +1,18 @@
 # Headroom — Context Compression Proxy
 
-Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending effective context window. `ANTHROPIC_BASE_URL` is set automatically via a fish alias — no manual export needed when launching Claude Code from a fish shell.
+Headroom proxy at localhost:8787 compresses CC tool outputs by ~34%, extending effective context window. `ANTHROPIC_BASE_URL` is set automatically via the shell setup below — a fish function or Bash/Zsh shell config — so no manual export is needed when launching Claude Code.
 
 ## Shell Setup
 
-**Fish** (configured in `~/.config/fish/config.fish`):
+**Fish** (add to `~/.config/fish/config.fish`):
 
 ```fish
-alias claude='ANTHROPIC_BASE_URL=http://127.0.0.1:8787 claude'
+function claude
+    env ANTHROPIC_BASE_URL=http://127.0.0.1:8787 command claude $argv
+end
 ```
+
+> **Note:** The fish function sets `ANTHROPIC_BASE_URL` only for each `claude` invocation. The `command` builtin bypasses the function itself to invoke the real `claude` binary directly (avoiding infinite recursion).
 
 Reload with `source ~/.config/fish/config.fish` or open a new terminal.
 
@@ -17,6 +21,8 @@ Reload with `source ~/.config/fish/config.fish` or open a new terminal.
 ```bash
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
 ```
+
+> **Note:** Unlike the fish function, this `export` sets `ANTHROPIC_BASE_URL` globally for the entire shell session — all subprocesses inherit it.
 
 ## Troubleshooting
 
