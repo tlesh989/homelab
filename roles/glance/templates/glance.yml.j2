@@ -203,17 +203,14 @@ pages:
             cache: 1m
             sites:
               - title: tika
-                url: https://{{ hostvars['tika.tlesh.xyz'].ansible_host }}:8006
+                url: https://tika.tlesh.xyz:8006
                 icon: si:proxmox
-                allow-insecure: true
               - title: bupu
-                url: https://{{ hostvars['bupu.tlesh.xyz'].ansible_host }}:8006
+                url: https://bupu.tlesh.xyz:8006
                 icon: si:proxmox
-                allow-insecure: true
               - title: sturm
-                url: https://{{ hostvars['sturm.tlesh.xyz'].ansible_host }}:8006
+                url: https://sturm.tlesh.xyz:8006
                 icon: si:proxmox
-                allow-insecure: true
               - title: TrueNAS
                 url: https://{{ hostvars['ansalon'].ansible_host }}
                 icon: si:truenas
@@ -222,10 +219,10 @@ pages:
                 url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
                 icon: si:uptimekuma
               - title: Netdata
-                url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999
+                url: https://netdata.tlesh.xyz:19999
                 icon: si:netdata
               - title: Pi-hole
-                url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}/admin
+                url: https://pihole.tlesh.xyz/admin
                 icon: si:pihole
               - title: Seerr
                 url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:5055
@@ -252,7 +249,7 @@ pages:
           - type: custom-api
             title: Netdata
             cache: 1m
-            url: http://{{ hostvars['netdata.tlesh.xyz'].ansible_host }}:19999/api/v1/info
+            url: https://netdata.tlesh.xyz:19999/api/v1/info
             template: |
               {% raw %}<div class="flex gap-2 items-center">
                 {{ $nodes := .JSON.Array "mirrored_hosts" }}

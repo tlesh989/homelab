@@ -67,3 +67,35 @@
   when: netdata_role == "parent"
   no_log: true
   notify: Restart Netdata
+
+- name: Create cert directory for acme deploy hook
+  ansible.builtin.file:
+    path: "{{ netdata_cert_dir }}"
+    state: directory
+    mode: "0750"
+    owner: root
+    group: root
+  become: true
+  when: netdata_role == "parent"
+
+- name: Check if homelab cert has been deployed
+  ansible.builtin.stat:
+    path: "{{ netdata_cert_dir }}/fullchain.pem"
+  register: _netdata_cert
+  when: netdata_role == "parent"
+
+- name: Configure Netdata SSL (enabled once cert is present)
+  ansible.builtin.blockinfile:
+    path: /etc/netdata/netdata.conf
+    create: true
+    mode: "0640"
+    marker: "# {mark} ANSIBLE MANAGED SSL"
+    block: |
+      [web]
+          ssl key = {{ netdata_cert_dir }}/privkey.pem
+          ssl certificate = {{ netdata_cert_dir }}/fullchain.pem
+  become: true
+  when:
+    - netdata_role == "parent"
+    - _netdata_cert.stat.exists | default(false)
+  notify: Restart Netdata
