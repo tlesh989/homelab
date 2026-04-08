@@ -5,3 +5,8 @@
   ansible.builtin.service:
     name: pihole-FTL
     state: restarted
+
+- name: Reload pihole-FTL DNS
+  ansible.builtin.command:
+    cmd: pihole reloaddns
+  changed_when: false

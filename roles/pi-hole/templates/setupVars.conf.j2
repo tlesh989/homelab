@@ -12,5 +12,5 @@ DNSMASQ_LISTENING=local
 WEBPASSWORD=
 BLOCKING_ENABLED=true
 DNSSEC=false
-PIHOLE_DNS_1={{ pihole_dns1 }}
-PIHOLE_DNS_2={{ pihole_dns2 }}
+PIHOLE_DNS_1={{ pihole_upstreams[0] }}
+PIHOLE_DNS_2={{ pihole_upstreams[1] | default('') }}
