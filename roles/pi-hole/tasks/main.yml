@@ -82,8 +82,8 @@
       pihole-FTL --config dns.upstreams
       '{{ pihole_upstreams | to_json }}'
   changed_when: >
-    (_current_upstreams.stdout | trim | from_json | sort)
-    != (pihole_upstreams | sort)
+    (_current_upstreams.stdout | regex_replace('[ "]', ''))
+    != (pihole_upstreams | to_json | regex_replace('[ "]', ''))
   notify: Reload pihole-FTL DNS
 
 - name: Read current local DNS hosts
@@ -98,8 +98,8 @@
       pihole-FTL --config dns.hosts
       '{{ pihole_local_hosts | to_json }}'
   changed_when: >
-    (_current_hosts.stdout | trim | from_json | sort)
-    != (pihole_local_hosts | sort)
+    (_current_hosts.stdout | regex_replace('[ "]', ''))
+    != (pihole_local_hosts | to_json | regex_replace('[ "]', ''))
   notify: Reload pihole-FTL DNS
 
 - name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
