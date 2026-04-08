@@ -141,7 +141,7 @@
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: users
-    - role: pi_hole
+    - role: pi-hole
 
 - name: setup uptime-kuma server
   hosts: uptime-kuma

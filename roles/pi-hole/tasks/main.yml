@@ -1,6 +1,11 @@
 ---
 # tasks file for pi-hole
 
+- name: Assert PIHOLE_ADMIN_PASSWORD is set
+  ansible.builtin.assert:
+    that: pihole_admin_password | length > 0
+    fail_msg: "PIHOLE_ADMIN_PASSWORD must be set in Doppler — cannot run with empty password"
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:
@@ -47,7 +52,7 @@
 
 - name: Set pi-hole admin password
   ansible.builtin.command:
-    cmd: pihole -a -p "{{ pihole_admin_password }}"
+    cmd: pihole setpassword "{{ pihole_admin_password }}"
   no_log: true
   changed_when: true
   when: not _pihole_installed.stat.exists
@@ -64,3 +69,50 @@
     name: pihole-FTL
     enabled: true
     state: started
+
+- name: Read current upstream DNS servers
+  ansible.builtin.command:
+    cmd: pihole-FTL --config dns.upstreams
+  register: _current_upstreams
+  changed_when: false
+
+- name: Configure upstream DNS servers
+  ansible.builtin.command:
+    cmd: >
+      pihole-FTL --config dns.upstreams
+      '{{ pihole_upstreams | to_json }}'
+  changed_when: >
+    (_current_upstreams.stdout | regex_replace('[ "]', ''))
+    != (pihole_upstreams | to_json | regex_replace('[ "]', ''))
+  notify: Reload pihole-FTL DNS
+
+- name: Read current local DNS hosts
+  ansible.builtin.command:
+    cmd: pihole-FTL --config dns.hosts
+  register: _current_hosts
+  changed_when: false
+
+- name: Configure local DNS hosts
+  ansible.builtin.command:
+    cmd: >
+      pihole-FTL --config dns.hosts
+      '{{ pihole_local_hosts | to_json }}'
+  changed_when: >
+    (_current_hosts.stdout | regex_replace('[ "]', ''))
+    != (pihole_local_hosts | to_json | regex_replace('[ "]', ''))
+  notify: Reload pihole-FTL DNS
+
+- name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
+  ansible.builtin.file:
+    path: /etc/pihole/custom.list
+    state: absent
+  notify: Reload pihole-FTL DNS
+
+- name: Schedule weekly auto-update
+  ansible.builtin.cron:
+    name: pi-hole auto-update
+    minute: "0"
+    hour: "3"
+    weekday: "0"
+    job: /usr/local/bin/pihole -up >> /var/log/pihole-update.log 2>&1
+    user: root
