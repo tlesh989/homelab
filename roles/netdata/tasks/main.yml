@@ -74,7 +74,7 @@
     state: directory
     mode: "0750"
     owner: root
-    group: root
+    group: netdata
   become: true
   when: netdata_role == "parent"
 

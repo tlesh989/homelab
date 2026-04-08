@@ -37,6 +37,15 @@
   changed_when: true
   become: true
 
+- name: Ensure /root/.ssh exists
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    mode: "0700"
+    owner: root
+    group: root
+  become: true
+
 - name: Generate deploy SSH keypair for cert distribution
   ansible.builtin.command:
     cmd: ssh-keygen -t ed25519 -f "{{ acme_deploy_key_path }}" -C "acme-deploy@pi-hole" -N ""
@@ -48,6 +57,7 @@
     src: "{{ acme_deploy_key_path }}.pub"
   register: _acme_deploy_pubkey
   become: true
+  when: not ansible_check_mode
 
 - name: Authorize deploy key on cert-consuming hosts
   ansible.posix.authorized_key:
@@ -78,6 +88,7 @@
 - name: Issue wildcard certificate (DNS-01 via Cloudflare)
   ansible.builtin.shell:
     cmd: |
+      set -o pipefail
       "{{ acme_acmesh_home }}/acme.sh" \
         --issue \
         --dns dns_cf \
@@ -97,6 +108,7 @@
 - name: Install cert to output directory and register reloadcmd
   ansible.builtin.shell:
     cmd: |
+      set -o pipefail
       "{{ acme_acmesh_home }}/acme.sh" \
         --install-cert \
         --domain "{{ acme_wildcard }}" \
