@@ -1,6 +1,11 @@
 ---
 # tasks file for pi-hole
 
+- name: Assert PIHOLE_ADMIN_PASSWORD is set
+  ansible.builtin.assert:
+    that: pihole_admin_password | length > 0
+    fail_msg: "PIHOLE_ADMIN_PASSWORD must be set in Doppler — cannot run with empty password"
+
 - name: Install dependencies
   ansible.builtin.apt:
     name:
@@ -76,7 +81,10 @@
     cmd: >
       pihole-FTL --config dns.upstreams
       '{{ pihole_upstreams | to_json }}'
-  changed_when: _current_upstreams.stdout | trim != pihole_upstreams | to_json
+  changed_when: >
+    (_current_upstreams.stdout | trim | from_json | sort)
+    != (pihole_upstreams | sort)
+  notify: Reload pihole-FTL DNS
 
 - name: Read current local DNS hosts
   ansible.builtin.command:
@@ -89,7 +97,9 @@
     cmd: >
       pihole-FTL --config dns.hosts
       '{{ pihole_local_hosts | to_json }}'
-  changed_when: _current_hosts.stdout | trim != pihole_local_hosts | to_json
+  changed_when: >
+    (_current_hosts.stdout | trim | from_json | sort)
+    != (pihole_local_hosts | sort)
   notify: Reload pihole-FTL DNS
 
 - name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
@@ -104,5 +114,5 @@
     minute: "0"
     hour: "3"
     weekday: "0"
-    job: pihole -up >> /var/log/pihole-update.log 2>&1
+    job: /usr/local/bin/pihole -up >> /var/log/pihole-update.log 2>&1
     user: root
