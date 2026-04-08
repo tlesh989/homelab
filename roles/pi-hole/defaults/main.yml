@@ -1,12 +1,29 @@
 ---
 # defaults file for pi-hole
 
-# Upstream DNS resolvers (pi-hole will forward to these)
-pihole_dns1: "1.1.1.1"
-pihole_dns2: "1.0.0.1"
+# Upstream DNS resolvers — nextdns CLI on gateway handles per-MAC profile routing
+pihole_upstreams:
+  - "192.168.233.1"
 
 # Admin web interface password — pulled from Doppler
 pihole_admin_password: "{{ lookup('env', 'PIHOLE_ADMIN_PASSWORD') }}"
 
 # Pi-hole install dir
 pihole_install_dir: /etc/pihole
+
+# Local DNS A records for homelab services (tlesh.xyz LAN domain)
+pihole_local_hosts:
+  - "192.168.233.7 tika.tlesh.xyz"
+  - "192.168.233.8 bupu.tlesh.xyz"
+  - "192.168.233.9 sturm.tlesh.xyz"
+  - "192.168.233.6 ansalon.tlesh.xyz"
+  - "192.168.233.11 jetkvm.tlesh.xyz"
+  - "192.168.233.12 plex.tlesh.xyz"
+  - "192.168.233.16 uptime-kuma.tlesh.xyz"
+  - "192.168.233.21 tailscale.tlesh.xyz"
+  - "192.168.233.22 glance.tlesh.xyz"
+  - "192.168.233.23 netdata.tlesh.xyz"
+  - "192.168.233.24 arr.tlesh.xyz"
+  - "192.168.233.3 pihole.tlesh.xyz"
+  - "192.168.233.10 kaz.tlesh.xyz"
+  - "192.168.233.125 homeassistant.tlesh.xyz"

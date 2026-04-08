@@ -47,7 +47,7 @@
 
 - name: Set pi-hole admin password
   ansible.builtin.command:
-    cmd: pihole -a -p "{{ pihole_admin_password }}"
+    cmd: pihole setpassword "{{ pihole_admin_password }}"
   no_log: true
   changed_when: true
   when: not _pihole_installed.stat.exists
@@ -64,3 +64,35 @@
     name: pihole-FTL
     enabled: true
     state: started
+
+- name: Configure upstream DNS servers
+  ansible.builtin.command:
+    cmd: >
+      pihole-FTL --config dns.upstreams
+      '{{ pihole_upstreams | to_json }}'
+  register: _upstream_result
+  changed_when: "'### CHANGED' in _upstream_result.stdout"
+
+- name: Configure local DNS hosts
+  ansible.builtin.command:
+    cmd: >
+      pihole-FTL --config dns.hosts
+      '{{ pihole_local_hosts | to_json }}'
+  register: _hosts_result
+  changed_when: "'### CHANGED' in _hosts_result.stdout"
+  notify: Reload pihole-FTL DNS
+
+- name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
+  ansible.builtin.file:
+    path: /etc/pihole/custom.list
+    state: absent
+  notify: Reload pihole-FTL DNS
+
+- name: Schedule weekly auto-update
+  ansible.builtin.cron:
+    name: pi-hole auto-update
+    minute: "0"
+    hour: "3"
+    weekday: "0"
+    job: pihole -up >> /var/log/pihole-update.log 2>&1
+    user: root
