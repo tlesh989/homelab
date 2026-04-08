@@ -6,6 +6,7 @@
     mode: "0750"
     owner: root
     group: root
+  become: true
 
 - name: Install acme.sh dependencies
   ansible.builtin.apt:
@@ -14,11 +15,13 @@
       - cron
     state: present
     update_cache: true
+  become: true
 
 - name: Check if acme.sh is installed
   ansible.builtin.stat:
     path: "{{ acme_acmesh_home }}/acme.sh"
   register: _acmesh_installed
+  become: true
 
 - name: Install acme.sh
   ansible.builtin.shell:
@@ -32,16 +35,19 @@
     - not _acmesh_installed.stat.exists
     - not ansible_check_mode
   changed_when: true
+  become: true
 
 - name: Generate deploy SSH keypair for cert distribution
   ansible.builtin.command:
     cmd: ssh-keygen -t ed25519 -f "{{ acme_deploy_key_path }}" -C "acme-deploy@pi-hole" -N ""
     creates: "{{ acme_deploy_key_path }}"
+  become: true
 
 - name: Read deploy public key
   ansible.builtin.slurp:
     src: "{{ acme_deploy_key_path }}.pub"
   register: _acme_deploy_pubkey
+  become: true
 
 - name: Authorize deploy key on cert-consuming hosts
   ansible.posix.authorized_key:
@@ -52,6 +58,7 @@
   delegate_to: "{{ item }}"
   loop: "{{ acme_deploy_target_hosts }}"
   when: not ansible_check_mode
+  become: true
 
 - name: Template deploy hook script
   ansible.builtin.template:
@@ -60,11 +67,13 @@
     mode: "0750"
     owner: root
     group: root
+  become: true
 
 - name: Check if cert is already installed
   ansible.builtin.stat:
     path: "{{ acme_cert_dir }}/fullchain.pem"
   register: _cert_installed
+  become: true
 
 - name: Issue wildcard certificate (DNS-01 via Cloudflare)
   ansible.builtin.shell:
@@ -83,6 +92,7 @@
     - not _cert_installed.stat.exists
     - not ansible_check_mode
   changed_when: true
+  become: true
 
 - name: Install cert to output directory and register reloadcmd
   ansible.builtin.shell:
@@ -102,6 +112,7 @@
     - not ansible_check_mode
   changed_when: true
   notify: Run deploy hook
+  become: true
 
 - name: Enable acme.sh auto-renewal cron
   ansible.builtin.shell:
@@ -111,3 +122,4 @@
     HOME: /root
   changed_when: false
   when: not ansible_check_mode
+  become: true
