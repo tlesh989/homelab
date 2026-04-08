@@ -22,7 +22,7 @@ log "pi-hole FTL: cert deployed, service restarted"
 {% for target in acme_deploy_targets %}
 log "deploying to {{ target.host }}..."
 # shellcheck disable=SC2086
-ssh $SSH_OPTS root@{{ target.host }} "mkdir -p $(dirname '{{ target.cert_dest }}')"
+ssh $SSH_OPTS root@{{ target.host }} "mkdir -p \$(dirname '{{ target.cert_dest }}')"
 # shellcheck disable=SC2086
 scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "root@{{ target.host }}:{{ target.cert_dest }}"
 # shellcheck disable=SC2086
