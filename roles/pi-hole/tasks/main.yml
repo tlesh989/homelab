@@ -65,21 +65,31 @@
     enabled: true
     state: started
 
+- name: Read current upstream DNS servers
+  ansible.builtin.command:
+    cmd: pihole-FTL --config dns.upstreams
+  register: _current_upstreams
+  changed_when: false
+
 - name: Configure upstream DNS servers
   ansible.builtin.command:
     cmd: >
       pihole-FTL --config dns.upstreams
       '{{ pihole_upstreams | to_json }}'
-  register: _upstream_result
-  changed_when: "'### CHANGED' in _upstream_result.stdout"
+  changed_when: _current_upstreams.stdout | trim != pihole_upstreams | to_json
+
+- name: Read current local DNS hosts
+  ansible.builtin.command:
+    cmd: pihole-FTL --config dns.hosts
+  register: _current_hosts
+  changed_when: false
 
 - name: Configure local DNS hosts
   ansible.builtin.command:
     cmd: >
       pihole-FTL --config dns.hosts
       '{{ pihole_local_hosts | to_json }}'
-  register: _hosts_result
-  changed_when: "'### CHANGED' in _hosts_result.stdout"
+  changed_when: _current_hosts.stdout | trim != pihole_local_hosts | to_json
   notify: Reload pihole-FTL DNS
 
 - name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
