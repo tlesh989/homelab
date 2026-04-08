@@ -1,0 +1,6 @@
+---
+- name: Run deploy hook
+  ansible.builtin.command:
+    cmd: "{{ acme_acmesh_home }}/deploy-hook.sh"
+  changed_when: true
+  become: true

@@ -1,0 +1,137 @@
+---
+- name: Create cert output directory
+  ansible.builtin.file:
+    path: "{{ acme_cert_dir }}"
+    state: directory
+    mode: "0750"
+    owner: root
+    group: root
+  become: true
+
+- name: Install acme.sh dependencies
+  ansible.builtin.apt:
+    name:
+      - curl
+      - cron
+    state: present
+    update_cache: true
+  become: true
+
+- name: Check if acme.sh is installed
+  ansible.builtin.stat:
+    path: "{{ acme_acmesh_home }}/acme.sh"
+  register: _acmesh_installed
+  become: true
+
+- name: Install acme.sh
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://get.acme.sh | sh -s -- --email "{{ acme_email }}" --no-profile
+    executable: /bin/bash
+  environment:
+    HOME: /root
+  when:
+    - not _acmesh_installed.stat.exists
+    - not ansible_check_mode
+  changed_when: true
+  become: true
+
+- name: Ensure /root/.ssh exists
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    mode: "0700"
+    owner: root
+    group: root
+  become: true
+
+- name: Generate deploy SSH keypair for cert distribution
+  ansible.builtin.command:
+    cmd: ssh-keygen -t ed25519 -f "{{ acme_deploy_key_path }}" -C "acme-deploy@pi-hole" -N ""
+    creates: "{{ acme_deploy_key_path }}"
+  become: true
+
+- name: Read deploy public key
+  ansible.builtin.slurp:
+    src: "{{ acme_deploy_key_path }}.pub"
+  register: _acme_deploy_pubkey
+  become: true
+  when: not ansible_check_mode
+
+- name: Authorize deploy key on cert-consuming hosts
+  ansible.posix.authorized_key:
+    user: root
+    key: "{{ _acme_deploy_pubkey.content | b64decode | trim }}"
+    comment: "acme-deploy from pi-hole"
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ acme_deploy_target_hosts }}"
+  when: not ansible_check_mode
+  become: true
+
+- name: Template deploy hook script
+  ansible.builtin.template:
+    src: deploy-hook.sh.j2
+    dest: "{{ acme_acmesh_home }}/deploy-hook.sh"
+    mode: "0750"
+    owner: root
+    group: root
+  become: true
+
+- name: Check if cert is already installed
+  ansible.builtin.stat:
+    path: "{{ acme_cert_dir }}/fullchain.pem"
+  register: _cert_installed
+  become: true
+
+- name: Issue wildcard certificate (DNS-01 via Cloudflare)
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      "{{ acme_acmesh_home }}/acme.sh" \
+        --issue \
+        --dns dns_cf \
+        --domain "{{ acme_wildcard }}" \
+        --keylength 4096
+    executable: /bin/bash
+  environment:
+    CF_Token: "{{ acme_cf_token }}"
+    HOME: /root
+  no_log: true
+  when:
+    - not _cert_installed.stat.exists
+    - not ansible_check_mode
+  changed_when: true
+  become: true
+
+- name: Install cert to output directory and register reloadcmd
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      "{{ acme_acmesh_home }}/acme.sh" \
+        --install-cert \
+        --domain "{{ acme_wildcard }}" \
+        --cert-file "{{ acme_cert_dir }}/cert.pem" \
+        --key-file "{{ acme_cert_dir }}/privkey.pem" \
+        --fullchain-file "{{ acme_cert_dir }}/fullchain.pem" \
+        --reloadcmd "{{ acme_acmesh_home }}/deploy-hook.sh"
+    executable: /bin/bash
+  environment:
+    HOME: /root
+  when:
+    - not _cert_installed.stat.exists
+    - not ansible_check_mode
+  changed_when: true
+  notify: Run deploy hook
+  become: true
+
+- name: Enable acme.sh auto-renewal cron
+  ansible.builtin.shell:
+    cmd: "{{ acme_acmesh_home }}/acme.sh --install-cronjob"
+    executable: /bin/bash
+  environment:
+    HOME: /root
+  changed_when: false
+  when: not ansible_check_mode
+  become: true
