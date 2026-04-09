@@ -7,28 +7,29 @@ set -euo pipefail
 CERT_DIR="{{ acme_cert_dir }}"
 DEPLOY_KEY="{{ acme_deploy_key_path }}"
 SSH_OPTS="-i $DEPLOY_KEY -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o BatchMode=yes"
+ANSIBLE_USER="{{ ansible_user | default('ansible') }}"
 
 log() { echo "[acme-deploy] $*"; }
 
 # ── pi-hole FTL (local) ───────────────────────────────────────────────────────
 # pi-hole v6 FTL expects a single PEM containing both cert chain and private key
-cat "$CERT_DIR/fullchain.pem" "$CERT_DIR/privkey.pem" > "$CERT_DIR/combined.pem"
+cat "$CERT_DIR/privkey.pem" "$CERT_DIR/fullchain.pem" > "$CERT_DIR/combined.pem"
 chmod 640 "$CERT_DIR/combined.pem"
-pihole-FTL --config webserver.tls.cert "$CERT_DIR/combined.pem"
-systemctl restart pihole-FTL
+sudo pihole-FTL --config webserver.tls.cert "$CERT_DIR/combined.pem"
+sudo systemctl restart pihole-FTL
 log "pi-hole FTL: cert deployed, service restarted"
 
 # ── remote hosts ─────────────────────────────────────────────────────────────
 {% for target in acme_deploy_targets %}
 log "deploying to {{ target.host }}..."
 # shellcheck disable=SC2086
-ssh $SSH_OPTS root@{{ target.host }} "mkdir -p \$(dirname '{{ target.cert_dest }}')"
+ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo mkdir -p \$(dirname '{{ target.cert_dest }}')"
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "root@{{ target.host }}:{{ target.cert_dest }}"
+scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "$ANSIBLE_USER@{{ target.host }}:{{ target.cert_dest }}"
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/privkey.pem" "root@{{ target.host }}:{{ target.key_dest }}"
+scp $SSH_OPTS "$CERT_DIR/privkey.pem" "$ANSIBLE_USER@{{ target.host }}:{{ target.key_dest }}"
 # shellcheck disable=SC2086
-ssh $SSH_OPTS root@{{ target.host }} "chmod 640 '{{ target.key_dest }}' && {{ target.restart_cmd }}"
+ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo chmod 640 '{{ target.key_dest }}' && sudo {{ target.restart_cmd }}"
 log "{{ target.host }}: cert deployed, service restarted"
 {% endfor %}
 

@@ -32,6 +32,7 @@ acme_deploy_targets:
 
 # Inventory hostnames whose root authorized_keys receive the deploy public key
 acme_deploy_target_hosts:
+  - "pi-hole.tlesh.xyz"
   - "netdata.tlesh.xyz"
   - "tika.tlesh.xyz"
   - "bupu.tlesh.xyz"

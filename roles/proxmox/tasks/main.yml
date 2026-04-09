@@ -34,3 +34,12 @@
 
 - name: Configure LXC device passthrough
   ansible.builtin.include_tasks: lxc-devices.yml
+
+- name: Add sudo rule for ansible user to refresh pveproxy certificates
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/92-pveproxy-cert-refresh
+    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /bin/mkdir -p /etc/pve/local, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key, /bin/systemctl restart pveproxy"
+    create: true
+    mode: "0440"
+  become: true
+  when: ansible_user is defined and ansible_user != "root"
