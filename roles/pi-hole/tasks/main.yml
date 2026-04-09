@@ -77,24 +77,28 @@
     owner: root
     group: pihole
     mode: "0750"
+  become: true
 
 - name: Read current webserver domain
   ansible.builtin.command:
     cmd: pihole-FTL --config webserver.domain
   register: _current_webserver_domain
   changed_when: false
+  become: true
 
 - name: Configure webserver domain
   ansible.builtin.command:
     cmd: pihole-FTL --config webserver.domain "{{ pihole_domain }}"
   changed_when: _current_webserver_domain.stdout != pihole_domain
   notify: Restart pihole-FTL
+  become: true
 
 - name: Configure webserver TLS certificate
   ansible.builtin.command:
     cmd: pihole-FTL --config webserver.tls.cert "{{ pihole_cert_dir }}/combined.pem"
   changed_when: true
   notify: Restart pihole-FTL
+  become: true
 
 - name: Add sudo rule for ansible user to refresh certificates
   ansible.builtin.lineinfile:

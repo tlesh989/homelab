@@ -23,14 +23,14 @@ log "pi-hole FTL: cert deployed, service restarted"
 # ── remote hosts ─────────────────────────────────────────────────────────────
 {% for target in acme_deploy_targets %}
 log "deploying to {{ target.host }}..."
+# SCP to /tmp (world-writable) since ansible user lacks direct write to cert dirs
 # shellcheck disable=SC2086
-ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo mkdir -p \$(dirname '{{ target.cert_dest }}')"
+scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/acme-fullchain.pem"
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "$ANSIBLE_USER@{{ target.host }}:{{ target.cert_dest }}"
+scp $SSH_OPTS "$CERT_DIR/privkey.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/acme-privkey.pem"
+# sudo mv to final location, set permissions, restart service
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/privkey.pem" "$ANSIBLE_USER@{{ target.host }}:{{ target.key_dest }}"
-# shellcheck disable=SC2086
-ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo chmod 640 '{{ target.key_dest }}' && sudo {{ target.restart_cmd }}"
+ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo mkdir -p \$(dirname '{{ target.cert_dest }}') && sudo mv /tmp/acme-fullchain.pem '{{ target.cert_dest }}' && sudo mv /tmp/acme-privkey.pem '{{ target.key_dest }}' && sudo chmod 640 '{{ target.cert_dest }}' && sudo chmod 640 '{{ target.key_dest }}' && sudo {{ target.restart_cmd }}"
 log "{{ target.host }}: cert deployed, service restarted"
 {% endfor %}
 

@@ -38,7 +38,7 @@
 - name: Add sudo rule for ansible user to refresh pveproxy certificates
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/92-pveproxy-cert-refresh
-    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /bin/mkdir -p /etc/pve/local, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key, /bin/systemctl restart pveproxy"
+    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /bin/mkdir -p /etc/pve/local, /bin/mv /tmp/acme-fullchain.pem /etc/pve/local/pveproxy-ssl.pem, /bin/mv /tmp/acme-privkey.pem /etc/pve/local/pveproxy-ssl.key, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.pem, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key, /bin/systemctl restart pveproxy"
     create: true
     mode: "0440"
   become: true
