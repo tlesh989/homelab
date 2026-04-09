@@ -70,6 +70,38 @@
     enabled: true
     state: started
 
+- name: Create certificate directory for acme deploy hook
+  ansible.builtin.file:
+    path: "{{ pihole_cert_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Read current webserver domain
+  ansible.builtin.command:
+    cmd: pihole-FTL --config webserver.domain
+  register: _current_webserver_domain
+  changed_when: false
+
+- name: Configure webserver domain
+  ansible.builtin.command:
+    cmd: pihole-FTL --config webserver.domain "{{ pihole_domain }}"
+  changed_when: _current_webserver_domain.stdout != pihole_domain
+  notify: Restart pihole-FTL
+
+- name: Configure webserver TLS certificate
+  ansible.builtin.command:
+    cmd: pihole-FTL --config webserver.tls.cert "{{ pihole_cert_dir }}/combined.pem"
+  changed_when: true
+  notify: Restart pihole-FTL
+
+- name: Add sudo rule for ansible user to refresh certificates
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/92-pihole-cert-refresh
+    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /usr/local/bin/pihole-FTL --config webserver.domain*, /usr/local/bin/pihole-FTL --config webserver.tls.cert*, /bin/systemctl restart pihole-FTL"
+    create: true
+    mode: "0440"
+  when: ansible_user is defined and ansible_user != "root"
+
 - name: Read current upstream DNS servers
   ansible.builtin.command:
     cmd: pihole-FTL --config dns.upstreams
