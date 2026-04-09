@@ -93,17 +93,32 @@
   notify: Restart pihole-FTL
   become: true
 
+- name: Read current webserver TLS certificate path
+  ansible.builtin.command:
+    cmd: pihole-FTL --config webserver.tls.cert
+  register: _current_tls_cert
+  changed_when: false
+  become: true
+
 - name: Configure webserver TLS certificate
   ansible.builtin.command:
     cmd: pihole-FTL --config webserver.tls.cert "{{ pihole_cert_dir }}/combined.pem"
-  changed_when: true
+  changed_when: _current_tls_cert.stdout != (pihole_cert_dir ~ "/combined.pem")
   notify: Restart pihole-FTL
   become: true
 
 - name: Add sudo rule for ansible user to refresh certificates
+  vars:
+    _sudo_rule: >-
+      {{ ansible_user }} ALL=(ALL) NOPASSWD:
+      /bin/chmod 640 {{ pihole_cert_dir }}/combined.pem,
+      /bin/chown root:pihole {{ pihole_cert_dir }}/combined.pem,
+      /usr/local/bin/pihole-FTL --config webserver.domain*,
+      /usr/local/bin/pihole-FTL --config webserver.tls.cert*,
+      /bin/systemctl restart pihole-FTL
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/92-pihole-cert-refresh
-    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /usr/local/bin/pihole-FTL --config webserver.domain*, /usr/local/bin/pihole-FTL --config webserver.tls.cert*, /bin/systemctl restart pihole-FTL"
+    line: "{{ _sudo_rule }}"
     create: true
     mode: "0440"
   become: true
