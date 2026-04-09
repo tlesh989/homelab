@@ -15,6 +15,7 @@ log() { echo "[acme-deploy] $*"; }
 # pi-hole v6 FTL expects a single PEM containing both cert chain and private key
 cat "$CERT_DIR/privkey.pem" "$CERT_DIR/fullchain.pem" > "$CERT_DIR/combined.pem"
 chmod 640 "$CERT_DIR/combined.pem"
+chown root:pihole "$CERT_DIR/combined.pem"
 sudo pihole-FTL --config webserver.tls.cert "$CERT_DIR/combined.pem"
 sudo systemctl restart pihole-FTL
 log "pi-hole FTL: cert deployed, service restarted"

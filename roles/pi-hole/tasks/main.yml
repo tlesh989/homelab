@@ -74,7 +74,9 @@
   ansible.builtin.file:
     path: "{{ pihole_cert_dir }}"
     state: directory
-    mode: "0755"
+    owner: root
+    group: pihole
+    mode: "0750"
 
 - name: Read current webserver domain
   ansible.builtin.command:
