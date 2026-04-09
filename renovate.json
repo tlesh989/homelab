@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-  "baseBranchPatterns": [
+  "baseBranches": [
     "main"
   ],
   "schedule": [
