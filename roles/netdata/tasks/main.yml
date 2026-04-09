@@ -85,6 +85,8 @@
       /bin/mkdir -p {{ netdata_cert_dir }},
       /bin/mv /tmp/acme-fullchain.pem {{ netdata_cert_dir }}/fullchain.pem,
       /bin/mv /tmp/acme-privkey.pem {{ netdata_cert_dir }}/privkey.pem,
+      /bin/chown root:netdata {{ netdata_cert_dir }}/fullchain.pem,
+      /bin/chown root:netdata {{ netdata_cert_dir }}/privkey.pem,
       /bin/chmod 640 {{ netdata_cert_dir }}/fullchain.pem,
       /bin/chmod 640 {{ netdata_cert_dir }}/privkey.pem,
       /bin/systemctl restart netdata
