@@ -7,28 +7,36 @@ set -euo pipefail
 CERT_DIR="{{ acme_cert_dir }}"
 DEPLOY_KEY="{{ acme_deploy_key_path }}"
 SSH_OPTS="-i $DEPLOY_KEY -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o BatchMode=yes"
+ANSIBLE_USER="{{ ansible_user | default('ansible') }}"
 
 log() { echo "[acme-deploy] $*"; }
 
 # ── pi-hole FTL (local) ───────────────────────────────────────────────────────
 # pi-hole v6 FTL expects a single PEM containing both cert chain and private key
-cat "$CERT_DIR/fullchain.pem" "$CERT_DIR/privkey.pem" > "$CERT_DIR/combined.pem"
+cat "$CERT_DIR/privkey.pem" "$CERT_DIR/fullchain.pem" > "$CERT_DIR/combined.pem"
 chmod 640 "$CERT_DIR/combined.pem"
-pihole-FTL --config webserver.tls.cert "$CERT_DIR/combined.pem"
-systemctl restart pihole-FTL
+chown root:pihole "$CERT_DIR/combined.pem"
+sudo pihole-FTL --config webserver.tls.cert "$CERT_DIR/combined.pem"
+sudo systemctl restart pihole-FTL
 log "pi-hole FTL: cert deployed, service restarted"
 
 # ── remote hosts ─────────────────────────────────────────────────────────────
 {% for target in acme_deploy_targets %}
 log "deploying to {{ target.host }}..."
+# SCP to /tmp (world-writable) since ansible user lacks direct write to cert dirs
 # shellcheck disable=SC2086
-ssh $SSH_OPTS root@{{ target.host }} "mkdir -p \$(dirname '{{ target.cert_dest }}')"
+scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/acme-fullchain.pem"
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "root@{{ target.host }}:{{ target.cert_dest }}"
+scp $SSH_OPTS "$CERT_DIR/privkey.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/acme-privkey.pem"
+# sudo mv to final location, set permissions, restart service
 # shellcheck disable=SC2086
-scp $SSH_OPTS "$CERT_DIR/privkey.pem" "root@{{ target.host }}:{{ target.key_dest }}"
-# shellcheck disable=SC2086
-ssh $SSH_OPTS root@{{ target.host }} "chmod 640 '{{ target.key_dest }}' && {{ target.restart_cmd }}"
+ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" \
+  "sudo /bin/mkdir -p \$(dirname '{{ target.cert_dest }}') && \
+   sudo /bin/mv /tmp/acme-fullchain.pem '{{ target.cert_dest }}' && \
+   sudo /bin/mv /tmp/acme-privkey.pem '{{ target.key_dest }}' && \
+   sudo /bin/chmod 640 '{{ target.cert_dest }}' && \
+   sudo /bin/chmod 640 '{{ target.key_dest }}' && \
+   sudo /bin/{{ target.restart_cmd }}"
 log "{{ target.host }}: cert deployed, service restarted"
 {% endfor %}
 

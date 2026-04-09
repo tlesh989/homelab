@@ -27,7 +27,7 @@
   ansible.builtin.shell:
     cmd: |
       set -o pipefail
-      curl -fsSL https://get.acme.sh | sh -s -- --email "{{ acme_email }}" --no-profile
+      curl -fsSL https://get.acme.sh | sh -s email="{{ acme_email }}"
     executable: /bin/bash
   environment:
     HOME: /root
@@ -61,13 +61,22 @@
 
 - name: Authorize deploy key on cert-consuming hosts
   ansible.posix.authorized_key:
-    user: root
+    user: "{{ ansible_user | default('ansible') }}"
     key: "{{ _acme_deploy_pubkey.content | b64decode | trim }}"
     comment: "acme-deploy from pi-hole"
     state: present
   delegate_to: "{{ item }}"
   loop: "{{ acme_deploy_target_hosts }}"
   when: not ansible_check_mode
+  become: true
+
+- name: Ensure acme.sh home directory exists
+  ansible.builtin.file:
+    path: "{{ acme_acmesh_home }}"
+    state: directory
+    mode: "0700"
+    owner: root
+    group: root
   become: true
 
 - name: Template deploy hook script

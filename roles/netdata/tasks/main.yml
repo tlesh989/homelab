@@ -78,6 +78,26 @@
   become: true
   when: netdata_role == "parent"
 
+- name: Add sudo rule for ansible user to refresh certificates
+  vars:
+    _sudo_rule: >-
+      {{ ansible_user }} ALL=(ALL) NOPASSWD:
+      /bin/mkdir -p {{ netdata_cert_dir }},
+      /bin/mv /tmp/acme-fullchain.pem {{ netdata_cert_dir }}/fullchain.pem,
+      /bin/mv /tmp/acme-privkey.pem {{ netdata_cert_dir }}/privkey.pem,
+      /bin/chmod 640 {{ netdata_cert_dir }}/fullchain.pem,
+      /bin/chmod 640 {{ netdata_cert_dir }}/privkey.pem,
+      /bin/systemctl restart netdata
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/92-netdata-cert-refresh
+    line: "{{ _sudo_rule }}"
+    create: true
+    mode: "0440"
+  become: true
+  when:
+    - netdata_role == "parent"
+    - ansible_user is defined and ansible_user != "root"
+
 - name: Check if homelab cert has been deployed
   ansible.builtin.stat:
     path: "{{ netdata_cert_dir }}/fullchain.pem"
