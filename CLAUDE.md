@@ -8,7 +8,7 @@ Refined homelab infrastructure management (Proxmox, Terraform, Ansible).
 - **Doppler First**: All secrets come from Doppler. No local vaults.
 
 ## Entry Points & Documentation
-Detailed conventions and workflows are split into specialized rules:
+Specialized rules:
 - **[Ansible](file:///.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
 - **[Terraform](file:///.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
 - **[Gitflow](file:///.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
