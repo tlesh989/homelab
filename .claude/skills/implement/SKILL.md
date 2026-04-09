@@ -14,7 +14,7 @@ Full design-to-PR workflow for infrastructure changes.
 
 ## Steps
 
-1. **Branch** — create a feature branch from `main` with an appropriate prefix (`feat/`, `fix/`, `chore/`)
+1. **Branch** — create a feature branch from `main` with an appropriate prefix (`feature/`, `bugfix/`, `chore/`, `hotfix/`)
 2. **Design doc** — write a brief doc in `docs/decisions/` summarizing what is changing and why
 3. **Plan** — break the work into an implementation task list and confirm with the user before proceeding
 4. **Implement** — make changes across Terraform and/or Ansible files following existing patterns
