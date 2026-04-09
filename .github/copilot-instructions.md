@@ -21,7 +21,7 @@ When reviewing a pull request, flag anything that violates the following:
 
 ### Gitflow
 
-- PRs must target `dev`, **never `main`**
+- PRs must target `main`
 - Branch names must follow: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`
 - Commits must use conventional prefixes: `feat:`, `fix:`, `chore:`, `refactor:`, etc.
 
@@ -66,7 +66,7 @@ When reviewing a pull request, flag anything that violates the following:
 ## What to Flag / Block
 
 - Any secret or credential in plaintext
-- Direct commits or merges targeting `main`
+- Direct commits targeting `main`
 - Tasks that reboot, reinitialize, or wipe state without a guard condition
 - Removing idempotency protections (e.g., dropping `when:` guards, `creates:`, `stat` checks)
 - DKMS or kernel module changes without a `failed_when:` on the running kernel

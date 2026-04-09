@@ -20,14 +20,14 @@ Autonomous pre-flight → commit → push → PR workflow. Runs all checks and f
 git branch --show-current
 ```
 
-- If on `dev` or `main`: STOP. Create a feature branch from `dev` first. Never proceed.
+- If already on `main`: STOP. Create a feature branch from `main` first. Never proceed.
 - If already on a feature branch: continue.
 
-### 2. Rebase on latest dev
+### 2. Rebase on latest main
 
 ```bash
 git fetch origin
-git rebase origin/dev
+git rebase origin/main
 ```
 
 - If conflicts: resolve them file by file, then `git rebase --continue`.
@@ -38,7 +38,7 @@ git rebase origin/dev
 Get the list of changed files:
 
 ```bash
-git diff --name-only origin/dev...HEAD
+git diff --name-only origin/main...HEAD
 ```
 
 For any `.tf` files in the list:
@@ -64,7 +64,7 @@ Repeat validate → fix → validate loop until both pass cleanly.
 Check changed files for plaintext values that should be Doppler references:
 
 ```bash
-git diff origin/dev...HEAD -- <changed_files> | grep -E '^\+.*"[A-Za-z0-9+/]{20,}"|password\s*=\s*"[^{]|token\s*=\s*"[^{]|secret\s*=\s*"[^{'
+git diff origin/main...HEAD -- <changed_files> | grep -E '^\+.*"[A-Za-z0-9+/]{20,}"|password\s*=\s*"[^{]|token\s*=\s*"[^{]|secret\s*=\s*"[^{'
 ```
 
 - If any matches: flag them to the user and stop. Do NOT create the PR.
@@ -118,7 +118,7 @@ Once all pre-flight checks pass:
 ### 6. CodeRabbit gate (blocking — runs before PR creation)
 
 ```bash
-coderabbit review --plain --base dev
+coderabbit review --plain --base main
 ```
 
 - This takes ~60 seconds. Run it on committed changes before opening the PR.
@@ -131,10 +131,10 @@ coderabbit review --plain --base dev
 Only open the PR after the CodeRabbit gate passes.
 
 ```bash
-gh pr create --base dev --title "<title>" --body "<body>"
+gh pr create --base main --title "<title>" --body "<body>"
 ```
 
-PR base is always `dev`. Never open directly against `main`.
+PR base is always `main`.
 
 ### PR Body Template
 
@@ -146,8 +146,8 @@ PR base is always `dev`. Never open directly against `main`.
 
 ## Pre-Flight Checks Passed
 
-- [x] Branch is not dev or main
-- [x] Rebased on latest origin/dev
+- [x] Branch is not main
+- [x] Rebased on latest origin/main
 - [x] terraform validate clean (or no .tf files changed)
 - [x] ansible-lint clean (or no Ansible files changed)
 - [x] No hardcoded secrets detected
@@ -189,6 +189,6 @@ Types: `feat`, `fix`, `chore`, `refactor`, `docs`
 
 - NEVER skip pre-flight checks — all 6 must pass before opening a PR
 - NEVER use `--no-verify` to bypass hooks
-- NEVER open a PR against `main`
+- NEVER commit directly to `main`
 - NEVER proceed if hardcoded secrets are detected — surface them to the user
 - If any validate/lint loop runs more than 5 iterations without converging, stop and ask the user

@@ -3,8 +3,8 @@
   "extends": [
     "config:recommended"
   ],
-  "baseBranchPatterns": [
-    "dev"
+  "baseBranches": [
+    "main"
   ],
   "schedule": [
     "before 9am on monday"

@@ -31,7 +31,7 @@ Review the provided infrastructure changes against these standards:
 
 - 2-space indentation, max 120 char line length
 - No direct references to deprecated/removed infrastructure (unifi is gone)
-- Changes follow gitflow — no instructions to commit directly to dev/main
+- Changes follow workflow — no instructions to commit directly to main
 
 ## Output Format
 
