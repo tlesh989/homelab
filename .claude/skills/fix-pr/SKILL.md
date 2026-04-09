@@ -19,7 +19,7 @@ If `{{pr}}` is provided, use that number. Otherwise, detect from the current bra
 gh pr view --json number,title,baseRefName,headRefName
 ```
 - If no open PR for this branch: STOP and tell the user.
-- If on `dev` or `main`: STOP.
+- If on `main`: STOP.
 
 ## Step 2 — Fetch All Review Feedback
 
@@ -100,7 +100,7 @@ If you skipped any comments, explain briefly so the user can decide whether to o
 ## Rules
 
 - NEVER use `--no-verify`
-- NEVER push directly to `dev` or `main`
+- NEVER push directly to `main`
 - NEVER apply a fix that contradicts the project's established patterns without flagging it
 - If a reviewer's suggestion would introduce a hardcoded secret, skip it and tell the user
 - If lint/validate loops more than 5 iterations without converging, stop and ask

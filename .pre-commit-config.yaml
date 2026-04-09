@@ -12,7 +12,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: no-commit-to-branch
-        args: ["--branch", "main", "--branch", "dev"]
+        args: ["--branch", "main"]
       - id: check-added-large-files
         args: ["--maxkb=500"]
       - id: check-case-conflict

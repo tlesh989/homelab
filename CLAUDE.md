@@ -60,12 +60,11 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 
 ## Gitflow & CI/CD
 
-- **Working Branch**: `dev`. **Production Branch**: `main`.
-- **NEVER** commit directly to `dev` or `main`. Always use `feature/*`, `bugfix/*`, `chore/*`, or `hotfix/*` branches, merged via PR.
-- Before any changes: 1) verify your branch, 2) create a feature branch from `dev` if needed, 3) review existing patterns, 4) list your plan and wait for explicit approval before editing.
+- **Working Branch**: `main`.
+- **NEVER** commit directly to `main`. Always use `feature/*`, `bugfix/*`, `chore/*`, or `hotfix/*` branches, merged via PR.
+- Before any changes: 1) verify your branch, 2) create a feature branch from `main` if needed, 3) review existing patterns, 4) list your plan and wait for explicit approval before editing.
 - **Automation**:
-  - `ci.yml`: Runs on push/PR to `dev`/`main`. Runs Terraform `task ci` and Ansible syntax check (no Doppler, no vault).
-  - `dev-to-main-pr.yml`: Auto-creates/updates PR from `dev` → `main` when `dev` is updated.
+  - `ci.yml`: Runs on push/PR to `main`. Runs Terraform `task ci` and Ansible syntax check (no Doppler, no vault).
   - `tailscale.yml`: Syncs Tailscale ACLs.
 
 ## Code Editing Rules
@@ -93,7 +92,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 ### Claude Code
 
 - `/deploy <target>` — dry-run first, apply on confirmation.
-- `/ship [message]` — commit, push, and open a PR against `dev`.
+- `/ship [message]` — commit, push, and open a PR against `main`.
 - `/new-service <name>` — scaffold Terraform LXC config + Ansible role skeleton.
 - Hooks (PostToolUse): `yamllint` on `.yml/.yaml`, `terraform fmt` + `validate` on `.tf`, `ansible-lint` on `roles/**/*.yml`. PreToolUse blocks edits to `.vault_pass`, `.envrc`, `vars/vault.yml`, `*.tfvars`.
 - Agents: `infra-reviewer` — pre-deploy review for Ansible/Terraform changes (idempotency, naming, secret hygiene).
@@ -101,7 +100,7 @@ doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags boots
 ## Behavior Rules
 
 - **SSH auth failures**: Stop immediately and tell the user to unlock their SSH key via 1Password before retrying.
-- **Before opening a PR**: Always run `coderabbit review --plain --base dev` on committed changes before creating a PR with `/ship`.
+- **Before opening a PR**: Always run `coderabbit review --plain --base main` on committed changes before creating a PR with `/ship`.
 
 ## Verification (Definition of Done)
 

@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess; params=json.load(sys.stdin); cmd=params.get('tool_input',{}).get('command',''); is_git=cmd.lstrip().startswith('git '); sys.exit(0) if not is_git else None; print('BLOCKED: --no-verify bypasses pre-commit hooks and is never allowed. Fix the hook failures instead.') if '--no-verify' in cmd else None; sys.exit(2) if '--no-verify' in cmd else None; sys.exit(0) if 'git commit' not in cmd else None; r=subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True); branch=r.stdout.strip(); print(f'BLOCKED: direct commits to {branch} are not allowed. Use a feature/* branch.') if branch in ('dev','main') else None; sys.exit(2) if branch in ('dev','main') else sys.exit(0)\"",
+            "command": "python3 -c \"import sys,json,subprocess; params=json.load(sys.stdin); cmd=params.get('tool_input',{}).get('command',''); is_git=cmd.lstrip().startswith('git '); sys.exit(0) if not is_git else None; print('BLOCKED: --no-verify bypasses pre-commit hooks and is never allowed. Fix the hook failures instead.') if '--no-verify' in cmd else None; sys.exit(2) if '--no-verify' in cmd else None; sys.exit(0) if 'git commit' not in cmd else None; r=subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True); branch=r.stdout.strip(); print(f'BLOCKED: direct commits to {branch} are not allowed. Use a feature/* branch.') if branch in ('main') else None; sys.exit(2) if branch in ('main') else sys.exit(0)\"",
             "timeout": 5000
           }
         ]
