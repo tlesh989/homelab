@@ -30,7 +30,13 @@ scp $SSH_OPTS "$CERT_DIR/fullchain.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/ac
 scp $SSH_OPTS "$CERT_DIR/privkey.pem" "$ANSIBLE_USER@{{ target.host }}:/tmp/acme-privkey.pem"
 # sudo mv to final location, set permissions, restart service
 # shellcheck disable=SC2086
-ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" "sudo mkdir -p \$(dirname '{{ target.cert_dest }}') && sudo mv /tmp/acme-fullchain.pem '{{ target.cert_dest }}' && sudo mv /tmp/acme-privkey.pem '{{ target.key_dest }}' && sudo chmod 640 '{{ target.cert_dest }}' && sudo chmod 640 '{{ target.key_dest }}' && sudo {{ target.restart_cmd }}"
+ssh $SSH_OPTS "$ANSIBLE_USER@{{ target.host }}" \
+  "sudo /bin/mkdir -p \$(dirname '{{ target.cert_dest }}') && \
+   sudo /bin/mv /tmp/acme-fullchain.pem '{{ target.cert_dest }}' && \
+   sudo /bin/mv /tmp/acme-privkey.pem '{{ target.key_dest }}' && \
+   sudo /bin/chmod 640 '{{ target.cert_dest }}' && \
+   sudo /bin/chmod 640 '{{ target.key_dest }}' && \
+   sudo /bin/{{ target.restart_cmd }}"
 log "{{ target.host }}: cert deployed, service restarted"
 {% endfor %}
 

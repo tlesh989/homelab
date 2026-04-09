@@ -36,9 +36,18 @@
   ansible.builtin.include_tasks: lxc-devices.yml
 
 - name: Add sudo rule for ansible user to refresh pveproxy certificates
+  vars:
+    _sudo_rule: >-
+      {{ ansible_user }} ALL=(ALL) NOPASSWD:
+      /bin/mkdir -p /etc/pve/local,
+      /bin/mv /tmp/acme-fullchain.pem /etc/pve/local/pveproxy-ssl.pem,
+      /bin/mv /tmp/acme-privkey.pem /etc/pve/local/pveproxy-ssl.key,
+      /bin/chmod 640 /etc/pve/local/pveproxy-ssl.pem,
+      /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key,
+      /bin/systemctl restart pveproxy
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/92-pveproxy-cert-refresh
-    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /bin/mkdir -p /etc/pve/local, /bin/mv /tmp/acme-fullchain.pem /etc/pve/local/pveproxy-ssl.pem, /bin/mv /tmp/acme-privkey.pem /etc/pve/local/pveproxy-ssl.key, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.pem, /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key, /bin/systemctl restart pveproxy"
+    line: "{{ _sudo_rule }}"
     create: true
     mode: "0440"
   become: true

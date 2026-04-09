@@ -106,6 +106,7 @@
     line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /usr/local/bin/pihole-FTL --config webserver.domain*, /usr/local/bin/pihole-FTL --config webserver.tls.cert*, /bin/systemctl restart pihole-FTL"
     create: true
     mode: "0440"
+  become: true
   when: ansible_user is defined and ansible_user != "root"
 
 - name: Read current upstream DNS servers
