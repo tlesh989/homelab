@@ -4,3 +4,5 @@ netdata_parent_host: "" # set on child nodes
 netdata_parent_port: 19999
 # Shared UUID for child→parent streaming auth — injected from Doppler as NETDATA_STREAM_API_KEY
 netdata_stream_api_key: "{{ lookup('env', 'NETDATA_STREAM_API_KEY') }}"
+# TLS — cert is deployed here by the acme role's deploy hook from pi-hole
+netdata_cert_dir: "/etc/ssl/homelab"
