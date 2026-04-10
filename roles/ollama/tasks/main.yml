@@ -55,13 +55,20 @@
     - hybrid-sleep.target
   become: true
 
+- name: Create logind drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/logind.conf.d
+    state: directory
+    mode: "0755"
+  become: true
+
 - name: Ignore lid close to keep running with lid shut
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/logind.conf
-    regexp: "^#?HandleLidSwitch="
-    line: "HandleLidSwitch=ignore"
-    state: present
+  ansible.builtin.copy:
+    dest: /etc/systemd/logind.conf.d/lid.conf
     mode: "0644"
+    content: |
+      [Login]
+      HandleLidSwitch=ignore
   become: true
   notify: Reload logind
 
