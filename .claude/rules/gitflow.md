@@ -2,18 +2,17 @@
 
 ## Branching Strategy
 
-- **Integration Branch**: `main`.
+- **Working Branch**: `main`.
+- **Protected Branch**: NEVER commit directly to `main`.
 - **Feature Branches**: Use `feature/*`, `bugfix/*`, `chore/*`, or `hotfix/*`.
-- **Local Commits**: Create a local branch for all work.
-- **Protected Branch**: Commits and pushes to `main` are restricted via git hooks.
 - **Merging**: Use PRs merged via GitHub UI.
 
 ## Workflow
 
-1. Create a feature branch from `main`.
-2. Review existing patterns and list your plan.
-3. Obtain explicit approval before editing.
-4. Verify your branch.
+1. Verify your current branch.
+2. Create a feature branch from `main` if needed.
+3. Review existing patterns and list your plan.
+4. Obtain explicit approval before editing.
 5. **PR Review**: Always run `coderabbit review --plain --base main` on committed changes before creating a PR with `/ship`.
 
 ## Automation
