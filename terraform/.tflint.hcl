@@ -7,11 +7,6 @@ plugin "terraform" {
   preset  = "recommended"
 }
 
-plugin "proxmox" {
-  enabled = true
-  version = "0.7.0"
-  source  = "github.com/bpg/tflint-ruleset-proxmox"
-}
 
 rule "terraform_deprecated_interpolation" {
   enabled = true

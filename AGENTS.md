@@ -40,7 +40,8 @@ cp -rf source dest          # NOT: cp -r source dest
 
 <!-- BEGIN BEADS INTEGRATION -->
 ## Issue Tracking with bd (beads)
-**IMPORTANT**: Use `bd` for ALL tracking. No markdown TODOs. Always use `--json`. 
+
+**IMPORTANT**: Use `bd` for ALL tracking. No markdown TODOs. Always use `--json`.
 
 - **Find work**: `bd ready --json`
 - **Claim task**: `bd update <id> --claim --json`
@@ -51,14 +52,17 @@ cp -rf source dest          # NOT: cp -r source dest
 *Priorities: 0 (Crit), 1 (High), 2 (Med), 3 (Low), 4 (Backlog).*
 
 ## Landing the Plane (Session Completion)
+
 You MUST complete these before ending a session. Work is NOT done until `git push` succeeds.
 
 1. **File issues**: Any remaining work gets a `bd create`
 2. **Quality Gates**: Run linting/tests.
 3. **Update Status**: `bd close` finished work.
-4. **PUSH (MANDATORY)**: 
+4. **PUSH (MANDATORY)**:
+
    ```bash
    git pull --rebase && bd dolt push && git push
    ```
+
 5. **Verify**: MUST push successfully. Never stop before pushing or say "ready when you are". Resolve conflicts if any.
 <!-- END BEADS INTEGRATION -->

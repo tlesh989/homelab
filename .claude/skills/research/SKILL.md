@@ -21,17 +21,20 @@ Is the library indexed by Context7?
 ```
 
 **Use Context7 for** (well-indexed libraries):
+
 - Ansible modules (`ansible.builtin.*`, community collections)
 - Terraform providers (`hashicorp/aws`, `hashicorp/google`, `bpg/proxmox`)
 - Popular open source tools (Tailscale, Docker, etc.)
 
 **Use Gemini CLI for** (not in Context7 or needs web search):
+
 - Niche/self-hosted tools (`glanceapp/glance`, `netdata`, Proxmox UI)
 - "What's current best practice for X?" questions
 - Fetching and summarizing a specific URL
 - Anything Context7 returns no results for
 
 **Do NOT use either for:**
+
 - Searching the local codebase (use Grep/Glob)
 - Questions answerable from context already in the conversation
 
@@ -49,6 +52,7 @@ gemini -p "{{query}}"
 ```
 
 For URL fetching:
+
 ```bash
 gemini -p "fetch https://... and extract only: {{what you need}}"
 ```
