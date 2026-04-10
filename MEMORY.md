@@ -12,14 +12,17 @@ This file tracks architectural decisions, legacy transitions, and core tradeoffs
 ## Major Decisions & Tradeoffs
 
 ### 2024-Q3: Migration to Doppler
+
 - **Decision**: Removed `vars/vault.yml` and `.vault_pass`.
 - **Reason**: Centralized secret management, easier CI integration, and rotation capabilities.
 
 ### 2024-Q4: Proxmox Provider Pivot
-- **Decision**: Switched to `bpg/proxmox`. 
+
+- **Decision**: Switched to `bpg/proxmox`.
 - **Reason**: Better support for LXC and modern Proxmox features compared to older providers.
 
 ### 2025-Q1: Single Branch Flow (Current Transition)
+
 - **Decision**: Moving from `dev/main` Gitflow to single-branch `main` strategy.
 - **Reason**: Reducing friction in PR cycles and branch synchronization issues.
 

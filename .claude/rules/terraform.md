@@ -16,7 +16,7 @@ task ci     # CI check (no Doppler)
 
 - **Resource Labels**: Use `snake_case` (e.g., `proxmox_nfs`).
 - **Infrastructure IDs**: Use `kebab-case` (e.g., `storage_id = "proxmox-nfs"`).
-- **Naming Prefixes**: Use standard abbreviations: 
+- **Naming Prefixes**: Use standard abbreviations:
   - `sa-` (Service Account)
   - `sneg-` (Serverless NEG)
   - `lb-` (Load Balancer)
