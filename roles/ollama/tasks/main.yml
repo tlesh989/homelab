@@ -1,0 +1,80 @@
+---
+- name: Install Ollama via official install script
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      curl -fsSL https://ollama.com/install.sh | sh
+    executable: /bin/bash
+    creates: /usr/local/bin/ollama
+  become: true
+  when: not ansible_check_mode
+
+- name: Create Ollama systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/ollama.service.d
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Configure Ollama to listen on all interfaces
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ollama.service.d/override.conf
+    mode: "0644"
+    content: |
+      [Service]
+      Environment="OLLAMA_HOST={{ ollama_host }}:{{ ollama_port }}"
+  become: true
+  notify: Restart ollama
+
+- name: Enable and start Ollama service
+  ansible.builtin.systemd:
+    name: ollama
+    enabled: true
+    state: started
+    daemon_reload: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  become: true
+
+- name: Open firewalld port for Ollama
+  ansible.posix.firewalld:
+    port: "{{ ollama_port }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Mask systemd sleep targets to prevent suspend
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop:
+    - sleep.target
+    - suspend.target
+    - hibernate.target
+    - hybrid-sleep.target
+  become: true
+
+- name: Ignore lid close to keep running with lid shut
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/logind.conf
+    regexp: "^#?HandleLidSwitch="
+    line: "HandleLidSwitch=ignore"
+    state: present
+    mode: "0644"
+  become: true
+  notify: Reload logind
+
+- name: Check installed Ollama models
+  ansible.builtin.command: ollama list
+  register: ollama_installed_models
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Pull Ollama models
+  ansible.builtin.command: ollama pull {{ item }}
+  loop: "{{ ollama_models }}"
+  when:
+    - not ansible_check_mode
+    - item not in ollama_installed_models.stdout
+  changed_when: true
