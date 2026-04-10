@@ -4,7 +4,7 @@ minimum_pre_commit_version: "4.1.0"
 default_language_version:
   python: python3.14
 
-exclude: ^(\.agents/|\.claude/|\.rtk/|\.serena/|\.superpowers/|\.beads/|docs/|galaxy_roles/)
+exclude: ^(\.agents/|\.claude/|\.rtk/|\.serena/|\.superpowers/|\.beads/)
 
 repos:
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
@@ -106,7 +106,23 @@ repos:
           - --skip-check
           - CKV2_ANSIBLE_3,CKV2_ANSIBLE_1,CKV_ANSIBLE_1,CKV2_GHA_1,CKV_DOCKER_3,CKV2_DOCKER_1,CKV_DOCKER_2
           - --skip-path
-          - .agents,.claude,.rtk,.serena,.superpowers,.beads,docs,galaxy_roles,terraform/.terraform
+          - .agents
+          - --skip-path
+          - .claude
+          - --skip-path
+          - .rtk
+          - --skip-path
+          - .serena
+          - --skip-path
+          - .superpowers
+          - --skip-path
+          - .beads
+          - --skip-path
+          - docs
+          - --skip-path
+          - galaxy_roles
+          - --skip-path
+          - terraform/.terraform
         stages: [pre-commit]
 
   - repo: local
