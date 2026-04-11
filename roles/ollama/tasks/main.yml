@@ -29,7 +29,7 @@
     content: |
       [Service]
       Environment="OLLAMA_HOST={{ ollama_host if ollama_expose | bool else '127.0.0.1' }}:{{ ollama_port }}"
-      Environment="OLLAMA_NUM_PARALLEL={{ ollama_num_parallel | default(2) }}"
+      Environment="OLLAMA_NUM_PARALLEL={{ ollama_num_parallel }}"
   become: true
   notify: Restart ollama
 
