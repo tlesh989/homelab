@@ -59,6 +59,7 @@ repos:
         args:
           - --hook-config=--retry-once-with-cleanup=true
         stages: [pre-commit]
+
   - repo: https://github.com/ansible/ansible-lint
     rev: v26.4.0
     hooks:
@@ -94,6 +95,7 @@ repos:
     hooks:
       - id: gitleaks
         stages: [pre-commit]
+
   - repo: https://github.com/bridgecrewio/checkov
     rev: "3.2.517"
     hooks:
@@ -129,25 +131,25 @@ repos:
     hooks:
       - id: beads-sync
         name: beads-sync
-        entry: bd hooks run pre-commit
+        entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run pre-commit"
         language: system
-        stages: [pre-commit]
+        stages: [commit]
         always_run: true
       - id: beads-push
         name: beads-push
-        entry: bd hooks run pre-push
+        entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run pre-push"
         language: system
-        stages: [pre-push]
+        stages: [push]
         always_run: true
       - id: beads-post-checkout
         name: beads-post-checkout
-        entry: bd hooks run post-checkout
+        entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run post-checkout"
         language: system
         stages: [post-checkout]
         always_run: true
       - id: beads-post-merge
         name: beads-post-merge
-        entry: bd hooks run post-merge
+        entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run post-merge"
         language: system
         stages: [post-merge]
         always_run: true

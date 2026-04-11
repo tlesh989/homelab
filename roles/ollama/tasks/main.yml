@@ -29,6 +29,7 @@
     content: |
       [Service]
       Environment="OLLAMA_HOST={{ ollama_host if ollama_expose | bool else '127.0.0.1' }}:{{ ollama_port }}"
+      Environment="OLLAMA_NUM_PARALLEL={{ ollama_num_parallel }}"
   become: true
   notify: Restart ollama
 
@@ -84,10 +85,15 @@
   changed_when: false
   when: not ansible_check_mode
 
+- name: Set installed model names list
+  ansible.builtin.set_fact:
+    ollama_installed_model_names: "{{ ollama_installed_models.stdout_lines[1:] | map('split', ' ') | map('first') | list }}"
+  when: not ansible_check_mode
+
 - name: Pull Ollama models
   ansible.builtin.command: ollama pull {{ item }}
   loop: "{{ ollama_models }}"
   when:
     - not ansible_check_mode
-    - item not in ollama_installed_models.stdout
+    - item.split(':')[0] not in ollama_installed_model_names
   changed_when: true

@@ -5,9 +5,11 @@ ollama_install_script_checksum: "sha256:25f64b810b947145095956533e1bdf56eacea267
 ollama_host: "0.0.0.0"
 ollama_port: 11434
 ollama_expose: false
+ollama_num_parallel: 1
 ollama_models:
   - gemma4:e4b
   - gemma4:e2b
   - qwen2.5-coder:7b
   - qwen3.5:4b
   - qwen3.5:9b
+  - llama3.2:3b

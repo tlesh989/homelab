@@ -1,68 +1,62 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+Personal homelab IaC: Terraform (Proxmox LXC/VM provisioning) + Ansible (configuration). Secrets via Doppler. Issue tracking via **bd** (beads).
 
-## Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
-
-## Non-Interactive Shell Commands
-
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
-
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
+## Issue Tracking
 
 ```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
+bd onboard      # Initial setup
+bd ready --json           # Find work
+bd update <id> --claim   # Claim atomically
+bd close <id> --reason "Done"  # Complete
+bd dolt push && git push   # MUST push before ending session
 ```
 
-**Other commands that may prompt:**
+## Dev Commands
 
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
+```bash
+task syntax && task lint  # Fast validation
+task check               # Dry-run all hosts
+task ping               # Test connectivity
+doppler run -- <cmd>    # Inject secrets
+```
 
-<!-- BEGIN BEADS INTEGRATION -->
-## Issue Tracking with bd (beads)
+## Git Workflow (gitnow)
 
-**IMPORTANT**: Use `bd` for ALL tracking. No markdown TODOs. Always use `--json`.
+```bash
+feature <name>   # Start feature branch
+bugfix <name>    # Start bugfix branch
+hotfix <name>    # Start hotfix branch
+chore/<name>    # Chore: git checkout -b chore/<name>
 
-- **Find work**: `bd ready --json`
-- **Claim task**: `bd update <id> --claim --json`
-- **Create task**: `bd create "Title" --description="Details" -t bug|feature|task|epic|chore -p 0-4 --json`
-- **Subtask/Discovered**: append `--deps discovered-from:<parent-id>`
-- **Complete task**: `bd close <id> --reason "Done" --json`
+# Pre-branch (replaces fetch+checkout+pull):
+/clean_gone       # Prune deleted remotes
+move dev          # Switch to dev with autostash
+pull              # Rebase pull
+```
 
-*Priorities: 0 (Crit), 1 (High), 2 (Med), 3 (Low), 4 (Backlog).*
+## Skills Available
 
-## Landing the Plane (Session Completion)
+- `/deploy` — Run playbook with dry-run verification first (Recommended)
+- `/diagnose` — Host/service connectivity, health, container status
+- `/implement` — Full workflow: branch → design → implement → validate → PR
+- `/new-host` — Bootstrap LXC: Terraform → Ansible → role deployment
+- `/new-service` — Scaffold new service: Terraform LXC + Ansible role
+- `/ship` — Commit, push, and open PR
 
-You MUST complete these before ending a session. Work is NOT done until `git push` succeeds.
+## Non-Interactive Flags
 
-1. **File issues**: Any remaining work gets a `bd create`
-2. **Quality Gates**: Run linting/tests.
-3. **Update Status**: `bd close` finished work.
-4. **PUSH (MANDATORY)**:
+```bash
+cp -f source dest      # NOT: cp source dest
+rm -rf directory     # NOT: rm -r directory
+ssh -o BatchMode=yes # Fail instead of prompt
+apt-get -y           # Auto-confirm
+```
 
-   ```bash
-   git pull --rebase && bd dolt push && git push
-   ```
+## Landing the Plane
 
-5. **Verify**: MUST push successfully. Never stop before pushing or say "ready when you are". Resolve conflicts if any.
-<!-- END BEADS INTEGRATION -->
+1. File remaining work: `bd create "title" --json`
+2. Run quality gates: `task syntax && task lint`
+3. Close completed work: `bd close <id> --reason "Done" --json`
+4. Push: `git pull --rebase && bd dolt push && git push`
+5. Verify push succeeded — resolve conflicts if any.
