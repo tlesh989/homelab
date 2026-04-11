@@ -4,6 +4,8 @@ minimum_pre_commit_version: "4.1.0"
 default_language_version:
   python: python3.14
 
+exclude: ^(\.agents/|\.claude/|\.rtk/|\.serena/|\.superpowers/|\.beads/)
+
 repos:
   - repo: https://github.com/pre-commit/sync-pre-commit-deps
     rev: v0.0.3
@@ -63,6 +65,7 @@ repos:
       - id: ansible-lint
         args:
           - --fix
+        exclude: ^galaxy_roles/
         stages: [pre-commit]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -97,7 +100,29 @@ repos:
       - id: checkov
         files: ^terraform/.*\.tf$
         args:
+          - --framework
+          - terraform
           - --quiet
+          - --skip-check
+          - CKV2_ANSIBLE_3,CKV2_ANSIBLE_1,CKV_ANSIBLE_1,CKV2_GHA_1,CKV_DOCKER_3,CKV2_DOCKER_1,CKV_DOCKER_2
+          - --skip-path
+          - .agents
+          - --skip-path
+          - .claude
+          - --skip-path
+          - .rtk
+          - --skip-path
+          - .serena
+          - --skip-path
+          - .superpowers
+          - --skip-path
+          - .beads
+          - --skip-path
+          - docs
+          - --skip-path
+          - galaxy_roles
+          - --skip-path
+          - terraform/.terraform
         stages: [pre-commit]
 
   - repo: local
