@@ -154,7 +154,6 @@
 
 - name: setup xps laptop (local LLM host)
   hosts: drizzt
-  become: true
   roles:
     - role: ansible_user
     - role: ollama

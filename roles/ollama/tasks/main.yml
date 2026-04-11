@@ -1,9 +1,15 @@
 ---
+- name: Download Ollama install script
+  ansible.builtin.get_url:
+    url: "{{ ollama_install_script_url }}"
+    dest: /tmp/ollama-install.sh
+    mode: "0755"
+    checksum: "{{ ollama_install_script_checksum }}"
+  when: not ansible_check_mode
+
 - name: Install Ollama via official install script
   ansible.builtin.shell:
-    cmd: |
-      set -o pipefail
-      curl -fsSL https://ollama.com/install.sh | sh
+    cmd: /tmp/ollama-install.sh
     executable: /bin/bash
     creates: /usr/local/bin/ollama
   become: true
@@ -16,13 +22,13 @@
     mode: "0755"
   become: true
 
-- name: Configure Ollama to listen on all interfaces
+- name: Configure Ollama service
   ansible.builtin.copy:
     dest: /etc/systemd/system/ollama.service.d/override.conf
     mode: "0644"
     content: |
       [Service]
-      Environment="OLLAMA_HOST={{ ollama_host }}:{{ ollama_port }}"
+      Environment="OLLAMA_HOST={{ ollama_host if ollama_expose | bool else '127.0.0.1' }}:{{ ollama_port }}"
   become: true
   notify: Restart ollama
 
@@ -32,8 +38,8 @@
     enabled: true
     state: started
     daemon_reload: true
-  ignore_errors: "{{ ansible_check_mode }}"
   become: true
+  when: not ansible_check_mode
 
 - name: Open firewalld port for Ollama
   ansible.posix.firewalld:
@@ -42,7 +48,7 @@
     immediate: true
     state: enabled
   become: true
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: ollama_expose and not ansible_check_mode
 
 - name: Mask systemd sleep targets to prevent suspend
   ansible.builtin.systemd:
