@@ -27,7 +27,7 @@ doppler run -- <cmd>    # Inject secrets
 feature <name>   # Start feature branch
 bugfix <name>    # Start bugfix branch
 hotfix <name>    # Start hotfix branch
- chore/<name>    # Chore: git checkout -b chore/<name>
+chore/<name>    # Chore: git checkout -b chore/<name>
 
 # Pre-branch (replaces fetch+checkout+pull):
 /clean_gone       # Prune deleted remotes
