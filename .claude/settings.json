@@ -1,7 +1,7 @@
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/tommy/repos/tlesh/homelab/.claude/statusline-command.sh"
+    "command": "bash /Users/tommy/repos/tlesh989/homelab/.claude/statusline-command.sh"
   },
   "deniedMcpServers": [
     { "serverName": "claude_ai_Google_Calendar" },
@@ -16,38 +16,6 @@
             "type": "command",
             "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(1) if any(b in path for b in blocked) else sys.exit(0)\"",
             "timeout": 5000
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /home/jailuser/git/.claude/git-hook-validator.py",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ext=path.rsplit('.',1)[-1] if '.' in path else ''; sys.exit(0) if ext not in ('yml','yaml') else None; yamllint=shutil.which('yamllint'); sys.exit(0) if not yamllint else None; r=subprocess.run([yamllint,'-d','relaxed',path],capture_output=True,text=True); print(r.stdout) if r.stdout else None; print(r.stderr) if r.stderr else None; sys.exit(0)\"",
-            "timeout": 10000
-          },
-          {
-            "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess,shutil,os; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); sys.exit(0) if not path.endswith('.tf') else None; tf=shutil.which('terraform'); sys.exit(0) if not tf else None; subprocess.run([tf,'fmt',path],capture_output=True); tf_dir=os.path.dirname(os.path.abspath(path)); r=subprocess.run([tf,'validate'],capture_output=True,text=True,cwd=tf_dir); print('terraform validate:\\n'+r.stdout+r.stderr) if r.returncode!=0 else None; sys.exit(0)\"",
-            "timeout": 10000
-          },
-          {
-            "type": "command",
-            "command": "python3 -c \"import sys,json,subprocess,shutil; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path',''); ansible_paths=['roles/','group_vars/','main.yml','bootstrap.yml']; sys.exit(0) if not any(p in path for p in ansible_paths) else None; task=shutil.which('task'); sys.exit(0) if not task else None; r=subprocess.run([task,'lint'],capture_output=True,text=True); print(r.stdout) if r.stdout else None; sys.exit(0)\"",
-            "timeout": 15000
           }
         ]
       }
