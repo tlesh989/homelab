@@ -32,7 +32,7 @@ arr.tlesh.xyz ansible_host=192.168.233.24
 uptime-kuma.tlesh.xyz ansible_host=192.168.233.16
 
 [drizzt]
-drizzt.tlesh.xyz
+drizzt.tlesh.xyz ansible_host=192.168.233.27
 
 [truenas]
 ansalon ansible_host=192.168.233.6 ansible_connection=local ansible_become=false
