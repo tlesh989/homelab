@@ -158,7 +158,7 @@ PR base is always `main`.
 
 - [ ] <verification step>
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 Generated with [OpenCode](https://opencode.ai)
 ```
 
 ## Post-PR: Copilot Review
@@ -180,7 +180,7 @@ After creating the PR, poll for the Copilot review:
 
 <bullet points of what changed>
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Co-Authored-By: OpenCode Agent <noreply@opencode.ai>
 ```
 
 Types: `feat`, `fix`, `chore`, `refactor`, `docs`
