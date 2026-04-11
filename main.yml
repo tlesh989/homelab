@@ -153,7 +153,7 @@
     - role: uptime_kuma
 
 - name: setup xps laptop (local LLM host)
-  hosts: xps
+  hosts: drizzt
   become: true
   roles:
     - role: ansible_user

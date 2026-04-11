@@ -166,7 +166,7 @@ tasks:
     desc: Deploy Ollama local LLM on XPS laptop
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "xps", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "drizzt", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts
