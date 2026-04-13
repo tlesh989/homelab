@@ -54,7 +54,7 @@ cd terraform && task apply
 
 ## Repository Layout
 
-```
+```text
 .
 ├── main.yml              # Master Ansible playbook
 ├── hosts                 # Inventory

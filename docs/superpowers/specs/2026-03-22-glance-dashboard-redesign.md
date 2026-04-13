@@ -77,12 +77,12 @@ All IDs confirmed from user-edited template file.
 - UCftwRNsjfRo08xYE31tkiyw  # WIRED
 - UCOk-gHyjcWZNj3Br4oxwh0A  # Techno Tim
 - UCn5fhcGRrCvrmFibPbT6q1A  # Brian Lagerstrom
-- UCxQbYGpbdrh-b2ND-AfIybg  # Maker's Muse
+- UCxQbYGpbdrh-b2AND-AfIybg  # Maker's Muse
 - UCb8Rde3uRL1ohROUVg46h1A  # Thomas Sanladerer
 - UC2C_jShtL725hvbm1arSV9w  # CGP Grey
 - UCzH5n3Ih5kgQoiDAQt2FwLw  # LifebyMikeG
 - UCfQgsKhHjSyRLOp9mnffqVg  # RP Strength
-- UCFHZHhZaH7Rc_FOMIzUziJA  # Rick Shiels Golf
+- UCFHZHhZaH7Rc_FOMIsUziJA  # Rick Shiels Golf
 - UCHnyfMqiRRG1u-2MsSQLbXA  # Veritasium
 ```
 

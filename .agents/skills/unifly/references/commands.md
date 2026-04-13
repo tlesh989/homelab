@@ -556,9 +556,11 @@ queries should always pass one of these flags to avoid silent truncation.**
 - `-o json-compact`: Single-line JSON per record, great for line-oriented
   processing
 - `-o plain`: Emits IDs one per line, ideal for `xargs`:
+
   ```bash
   unifly clients list -o plain | xargs -n1 unifly clients block
   ```
+
 - `-o table`: Human display only, not for parsing
 
 ### Dry-Run-Like Patterns

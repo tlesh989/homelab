@@ -151,3 +151,9 @@
     - role: ansible_user
     - role: GROG.package
     - role: uptime_kuma
+
+- name: setup xps laptop (local LLM host)
+  hosts: drizzt
+  roles:
+    - role: ansible_user
+    - role: ollama

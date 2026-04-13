@@ -1,24 +1,18 @@
 # Agent Instructions
 
-This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+Personal homelab IaC: Terraform (Proxmox LXC/VM provisioning) + Ansible (configuration). Secrets via Doppler. Issue tracking via **bd** (beads).
 
-## Quick Reference
+## Issue Tracking
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
+bd onboard      # Initial setup
+bd ready --json           # Find work
+bd update <id> --claim   # Claim atomically
+bd close <id> --reason "Done"  # Complete
+bd dolt push && git push   # MUST push before ending session
 ```
 
-## Non-Interactive Shell Commands
-
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
-
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
+## Dev Commands
 
 ```bash
 task syntax && task lint  # Fast validation
@@ -33,11 +27,11 @@ doppler run -- <cmd>    # Inject secrets
 feature <name>   # Start feature branch
 bugfix <name>    # Start bugfix branch
 hotfix <name>    # Start hotfix branch
- chore/<name>    # Chore: git checkout -b chore/<name>
+chore/<name>    # Chore: git checkout -b chore/<name>
 
 # Pre-branch (replaces fetch+checkout+pull):
 /clean_gone       # Prune deleted remotes
-move main         # Switch to main with autostash
+move dev          # Switch to dev with autostash
 pull              # Rebase pull
 ```
 

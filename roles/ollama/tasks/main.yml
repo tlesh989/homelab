@@ -1,0 +1,99 @@
+---
+- name: Download Ollama install script
+  ansible.builtin.get_url:
+    url: "{{ ollama_install_script_url }}"
+    dest: /tmp/ollama-install.sh
+    mode: "0755"
+    checksum: "{{ ollama_install_script_checksum }}"
+  when: not ansible_check_mode
+
+- name: Install Ollama via official install script
+  ansible.builtin.shell:
+    cmd: /tmp/ollama-install.sh
+    executable: /bin/bash
+    creates: /usr/local/bin/ollama
+  become: true
+  when: not ansible_check_mode
+
+- name: Create Ollama systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/ollama.service.d
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Configure Ollama service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ollama.service.d/override.conf
+    mode: "0644"
+    content: |
+      [Service]
+      Environment="OLLAMA_HOST={{ ollama_host if ollama_expose | bool else '127.0.0.1' }}:{{ ollama_port }}"
+      Environment="OLLAMA_NUM_PARALLEL={{ ollama_num_parallel }}"
+  become: true
+  notify: Restart ollama
+
+- name: Enable and start Ollama service
+  ansible.builtin.systemd:
+    name: ollama
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+  when: not ansible_check_mode
+
+- name: Open firewalld port for Ollama
+  ansible.posix.firewalld:
+    port: "{{ ollama_port }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+  become: true
+  when: ollama_expose and not ansible_check_mode
+
+- name: Mask systemd sleep targets to prevent suspend
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop:
+    - sleep.target
+    - suspend.target
+    - hibernate.target
+    - hybrid-sleep.target
+  become: true
+
+- name: Create logind drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/logind.conf.d
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Ignore lid close to keep running with lid shut
+  ansible.builtin.copy:
+    dest: /etc/systemd/logind.conf.d/lid.conf
+    mode: "0644"
+    content: |
+      [Login]
+      HandleLidSwitch=ignore
+  become: true
+  notify: Reload logind
+
+- name: Check installed Ollama models
+  ansible.builtin.command: ollama list
+  register: ollama_installed_models
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Set installed model names list
+  ansible.builtin.set_fact:
+    ollama_installed_model_names: "{{ ollama_installed_models.stdout_lines[1:] | map('split', ' ') | map('first') | list }}"
+  when: not ansible_check_mode
+
+- name: Pull Ollama models
+  ansible.builtin.command: ollama pull {{ item }}
+  loop: "{{ ollama_models }}"
+  when:
+    - not ansible_check_mode
+    - item.split(':')[0] not in ollama_installed_model_names
+  changed_when: true

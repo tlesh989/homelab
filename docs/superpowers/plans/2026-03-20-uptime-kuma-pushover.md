@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-03-20-uptime-kuma-pushover-design.md`
 
-**Beads issues:** homelab-0ha (Terraform), homelab-65e (Ansible role), homelab-dqo (wiring), homelab-j78 (runbook), homelab-ded (manual setup)
+**Beads issues:** homelab-0ha (Terraform), homelab-65e (Ansible role), homelab-dqo (wiring), homelab-j78 (runbook), homelab-dead (manual setup)
 
 ---
 
@@ -483,14 +483,14 @@ bd close homelab-j78
 
 ---
 
-## Task 5: Deploy and First-Time Setup (homelab-ded)
+## Task 5: Deploy and First-Time Setup (homelab-dead)
 
 > **Prerequisite:** Tasks 1–4 must be complete. The LXC must be provisioned via `terraform apply` before running Ansible.
 
 - [ ] **Step 1: Mark issue in progress**
 
 ```bash
-bd update homelab-ded --status=in_progress
+bd update homelab-dead --status=in_progress
 ```
 
 - [ ] **Step 2: Apply Terraform**
@@ -550,7 +550,7 @@ Wait ~2 minutes. All 18 monitors should show green/up. Investigate any that stay
 - [ ] **Step 9: Close all issues**
 
 ```bash
-bd close homelab-0ha homelab-65e homelab-dqo homelab-ded
+bd close homelab-0ha homelab-65e homelab-dqo homelab-dead
 ```
 
 ---
