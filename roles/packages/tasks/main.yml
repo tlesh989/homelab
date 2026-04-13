@@ -1,0 +1,30 @@
+---
+- name: Gather package manager facts
+  ansible.builtin.setup:
+    gather_subset:
+      - pkg_mgr
+
+- name: Merge package lists
+  ansible.builtin.set_fact:
+    _packages_combined: "{{ package_list + package_list_group + package_list_host }}"
+
+- name: Install packages (apt)
+  ansible.builtin.apt:
+    name: "{{ item.apt | default(item.name) }}"
+    state: "{{ item.state | default(package_state) }}"
+    update_cache: "{{ package_update_cache }}"
+    cache_valid_time: "{{ package_cache_valid_time }}"
+  loop: "{{ _packages_combined }}"
+  when:
+    - ansible_pkg_mgr == 'apt'
+    - not (item.apt_ignore | default(false) | bool)
+
+- name: Install packages (dnf)
+  ansible.builtin.dnf:
+    name: "{{ item.dnf | default(item.name) }}"
+    state: "{{ item.state | default(package_state) }}"
+    update_cache: "{{ package_update_cache }}"
+  loop: "{{ _packages_combined }}"
+  when:
+    - ansible_pkg_mgr == 'dnf'
+    - not (item.dnf_ignore | default(false) | bool)

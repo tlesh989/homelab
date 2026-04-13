@@ -21,44 +21,48 @@ Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interac
 **Use these forms instead:**
 
 ```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
+task syntax && task lint  # Fast validation
+task check               # Dry-run all hosts
+task ping               # Test connectivity
+doppler run -- <cmd>    # Inject secrets
 ```
 
-**Other commands that may prompt:**
+## Git Workflow (gitnow)
 
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
+```bash
+feature <name>   # Start feature branch
+bugfix <name>    # Start bugfix branch
+hotfix <name>    # Start hotfix branch
+ chore/<name>    # Chore: git checkout -b chore/<name>
 
-<!-- BEGIN BEADS INTEGRATION -->
-## Issue Tracking with bd (beads)
-**IMPORTANT**: Use `bd` for ALL tracking. No markdown TODOs. Always use `--json`. 
+# Pre-branch (replaces fetch+checkout+pull):
+/clean_gone       # Prune deleted remotes
+move main         # Switch to main with autostash
+pull              # Rebase pull
+```
 
-- **Find work**: `bd ready --json`
-- **Claim task**: `bd update <id> --claim --json`
-- **Create task**: `bd create "Title" --description="Details" -t bug|feature|task|epic|chore -p 0-4 --json`
-- **Subtask/Discovered**: append `--deps discovered-from:<parent-id>`
-- **Complete task**: `bd close <id> --reason "Done" --json`
+## Skills Available
 
-*Priorities: 0 (Crit), 1 (High), 2 (Med), 3 (Low), 4 (Backlog).*
+- `/deploy` — Run playbook with dry-run verification first (Recommended)
+- `/diagnose` — Host/service connectivity, health, container status
+- `/implement` — Full workflow: branch → design → implement → validate → PR
+- `/new-host` — Bootstrap LXC: Terraform → Ansible → role deployment
+- `/new-service` — Scaffold new service: Terraform LXC + Ansible role
+- `/ship` — Commit, push, and open PR
 
-## Landing the Plane (Session Completion)
-You MUST complete these before ending a session. Work is NOT done until `git push` succeeds.
+## Non-Interactive Flags
 
-1. **File issues**: Any remaining work gets a `bd create`
-2. **Quality Gates**: Run linting/tests.
-3. **Update Status**: `bd close` finished work.
-4. **PUSH (MANDATORY)**: 
-   ```bash
-   git pull --rebase && bd dolt push && git push
-   ```
-5. **Verify**: MUST push successfully. Never stop before pushing or say "ready when you are". Resolve conflicts if any.
-<!-- END BEADS INTEGRATION -->
+```bash
+cp -f source dest      # NOT: cp source dest
+rm -rf directory     # NOT: rm -r directory
+ssh -o BatchMode=yes # Fail instead of prompt
+apt-get -y           # Auto-confirm
+```
+
+## Landing the Plane
+
+1. File remaining work: `bd create "title" --json`
+2. Run quality gates: `task syntax && task lint`
+3. Close completed work: `bd close <id> --reason "Done" --json`
+4. Push: `git pull --rebase && bd dolt push && git push`
+5. Verify push succeeded — resolve conflicts if any.
