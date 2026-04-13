@@ -144,6 +144,17 @@
     - role: pi-hole
     - role: acme
 
+- name: setup caddy reverse proxy
+  hosts: caddy
+  become: true
+  roles:
+    - role: ansible_user
+    - role: GROG.package
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: users
+    - role: caddy
+
 - name: setup uptime-kuma server
   hosts: uptime-kuma
   become: true

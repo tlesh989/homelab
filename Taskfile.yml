@@ -156,6 +156,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  caddy:
+    desc: Run Ansible playbook for Caddy reverse proxy
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "caddy", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   pi-hole:
     desc: Run Ansible playbook for pi-hole host
     cmds:

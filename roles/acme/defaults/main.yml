@@ -8,36 +8,7 @@ acme_email: "thomas.lesh@gmail.com"
 # Cloudflare API token (Zone:DNS:Edit for tlesh.xyz) — from Doppler as CF_DNS_API_TOKEN
 acme_cf_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
 
-# SSH keypair used by deploy hook to push certs to remote hosts
-acme_deploy_key_path: "/root/.ssh/acme_deploy_ed25519"
-
-# Remote hosts that receive cert pushes after each renewal
-acme_deploy_targets:
-  - host: "{{ hostvars['netdata.tlesh.xyz'].ansible_host }}"
-    cert_dest: "/etc/ssl/homelab/fullchain.pem"
-    key_dest: "/etc/ssl/homelab/privkey.pem"
-    cert_group: "netdata"
-    restart_cmd: "systemctl restart netdata"
-  - host: "{{ hostvars['tika.tlesh.xyz'].ansible_host }}"
-    cert_dest: "/etc/pve/local/pveproxy-ssl.pem"
-    key_dest: "/etc/pve/local/pveproxy-ssl.key"
-    cert_group: "root"
-    restart_cmd: "systemctl restart pveproxy"
-  - host: "{{ hostvars['bupu.tlesh.xyz'].ansible_host }}"
-    cert_dest: "/etc/pve/local/pveproxy-ssl.pem"
-    key_dest: "/etc/pve/local/pveproxy-ssl.key"
-    cert_group: "root"
-    restart_cmd: "systemctl restart pveproxy"
-  - host: "{{ hostvars['sturm.tlesh.xyz'].ansible_host }}"
-    cert_dest: "/etc/pve/local/pveproxy-ssl.pem"
-    key_dest: "/etc/pve/local/pveproxy-ssl.key"
-    cert_group: "root"
-    restart_cmd: "systemctl restart pveproxy"
-
-# Inventory hostnames whose root authorized_keys receive the deploy public key
-acme_deploy_target_hosts:
-  - "pi-hole.tlesh.xyz"
-  - "netdata.tlesh.xyz"
-  - "tika.tlesh.xyz"
-  - "bupu.tlesh.xyz"
-  - "sturm.tlesh.xyz"
+# TLS deployment is now handled by Caddy (roles/caddy).
+# acme.sh continues to issue/renew *.tlesh.xyz but no longer pushes to remotes.
+acme_deploy_targets: []
+acme_deploy_target_hosts: []

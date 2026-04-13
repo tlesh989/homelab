@@ -11,11 +11,12 @@ pihole_admin_password: "{{ lookup('env', 'PIHOLE_ADMIN_PASSWORD') }}"
 # Pi-hole install dir
 pihole_install_dir: /etc/pihole
 
-# Webserver domain and SSL certificate — deployed by acme role
-pihole_domain: "pi-hole.tlesh.xyz"
-pihole_cert_dir: "/etc/ssl/homelab"
+# Webserver port — HTTP only, TLS terminated by Caddy reverse proxy
+# FTL port format: <port>o (o = open/HTTP), e.g. "8080o" for HTTP-only on 8080
+pihole_port: "8080o"
 
 # Local DNS A records for homelab services (tlesh.xyz LAN domain)
+# Services proxied through Caddy (.25) resolve to Caddy IP, not their own IP
 pihole_local_hosts:
   - "192.168.233.7 tika.tlesh.xyz"
   - "192.168.233.8 bupu.tlesh.xyz"
@@ -23,11 +24,12 @@ pihole_local_hosts:
   - "192.168.233.6 ansalon.tlesh.xyz"
   - "192.168.233.11 jetkvm.tlesh.xyz"
   - "192.168.233.12 plex.tlesh.xyz"
-  - "192.168.233.16 uptime-kuma.tlesh.xyz"
   - "192.168.233.21 tailscale.tlesh.xyz"
-  - "192.168.233.22 glance.tlesh.xyz"
-  - "192.168.233.23 netdata.tlesh.xyz"
   - "192.168.233.24 arr.tlesh.xyz"
-  - "192.168.233.3 pihole.tlesh.xyz"
   - "192.168.233.10 kaz.tlesh.xyz"
   - "192.168.233.125 homeassistant.tlesh.xyz"
+  - "192.168.233.25 caddy.tlesh.xyz"
+  - "192.168.233.25 pihole.tlesh.xyz"
+  - "192.168.233.25 netdata.tlesh.xyz"
+  - "192.168.233.25 glance.tlesh.xyz"
+  - "192.168.233.25 uptime-kuma.tlesh.xyz"

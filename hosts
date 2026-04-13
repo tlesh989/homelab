@@ -42,6 +42,9 @@ tika
 bupu
 sturm
 
+[caddy]
+caddy.tlesh.xyz ansible_host=192.168.233.25
+
 [lxc:children]
 tailscale
 plex
@@ -50,6 +53,7 @@ pi-hole
 netdata
 arr
 uptime-kuma
+caddy
 
 [laptops:children]
 drizzt

@@ -1,0 +1,21 @@
+# Managed by Ansible — do not edit manually
+{
+	email {{ caddy_acme_email }}
+}
+
+*.{{ caddy_domain }} {
+	tls {
+		dns cloudflare {{ caddy_cf_api_token }}
+	}
+{% for service in caddy_services %}
+
+	@{{ service.name | replace('-', '_') }} host {{ service.name }}.{{ caddy_domain }}
+	handle @{{ service.name | replace('-', '_') }} {
+		reverse_proxy {{ service.upstream }}
+	}
+{% endfor %}
+
+	handle {
+		abort
+	}
+}
