@@ -8,23 +8,31 @@
   ansible.builtin.set_fact:
     _packages_combined: "{{ package_list + package_list_group + package_list_host }}"
 
+- name: Refresh apt cache
+  ansible.builtin.apt:
+    update_cache: "{{ package_update_cache }}"
+    cache_valid_time: "{{ package_cache_valid_time }}"
+  when: ansible_facts.pkg_mgr == 'apt'
+
 - name: Install packages (apt)
   ansible.builtin.apt:
     name: "{{ item.apt | default(item.name) }}"
     state: "{{ item.state | default(package_state) }}"
-    update_cache: "{{ package_update_cache }}"
-    cache_valid_time: "{{ package_cache_valid_time }}"
   loop: "{{ _packages_combined }}"
   when:
-    - ansible_pkg_mgr == 'apt'
+    - ansible_facts.pkg_mgr == 'apt'
     - not (item.apt_ignore | default(false) | bool)
+
+- name: Refresh dnf cache
+  ansible.builtin.dnf:
+    update_cache: "{{ package_update_cache }}"
+  when: ansible_facts.pkg_mgr == 'dnf'
 
 - name: Install packages (dnf)
   ansible.builtin.dnf:
     name: "{{ item.dnf | default(item.name) }}"
     state: "{{ item.state | default(package_state) }}"
-    update_cache: "{{ package_update_cache }}"
   loop: "{{ _packages_combined }}"
   when:
-    - ansible_pkg_mgr == 'dnf'
+    - ansible_facts.pkg_mgr == 'dnf'
     - not (item.dnf_ignore | default(false) | bool)
