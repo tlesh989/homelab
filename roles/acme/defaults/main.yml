@@ -8,6 +8,10 @@ acme_email: "thomas.lesh@gmail.com"
 # Cloudflare API token (Zone:DNS:Edit for tlesh.xyz) — from Doppler as CF_DNS_API_TOKEN
 acme_cf_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
 
+# SSH keypair used by deploy hook — retained so acme tasks don't fail on undefined var.
+# Key is generated but not used; TLS deployment is now handled by Caddy (roles/caddy).
+acme_deploy_key_path: "/root/.ssh/acme_deploy_ed25519"
+
 # TLS deployment is now handled by Caddy (roles/caddy).
 # acme.sh continues to issue/renew *.tlesh.xyz but no longer pushes to remotes.
 acme_deploy_targets: []

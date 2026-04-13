@@ -5,7 +5,7 @@
 
 *.{{ caddy_domain }} {
 	tls {
-		dns cloudflare {{ caddy_cf_api_token }}
+		dns cloudflare {$CF_DNS_API_TOKEN}
 	}
 {% for service in caddy_services %}
 

@@ -1,4 +1,9 @@
 ---
+- name: Assert CF_DNS_API_TOKEN is set
+  ansible.builtin.assert:
+    that: caddy_cf_api_token | length > 0
+    fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot configure Caddy without Cloudflare DNS token"
+
 - name: Create caddy system group
   ansible.builtin.group:
     name: caddy
@@ -38,6 +43,15 @@
     owner: root
     group: root
   when: not _caddy_binary.stat.exists
+  notify: Restart caddy
+
+- name: Template Caddy environment file
+  ansible.builtin.template:
+    src: caddy.env.j2
+    dest: "{{ caddy_install_dir }}/caddy.env"
+    owner: root
+    group: caddy
+    mode: "0640"
   notify: Restart caddy
 
 - name: Template Caddyfile

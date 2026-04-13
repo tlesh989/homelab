@@ -10,6 +10,8 @@ caddy_download_url: "https://caddyserver.com/api/download?os=linux&arch=amd64&p=
 caddy_services:
   - name: pihole
     upstream: "192.168.233.3:8080"
+  - name: pi-hole
+    upstream: "192.168.233.3:8080"
   - name: netdata
     upstream: "192.168.233.23:19999"
   - name: glance

@@ -30,6 +30,7 @@ pihole_local_hosts:
   - "192.168.233.125 homeassistant.tlesh.xyz"
   - "192.168.233.25 caddy.tlesh.xyz"
   - "192.168.233.25 pihole.tlesh.xyz"
+  - "192.168.233.25 pi-hole.tlesh.xyz"
   - "192.168.233.25 netdata.tlesh.xyz"
   - "192.168.233.25 glance.tlesh.xyz"
   - "192.168.233.25 uptime-kuma.tlesh.xyz"
