@@ -24,7 +24,8 @@ task reqs               # Run after any requirements.yml change
 - Always include `mode:` on `file`/`copy` tasks (ansible-lint enforces this).
 - Any task creating dirs/files for a service user: add `chown -R <puid>:<pgid> <path>` immediately after.
 - `become: true` at task level, not play level, where possible.
-- `gathering = explicit` in ansible.cfg — roles using facts (`ansible_pkg_mgr`, `ansible_distribution`, etc.) **must** include an explicit `setup:` task with `gather_subset`. Galaxy roles (e.g. `geerlingguy.ntp`) need `gather_facts: true` at play level instead.
+- `gathering = explicit` in ansible.cfg — roles using facts **must** include an explicit `setup:` task with `gather_subset`.
+- Galaxy roles (e.g. `geerlingguy.ntp`) require `gather_facts: true` at the play level instead.
 
 ## Terraform
 
