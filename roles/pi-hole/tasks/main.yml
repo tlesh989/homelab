@@ -86,7 +86,7 @@
 - name: Configure webserver port (HTTP only, TLS terminated by Caddy)
   ansible.builtin.command:
     cmd: pihole-FTL --config webserver.port "{{ pihole_port }}"
-  changed_when: _current_webserver_port.stdout != pihole_port
+  changed_when: _current_webserver_port.stdout != (pihole_port | string)
   notify: Restart pihole-FTL
   become: true
 
