@@ -153,3 +153,6 @@ galaxy_collections/
 # Claude Code local settings (project-specific permissions, not for sharing)
 .claude/settings.local.json
 .aider*
+
+# OpenPackage (contains machine-specific absolute paths)
+.openpackage/openpackage.lock

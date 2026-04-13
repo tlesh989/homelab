@@ -1,0 +1,11 @@
+---
+# This file is managed by OpenPackage. Do not edit manually.
+
+packages:
+  homelab:
+    files: {}
+    installScope: full
+    path: ./.openpackage
+    platforms:
+      - opencode
+    version: 0.0.0
