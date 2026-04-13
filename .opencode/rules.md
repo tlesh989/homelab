@@ -22,10 +22,10 @@ task reqs               # Run after any requirements.yml change
 - Every task **must** have a `name:` field.
 - Use `loop`, not `with_items`.
 - Always include `mode:` on `file`/`copy` tasks (ansible-lint enforces this).
-- Any task creating dirs/files for a service user: add `chown -R <puid>:<pgid> <path>` immediately after.
+- For service-user dirs/files: set `owner:`/`group:` on `ansible.builtin.file`/`copy` tasks; use `recurse: true` for directories.
 - `become: true` at task level, not play level, where possible.
-- `gathering = explicit` in ansible.cfg — roles using facts **must** include an explicit `setup:` task with `gather_subset`.
-- Galaxy roles (e.g. `geerlingguy.ntp`) require `gather_facts: true` at the play level instead.
+- `gathering = explicit` in `ansible.cfg` — in-house roles using facts must include an explicit `setup:` task with `gather_subset`.
+- Galaxy roles (e.g. `geerlingguy.ntp`) need `gather_facts: true` at the play level instead.
 
 ## Terraform
 
