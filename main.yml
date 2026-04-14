@@ -8,13 +8,19 @@
     - name: linux/macos find current user home directory
       ansible.builtin.set_fact:
         my_home: "{{ lookup('env', 'HOME') }}"
+    - name: gather facts
+      ansible.builtin.setup:
+        gather_subset:
+          - distribution_release
+          - processor
+          - os_family
 
 - name: setup proxmox hosts
   hosts: proxmox
   become: true
   roles:
     - role: proxmox
-    - role: GROG.package
+    - role: packages
     - role: users
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
@@ -37,11 +43,16 @@
 - name: setup tailscale server
   hosts: tailscale
   become: true
+  pre_tasks:
+    - name: Remove legacy Tailscale apt source (conflicts with DEB822 tailscale.sources)
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/pkgs_tailscale_com_stable_ubuntu.list
+        state: absent
   roles:
     - role: ansible_user
     - role: geerlingguy.ntp
     - role: geerlingguy.security
-    - role: GROG.package
+    - role: packages
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
     - role: users
@@ -76,7 +87,7 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: users
     - role: weareinteractive.environment
     - role: geerlingguy.ntp
@@ -90,7 +101,7 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: users
     - role: geerlingguy.ntp
     - role: geerlingguy.security
@@ -101,7 +112,7 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: artis3n.tailscale.machine
@@ -114,7 +125,7 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: users
     - role: netdata
 
@@ -123,7 +134,7 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: arr
 
 - name: setup netdata agents on proxmox nodes
@@ -137,19 +148,30 @@
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: users
     - role: pi-hole
     - role: acme
 
+- name: setup caddy reverse proxy
+  hosts: caddy
+  become: true
+  roles:
+    - role: ansible_user
+    - role: packages
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: users
+    - role: caddy
+
 - name: setup uptime-kuma server
   hosts: uptime-kuma
   become: true
   roles:
     - role: ansible_user
-    - role: GROG.package
+    - role: packages
     - role: uptime_kuma
 
 - name: setup xps laptop (local LLM host)

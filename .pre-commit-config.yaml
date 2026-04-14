@@ -133,13 +133,13 @@ repos:
         name: beads-sync
         entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run pre-commit"
         language: system
-        stages: [commit]
+        stages: [pre-commit]
         always_run: true
       - id: beads-push
         name: beads-push
         entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run pre-push"
         language: system
-        stages: [push]
+        stages: [pre-push]
         always_run: true
       - id: beads-post-checkout
         name: beads-post-checkout

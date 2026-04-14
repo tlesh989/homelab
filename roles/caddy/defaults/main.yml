@@ -1,0 +1,20 @@
+---
+caddy_install_dir: /etc/caddy
+caddy_data_dir: /var/lib/caddy
+caddy_log_dir: /var/log/caddy
+caddy_acme_email: "thomas.lesh@gmail.com"
+caddy_domain: "tlesh.xyz"
+caddy_cf_api_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
+caddy_download_url: "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fcaddy-dns%2Fcloudflare"
+
+caddy_services:
+  - name: pihole
+    upstream: "192.168.233.3:8080"
+  - name: pi-hole
+    upstream: "192.168.233.3:8080"
+  - name: netdata
+    upstream: "192.168.233.23:19999"
+  - name: glance
+    upstream: "192.168.233.22:8080"
+  - name: uptime-kuma
+    upstream: "192.168.233.16:3001"

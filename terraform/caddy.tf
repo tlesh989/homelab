@@ -1,21 +1,19 @@
-resource "proxmox_virtual_environment_container" "netdata" {
-  node_name    = "sturm"
-  vm_id        = 105
+resource "proxmox_virtual_environment_container" "caddy" {
+  node_name    = "tika"
+  vm_id        = 117
   unprivileged = true
-
-  description = "Netdata monitoring parent"
 
   features {
     nesting = true
   }
 
   disk {
-    datastore_id = "vm_data"
+    datastore_id = "truenas-lvm"
     size         = 8
   }
 
   initialization {
-    hostname = "netdata"
+    hostname = "caddy"
 
     dns {
       domain  = "tlesh.xyz"
@@ -24,27 +22,29 @@ resource "proxmox_virtual_environment_container" "netdata" {
 
     ip_config {
       ipv4 {
-        address = "192.168.233.23/24"
+        address = "192.168.233.17/24"
         gateway = "192.168.233.1"
       }
     }
 
     user_account {
-      keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      keys = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
+      # PM_API_PASSWORD reused for container root password (project-wide convention).
+      # initialization[0].user_account is in ignore_changes — only applied at initial creation.
       password = data.doppler_secrets.this.map.PM_API_PASSWORD
     }
   }
 
   memory {
     dedicated = 512
-    swap      = 0
+    swap      = 256
   }
 
   network_interface {
     bridge      = "vmbr0"
     enabled     = true
     firewall    = true
-    mac_address = "BC:24:11:A2:3C:55"
+    mac_address = "BC:24:11:3D:9A:17"
     name        = "eth0"
   }
 
@@ -58,6 +58,7 @@ resource "proxmox_virtual_environment_container" "netdata" {
       node_name,
       operating_system[0].template_file_id,
       initialization[0].user_account,
+      disk,
     ]
   }
 

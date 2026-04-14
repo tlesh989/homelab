@@ -74,7 +74,7 @@ resource "proxmox_virtual_environment_container" "plex" {
   }
 
   operating_system {
-    template_file_id = proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template.id
+    template_file_id = proxmox_download_file.ubuntu_24_04_lxc_template.id
     type             = "ubuntu"
   }
 

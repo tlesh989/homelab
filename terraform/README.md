@@ -18,15 +18,15 @@ pveum aclmod / -user terraform-prov@pve -role TerraformProv
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~>1.14.0 |
-| <a name="requirement_doppler"></a> [doppler](#requirement\_doppler) | 1.21.1 |
-| <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox) | 0.100.0 |
+| <a name="requirement_doppler"></a> [doppler](#requirement\_doppler) | 1.21.2 |
+| <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox) | 0.101.1 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_doppler"></a> [doppler](#provider\_doppler) | 1.21.1 |
-| <a name="provider_proxmox"></a> [proxmox](#provider\_proxmox) | 0.100.0 |
+| <a name="provider_doppler"></a> [doppler](#provider\_doppler) | 1.21.2 |
+| <a name="provider_proxmox"></a> [proxmox](#provider\_proxmox) | 0.101.1 |
 
 ## Modules
 
@@ -36,17 +36,18 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [proxmox_virtual_environment_container.arr](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.glance](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.netdata](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.uptime_kuma](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_download_file.ubuntu_24_04_cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_download_file) | resource |
-| [proxmox_virtual_environment_download_file.ubuntu_24_04_lxc_template](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_download_file) | resource |
-| [proxmox_virtual_environment_storage_nfs.proxmox_nfs](https://registry.terraform.io/providers/bpg/proxmox/0.100.0/docs/resources/virtual_environment_storage_nfs) | resource |
-| [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.1/docs/data-sources/secrets) | data source |
+| [proxmox_download_file.ubuntu_24_04_cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/download_file) | resource |
+| [proxmox_download_file.ubuntu_24_04_lxc_template](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/download_file) | resource |
+| [proxmox_storage_nfs.proxmox_nfs](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/storage_nfs) | resource |
+| [proxmox_virtual_environment_container.arr](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.caddy](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.glance](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.netdata](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.uptime_kuma](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.2/docs/data-sources/secrets) | data source |
 
 ## Inputs
 
