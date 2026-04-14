@@ -7,6 +7,7 @@ Refined homelab infrastructure management (Proxmox, Terraform, Ansible).
 - **Stability & Uptime**: Prioritize absolute reliability.
 - **KISS**: Simplicity over engineering.
 - **Doppler First**: All secrets come from Doppler. No local vaults.
+- **Efficiency**: Do not re-read files already read in this session unless the file may have changed. Prefer targeted edits over full rewrites.
 
 ## Entry Points & Documentation
 

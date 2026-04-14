@@ -37,13 +37,13 @@ drizzt.tlesh.xyz ansible_host=192.168.233.27
 [truenas]
 ansalon ansible_host=192.168.233.6 ansible_connection=local ansible_become=false
 
+[caddy]
+caddy.tlesh.xyz ansible_host=192.168.233.17
+
 [proxmox:children]
 tika
 bupu
 sturm
-
-[caddy]
-caddy.tlesh.xyz ansible_host=192.168.233.25
 
 [lxc:children]
 tailscale
