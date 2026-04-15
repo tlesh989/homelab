@@ -104,6 +104,13 @@
     enabled: true
     state: started
   become: true
+  when: open_webui_enabled | bool and not ansible_check_mode
+
+- name: Install Docker Python SDK
+  ansible.builtin.pip:
+    name: docker
+    state: present
+  become: true
   when: open_webui_enabled | bool
 
 - name: Deploy Open WebUI container

@@ -9,7 +9,7 @@ ollama_num_parallel: 1
 ollama_models:
   - gemma4:e2b
   - qwen2.5-coder:7b
-open_webui_enabled: true
+open_webui_enabled: false
 open_webui_version: "0.6.5"
 open_webui_port: 3000
-open_webui_expose: true
+open_webui_expose: false

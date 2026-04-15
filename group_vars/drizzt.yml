@@ -1,2 +1,4 @@
 ---
 ansible_host: "{{ lookup('env', 'DRIZZT_ANSIBLE_HOST') }}"
+open_webui_enabled: true
+open_webui_expose: true
