@@ -178,4 +178,5 @@
   hosts: drizzt
   roles:
     - role: ansible_user
+    - role: geerlingguy.docker
     - role: ollama

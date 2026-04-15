@@ -7,9 +7,9 @@ ollama_port: 11434
 ollama_expose: false
 ollama_num_parallel: 1
 ollama_models:
-  - gemma4:e4b
   - gemma4:e2b
   - qwen2.5-coder:7b
-  - qwen3.5:4b
-  - qwen3.5:9b
-  - llama3.2:3b
+open_webui_enabled: true
+open_webui_version: "0.6.5"
+open_webui_port: 3000
+open_webui_expose: true
