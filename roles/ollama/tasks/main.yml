@@ -116,8 +116,8 @@
     volumes:
       - open-webui:/app/backend/data
     env:
-      OLLAMA_BASE_URL: "http://127.0.0.1:{{ ollama_port }}"
-      PORT: "{{ open_webui_port }}"
+      OLLAMA_BASE_URL: "http://127.0.0.1:{{ ollama_port | string }}"
+      PORT: "{{ open_webui_port | string }}"
   become: true
   when:
     - open_webui_enabled | bool
