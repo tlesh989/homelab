@@ -107,7 +107,7 @@
   when: open_webui_enabled | bool and not ansible_check_mode
 
 - name: Install Docker Python SDK
-  ansible.builtin.apt:
+  ansible.builtin.package:
     name: python3-docker
     state: present
   become: true
