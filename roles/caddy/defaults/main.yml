@@ -18,3 +18,5 @@ caddy_services:
     upstream: "192.168.233.22:8080"
   - name: uptime-kuma
     upstream: "192.168.233.16:3001"
+  - name: ollama
+    upstream: "192.168.233.27:3000"

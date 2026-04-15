@@ -134,3 +134,21 @@
     - open_webui_enabled | bool
     - open_webui_expose | bool
     - not ansible_check_mode
+
+- name: Check Tailscale serve status
+  ansible.builtin.command: tailscale serve status
+  register: ts_serve_status
+  changed_when: false
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+
+- name: Configure Tailscale serve for Open WebUI
+  ansible.builtin.command:
+    cmd: tailscale serve --bg http://127.0.0.1:{{ open_webui_port }}
+  changed_when: true
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+    - ts_serve_status is defined
+    - open_webui_port | string not in ts_serve_status.stdout
