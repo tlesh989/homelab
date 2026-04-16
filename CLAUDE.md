@@ -16,6 +16,7 @@ Specialized rules:
 - **[Ansible](file:///.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
 - **[Terraform](file:///.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
 - **[Gitflow](file:///.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
+- **[Docker](file:///.claude/rules/docker.md)**: Image tags, Watchtower, env vars, new service checklist.
 - **[Tooling](file:///.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
 - **[Memory](file:///MEMORY.md)**: Architectural decisions and tech debt history.
 - **[Issue Tracking](file:///AGENTS.md)**: `bd` (beads) command reference and session landing rules.
@@ -32,6 +33,6 @@ doppler run -- ...          # Run any command with secrets
 ## Definition of Done
 
 1. **Verify**: Run `task syntax`, `task lint`, and `task test` (TF).
-2. **Review**: Run `coderabbit review` if changing logic.
+2. **Review**: Always run `coderabbit review --plain --base main` before creating a PR.
 3. **Commit**: Use `feat:`, `fix:`, or `chore:` prefixes.
 4. **Push**: Work is NOT complete until `git push` succeeds (see `AGENTS.md`).

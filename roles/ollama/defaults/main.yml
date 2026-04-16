@@ -10,7 +10,9 @@ ollama_models:
   - gemma4:e2b
   - qwen2.5-coder:7b
 open_webui_enabled: false
-open_webui_version: "0.6.5"
+open_webui_version: "main"
 open_webui_port: 3000
 open_webui_expose: false
-open_webui_watchtower_version: "1.14.4"
+open_webui_watchtower_version: "latest"
+ollama_update_script: "https://ollama.com/install.sh"
+ollama_update_schedule: "03:00:00"

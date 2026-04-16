@@ -6,3 +6,6 @@ MD024:
   siblings_only: true
 MD033: false
 MD060: false
+MD041: false
+exclude:
+  - ".agent/rules/*.md"

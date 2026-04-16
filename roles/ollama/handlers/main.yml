@@ -10,3 +10,7 @@
   ansible.builtin.command: systemctl kill -s HUP systemd-logind
   changed_when: true
   become: true
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
