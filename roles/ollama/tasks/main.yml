@@ -97,3 +97,121 @@
     - not ansible_check_mode
     - item.split(':')[0] not in ollama_installed_model_names
   changed_when: true
+
+- name: Create Ollama updater service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ollama-updater.service
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Update Ollama Binary
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/bash -c 'curl -fsSL {{ ollama_update_script }} | sh'
+  become: true
+
+- name: Create Ollama updater timer
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ollama-updater.timer
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Run Ollama Updater Daily
+
+      [Timer]
+      OnCalendar={{ ollama_update_schedule }}
+      Persistent=true
+
+      [Install]
+      WantedBy=timers.target
+  become: true
+  notify: Reload systemd
+
+- name: Enable Ollama updater timer
+  ansible.builtin.systemd:
+    name: ollama-updater.timer
+    enabled: true
+    state: started
+  become: true
+  when: not ansible_check_mode
+
+- name: Ensure Docker service is running
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  become: true
+  when: open_webui_enabled | bool and not ansible_check_mode
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+  when: open_webui_enabled | bool
+
+- name: Deploy Open WebUI container
+  community.docker.docker_container:
+    name: open-webui
+    image: "ghcr.io/open-webui/open-webui:{{ open_webui_version }}"
+    state: started
+    restart_policy: always
+    network_mode: host
+    volumes:
+      - open-webui:/app/backend/data
+    env:
+      OLLAMA_BASE_URL: "http://127.0.0.1:{{ ollama_port | string }}"
+      PORT: "{{ open_webui_port | string }}"
+  become: true
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+
+- name: Deploy Watchtower for Open WebUI auto-updates
+  community.docker.docker_container:
+    name: watchtower
+    image: "ghcr.io/nicholas-fedor/watchtower:{{ open_webui_watchtower_version }}"
+    state: started
+    restart_policy: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "0 0 3 * * *"
+  become: true
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+
+- name: Open firewalld port for Open WebUI
+  ansible.posix.firewalld:
+    port: "{{ open_webui_port }}/tcp"
+    permanent: true
+    immediate: true
+    state: enabled
+  become: true
+  when:
+    - open_webui_enabled | bool
+    - open_webui_expose | bool
+    - not ansible_check_mode
+
+- name: Check Tailscale serve status
+  ansible.builtin.command: tailscale serve status
+  register: ts_serve_status
+  changed_when: false
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+
+- name: Configure Tailscale serve for Open WebUI
+  ansible.builtin.command:
+    cmd: tailscale serve --bg http://127.0.0.1:{{ open_webui_port }}
+  changed_when: true
+  when:
+    - open_webui_enabled | bool
+    - not ansible_check_mode
+    - ts_serve_status is defined
+    - open_webui_port | string not in ts_serve_status.stdout

@@ -13,7 +13,7 @@ users_list:
     authorized_keys:
       - "{{ lookup('env', 'SSH_PUBLIC_KEY') }}"
 
-# grog.package
+# packages role
 package_list:
   - name: curl
   - name: git
