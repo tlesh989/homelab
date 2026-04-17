@@ -1,2 +1,6 @@
 ---
 ansible_host: "{{ lookup('env', 'DRIZZT_ANSIBLE_HOST') }}"
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+open_webui_enabled: true
+open_webui_expose: true
+tailscale_args: "--reset --ssh"
