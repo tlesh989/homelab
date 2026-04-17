@@ -29,6 +29,11 @@ by Hybrid. Consult `concepts.md` for the full gate matrix.
 All also accept the matching `UNIFI_*` environment variable (see
 concepts.md).
 
+Hidden but useful for cloud mode:
+
+- `--host-id <ID>` overrides the Site Manager console/host ID used for
+  connector-routed Integration commands.
+
 ## Devices `[H for list/get, L for commands]`
 
 ```bash
@@ -218,13 +223,20 @@ unifly nat policies create --name NAME --nat-type masquerade|source|destination 
   [--src-port N] [--dst-port N] \
   [--translated-address IP] [--translated-port N] \
   [--protocol tcp|udp|all] [-F payload.json]
+unifly nat policies update <id> [--name NAME | --description DESC] \
+  [--type masquerade|source|destination] [--protocol tcp|udp|all] \
+  [--enabled true|false] [--src-address CIDR] [--dst-address CIDR] \
+  [--src-port N] [--dst-port N] \
+  [--translated-address IP] [--translated-port N] [-F payload.json]
 unifly nat policies delete <id>
 ```
 
 **Gotchas:**
 
-- **There is no `update` subcommand for NAT policies.** Delete and
-  recreate to modify.
+- **`nat policies update <id>`** fetches the existing rule and merges
+  only the changed fields. Use `--name` or `--description` (mutually
+  exclusive) for the display label, plus any combination of `--type`,
+  `--protocol`, `--enabled`, address/port flags, or `--from-file`.
 - `masquerade` is source NAT using the outgoing interface address (most
   common for Internet-bound traffic).
 - `destination` is how port forwarding works on UniFi: specify
@@ -348,6 +360,32 @@ unifly dpi disable
 - `status`, `enable`, `disable` are Session API lifecycle controls for the
   DPI subsystem itself. Use these to toggle DPI on/off without touching
   the web UI.
+
+## Settings `[L]`
+
+```bash
+unifly settings list
+unifly settings get <KEY>
+unifly settings set <KEY> <FIELD> <VALUE>
+unifly settings set <KEY> --data '{"field": "value"}'
+unifly settings export
+```
+
+**Gotchas:**
+
+- All subcommands use the Session API (`rest/setting` / `set/setting/{key}`).
+- `list` shows a summary table of all ~44 setting sections with key, field
+  count, enabled status, and notable values.
+- `get` masks `x_`-prefixed fields (credentials, internal secrets) in table
+  mode. Use `-o json` to see everything.
+- `set` performs a read-modify-write: fetches the current section, patches
+  the specified field, and PUTs the full section back. Values are parsed as
+  bool (`true`/`false`), number, or string fallback.
+- `set --data` merges a JSON object into the section. Mutually exclusive
+  with the positional `<FIELD> <VALUE>` form.
+- `export` always outputs full JSON regardless of `--output` flag.
+- The PUT endpoint replaces the entire section; the handler strips `_id`,
+  `site_id`, and `key` metadata before sending.
 
 ## System `[L]`
 
@@ -491,6 +529,38 @@ unifly api <path> [-m get|post|put|patch|delete] [-d '<json-body>']
 - `delete` does not require a body.
 - Essential when unifly does not wrap a specific endpoint yet.
 
+## Cloud `[cloud fleet API]`
+
+```bash
+unifly cloud hosts
+unifly cloud hosts get <id>
+unifly cloud sites
+unifly cloud switch <site>
+unifly cloud devices [--host <id>]...
+unifly cloud isp [--type 5m|1h]
+unifly cloud isp query --sites <site-1,site-2>
+unifly cloud sdwan
+unifly cloud sdwan get <id>
+unifly cloud sdwan status <id>
+```
+
+**Gotchas:**
+
+- `unifly cloud ...` talks directly to `api.ui.com/v1/`; it does **not**
+  create a `Controller` or use the local Session API.
+- `cloud devices --host` is repeatable. Omit it to list devices across all
+  accessible consoles.
+- `cloud isp query --sites` is comma-delimited and returns a warning if Site
+  Manager responds with `partialSuccess`.
+- `cloud switch <site>` updates the active cloud profile's `site` field using
+  the controller connector's site inventory. It accepts a site name, internal
+  reference, or UUID, and stores the controller-side internal reference.
+- `cloud` commands only need a Site Manager API key. They do **not** need
+  `host_id`.
+- Regular commands such as `networks list` or `firewall policies list` still
+  need `host_id` in cloud mode, but unifly will auto-resolve it when the API
+  key only exposes one console, or one owner console.
+
 ## Topology, TUI, Completions, Config, Countries
 
 - `unifly topology`: Pretty-print the gateway > switch > AP > client tree
@@ -499,8 +569,10 @@ unifly api <path> [-m get|post|put|patch|delete] [-d '<json-body>']
   dashboard. `UNIFLY_THEME` env var also sets the theme.
 - `unifly completions bash|zsh|fish|powershell|elvish`: Emit completion
   script to stdout.
-- `unifly config init | show | set | profiles | use | set-password`:
-  Profile management. `set-password` stores in OS keyring.
+- `unifly config init | cloud-setup | show | set | profiles | use | set-password`:
+  Profile management. `cloud-setup` validates a Site Manager API key, lets
+  you pick a console and site interactively, and writes a cloud profile.
+  `set-password` stores secrets in the OS keyring.
 - `unifly countries`: List country codes for WiFi regulatory settings.
 
 ## Cross-Cutting Patterns
@@ -556,11 +628,9 @@ queries should always pass one of these flags to avoid silent truncation.**
 - `-o json-compact`: Single-line JSON per record, great for line-oriented
   processing
 - `-o plain`: Emits IDs one per line, ideal for `xargs`:
-
   ```bash
   unifly clients list -o plain | xargs -n1 unifly clients block
   ```
-
 - `-o table`: Human display only, not for parsing
 
 ### Dry-Run-Like Patterns

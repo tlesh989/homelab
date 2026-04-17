@@ -33,6 +33,6 @@ doppler run -- ...          # Run any command with secrets
 ## Definition of Done
 
 1. **Verify**: Run `task syntax`, `task lint`, and `task test` (TF).
-2. **Review**: Run `coderabbit review` if changing logic.
+2. **Review**: Always run `coderabbit review --plain --base main` before creating a PR.
 3. **Commit**: Use `feat:`, `fix:`, or `chore:` prefixes.
 4. **Push**: Work is NOT complete until `git push` succeeds (see `AGENTS.md`).

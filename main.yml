@@ -176,6 +176,11 @@
 
 - name: setup xps laptop (local LLM host)
   hosts: drizzt
+  become: true
   roles:
     - role: ansible_user
+    - role: packages
+    - role: geerlingguy.docker
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
     - role: ollama

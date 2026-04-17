@@ -140,6 +140,7 @@ matrix to pick the right `auth_mode`.
 - `vpn settings` (list/get/set/patch): `/rest/setting`
 - `wifi neighbors`: `/stat/rogueap`
 - `wifi channels`: `/stat/current-channel`
+- `nat policies` (list/get/create/update/delete): Session v2 API
 
 ### Session WebSocket required (session-backed auth)
 
@@ -205,14 +206,14 @@ falls back to polling when no session cookie is available.
 
 ### Platform-Native Config Paths
 
-| OS      | Config File                                        |
-| ------- | -------------------------------------------------- |
-| Linux   | `~/.config/unifly/config.toml`                     |
-| macOS   | `~/Library/Application Support/unifly/config.toml` |
-| Windows | `%APPDATA%\unifly\config.toml`                     |
+| OS      | Config File                    |
+| ------- | ------------------------------ |
+| Linux   | `~/.config/unifly/config.toml` |
+| macOS   | `~/.config/unifly/config.toml` |
+| Windows | `%APPDATA%\unifly\config.toml` |
 
-The CLI uses `ProjectDirs` for per-OS resolution. Agents should not assume
-Linux paths on macOS or Windows.
+Unix platforms (Linux and macOS) use XDG-standard paths. Windows uses
+platform-native `%APPDATA%`. Agents should not assume Unix paths on Windows.
 
 ### Environment Variables
 
@@ -223,8 +224,8 @@ over CLI flags when running in automation contexts:
 | ---------------- | ---------------------------------------------------- |
 | `UNIFI_URL`      | Controller URL (overrides profile)                   |
 | `UNIFI_API_KEY`  | Integration API key                                  |
-| `UNIFI_USERNAME` | Session API username                                  |
-| `UNIFI_PASSWORD` | Session API password (prefer keyring in interactive)  |
+| `UNIFI_USERNAME` | Session API username                                 |
+| `UNIFI_PASSWORD` | Session API password (prefer keyring in interactive) |
 | `UNIFI_SITE`     | Target site name or UUID                             |
 | `UNIFI_PROFILE`  | Active profile                                       |
 | `UNIFI_OUTPUT`   | Default output format                                |
@@ -401,8 +402,8 @@ Common failures and how to diagnose them:
 
 | Error                                         | Root Cause                                               | Fix                                         |
 | --------------------------------------------- | -------------------------------------------------------- | ------------------------------------------- |
-| `Unsupported { required: "Integration API" }` | Command needs API key, running in `session` mode          | Switch to `hybrid` or `integration` mode    |
-| `Unsupported { required: "Session API" }`      | Command needs credentials, running in `integration` mode | Switch to `hybrid` or `session` mode         |
+| `Unsupported { required: "Integration API" }` | Command needs API key, running in `session` mode         | Switch to `hybrid` or `integration` mode    |
+| `Unsupported { required: "Session API" }`     | Command needs credentials, running in `integration` mode | Switch to `hybrid` or `session` mode        |
 | 403 on POST/PUT/DELETE via `/proxy/network/`  | Missing CSRF token                                       | Re-login (cache invalidated); `--no-cache`  |
 | `tls error: self-signed certificate`          | Controller uses self-signed TLS                          | Use `-k`/`--insecure` or `UNIFI_INSECURE=1` |
 | `profile 'foo' not found`                     | No matching profile in config                            | Run `unifly config profiles` to list        |
@@ -413,9 +414,11 @@ Common failures and how to diagnose them:
 
 ## Limits and Known Gaps
 
-- **Local controllers only.** The Site Manager cloud API (`api.ui.com/v1/`)
-  is not yet implemented. Do not attempt to use unifly against cloud-only
-  controllers.
+- **Cloud support is Integration-only.** `unifly cloud ...` talks to the Site
+  Manager fleet API at `api.ui.com/v1/`, and `auth_mode = "cloud"` tunnels
+  Integration-backed commands through the cloud connector. Session-only
+  surfaces such as `events watch`, Wi-Fi observability, and admin/session
+  workflows still require direct controller access.
 - **VPN coverage is broad but split across two APIs.** Integration API
   provides `unifly vpn servers` (with get/detail), `unifly vpn tunnels`
   (with get/detail), `unifly vpn status` (IPsec SA), and
@@ -427,6 +430,7 @@ Common failures and how to diagnose them:
   UniFi-to-UniFi auto flows are still not wrapped.
 - **Port forwarding** lives under `nat policies` with destination NAT, not
   a dedicated command.
-- **No `nat policies update`.** Delete and recreate to modify a NAT policy.
+- **`nat policies update`** is now available. It fetches the existing
+  rule and merges only the changed fields via the Session v2 API.
 - **DeviceFilter lacks a `BySite` variant.** Filter client-side after
   fetching if cross-site device filtering is required.

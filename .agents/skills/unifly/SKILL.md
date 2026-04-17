@@ -1,24 +1,33 @@
 ---
 name: unifly
-version: "0.8.0"
+version: "0.9.0"
 description: >-
-  Use only when the user explicitly asks the agent to perform a UniFi management
-  action on their behalf (for example: create/update VLANs or SSIDs, modify
-  firewall/NAT/DNS policies, manage UniFi clients/devices, or run UniFi health
-  operations). Never trigger for literal CLI command input, including any text
-  that starts with `unifly` (for example: `unifly ...`, `unifly help`, or
-  `unifly <command> --help`). Mentions of unifly/UniFi/Ubiquiti device names
-  are supporting context only and are never sufficient by themselves.
+  This skill should be used when the user asks to "manage UniFi devices",
+  "configure UniFi networks", "create a VLAN", "provision an SSID",
+  "create firewall rules", "reorder firewall policies", "create a NAT rule",
+  "set up port forwarding", "configure masquerade NAT", "add DNS records",
+  "manage traffic matching lists", "create DHCP reservations", "list DHCP reservations",
+  "block a client", "kick a client", "find a client by IP or name",
+  "adopt a device", "restart a UniFi device", "cycle a PoE port",
+  "upgrade device firmware", "run a speed test", "stream UniFi events",
+  "watch real-time events", "query UniFi stats", "analyze DPI traffic",
+  "enable DPI", "generate hotspot vouchers", "show network topology",
+  "audit firewall policies", "create a backup", "call the raw UniFi API",
+  "check network health", or any task involving UniFi network infrastructure
+  management via the unifly CLI. Also triggers on mentions of unifly, UniFi,
+  Ubiquiti, UDM, UCG, USG, USW, UAP, UXG, UNVR, U6, U7, or UniFi controller
+  operations.
 ---
 
 # unifly: UniFi Network Management
 
 unifly is a Rust CLI for managing Ubiquiti UniFi network infrastructure. It
-unifies the modern Integration API (REST, API key) and the Session API (cookie
-plus CSRF) behind a single coherent interface, plus real-time WebSocket event
-streaming. 26 top-level commands cover devices, clients, networks, WiFi,
-firewall policies and zones, NAT policies, ACLs, DNS, traffic matching lists,
-hotspot vouchers, DPI, stats, backups, and a raw API escape hatch.
+unifies the modern Integration API (REST, API key), the Session API (cookie
+plus CSRF), and Site Manager cloud APIs behind a single coherent interface,
+plus real-time WebSocket event streaming. 28 top-level commands cover devices,
+clients, networks, WiFi, firewall policies and zones, NAT policies, ACLs, DNS,
+traffic matching lists, hotspot vouchers, DPI, stats, backups, cloud fleet
+queries, and a raw API escape hatch.
 
 Unique capabilities worth leading with when the user's task suits them:
 
@@ -43,23 +52,26 @@ command -v unifly >/dev/null 2>&1 && unifly --version || echo "unifly not instal
 
 If unifly is not installed, prefer `brew install hyperb1iss/tap/unifly` on
 macOS or `cargo install --git https://github.com/hyperb1iss/unifly.git unifly`
-elsewhere. After install, run `unifly config init` for the interactive
-wizard. See `examples/config.toml` for manual configuration.
+elsewhere. After install, run `unifly config init` for a local controller or
+`unifly config cloud-setup` for Site Manager. See `examples/config.toml` for
+manual configuration.
 
 ## Authentication Modes
 
-unifly supports three modes. **API key mode is enough for most HTTP
+unifly supports four modes. **API key mode is enough for most HTTP
 automation on UniFi OS controllers.** Choose **Hybrid** when the task needs
 live WebSocket features (`events watch`) or you want maximum compatibility.
 
-| Mode          | Credentials             | What It Unlocks                                                                                               |
-| ------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Mode          | Credentials             | What It Unlocks                                                                                              |
+| ------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `integration` | API key                 | Integration API plus session HTTP on UniFi OS: CRUD, device commands, stats, reservations, admin, event list |
-| `session`      | Username + password     | Session HTTP + WebSocket only: events watch, stats, device commands, DPI control, admin, backups              |
-| `hybrid`      | API key + username/pass | Everything above, including session WebSocket plus enriched records with maximum controller compatibility       |
+| `session`     | Username + password     | Session HTTP + WebSocket only: events watch, stats, device commands, DPI control, admin, backups             |
+| `hybrid`      | API key + username/pass | Everything above, including session WebSocket plus enriched records with maximum controller compatibility    |
+| `cloud`       | Site Manager API key    | Connector-routed Integration CRUD plus `unifly cloud` fleet commands against `api.ui.com`                    |
 
 Session WebSocket still rejects API keys, so `events watch` needs `session` or
-`hybrid`.
+`hybrid`. Cloud mode does **not** expose Session API endpoints or WebSocket
+streaming.
 
 For the complete command-to-API gate matrix (which commands require which
 auth mode), consult `references/concepts.md`.
@@ -68,34 +80,36 @@ auth mode), consult `references/concepts.md`.
 
 All commands follow `unifly [global-flags] <command> <action> [args]`.
 
-| Command         | Aliases    | Actions                                                                                                        |
-| --------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
-| `devices`       | `dev`, `d` | list, get, adopt, remove, restart, locate, port-cycle, stats, pending, upgrade, provision, speedtest, tags     |
-| `clients`       | `cl`       | list, find, get, roams, wifi, authorize, unauthorize, block, unblock, kick, forget, reservations (`res`), set-ip, remove-ip |
-| `networks`      | `net`, `n` | list, get, create, update, delete, refs                                                                        |
-| `wifi`          | `w`        | list, get, neighbors, channels, create, update, delete                                                        |
-| `firewall`      | `fw`       | policies {list, get, create, update, patch, delete, reorder}, zones {list, get, create, update, delete}        |
-| `nat`           |            | policies {list, get, create, delete}                                                                           |
-| `acl`           |            | list, get, create, update, delete, reorder                                                                     |
-| `dns`           |            | list, get, create, update, delete                                                                              |
-| `traffic-lists` |            | list, get, create, update, delete                                                                              |
-| `hotspot`       |            | list, get, create, delete, purge                                                                               |
-| `events`        |            | list, watch                                                                                                    |
-| `alarms`        |            | list, archive, archive-all                                                                                     |
-| `stats`         |            | site, device, client, gateway, dpi                                                                             |
-| `dpi`           |            | apps, categories, status, enable, disable                                                                      |
-| `topology`      | `topo`     | _(no subcommands)_                                                                                             |
-| `system`        | `sys`      | info, health, sysinfo, backup {create, list, download, delete}, reboot, poweroff                               |
-| `sites`         |            | list, create, delete                                                                                           |
-| `admin`         |            | list, invite, revoke, update                                                                                   |
-| `wans`          |            | list                                                                                                           |
+| Command         | Aliases    | Actions                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `devices`       | `dev`, `d` | list, get, adopt, remove, restart, locate, port-cycle, stats, pending, upgrade, provision, speedtest, tags                                                                                                                                                                                                                                                                                        |
+| `clients`       | `cl`       | list, find, get, roams, wifi, authorize, unauthorize, block, unblock, kick, forget, reservations (`res`), set-ip, remove-ip                                                                                                                                                                                                                                                                       |
+| `cloud`         |            | hosts [get], sites, switch, devices, isp [query], sdwan [get, status]                                                                                                                                                                                                                                                                                                                             |
+| `networks`      | `net`, `n` | list, get, create, update, delete, refs                                                                                                                                                                                                                                                                                                                                                           |
+| `wifi`          | `w`        | list, get, neighbors, channels, create, update, delete                                                                                                                                                                                                                                                                                                                                            |
+| `firewall`      | `fw`       | policies {list, get, create, update, patch, delete, reorder}, zones {list, get, create, update, delete}                                                                                                                                                                                                                                                                                           |
+| `nat`           |            | policies {list, get, create, update, delete}                                                                                                                                                                                                                                                                                                                                                      |
+| `acl`           |            | list, get, create, update, delete, reorder                                                                                                                                                                                                                                                                                                                                                        |
+| `dns`           |            | list, get, create, update, delete                                                                                                                                                                                                                                                                                                                                                                 |
+| `traffic-lists` |            | list, get, create, update, delete                                                                                                                                                                                                                                                                                                                                                                 |
+| `hotspot`       |            | list, get, create, delete, purge                                                                                                                                                                                                                                                                                                                                                                  |
+| `events`        |            | list, watch                                                                                                                                                                                                                                                                                                                                                                                       |
+| `alarms`        |            | list, archive, archive-all                                                                                                                                                                                                                                                                                                                                                                        |
+| `stats`         |            | site, device, client, gateway, dpi                                                                                                                                                                                                                                                                                                                                                                |
+| `dpi`           |            | apps, categories, status, enable, disable                                                                                                                                                                                                                                                                                                                                                         |
+| `topology`      | `topo`     | _(no subcommands)_                                                                                                                                                                                                                                                                                                                                                                                |
+| `system`        | `sys`      | info, health, sysinfo, backup {create, list, download, delete}, reboot, poweroff                                                                                                                                                                                                                                                                                                                  |
+| `settings`      |            | list, get, set, export                                                                                                                                                                                                                                                                                                                                                                            |
+| `sites`         |            | list, create, delete                                                                                                                                                                                                                                                                                                                                                                              |
+| `admin`         |            | list, invite, revoke, update                                                                                                                                                                                                                                                                                                                                                                      |
+| `wans`          |            | list                                                                                                                                                                                                                                                                                                                                                                                              |
 | `vpn`           |            | servers {list, get}, tunnels {list, get}, status, health, site-to-site {list, get, create, update, delete}, remote-access {list, get, create, update, suggest-port, download-config, delete}, clients {list, get, create, update, delete}, connections {list, get, restart}, peers {list, get, create, update, delete, subnets}, magic-site-to-site {list, get}, settings {list, get, set, patch} |
-| `radius`        |            | profiles                                                                                                       |
-| `countries`     |            | _(no subcommands)_                                                                                             |
-| `api`           |            | Raw API passthrough (GET/POST/PUT/PATCH/DELETE any path)                                                       |
-| `config`        |            | init, show, set, profiles, use, set-password                                                                   |
-| `tui`           |            | _(no subcommands)_                                                                                             |
-| `completions`   |            | bash, zsh, fish, powershell, elvish                                                                            |
+| `radius`        |            | profiles                                                                                                                                                                                                                                                                                                                                                                                          |
+| `countries`     |            | _(no subcommands)_                                                                                                                                                                                                                                                                                                                                                                                |
+| `api`           |            | Raw API passthrough (GET/POST/PUT/PATCH/DELETE any path)                                                                                                                                                                                                                                                                                                                                          |
+| `config`        |            | init, cloud-setup, show, set, profiles, use, set-password                                                                                                                                                                                                                                                                                                                                         |
+| `tui`           |            | _(no subcommands)_                                                                                                                                                                                                                                                                                                                                                                                |
+| `completions`   |            | bash, zsh, fish, powershell, elvish                                                                                                                                                                                                                                                                                                                                                               |
 
 For flag details and gotchas, consult `references/commands.md`. Every entity
 command accepts `--help` at runtime as the authoritative reference.
@@ -303,11 +317,14 @@ UNIFI_PROFILE=warehouse unifly system health
    for the TUI.
 3. **`--yes` / `-y`** skips confirmation prompts for mutations. Required for
    non-interactive use.
-4. **Hybrid auth is recommended** even if the task only needs configuration
-   CRUD. Client lists and device stats silently omit fields in
-   integration-only mode because the enrichment happens via the Session API.
-5. **Local controllers only.** unifly targets on-prem controllers. The Site
-   Manager cloud API (`api.ui.com`) is not yet implemented.
+4. **API key mode covers most commands** on UniFi OS, including Session API
+   endpoints (stats, device commands, Wi-Fi observability, client enrichment).
+   Use **Hybrid only when live WebSocket streaming is needed** (`events watch`,
+   TUI live refresh). Client and device enrichment fields work in API key mode.
+5. **Cloud support is Integration-only.** `unifly cloud ...` talks to
+   Site Manager and `auth_mode = "cloud"` routes Integration-backed commands
+   through the connector, but Session-only features still need direct
+   controller access.
 6. **Exit codes are meaningful.** `0` on success, non-zero on error. Capture
    stderr for diagnostics.
 
@@ -342,5 +359,10 @@ UNIFI_PROFILE=warehouse unifly system health
 - **`examples/config.toml`**: Multi-profile config template
 - **`examples/network-iot-vlan.json`**: VLAN creation payload for `--from-file`
 - **`examples/firewall-block-iot.json`**: Firewall policy payload
-- **`examples/nat-masquerade.json`**: NAT policy payload
+- **`examples/nat-masquerade.json`**: NAT masquerade policy payload
+- **`examples/nat-port-forward.json`**: Destination NAT (port forward) payload
 - **`examples/wifi-iot.json`**: WiFi SSID payload
+- **`examples/vpn-remote-access-wireguard.json`**: WireGuard remote-access VPN payload
+- **`examples/vpn-site-to-site-ipsec.json`**: IPsec site-to-site tunnel payload
+- **`examples/vpn-client-openvpn.json`**: OpenVPN client payload
+- **`examples/vpn-wireguard-peer.json`**: WireGuard peer configuration payload
