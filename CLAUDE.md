@@ -13,13 +13,13 @@ Refined homelab infrastructure management (Proxmox, Terraform, Ansible).
 
 Specialized rules:
 
-- **[Ansible](file:///.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
-- **[Terraform](file:///.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
-- **[Gitflow](file:///.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
-- **[Tooling](file:///.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
-- **[RTK](file:///.claude/rules/rtk.md)**: Token-optimized command instructions.
-- **[Memory](file:///MEMORY.md)**: Architectural decisions and tech debt history.
-- **[Issue Tracking](file:///AGENTS.md)**: `bd` (beads) command reference and session landing rules.
+- **[Ansible](.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
+- **[Terraform](.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
+- **[Gitflow](.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
+- **[Tooling](.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
+- **[RTK](.claude/rules/rtk.md)**: Token-optimized command instructions.
+- **[Memory](MEMORY.md)**: Architectural decisions and tech debt history.
+- **[Issue Tracking](AGENTS.md)**: `bd` (beads) command reference and session landing rules.
 
 ## Primary Commands
 
