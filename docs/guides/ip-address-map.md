@@ -21,7 +21,7 @@ Static range: `.1–.49` (reserved for infrastructure)
 | .11 | jetkvm | JetKVM | KVM-over-IP |
 | .12 | plex | Plex LXC | Media server |
 | .21 | tailscale | Tailscale LXC | Subnet router (on tika) |
-| .22 | glance | Glance LXC | Dashboard (on tika) |
+| .22 | glance | Glance LXC *(retiring)* | Migrated to kaz (.10); decommission after kaz verified |
 | .23 | netdata | Netdata LXC | Monitoring (on sturm) |
 | .25 | *(unknown)* | — | DHCP reservation (MAC: 4e:64:17:37:7d:87) |
 | .28 | magius | Machine | Reserved (MAC: f0:d5:bf:35:0d:e0) |

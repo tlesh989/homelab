@@ -150,12 +150,6 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  glance:
-    desc: Run Ansible playbook for Glance host
-    cmds:
-      - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
-
   caddy:
     desc: Run Ansible playbook for Caddy reverse proxy
     cmds:
