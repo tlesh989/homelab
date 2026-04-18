@@ -1,0 +1,20 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Watchtower container
+  community.docker.docker_container:
+    name: watchtower
+    image: "ghcr.io/nicholas-fedor/watchtower:{{ watchtower_version }}"
+    state: started
+    restart_policy: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_SCHEDULE: "{{ watchtower_schedule }}"
+  become: true
+  when: not ansible_check_mode

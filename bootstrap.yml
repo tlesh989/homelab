@@ -1,6 +1,6 @@
 ---
 - name: Bootstrap new servers
-  hosts: all:!truenas:!drizzt
+  hosts: all:!truenas
   gather_facts: false
   ignore_unreachable: true
   tags: [always]

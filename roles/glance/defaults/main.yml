@@ -1,7 +1,4 @@
 ---
-# roles/glance/defaults/main.yml
-
-glance_version: latest
-glance_install_dir: /opt/glance
+glance_version: "0"
 glance_port: 8080
-glance_hostname: glance.dunker-hops.ts.net
+glance_data_dir: /opt/glance
