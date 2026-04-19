@@ -1,0 +1,4 @@
+---
+# Kaz VM
+
+tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
