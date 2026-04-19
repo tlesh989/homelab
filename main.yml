@@ -85,6 +85,12 @@
 - name: setup docker server
   hosts: kaz
   become: true
+  pre_tasks:
+    - name: Enable and start qemu-guest-agent
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        state: started
+        enabled: true
   roles:
     - role: ansible_user
     - role: packages
