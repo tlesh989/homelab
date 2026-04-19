@@ -1,4 +1,0 @@
----
-ansible_host: "{{ lookup('env', 'DRIZZT_ANSIBLE_HOST') }}"
-tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
-tailscale_args: "--ssh"

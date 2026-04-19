@@ -42,4 +42,4 @@
     regexp: "^#?PermitRootLogin"
     line: "PermitRootLogin no"
     state: present
-  notify: Restart sshd
+  notify: Restart ssh

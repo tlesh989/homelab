@@ -31,6 +31,10 @@ resource "proxmox_virtual_environment_vm" "kaz" {
   }
 
   initialization {
+    dns {
+      domain  = "tlesh.xyz"
+      servers = ["1.1.1.1"]
+    }
     ip_config {
       ipv4 {
         address = "192.168.233.10/24"
