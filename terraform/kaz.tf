@@ -40,8 +40,8 @@ resource "proxmox_virtual_environment_vm" "kaz" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.BOOTSTRAP_PASS
-      username = data.doppler_secrets.this.map.SSH_USER
+      password = data.doppler_secrets.this.map.ROOT_PASSWORD
+      username = "root"
     }
   }
 

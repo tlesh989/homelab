@@ -1,5 +1,5 @@
 resource "proxmox_virtual_environment_container" "netdata" {
-  node_name    = "sturm"
+  node_name    = "tika"
   vm_id        = 105
   unprivileged = true
 

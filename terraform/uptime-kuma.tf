@@ -1,5 +1,5 @@
 resource "proxmox_virtual_environment_container" "uptime_kuma" {
-  node_name    = "sturm"
+  node_name    = "bupu"
   vm_id        = 116
   unprivileged = true
 
