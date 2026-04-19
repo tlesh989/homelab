@@ -5,45 +5,50 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
-- name: Remove Proxmox enterprise repo from apt
-  loop:
-    - /etc/apt/sources.list.d/pve-enterprise.list
-    - /etc/apt/sources.list.d/pve-enterprise.list.dpkg-dist
-    - /etc/apt/sources.list.d/pve-enterprise.sources
-    - /etc/apt/sources.list.d/ceph.list
-    - /etc/apt/sources.list.d/ceph.sources
-    - /etc/apt/sources.list.d/proxmox.sources
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: absent
+- name: Manage Legacy Proxmox Repositories
+  when: not (proxmox_migrate_to_deb822 | bool)
+  block:
+    - name: Remove Proxmox enterprise repo from apt
+      loop:
+        - /etc/apt/sources.list.d/pve-enterprise.list
+        - /etc/apt/sources.list.d/pve-enterprise.list.dpkg-dist
+        - /etc/apt/sources.list.d/pve-enterprise.sources
+        - /etc/apt/sources.list.d/ceph.list
+        - /etc/apt/sources.list.d/ceph.sources
+        - /etc/apt/sources.list.d/proxmox.sources
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
 
-- name: Variabilize Proxmox no-sub repo
-  ansible.builtin.set_fact:
-    proxmox_no_sub_repo: pve-install-repo
+    - name: Variabilize Proxmox no-sub repo
+      ansible.builtin.set_fact:
+        proxmox_no_sub_repo: pve-install-repo
 
-- name: Add Proxmox VE no subscription repo
-  ansible.builtin.apt_repository:
-    filename: "{{ proxmox_no_sub_repo }}"
-    repo: >-
-      deb http://download.proxmox.com/debian/pve
-        {{ ansible_facts.distribution_release }} pve-no-subscription
-    state: present
+    - name: Add Proxmox VE no subscription repo
+      ansible.builtin.apt_repository:
+        filename: "{{ proxmox_no_sub_repo }}"
+        repo: >-
+          deb http://download.proxmox.com/debian/pve
+            {{ ansible_facts.distribution_release }} pve-no-subscription
+        state: present
 
-- name: Find Proxmox VE no sub repos for older distributions
-  ansible.builtin.command:
-    cmd: >-
-      grep -v {{ ansible_facts.distribution_release }}
-        /etc/apt/sources.list.d/{{ proxmox_no_sub_repo }}.list
-  register: proxmox_old_repos
-  changed_when: false
-  failed_when: false
+    - name: Find Proxmox VE no sub repos for older distributions
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail &&
+          grep -E '^\s*deb\s+' /etc/apt/sources.list.d/{{ proxmox_no_sub_repo }}.list |
+          grep -v {{ ansible_facts.distribution_release }} || true
+        executable: /bin/bash
+      register: proxmox_old_repos
+      changed_when: false
+      failed_when: false
 
-- name: Remove Proxmox VE no subscription repo for older distributions
-  loop: "{{ proxmox_old_repos.stdout_lines }}"
-  ansible.builtin.apt_repository:
-    filename: "{{ proxmox_no_sub_repo }}"
-    repo: "{{ item }}"
-    state: absent
+    - name: Remove Proxmox VE no subscription repo for older distributions
+      loop: "{{ proxmox_old_repos.stdout_lines }}"
+      ansible.builtin.apt_repository:
+        filename: "{{ proxmox_no_sub_repo }}"
+        repo: "{{ item }}"
+        state: absent
 
 - name: Add proxmoxlib.js path to variable
   ansible.builtin.set_fact:
@@ -155,7 +160,7 @@
       length > 0
   ansible.builtin.lineinfile:
     path: /etc/default/grub
-    search_string: GRUB_CMDLINE_LINUX
+    regexp: "^GRUB_CMDLINE_LINUX=.*$"
     line: 'GRUB_CMDLINE_LINUX="processor.max_cstate=1 amd_idle.max_cstate=1"'
     state: present
   notify: Update grub

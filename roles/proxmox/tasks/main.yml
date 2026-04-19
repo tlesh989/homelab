@@ -42,15 +42,17 @@
       /bin/mkdir -p /etc/pve/local,
       /bin/mv /tmp/acme-fullchain.pem /etc/pve/local/pveproxy-ssl.pem,
       /bin/mv /tmp/acme-privkey.pem /etc/pve/local/pveproxy-ssl.key,
-      /bin/chown root:root /etc/pve/local/pveproxy-ssl.pem,
-      /bin/chown root:root /etc/pve/local/pveproxy-ssl.key,
+      /bin/chown root\:root /etc/pve/local/pveproxy-ssl.pem,
+      /bin/chown root\:root /etc/pve/local/pveproxy-ssl.key,
       /bin/chmod 640 /etc/pve/local/pveproxy-ssl.pem,
       /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key,
       /bin/systemctl restart pveproxy
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/92-pveproxy-cert-refresh
+    regexp: "^{{ ansible_user | regex_escape }} ALL="
     line: "{{ _sudo_rule }}"
     create: true
     mode: "0440"
+    validate: visudo -cf %s
   become: true
   when: ansible_user is defined and ansible_user != "root"
