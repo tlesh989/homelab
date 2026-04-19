@@ -41,7 +41,7 @@ tasks:
   setup:
     desc: Write ansible SSH private key from Doppler to ~/.ssh/ansible_ed25519 (run once per machine)
     cmds:
-      - doppler run -- sh -c 'mkdir -p ~/.ssh && printf "%s" "$ANSIBLE_SSH_PRIVATE_KEY" > ~/.ssh/ansible_ed25519 && chmod 600 ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
+      - doppler run -- sh -c 'test -n "$ANSIBLE_SSH_PRIVATE_KEY" || { echo "ANSIBLE_SSH_PRIVATE_KEY missing" >&2; exit 1; } && mkdir -p ~/.ssh && printf "%s\n" "$ANSIBLE_SSH_PRIVATE_KEY" | install -m 600 /dev/stdin ~/.ssh/ansible_ed25519' # noqa yaml[line-length]
 
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
@@ -150,12 +150,6 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "uptime-kuma", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  glance:
-    desc: Run Ansible playbook for Glance host
-    cmds:
-      - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "glance", CLI_ARGS: "{{.CLI_ARGS}}" }
-
   caddy:
     desc: Run Ansible playbook for Caddy reverse proxy
     cmds:
@@ -168,11 +162,11 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  ollama:
-    desc: Deploy Ollama local LLM on XPS laptop
+  kaz:
+    desc: Deploy kaz Docker host (glance, n8n, watchtower)
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "drizzt", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts

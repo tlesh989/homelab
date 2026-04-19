@@ -15,7 +15,7 @@ resource "proxmox_virtual_environment_container" "arr" {
 
   disk {
     datastore_id = "vm_data"
-    size         = 100
+    size         = 200
   }
 
   initialization {

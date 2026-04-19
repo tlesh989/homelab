@@ -41,12 +41,12 @@ No modules.
 | [proxmox_storage_nfs.proxmox_nfs](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/storage_nfs) | resource |
 | [proxmox_virtual_environment_container.arr](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.caddy](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
-| [proxmox_virtual_environment_container.glance](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.netdata](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.uptime_kuma](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_vm.kaz](https://registry.terraform.io/providers/bpg/proxmox/0.101.1/docs/resources/virtual_environment_vm) | resource |
 | [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.2/docs/data-sources/secrets) | data source |
 
 ## Inputs

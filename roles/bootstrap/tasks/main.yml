@@ -34,7 +34,7 @@
     regexp: "^#?PasswordAuthentication"
     line: "PasswordAuthentication no"
     state: present
-  notify: Restart sshd
+  notify: Restart ssh
 
 - name: Disable SSH root login
   ansible.builtin.lineinfile:
@@ -42,4 +42,4 @@
     regexp: "^#?PermitRootLogin"
     line: "PermitRootLogin no"
     state: present
-  notify: Restart sshd
+  notify: Restart ssh

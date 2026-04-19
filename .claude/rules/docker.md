@@ -17,7 +17,7 @@
 - Always pipe values through `| string` in Jinja2 to avoid type coercion errors:
   ```yaml
   env:
-    PORT: "{{ open_webui_port | string }}"
+    PORT: "{{ service_port | string }}"  # replace with your role variable (e.g., n8n_port, glance_port)
   ```
 
 ## New Service Checklist

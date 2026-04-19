@@ -1,5 +1,0 @@
----
-# Glance LXC container
-# Inherits base package list and NTP config from group_vars/lxc.yml
-
-tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"

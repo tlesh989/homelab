@@ -1,0 +1,5 @@
+---
+n8n_version: "1"
+n8n_port: 5678
+n8n_data_path: /opt/n8n/data
+n8n_host: "n8n.tlesh.xyz"

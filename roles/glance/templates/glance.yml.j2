@@ -77,6 +77,8 @@ pages:
                 collapse-after: 7
                 # Note: Anthropic RSS omitted — returned 404 during URL verification
                 feeds:
+                  - url: https://hackernoon.com/feed
+                    title: Hacker Noon
                   - url: https://www.theverge.com/rss/index.xml
                     title: The Verge
                   - url: https://simonwillison.net/atom/everything/
@@ -85,15 +87,15 @@ pages:
                     title: Latent Space
 
               - type: rss
-                title: Gaming
+                title: Lifehacker
                 style: vertical-list
                 cache: 2h
                 limit: 15
                 collapse-after: 7
                 # Note: IGN omitted — returned 501 during URL verification
                 feeds:
-                  - url: https://www.pcgamer.com/rss/
-                    title: PC Gamer
+                  - url: https://www.lifehacker.com/software/top/atom.xml
+                    title: Lifehacker
 
               - type: rss
                 title: DIY & Making
@@ -109,7 +111,7 @@ pages:
                     title: Make Magazine
 
           - type: rss
-            title: Deals & Outdoor
+            title: Outdoor
             style: vertical-list
             cache: 1h
             limit: 15
@@ -205,14 +207,17 @@ pages:
             cache: 1m
             sites:
               - title: tika
-                url: https://tika.tlesh.xyz:8006
+                url: https://{{ hostvars['tika.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
+                allow-insecure: true
               - title: bupu
-                url: https://bupu.tlesh.xyz:8006
+                url: https://{{ hostvars['bupu.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
+                allow-insecure: true
               - title: sturm
-                url: https://sturm.tlesh.xyz:8006
+                url: https://{{ hostvars['sturm.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
+                allow-insecure: true
               - title: TrueNAS
                 url: https://{{ hostvars['ansalon'].ansible_host }}
                 icon: si:truenas
@@ -221,11 +226,14 @@ pages:
                 url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
                 icon: si:uptimekuma
               - title: Netdata
-                url: https://netdata.tlesh.xyz:19999
+                url: https://netdata.tlesh.xyz
                 icon: si:netdata
               - title: Pi-hole
                 url: https://pihole.tlesh.xyz/admin
                 icon: si:pihole
+              - title: n8n
+                url: https://n8n.tlesh.xyz
+                icon: si:n8n
               - title: Seerr
                 url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:5055
                 icon: si:seerr
@@ -251,11 +259,11 @@ pages:
           - type: custom-api
             title: Netdata
             cache: 1m
-            url: https://netdata.tlesh.xyz:19999/api/v1/info
+            url: https://netdata.tlesh.xyz/api/v1/info
             template: |
               {% raw %}<div class="flex gap-2 items-center">
                 {{ $nodes := .JSON.Array "mirrored_hosts" }}
-                <span>{{ len $nodes }} nodes monitored</span>
+                <span>{{ len $nodes }} nodes monitored | </span>
                 {{ if gt (.JSON.Int "alarms.critical") 0 }}
                 <span class="color-negative">{{ .JSON.Int "alarms.critical" }} critical</span>
                 {{ else if gt (.JSON.Int "alarms.warning") 0 }}

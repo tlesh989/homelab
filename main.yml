@@ -89,12 +89,14 @@
     - role: ansible_user
     - role: packages
     - role: users
-    - role: weareinteractive.environment
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: geerlingguy.docker
-    - role: geerlingguy.pip
-    - role: shelleg.ansible_role_portainer
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: watchtower
+    - role: glance
+    - role: n8n
 
 - name: setup plex server
   hosts: plex
@@ -106,19 +108,6 @@
     - role: geerlingguy.ntp
     - role: geerlingguy.security
     - role: plex
-
-- name: setup glance server
-  hosts: glance
-  become: true
-  roles:
-    - role: ansible_user
-    - role: packages
-    - role: geerlingguy.ntp
-    - role: geerlingguy.security
-    - role: artis3n.tailscale.machine
-      when: not ansible_check_mode
-    - role: users
-    - role: glance
 
 - name: setup netdata parent
   hosts: netdata
@@ -173,14 +162,3 @@
     - role: ansible_user
     - role: packages
     - role: uptime_kuma
-
-- name: setup xps laptop (local LLM host)
-  hosts: drizzt
-  become: true
-  roles:
-    - role: ansible_user
-    - role: packages
-    - role: geerlingguy.docker
-    - role: artis3n.tailscale.machine
-      when: not ansible_check_mode
-    - role: ollama
