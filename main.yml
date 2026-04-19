@@ -86,6 +86,10 @@
   hosts: kaz
   become: true
   pre_tasks:
+    - name: Install qemu-guest-agent
+      ansible.builtin.package:
+        name: qemu-guest-agent
+        state: present
     - name: Enable and start qemu-guest-agent
       ansible.builtin.service:
         name: qemu-guest-agent
