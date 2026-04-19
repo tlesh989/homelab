@@ -42,8 +42,8 @@
       /bin/mkdir -p /etc/pve/local,
       /bin/mv /tmp/acme-fullchain.pem /etc/pve/local/pveproxy-ssl.pem,
       /bin/mv /tmp/acme-privkey.pem /etc/pve/local/pveproxy-ssl.key,
-      /bin/chown root:root /etc/pve/local/pveproxy-ssl.pem,
-      /bin/chown root:root /etc/pve/local/pveproxy-ssl.key,
+      /bin/chown root\:root /etc/pve/local/pveproxy-ssl.pem,
+      /bin/chown root\:root /etc/pve/local/pveproxy-ssl.key,
       /bin/chmod 640 /etc/pve/local/pveproxy-ssl.pem,
       /bin/chmod 640 /etc/pve/local/pveproxy-ssl.key,
       /bin/systemctl restart pveproxy
