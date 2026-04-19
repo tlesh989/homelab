@@ -40,14 +40,13 @@ resource "proxmox_virtual_environment_vm" "kaz" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.PM_API_PASSWORD
-      username = "ubuntu"
+      password = data.doppler_secrets.this.map.BOOTSTRAP_PASS
+      username = data.doppler_secrets.this.map.SSH_USER
     }
   }
 
   network_device {
     bridge      = "vmbr0"
-    enabled     = true
     firewall    = true
     mac_address = "BC:24:11:10:00:01"
   }
@@ -60,7 +59,7 @@ resource "proxmox_virtual_environment_vm" "kaz" {
 
   lifecycle {
     ignore_changes = [
-      initialization[0].user_account,
+      node_name,
       disk[0].file_id,
     ]
   }
