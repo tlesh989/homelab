@@ -5,7 +5,7 @@
     state: directory
     owner: "1000"
     group: "1000"
-    mode: "0755"
+    mode: "0700"
   become: true
 
 - name: Install Docker Python SDK
@@ -26,7 +26,7 @@
       - "{{ n8n_data_path }}:/home/node/.n8n"
     env:
       N8N_HOST: "{{ n8n_host }}"
-      N8N_PORT: "{{ n8n_port | string }}"
+      N8N_PORT: "5678"
       N8N_PROTOCOL: "https"
       WEBHOOK_URL: "https://{{ n8n_host }}/"
   become: true

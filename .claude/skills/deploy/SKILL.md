@@ -4,7 +4,7 @@ description: "Run Ansible playbook with dry-run verification first"
 user-invocable: true
 arguments:
   - name: target
-    description: "Host group to deploy to (proxmox, tailscale, plex, kaz, arr)"
+    description: "Host group to deploy to (proxmox, tailscale, plex, kaz, arr, truenas, netdata, uptime-kuma, caddy, pi-hole)"
     required: true
 ---
 
@@ -14,7 +14,7 @@ Run a safe two-step deploy: dry-run first, then apply only if the user confirms.
 
 ## Steps
 
-1. Validate that `{{target}}` is one of: proxmox, tailscale, plex, kaz, arr
+1. Validate that `{{target}}` is one of: proxmox, tailscale, plex, kaz, arr, truenas, netdata, uptime-kuma, caddy, pi-hole
 2. Run `task {{target}} -- --check` to perform a dry-run
 3. Show the user the output and ask for explicit confirmation before proceeding
 4. Only if the user confirms, run `task {{target}}` to apply

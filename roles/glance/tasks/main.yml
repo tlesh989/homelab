@@ -29,6 +29,6 @@
     ports:
       - "{{ glance_port | string }}:{{ glance_port | string }}"
     volumes:
-      - "{{ glance_data_dir }}/glance.yml:/app/glance.yml:ro"
+      - "{{ glance_data_dir }}:/app/config:ro"
   become: true
   when: not ansible_check_mode

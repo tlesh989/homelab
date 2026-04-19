@@ -94,7 +94,7 @@ pages:
                 collapse-after: 7
                 # Note: IGN omitted — returned 501 during URL verification
                 feeds:
-                  - url: http://www.lifehacker.com/software/top/atom.xml
+                  - url: https://www.lifehacker.com/software/top/atom.xml
                     title: Lifehacker
 
               - type: rss
@@ -207,15 +207,15 @@ pages:
             cache: 1m
             sites:
               - title: tika
-                url: https://192.168.233.7:8006
+                url: https://{{ hostvars['tika.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
                 allow-insecure: true
               - title: bupu
-                url: https://192.168.233.8:8006
+                url: https://{{ hostvars['bupu.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
                 allow-insecure: true
               - title: sturm
-                url: https://192.168.233.9:8006
+                url: https://{{ hostvars['sturm.tlesh.xyz'].ansible_host }}:8006
                 icon: si:proxmox
                 allow-insecure: true
               - title: TrueNAS
