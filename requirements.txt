@@ -1,2 +1,3 @@
 ansible
 ansible-lint
+truenas-api-client @ git+https://github.com/truenas/api_client.git@8c59978c3bf6c4e38271363907ec46e9b7f10abf
