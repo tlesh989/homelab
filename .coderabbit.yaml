@@ -20,6 +20,7 @@ reviews:
     - "!galaxy_roles/**"
     - "!terraform/.terraform/**"
     - "!terraform/tfplan.out"
+    - "!.agent/**"
     - "!.agents/**"
     - "!.claude/**"
     - "!.rtk/**"
@@ -31,7 +32,7 @@ reviews:
     - "!**/*.tfstate"
     - "!**/*.tfstate.backup"
 
-  # Static analysis tools — mirror what pre-commit enforces
+  # Static analysis tools — supplement pre-commit with additional checks
   tools:
     yamllint:
       enabled: true
@@ -59,7 +60,7 @@ reviews:
         - Prefer `ansible.builtin.*` FQCN for all core modules.
         - File/dir tasks that set `owner`/`group` must use `ansible_user` or `root`, not bare strings.
         - Tasks writing to `/etc/sudoers.d/` MUST include `validate: visudo -cf %s`.
-        - Handlers must have `listen:` labels; ensure corresponding `notify:` calls match exactly.
+        - Each `notify:` must resolve to a handler `name:` or `listen:` label exactly.
         - Secrets must never be hardcoded — flag any literal passwords, tokens, or keys.
         - Prefer `lineinfile`/`blockinfile` with `regexp:` + `validate:` over raw `shell` for config edits.
         - Service tasks should use `ansible.builtin.systemd` with `daemon_reload: true` where appropriate.
@@ -75,7 +76,7 @@ reviews:
     - path: "roles/*/handlers/**"
       instructions: |
         Handler review:
-        - Each handler must have a `listen:` label matching the `notify:` string in tasks.
+        - Each handler must be reachable by an exact `notify:` match against its `name:` or `listen:` label.
         - Handlers restarting services should use `ansible.builtin.systemd` with `state: restarted`.
         - Handlers that touch files requiring root MUST include `become: true`.
 
@@ -86,7 +87,7 @@ reviews:
         - Validate that variable names follow `snake_case`.
         - Flag any `vault_*` prefixed vars that appear unencrypted.
 
-    - path: "*.yml"
+    - path: "[a-z]*.yml"
       instructions: |
         Playbook review:
         - Ensure `hosts:` targets are explicit (avoid bare `all` without justification).
