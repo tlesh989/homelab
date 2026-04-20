@@ -1,0 +1,168 @@
+---
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "assertive" # Stricter: this is our gatekeeper
+  request_changes_workflow: true # Block merges on issues
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Exclude vendor/generated/agent directories from review
+  path_filters:
+    - "!galaxy_roles/**"
+    - "!terraform/.terraform/**"
+    - "!terraform/tfplan.out"
+    - "!.agents/**"
+    - "!.claude/**"
+    - "!.rtk/**"
+    - "!.serena/**"
+    - "!.superpowers/**"
+    - "!.beads/**"
+    - "!.opencode/**"
+    - "!.openpackage/**"
+    - "!**/*.tfstate"
+    - "!**/*.tfstate.backup"
+
+  # Static analysis tools — mirror what pre-commit enforces
+  tools:
+    yamllint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    hadolint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    checkov:
+      enabled: true
+    markdownlint:
+      enabled: true
+    actionlint:
+      enabled: true
+    trivy:
+      enabled: true
+
+  path_instructions:
+    # ── Ansible ───────────────────────────────────────────────────────────
+    - path: "roles/**"
+      instructions: |
+        Ansible role review — enforce these rules strictly:
+        - Every `shell`/`command` task MUST have a `changed_when` condition. Flag unconditionally changed tasks.
+        - Prefer `ansible.builtin.*` FQCN for all core modules.
+        - File/dir tasks that set `owner`/`group` must use `ansible_user` or `root`, not bare strings.
+        - Tasks writing to `/etc/sudoers.d/` MUST include `validate: visudo -cf %s`.
+        - Handlers must have `listen:` labels; ensure corresponding `notify:` calls match exactly.
+        - Secrets must never be hardcoded — flag any literal passwords, tokens, or keys.
+        - Prefer `lineinfile`/`blockinfile` with `regexp:` + `validate:` over raw `shell` for config edits.
+        - Service tasks should use `ansible.builtin.systemd` with `daemon_reload: true` where appropriate.
+
+    - path: "roles/*/tasks/**"
+      instructions: |
+        Task file specifics:
+        - All tasks must have a `name:` field — descriptive and action-oriented.
+        - Avoid `ignore_errors: true` unless paired with explicit error handling on subsequent tasks.
+        - `when:` conditions should reference defined variables; flag undefined-variable risks.
+        - Check `become: true` is present on tasks that modify system state.
+
+    - path: "roles/*/handlers/**"
+      instructions: |
+        Handler review:
+        - Each handler must have a `listen:` label matching the `notify:` string in tasks.
+        - Handlers restarting services should use `ansible.builtin.systemd` with `state: restarted`.
+        - Handlers that touch files requiring root MUST include `become: true`.
+
+    - path: "group_vars/**"
+      instructions: |
+        Group vars review:
+        - No secrets or tokens in plaintext — all sensitive values must use Doppler variable references.
+        - Validate that variable names follow `snake_case`.
+        - Flag any `vault_*` prefixed vars that appear unencrypted.
+
+    - path: "*.yml"
+      instructions: |
+        Playbook review:
+        - Ensure `hosts:` targets are explicit (avoid bare `all` without justification).
+        - Verify `become: true` is set at the play or task level as appropriate.
+        - Confirm role references exist in `roles/` or `galaxy_roles/`.
+
+    - path: "bootstrap.yml"
+      instructions: |
+        Bootstrap playbook — extra scrutiny:
+        - Must be idempotent on re-runs against already-bootstrapped hosts.
+        - SSH and sudo configuration tasks must be resilient to partially bootstrapped state.
+
+    # ── Terraform ─────────────────────────────────────────────────────────
+    - path: "terraform/**/*.tf"
+      instructions: |
+        Terraform review — IaC safety rules:
+        - Resource names must follow `snake_case` and include the environment or purpose in the name.
+        - All Proxmox LXC/VM resources must specify explicit `cpu`, `memory`, and `disk` values — no defaults.
+        - `tags` or equivalent labels should be present on all resources for inventory traceability.
+        - Sensitive outputs must use `sensitive = true`.
+        - No hardcoded IPs, passwords, or tokens — reference Doppler-injected variables via `var.*`.
+        - Flag any `lifecycle { prevent_destroy = false }` on critical infrastructure resources.
+        - `depends_on` should be justified in a comment if used; implicit dependencies preferred.
+        - Review provider version constraints in `versions.tf` — flag unconstrained `>=` without upper bound.
+
+    - path: "terraform/variables.tf"
+      instructions: |
+        All variables must have a `description` field. Sensitive variables must set `sensitive = true`.
+
+    - path: "terraform/versions.tf"
+      instructions: |
+        Provider version constraints should pin at least the minor version (e.g., `~> 1.2`).
+        Flag any `source` using an unofficial or unverified registry path.
+
+    # ── Docker ────────────────────────────────────────────────────────────
+    - path: "Dockerfile"
+      instructions: |
+        Dockerfile review:
+        - Base image must be pinned to a specific tag or digest — no `latest`.
+        - Minimize layer count by chaining `RUN` commands with `&&`.
+        - Non-root USER must be set before CMD/ENTRYPOINT.
+        - No secrets in ENV or ARG that are visible in the final image.
+        - COPY preferred over ADD unless extracting archives.
+
+    # ── Shell Scripts ─────────────────────────────────────────────────────
+    - path: "**/*.sh"
+      instructions: |
+        Shell script review:
+        - Must start with `#!/usr/bin/env bash` or `#!/bin/bash`.
+        - `set -euo pipefail` (or equivalent) required at the top.
+        - Flag any command that could silently fail without error checking.
+        - Non-interactive flags required for package managers (e.g., `apt-get -y`, `cp -f`).
+
+    # ── CI / GitHub Actions ───────────────────────────────────────────────
+    - path: ".github/**"
+      instructions: |
+        GitHub Actions review:
+        - Pin all third-party actions to a full commit SHA, not a tag.
+        - Secrets must be injected via `${{ secrets.* }}` — never hardcoded.
+        - Workflows touching infrastructure (Terraform/Ansible) must require manual approval for `main`.
+        - Flag `permissions: write-all` — use least-privilege permissions instead.
+
+    # ── Taskfile ──────────────────────────────────────────────────────────
+    - path: "Taskfile.yml"
+      instructions: |
+        Taskfile review:
+        - Each task must have `desc:` set.
+        - Tasks invoking Ansible or Terraform should run through Doppler: `doppler run -- <cmd>`.
+        - Destructive tasks (destroy, reset) must include a confirmation prompt or `--force` guard.
+
+    # ── Documentation ─────────────────────────────────────────────────────
+    - path: "**/*.md"
+      instructions: |
+        - Check for accuracy against the actual codebase structure.
+        - Flag references to roles, files, or commands that no longer exist.
+        - Verify code blocks use correct language identifiers for syntax highlighting.
+
+chat:
+  auto_reply: true
