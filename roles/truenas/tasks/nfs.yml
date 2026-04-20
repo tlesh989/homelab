@@ -1,54 +1,107 @@
 ---
 # tasks file for truenas — NFS share management
 
+- name: Get existing datasets
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.dataset.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_datasets
+  changed_when: false
+  no_log: true
+
 - name: Create media dataset
-  ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/pool/dataset"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ truenas_api_key }}"
-    body_format: json
-    body:
-      name: "{{ item.dataset }}"
-      type: "FILESYSTEM"
-      comments: "{{ item.comment }}"
-    status_code: [200, 422]
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.dataset.create
+    params:
+      - name: "{{ item.dataset }}"
+        type: "FILESYSTEM"
+        comments: "{{ item.comment }}"
     validate_certs: "{{ truenas_validate_certs }}"
   loop: "{{ truenas_nfs_shares }}"
   loop_control:
     label: "{{ item.dataset }}"
+  when: >-
+    _truenas_datasets.result
+    | selectattr('name', 'equalto', item.dataset)
+    | list | length == 0
+  changed_when: true
+  no_log: true
+
+- name: Get existing NFS shares
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: sharing.nfs.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_nfs_shares
+  changed_when: false
   no_log: true
 
 - name: Create NFS share
-  ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/sharing/nfs"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ truenas_api_key }}"
-    body_format: json
-    body:
-      path: "/mnt/{{ item.dataset }}"
-      comment: "{{ item.comment }}"
-      hosts: "{{ item.hosts }}"
-      maproot_user: "{{ item.maproot_user }}"
-      maproot_group: "{{ item.maproot_group }}"
-      enabled: true
-    status_code: [200, 422]
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: sharing.nfs.create
+    params:
+      - paths:
+          - "/mnt/{{ item.dataset }}"
+        comment: "{{ item.comment }}"
+        hosts: "{{ item.hosts }}"
+        maproot_user: "{{ item.maproot_user }}"
+        maproot_group: "{{ item.maproot_group }}"
+        enabled: true
     validate_certs: "{{ truenas_validate_certs }}"
   loop: "{{ truenas_nfs_shares }}"
   loop_control:
     label: "{{ item.dataset }}"
+  when: >-
+    _truenas_nfs_shares.result
+    | selectattr('comment', 'equalto', item.comment)
+    | list | length == 0
+  changed_when: true
   no_log: true
 
-- name: Ensure NFS service is running
-  ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/service/start"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ truenas_api_key }}"
-    body_format: json
-    body:
-      service: "nfs"
-    status_code: [200]
+- name: Get NFS service state
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.query
     validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_nfs_service_state
+  changed_when: false
+  no_log: true
+
+- name: Enable NFS service at boot
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.update
+    params:
+      - "nfs"
+      - enable: true
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: >-
+    not (_truenas_nfs_service_state.result
+    | selectattr('service', 'equalto', 'nfs')
+    | list | first).enable
+  changed_when: true
+  no_log: true
+
+- name: Start NFS service if not running
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.start
+    params:
+      - "nfs"
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: >-
+    (_truenas_nfs_service_state.result
+    | selectattr('service', 'equalto', 'nfs')
+    | list | first).state != "RUNNING"
+  changed_when: true
   no_log: true

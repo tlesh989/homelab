@@ -2,16 +2,12 @@
 # handlers file for truenas
 
 - name: Start iSCSI service
-  ansible.builtin.uri:
-    url: "{{ truenas_api_url }}/service/start"
-    method: POST
-    headers:
-      Authorization: "Bearer {{ truenas_api_key }}"
-      Content-Type: "application/json"
-    body_format: json
-    body:
-      service: "iscsitarget"
-    status_code: [200, 201]
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.start
+    params:
+      - "iscsitarget"
     validate_certs: "{{ truenas_validate_certs }}"
-  no_log: true
   changed_when: true
+  no_log: true
