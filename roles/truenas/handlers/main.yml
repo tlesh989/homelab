@@ -1,13 +1,2 @@
 ---
 # handlers file for truenas
-
-- name: Start iSCSI service
-  truenas_api:
-    host: "{{ truenas_host }}"
-    api_key: "{{ truenas_api_key }}"
-    method: service.start
-    params:
-      - "iscsitarget"
-    validate_certs: "{{ truenas_validate_certs }}"
-  changed_when: true
-  no_log: true

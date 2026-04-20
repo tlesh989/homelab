@@ -112,11 +112,11 @@
     method: iscsi.target.update
     params:
       - "{{ _truenas_target_id | int }}"
-      - groups:
-          - portal: "{{ _truenas_portal_id | int }}"
-            initiator:
-            auth:
-            authmethod: "NONE"
+      - groups: >-
+          {{
+            ((_truenas_target_detail.result | default([]) | first | default({})).groups | default([]))
+            + [{'portal': (_truenas_portal_id | int), 'initiator': none, 'auth': none, 'authmethod': 'NONE'}]
+          }}
     validate_certs: "{{ truenas_validate_certs }}"
   when: >-
     (_truenas_target_detail.result | default([]) | first | default({}) ).groups | default([])
@@ -232,7 +232,6 @@
     | selectattr('service', 'equalto', 'iscsitarget')
     | list | first).enable
   changed_when: true
-  notify: Start iSCSI service
   no_log: true
 
 - name: Start iSCSI service if not running

@@ -3,8 +3,6 @@
 
 # TrueNAS host (hostname or IP — accessible from Ansible controller)
 truenas_host: "192.168.233.6"
-# Pin to the tag matching your TrueNAS server version — update when upgrading TrueNAS
-truenas_api_version: "TS-25.10.3"
 # TrueNAS API key — injected from Doppler as TRUENAS_API_KEY
 truenas_api_key: "{{ lookup('env', 'TRUENAS_API_KEY') }}"
 
