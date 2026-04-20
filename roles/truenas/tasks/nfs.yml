@@ -75,6 +75,12 @@
   changed_when: false
   no_log: true
 
+- name: Assert NFS service entry exists in TrueNAS
+  ansible.builtin.assert:
+    that:
+      - _truenas_nfs_service_state.result | selectattr('service', 'equalto', 'nfs') | list | length > 0
+    fail_msg: "'nfs' service not found in TrueNAS service list — check TrueNAS version/config"
+
 - name: Enable NFS service at boot
   truenas_api:
     host: "{{ truenas_host }}"
