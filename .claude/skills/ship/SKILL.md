@@ -161,18 +161,6 @@ PR base is always `main`.
 🤖 Generated with [OpenCode](https://opencode.ai)
 ```
 
-## Post-PR: Copilot Review
-
-After creating the PR, poll for the Copilot review:
-
-- Extract PR number from `gh pr create` output
-- Poll `gh api repos/tlesh989/homelab/pulls/<PR>/reviews` every 15 seconds (up to 3 minutes) until a `Copilot` review appears
-- Fetch inline comments: `gh api repos/tlesh989/homelab/pulls/<PR>/comments`
-- Display feedback grouped by file
-- Triage: apply valid issues, skip style preferences or YAGNI suggestions
-- Fix, commit, and push any accepted changes before declaring done
-- If no Copilot review after 3 minutes: move on
-
 ## Commit Message Format
 
 ```text
