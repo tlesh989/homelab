@@ -43,7 +43,7 @@ resource "proxmox_virtual_environment_container" "arr" {
 
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      password = data.doppler_secrets.this.map.PM_API_PASSWORD
+      password = data.doppler_secrets.this.map.ROOT_PASSWORD
     }
   }
 
