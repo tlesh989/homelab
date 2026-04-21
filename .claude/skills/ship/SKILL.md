@@ -158,7 +158,7 @@ PR base is always `main`.
 
 - [ ] <verification step>
 
-🤖 Generated with [OpenCode](https://opencode.ai)
+🤖 Generated with [Claude Code](https://claude.ai/code)
 ```
 
 ## Commit Message Format
@@ -168,7 +168,7 @@ PR base is always `main`.
 
 <bullet points of what changed>
 
-Co-Authored-By: OpenCode Agent <noreply@opencode.ai>
+Co-Authored-By: Claude Code <noreply@anthropic.com>
 ```
 
 Types: `feat`, `fix`, `chore`, `refactor`, `docs`
