@@ -70,7 +70,7 @@ def main():
 
     try:
         with Client(uri=uri, verify_ssl=validate_certs) as c:
-            c.login_with_api_key(api_key)
+            c.call('auth.login_with_api_key', api_key)
             result = c.call(method, *params)
     except Exception as e:
         module.fail_json(msg=f"TrueNAS API call '{method}' failed: {e}")
