@@ -23,6 +23,26 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "(Edit|Write).*\\.ya?ml",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; case \"$file\" in */roles/*|*/group_vars/*|*/host_vars/*|*/playbooks/*|*/tasks/*|*/handlers/*|*/defaults/*) ansible-lint \"$file\" 2>&1 | head -30 ;; esac"
+          }
+        ]
+      },
+      {
+        "matcher": "(Edit|Write).*\\.tf",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terraform fmt -check -diff \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>&1 | head -20"
+          }
+        ]
+      }
     ]
   }
 }

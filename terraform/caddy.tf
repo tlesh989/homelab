@@ -29,9 +29,8 @@ resource "proxmox_virtual_environment_container" "caddy" {
 
     user_account {
       keys = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
-      # PM_API_PASSWORD reused for container root password (project-wide convention).
       # initialization[0].user_account is in ignore_changes — only applied at initial creation.
-      password = data.doppler_secrets.this.map.PM_API_PASSWORD
+      password = data.doppler_secrets.this.map.ROOT_PASSWORD
     }
   }
 

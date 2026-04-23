@@ -1,6 +1,6 @@
 ---
 name: fix-pr
-description: Use when a PR has review comments to address — fetches Copilot/Coderabbit/human reviewer feedback for the current branch's PR, fixes valid issues, and pushes
+description: Use when a PR has review comments to address — fetches CodeRabbit/human reviewer feedback for the current branch's PR, fixes valid issues, and pushes
 user-invocable: true
 arguments:
   - name: pr
@@ -32,7 +32,7 @@ gh api repos/tlesh989/homelab/pulls/<PR>/reviews
 gh api repos/tlesh989/homelab/pulls/<PR>/comments
 ```
 
-**Reviews** (`/reviews`): top-level review bodies from Copilot, Coderabbit, or human reviewers.
+**Reviews** (`/reviews`): top-level review bodies from CodeRabbit or human reviewers.
 
 **Comments** (`/comments`): inline comments attached to specific file+line.
 
@@ -81,8 +81,8 @@ git commit -m "fix: address PR review comments"
 Commit message body: one bullet per issue fixed, e.g.:
 
 ```
-- Fix monitor widget allow-insecure syntax (Copilot)
-- Add cache directive to custom-api widget (Coderabbit)
+- Fix monitor widget allow-insecure syntax (reviewer)
+- Add cache directive to custom-api widget (CodeRabbit)
 ```
 
 Push:
