@@ -35,6 +35,12 @@ package_list:
   - name: tree
   - name: wget
 
+# unifi role
+unifi_dhcp_reservations:
+  - name: kaz
+    mac: "bc:24:11:10:00:01"
+    ip: "192.168.233.10"
+
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
 

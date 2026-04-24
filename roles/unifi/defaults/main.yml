@@ -1,0 +1,5 @@
+---
+unifi_base_url: "https://192.168.233.1"
+unifi_site: default
+unifi_validate_certs: false
+unifi_dhcp_reservations: []
