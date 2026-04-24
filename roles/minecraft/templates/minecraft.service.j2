@@ -1,0 +1,15 @@
+[Unit]
+Description=Minecraft Bedrock Dedicated Server
+After=network.target
+
+[Service]
+Type=simple
+User=minecraft
+WorkingDirectory={{ minecraft_install_dir }}
+ExecStart={{ minecraft_install_dir }}/bedrock_server
+Restart=on-failure
+RestartSec=5s
+Environment=LD_LIBRARY_PATH={{ minecraft_install_dir }}
+
+[Install]
+WantedBy=multi-user.target

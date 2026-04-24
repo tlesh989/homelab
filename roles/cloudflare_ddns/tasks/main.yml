@@ -1,0 +1,21 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Cloudflare DDNS container
+  community.docker.docker_container:
+    name: cloudflare-ddns
+    image: "favonia/cloudflare-ddns:{{ ddns_image_version }}"
+    state: started
+    restart_policy: always
+    env:
+      CF_API_TOKEN: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
+      DOMAINS: "{{ ddns_domains }}"
+      PROXIED: "{{ ddns_proxied }}"
+      IP6_PROVIDER: none
+  become: true
+  when: not ansible_check_mode
+  no_log: true

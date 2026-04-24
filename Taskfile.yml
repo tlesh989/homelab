@@ -78,7 +78,7 @@ tasks:
         vars: { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   unifi:
-    desc: Configure UniFi DHCP reservations
+    desc: Configure UniFi network (DHCP reservations, port forwards)
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "unifi", CLI_ARGS: "{{.CLI_ARGS}}" }
@@ -170,10 +170,16 @@ tasks:
         vars: { PLAYBOOK: "main.yml", LIMIT: "pi-hole", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   kaz:
-    desc: Deploy kaz Docker host (glance, n8n, watchtower)
+    desc: Deploy kaz Docker host (glance, n8n, watchtower, ddns)
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
+
+  minecraft:
+    desc: Deploy Minecraft Bedrock server
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "minecraft", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   ping:
     desc: Test connectivity to all hosts

@@ -76,6 +76,17 @@ unifi_dhcp_reservations:
   - name: diskstation
     mac: "00:11:32:78:26:f4"
     ip: "192.168.233.205"
+  - name: minecraft
+    mac: "bc:24:11:13:00:01"
+    ip: "192.168.233.19"
+
+unifi_port_forwards:
+  - name: minecraft
+    proto: udp
+    dst_port: "19132"
+    fwd: "192.168.233.19"
+    fwd_port: "19132"
+    enabled: true
 
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
