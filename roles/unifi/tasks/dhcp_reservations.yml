@@ -1,4 +1,10 @@
 ---
+- name: Ensure UNIFI_API_KEY is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'UNIFI_API_KEY') | length > 0
+    fail_msg: "UNIFI_API_KEY environment variable must be set (run via doppler run -- or task unifi)"
+
 - name: Fetch all UniFi client records
   ansible.builtin.uri:
     url: "{{ unifi_base_url }}/proxy/network/api/s/{{ unifi_site }}/rest/user"
