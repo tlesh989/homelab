@@ -1,5 +1,7 @@
 ---
 unifi_base_url: "https://192.168.233.1"
 unifi_site: default
+# UniFi controller ships a self-signed cert on LAN; override to true when
+# fronting the API via a trusted hostname (e.g. caddy reverse proxy).
 unifi_validate_certs: false
 unifi_dhcp_reservations: []

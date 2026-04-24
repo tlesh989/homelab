@@ -13,6 +13,8 @@
       X-API-KEY: "{{ lookup('env', 'UNIFI_API_KEY') }}"
     validate_certs: "{{ unifi_validate_certs }}"
   register: _unifi_clients
+  check_mode: false
+  no_log: true
 
 - name: Update DHCP reservation for existing clients
   ansible.builtin.uri:
@@ -37,6 +39,7 @@
     - _existing | length > 0
     - not (_existing.use_fixedip | default(false) | bool) or (_existing.fixed_ip | default('')) != item.ip
   changed_when: true
+  no_log: true
   loop: "{{ unifi_dhcp_reservations }}"
   loop_control:
     label: "{{ item.name }} ({{ item.mac }} → {{ item.ip }})"
@@ -64,6 +67,7 @@
     - not ansible_check_mode
     - _existing | length == 0
   changed_when: true
+  no_log: true
   loop: "{{ unifi_dhcp_reservations }}"
   loop_control:
     label: "{{ item.name }} ({{ item.mac }} → {{ item.ip }})"
