@@ -77,6 +77,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "truenas", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  unifi:
+    desc: Configure UniFi DHCP reservations
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "unifi", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   r8152:
     desc: Install Realtek r8152 DKMS driver on Proxmox hosts
     cmds:

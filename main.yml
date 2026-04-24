@@ -172,3 +172,10 @@
     - role: ansible_user
     - role: packages
     - role: uptime_kuma
+
+- name: configure unifi
+  hosts: unifi
+  connection: local
+  gather_facts: false
+  roles:
+    - role: unifi
