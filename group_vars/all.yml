@@ -37,9 +37,45 @@ package_list:
 
 # unifi role
 unifi_dhcp_reservations:
+  - name: ansalon
+    mac: "6c:1f:f7:76:99:8f"
+    ip: "192.168.233.6"
   - name: kaz
     mac: "bc:24:11:10:00:01"
     ip: "192.168.233.10"
+  - name: jetkvm
+    mac: "44:b7:d0:e7:82:89"
+    ip: "192.168.233.11"
+  - name: printer
+    mac: "54:35:30:68:19:38"
+    ip: "192.168.233.15"
+  - name: tailscale
+    mac: "ea:31:e7:19:05:63"
+    ip: "192.168.233.21"
+  - name: drizzt
+    mac: "6c:6e:07:1e:39:74"
+    ip: "192.168.233.27"
+  - name: magius
+    mac: "d0:37:45:cf:ce:4c"
+    ip: "192.168.233.29"
+  - name: kaladin
+    mac: "c4:35:d9:89:4c:b4"
+    ip: "192.168.233.30"
+  - name: kvothe
+    mac: "54:bf:64:2e:b2:51"
+    ip: "192.168.233.31"
+  - name: homeassistant
+    mac: "b8:27:eb:75:3a:e3"
+    ip: "192.168.233.125"
+  - name: coltons-tablet
+    mac: "da:4d:62:21:d6:88"
+    ip: "192.168.233.169"
+  - name: solinari
+    mac: "00:11:32:8e:27:e1"
+    ip: "192.168.233.200"
+  - name: diskstation
+    mac: "00:11:32:78:26:f4"
+    ip: "192.168.233.205"
 
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
