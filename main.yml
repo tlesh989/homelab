@@ -109,6 +109,12 @@
     - role: n8n
     - role: cloudflare_ddns
 
+- name: deploy monitoring stack
+  hosts: monitoring
+  gather_facts: true
+  roles:
+    - role: monitoring
+
 - name: setup plex server
   hosts: plex
   become: true
@@ -136,6 +142,12 @@
     - role: ansible_user
     - role: packages
     - role: arr
+
+- name: deploy exportarr metrics exporters
+  hosts: arr
+  gather_facts: true
+  roles:
+    - role: exportarr
 
 - name: setup netdata agents on proxmox nodes
   hosts: proxmox
