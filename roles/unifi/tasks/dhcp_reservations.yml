@@ -37,7 +37,7 @@
   when:
     - not ansible_check_mode
     - _existing | length > 0
-    - not (_existing.use_fixedip | default(false) | bool) or (_existing.fixed_ip | default('')) != item.ip
+    - not (_existing.use_fixedip | default(false) | bool) or (_existing.fixed_ip | default('')) != item.ip or (_existing.name | default('')) != item.name
   changed_when: true
   no_log: true
   loop: "{{ unifi_dhcp_reservations }}"

@@ -4,44 +4,51 @@ Reference for static and reserved IPs across all homelab networks.
 
 ## Main Network — 192.168.233.0/24 (Default, VLAN 1)
 
-DHCP pool: `.50–.254` (dynamic)
-Static range: `.1–.49` (reserved for infrastructure)
+DHCP pool: `.51–.220` (dynamic)
+Static range: `.1–.50` (reserved for infrastructure)
+Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 
-### Infrastructure — Static (.1–.49)
+### Infrastructure — Static (.1–.50)
 
 | IP | Hostname | Role | Notes |
 |----|----------|------|-------|
 | .1 | gateway | UniFi Express 7 | Router/controller |
 | .3 | pi-hole | Pi-hole LXC | Primary DNS (Proxmox: tika) |
-| .6 | *(secondary DNS)* | DNS server | Reserved via DHCP |
+| .6 | ansalon | — | DHCP reservation (MAC: 6c:1f:f7:76:99:8f) |
 | .7 | tika | Proxmox node | Mini PC, 1GbE (AX88179B) |
 | .8 | bupu | Proxmox node | Mini PC, 1GbE (AX88179) |
 | .9 | sturm | Proxmox node | Mini PC, 2.5GbE native |
 | .10 | kaz | Docker host VM | glance, n8n, watchtower (on tika) |
 | .11 | jetkvm | JetKVM | KVM-over-IP |
-| .12 | plex | Plex LXC | Media server |
+| .12 | plex | Plex LXC | Media server (on sturm) |
+| .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
+| .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
 | .21 | tailscale | Tailscale LXC | Subnet router (on tika) |
 | .22 | glance | Glance LXC *(retiring)* | Migrated to kaz (.10); decommission after kaz verified |
 | .23 | netdata | Netdata LXC | Monitoring (on sturm) |
-| .25 | *(unknown)* | — | DHCP reservation (MAC: 4e:64:17:37:7d:87) |
-| .28 | magius | Machine | Reserved (MAC: f0:d5:bf:35:0d:e0) |
-| .29 | magius | Machine | Reserved 2nd NIC (MAC: d0:37:45:cf:ce:4c) |
-| .30 | *(unknown)* | — | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
-| .31 | *(unknown)* | — | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
+| .27 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
+| .29 | magius | Machine | DHCP reservation (MAC: d0:37:45:cf:ce:4c) |
+| .30 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
+| .31 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
+| .35 | homeassistant | Home Assistant | DHCP reservation (Raspberry Pi — MAC: b8:27:eb:75:3a:e3) |
 
 ### Personal/Media Devices — Dynamic but Notable
 
 | IP | Hostname | Role | Notes |
 |----|----------|------|-------|
-| .15 | BRW543530681938 | Brother printer | Fixed reservation |
-| .125 | homeassistant | Home Assistant | Fixed reservation (Raspberry Pi — installed, not yet configured) |
 | .139 | chimney-ap | UniFi AC Mesh | Access point |
 | .156 | Denon-AVR-S750H | AV receiver | Stays on main (Plex/DLNA) |
-| .169 | Coltons-Tablet | Tablet | Fixed reservation |
 | .185 | USW Flex Mini | UniFi switch | Managed switch |
 | .188 | USW Pro Max 16 PoE | UniFi switch | Core switch |
-| .200 | solinari | UGREEN NAS | Fixed reservation (TrueNAS) |
-| .205 | *(unknown)* | — | Fixed reservation (MAC: 00:11:32:78:26:f4) |
+| .200 | solinari | UGREEN NAS | DHCP reservation — Time Machine + TrueNAS SCALE; stays at .200 (moving would break macOS Time Machine config and Proxmox iSCSI storage references) |
+
+### Personal Device Pool — Reservation-Only (.240–.250)
+
+These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit DHCP reservation. Used for personal/family devices to enable range-based firewall filtering.
+
+| IP | Hostname | Role | Notes |
+|----|----------|------|-------|
+| .240 | coltons-tablet | Tablet | DHCP reservation (MAC: da:4d:62:21:d6:88) |
 
 ### Media Devices (staying on main — Plex/DLNA access)
 

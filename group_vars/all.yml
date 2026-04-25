@@ -66,16 +66,13 @@ unifi_dhcp_reservations:
     ip: "192.168.233.31"
   - name: homeassistant
     mac: "b8:27:eb:75:3a:e3"
-    ip: "192.168.233.125"
+    ip: "192.168.233.35"
   - name: coltons-tablet
     mac: "da:4d:62:21:d6:88"
-    ip: "192.168.233.169"
+    ip: "192.168.233.240"
   - name: solinari
     mac: "00:11:32:8e:27:e1"
     ip: "192.168.233.200"
-  - name: diskstation
-    mac: "00:11:32:78:26:f4"
-    ip: "192.168.233.205"
   - name: minecraft
     mac: "bc:24:11:13:00:01"
     ip: "192.168.233.19"
