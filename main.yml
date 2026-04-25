@@ -191,3 +191,9 @@
   gather_facts: false
   roles:
     - role: unifi
+
+- name: deploy node exporter to all hosts
+  hosts: exporters
+  gather_facts: true
+  roles:
+    - role: node_exporter
