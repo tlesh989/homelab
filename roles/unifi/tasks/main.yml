@@ -2,3 +2,7 @@
 - name: Manage DHCP reservations
   ansible.builtin.include_tasks: dhcp_reservations.yml
   when: unifi_dhcp_reservations | length > 0
+
+- name: Manage port forwards
+  ansible.builtin.include_tasks: port_forwards.yml
+  when: unifi_port_forwards | length > 0

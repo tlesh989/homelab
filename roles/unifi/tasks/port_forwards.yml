@@ -1,0 +1,91 @@
+---
+- name: Fetch all UniFi port forwards
+  ansible.builtin.uri:
+    url: "{{ unifi_base_url }}/proxy/network/api/s/{{ unifi_site }}/rest/portforward"
+    method: GET
+    headers:
+      X-API-KEY: "{{ lookup('env', 'UNIFI_API_KEY') }}"
+    validate_certs: "{{ unifi_validate_certs }}"
+  register: _unifi_port_forwards
+  check_mode: false
+  no_log: true
+
+- name: Update existing port forward
+  ansible.builtin.uri:
+    url: "{{ unifi_base_url }}/proxy/network/api/s/{{ unifi_site }}/rest/portforward/{{ _existing._id }}"
+    method: PUT
+    headers:
+      X-API-KEY: "{{ lookup('env', 'UNIFI_API_KEY') }}"
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      enabled: "{{ item.enabled | default(true) }}"
+      pfwd_interface: wan
+      proto: "{{ item.proto }}"
+      src: any
+      dst_port: "{{ item.dst_port }}"
+      fwd: "{{ item.fwd }}"
+      fwd_port: "{{ item.fwd_port }}"
+    validate_certs: "{{ unifi_validate_certs }}"
+    status_code: 200
+  vars:
+    _existing: >-
+      {{ (_unifi_port_forwards.json.data |
+          selectattr('name', 'equalto', item.name) |
+          list | first | default(
+            _unifi_port_forwards.json.data |
+            selectattr('proto', 'equalto', item.proto) |
+            selectattr('dst_port', 'equalto', item.dst_port) |
+            list | first | default({})
+          )) }}
+  when:
+    - not ansible_check_mode
+    - _existing | length > 0
+    - >-
+      (_existing.proto | default('')) != item.proto or
+      (_existing.dst_port | default('')) != item.dst_port or
+      (_existing.fwd | default('')) != item.fwd or
+      (_existing.fwd_port | default('')) != item.fwd_port or
+      (_existing.enabled | default(true) | bool) != (item.enabled | default(true) | bool)
+  changed_when: true
+  no_log: true
+  loop: "{{ unifi_port_forwards }}"
+  loop_control:
+    label: "{{ item.name }} ({{ item.proto }}/{{ item.dst_port }} → {{ item.fwd }}:{{ item.fwd_port }})"
+
+- name: Create new port forward
+  ansible.builtin.uri:
+    url: "{{ unifi_base_url }}/proxy/network/api/s/{{ unifi_site }}/rest/portforward"
+    method: POST
+    headers:
+      X-API-KEY: "{{ lookup('env', 'UNIFI_API_KEY') }}"
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      enabled: "{{ item.enabled | default(true) }}"
+      pfwd_interface: wan
+      proto: "{{ item.proto }}"
+      src: any
+      dst_port: "{{ item.dst_port }}"
+      fwd: "{{ item.fwd }}"
+      fwd_port: "{{ item.fwd_port }}"
+    validate_certs: "{{ unifi_validate_certs }}"
+    status_code: 200
+  vars:
+    _existing: >-
+      {{ (_unifi_port_forwards.json.data |
+          selectattr('name', 'equalto', item.name) |
+          list | first | default(
+            _unifi_port_forwards.json.data |
+            selectattr('proto', 'equalto', item.proto) |
+            selectattr('dst_port', 'equalto', item.dst_port) |
+            list | first | default({})
+          )) }}
+  when:
+    - not ansible_check_mode
+    - _existing | length == 0
+  changed_when: true
+  no_log: true
+  loop: "{{ unifi_port_forwards }}"
+  loop_control:
+    label: "{{ item.name }} ({{ item.proto }}/{{ item.dst_port }} → {{ item.fwd }}:{{ item.fwd_port }})"

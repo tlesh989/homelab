@@ -107,6 +107,7 @@
     - role: watchtower
     - role: glance
     - role: n8n
+    - role: cloudflare_ddns
 
 - name: setup plex server
   hosts: plex
@@ -172,6 +173,17 @@
     - role: ansible_user
     - role: packages
     - role: uptime_kuma
+
+- name: setup minecraft server
+  hosts: minecraft
+  become: true
+  roles:
+    - role: ansible_user
+    - role: packages
+    - role: users
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: minecraft
 
 - name: configure unifi
   hosts: unifi

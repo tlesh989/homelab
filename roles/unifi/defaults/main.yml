@@ -5,3 +5,4 @@ unifi_site: default
 # fronting the API via a trusted hostname (e.g. caddy reverse proxy).
 unifi_validate_certs: false
 unifi_dhcp_reservations: []
+unifi_port_forwards: []

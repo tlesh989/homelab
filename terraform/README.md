@@ -41,6 +41,7 @@ No modules.
 | [proxmox_storage_nfs.proxmox_nfs](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/storage_nfs) | resource |
 | [proxmox_virtual_environment_container.arr](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.caddy](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.minecraft](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.netdata](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.103.0/docs/resources/virtual_environment_container) | resource |

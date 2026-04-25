@@ -37,6 +37,9 @@ localhost ansible_connection=local ansible_become=false
 [caddy]
 caddy.tlesh.xyz ansible_host=192.168.233.17
 
+[minecraft]
+minecraft.tlesh.xyz ansible_host=192.168.233.19
+
 [proxmox:children]
 tika
 bupu
@@ -50,3 +53,4 @@ netdata
 arr
 uptime-kuma
 caddy
+minecraft
