@@ -72,9 +72,17 @@
     enabled: true
   become: true
 
-- name: Allow Minecraft UDP port in UFW
-  ansible.builtin.command:
-    cmd: "ufw allow {{ minecraft_port }}/udp"
+- name: Allow Minecraft UDP port in UFW (IPv4)
+  community.general.ufw:
+    rule: allow
+    port: "{{ minecraft_port | string }}"
+    proto: udp
   become: true
-  register: _ufw_result
-  changed_when: "'Rules updated' in _ufw_result.stdout"
+
+- name: Allow Minecraft UDP port in UFW (IPv6)
+  community.general.ufw:
+    rule: allow
+    port: "{{ minecraft_port_v6 | default(minecraft_port) | string }}"
+    proto: udp
+    ipv6: true
+  become: true

@@ -23,10 +23,7 @@
     headers:
       X-API-KEY: "{{ lookup('env', 'UNIFI_API_KEY') }}"
     body_format: json
-    body:
-      use_fixedip: true
-      fixed_ip: "{{ item.ip }}"
-      name: "{{ item.name }}"
+    body: "{{ _existing | combine({'use_fixedip': true, 'fixed_ip': item.ip, 'name': item.name}) }}"
     validate_certs: "{{ unifi_validate_certs }}"
     status_code: 200
   vars:

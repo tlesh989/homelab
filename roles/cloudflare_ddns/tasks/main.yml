@@ -1,4 +1,10 @@
 ---
+- name: Assert CF_DNS_API_TOKEN is set
+  ansible.builtin.assert:
+    that: lookup('env', 'CF_DNS_API_TOKEN') | length > 0
+    fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot deploy cloudflare_ddns container without it"
+  when: not ansible_check_mode
+
 - name: Install Docker Python SDK
   ansible.builtin.package:
     name: python3-docker

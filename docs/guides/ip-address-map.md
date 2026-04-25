@@ -18,12 +18,12 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .7 | tika | Proxmox node | Mini PC, 1GbE (AX88179B) |
 | .8 | bupu | Proxmox node | Mini PC, 1GbE (AX88179) |
 | .9 | sturm | Proxmox node | Mini PC, 2.5GbE native |
-| .10 | kaz | Docker host VM | glance, n8n, watchtower (on tika) |
-| .11 | jetkvm | JetKVM | KVM-over-IP |
+| .10 | kaz | Docker host VM | DHCP reservation (MAC: bc:24:11:10:00:01) — glance, n8n, watchtower (on tika) |
+| .11 | jetkvm | JetKVM | DHCP reservation (MAC: 44:b7:d0:e7:82:89) — KVM-over-IP |
 | .12 | plex | Plex LXC | Media server (on sturm) |
 | .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
 | .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
-| .21 | tailscale | Tailscale LXC | Subnet router (on tika) |
+| .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | glance | Glance LXC *(retiring)* | Migrated to kaz (.10); decommission after kaz verified |
 | .23 | netdata | Netdata LXC | Monitoring (on sturm) |
 | .27 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
@@ -31,6 +31,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .30 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
 | .31 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
 | .35 | homeassistant | Home Assistant | DHCP reservation (Raspberry Pi — MAC: b8:27:eb:75:3a:e3) |
+| .200 | solinari | UGREEN NAS | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
 
 ### Personal/Media Devices — Dynamic but Notable
 
@@ -40,7 +41,6 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .156 | Denon-AVR-S750H | AV receiver | Stays on main (Plex/DLNA) |
 | .185 | USW Flex Mini | UniFi switch | Managed switch |
 | .188 | USW Pro Max 16 PoE | UniFi switch | Core switch |
-| .200 | solinari | UGREEN NAS | DHCP reservation — Time Machine + TrueNAS SCALE; stays at .200 (moving would break macOS Time Machine config and Proxmox iSCSI storage references) |
 
 ### Personal Device Pool — Reservation-Only (.240–.250)
 

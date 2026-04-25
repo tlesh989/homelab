@@ -5,7 +5,7 @@
   become: true
 
 - name: restart minecraft
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: minecraft
     state: restarted
   become: true

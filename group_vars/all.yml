@@ -49,6 +49,9 @@ unifi_dhcp_reservations:
   - name: printer
     mac: "54:35:30:68:19:38"
     ip: "192.168.233.15"
+  - name: minecraft
+    mac: "bc:24:11:13:00:01"
+    ip: "192.168.233.19"
   - name: tailscale
     mac: "ea:31:e7:19:05:63"
     ip: "192.168.233.21"
@@ -67,15 +70,12 @@ unifi_dhcp_reservations:
   - name: homeassistant
     mac: "b8:27:eb:75:3a:e3"
     ip: "192.168.233.35"
-  - name: coltons-tablet
-    mac: "da:4d:62:21:d6:88"
-    ip: "192.168.233.240"
   - name: solinari
     mac: "00:11:32:8e:27:e1"
     ip: "192.168.233.200"
-  - name: minecraft
-    mac: "bc:24:11:13:00:01"
-    ip: "192.168.233.19"
+  - name: coltons-tablet
+    mac: "da:4d:62:21:d6:88"
+    ip: "192.168.233.240"
 
 unifi_port_forwards:
   - name: minecraft

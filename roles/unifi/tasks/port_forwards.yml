@@ -30,14 +30,23 @@
     status_code: 200
   vars:
     _existing: >-
-      {{ _unifi_port_forwards.json.data |
-         selectattr('name', 'equalto', item.name) |
-         list | first | default({}) }}
+      {{ (_unifi_port_forwards.json.data |
+          selectattr('name', 'equalto', item.name) |
+          list | first | default(
+            _unifi_port_forwards.json.data |
+            selectattr('proto', 'equalto', item.proto) |
+            selectattr('dst_port', 'equalto', item.dst_port) |
+            list | first | default({})
+          )) }}
   when:
     - not ansible_check_mode
     - _existing | length > 0
-    - (_existing.proto | default('')) != item.proto or (_existing.dst_port | default('')) != item.dst_port or (_existing.fwd | default('')) != item.fwd or
-      (_existing.fwd_port | default('')) != item.fwd_port or (_existing.enabled | default(true) | bool) != (item.enabled | default(true) | bool)
+    - >-
+      (_existing.proto | default('')) != item.proto or
+      (_existing.dst_port | default('')) != item.dst_port or
+      (_existing.fwd | default('')) != item.fwd or
+      (_existing.fwd_port | default('')) != item.fwd_port or
+      (_existing.enabled | default(true) | bool) != (item.enabled | default(true) | bool)
   changed_when: true
   no_log: true
   loop: "{{ unifi_port_forwards }}"
@@ -64,9 +73,14 @@
     status_code: 200
   vars:
     _existing: >-
-      {{ _unifi_port_forwards.json.data |
-         selectattr('name', 'equalto', item.name) |
-         list | first | default({}) }}
+      {{ (_unifi_port_forwards.json.data |
+          selectattr('name', 'equalto', item.name) |
+          list | first | default(
+            _unifi_port_forwards.json.data |
+            selectattr('proto', 'equalto', item.proto) |
+            selectattr('dst_port', 'equalto', item.dst_port) |
+            list | first | default({})
+          )) }}
   when:
     - not ansible_check_mode
     - _existing | length == 0
