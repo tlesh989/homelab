@@ -1,0 +1,11 @@
+---
+exportarr_version: "v2"
+exportarr_sonarr_port: 9707
+exportarr_radarr_port: 9708
+exportarr_lidarr_port: 9709
+exportarr_sonarr_url: "http://localhost:8989"
+exportarr_radarr_url: "http://localhost:7878"
+exportarr_lidarr_url: "http://localhost:8686"
+exportarr_sonarr_api_key: "{{ lookup('env', 'SONARR_API_KEY') }}"
+exportarr_radarr_api_key: "{{ lookup('env', 'RADARR_API_KEY') }}"
+exportarr_lidarr_api_key: "{{ lookup('env', 'LIDARR_API_KEY') }}"

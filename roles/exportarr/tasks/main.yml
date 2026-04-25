@@ -1,0 +1,57 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy exportarr for Sonarr
+  community.docker.docker_container:
+    name: exportarr-sonarr
+    image: "ghcr.io/onedr0p/exportarr:{{ exportarr_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ exportarr_sonarr_port | string }}:{{ exportarr_sonarr_port | string }}"
+    command: sonarr
+    env:
+      PORT: "{{ exportarr_sonarr_port | string }}"
+      URL: "{{ exportarr_sonarr_url }}"
+      APIKEY: "{{ exportarr_sonarr_api_key }}"
+  become: true
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Deploy exportarr for Radarr
+  community.docker.docker_container:
+    name: exportarr-radarr
+    image: "ghcr.io/onedr0p/exportarr:{{ exportarr_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ exportarr_radarr_port | string }}:{{ exportarr_radarr_port | string }}"
+    command: radarr
+    env:
+      PORT: "{{ exportarr_radarr_port | string }}"
+      URL: "{{ exportarr_radarr_url }}"
+      APIKEY: "{{ exportarr_radarr_api_key }}"
+  become: true
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Deploy exportarr for Lidarr
+  community.docker.docker_container:
+    name: exportarr-lidarr
+    image: "ghcr.io/onedr0p/exportarr:{{ exportarr_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ exportarr_lidarr_port | string }}:{{ exportarr_lidarr_port | string }}"
+    command: lidarr
+    env:
+      PORT: "{{ exportarr_lidarr_port | string }}"
+      URL: "{{ exportarr_lidarr_url }}"
+      APIKEY: "{{ exportarr_lidarr_api_key }}"
+  become: true
+  when: not ansible_check_mode
+  no_log: true
