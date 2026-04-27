@@ -209,5 +209,6 @@
 - name: deploy node exporter to all hosts
   hosts: exporters
   gather_facts: true
+  become: true
   roles:
     - role: node_exporter

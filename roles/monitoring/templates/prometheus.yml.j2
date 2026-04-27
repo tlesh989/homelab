@@ -10,6 +10,7 @@ scrape_configs:
         - "{{ hostvars[host]['ansible_host'] }}:9100"
 {% endfor %}
 
+{% if groups['arr'] | default([]) | length > 0 %}
   - job_name: exportarr-sonarr
     static_configs:
       - targets:
@@ -24,3 +25,4 @@ scrape_configs:
     static_configs:
       - targets:
         - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_lidarr_port }}"
+{% endif %}

@@ -10,5 +10,6 @@
     name: prometheus-node-exporter
     enabled: true
     state: started
+    daemon_reload: true
   become: true
   ignore_errors: "{{ ansible_check_mode }}"
