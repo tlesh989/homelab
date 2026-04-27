@@ -9,7 +9,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "65534"
+    owner: "65534" # nobody — Prometheus container UID for bind-mount write access
     group: "65534"
     mode: "0755"
   loop:
@@ -21,7 +21,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "472"
+    owner: "472" # grafana — Grafana container UID for bind-mount write access
     group: "472"
     mode: "0755"
   loop:

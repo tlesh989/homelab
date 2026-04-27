@@ -112,6 +112,7 @@
 - name: deploy monitoring stack
   hosts: monitoring
   gather_facts: true
+  become: true
   roles:
     - role: monitoring
 
@@ -146,6 +147,7 @@
 - name: deploy exportarr metrics exporters
   hosts: arr
   gather_facts: true
+  become: true
   roles:
     - role: exportarr
 

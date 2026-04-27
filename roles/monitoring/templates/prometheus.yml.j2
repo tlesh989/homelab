@@ -13,14 +13,14 @@ scrape_configs:
   - job_name: exportarr-sonarr
     static_configs:
       - targets:
-        - "192.168.233.24:9707"
+        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_sonarr_port }}"
 
   - job_name: exportarr-radarr
     static_configs:
       - targets:
-        - "192.168.233.24:9708"
+        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_radarr_port }}"
 
   - job_name: exportarr-lidarr
     static_configs:
       - targets:
-        - "192.168.233.24:9709"
+        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_lidarr_port }}"
