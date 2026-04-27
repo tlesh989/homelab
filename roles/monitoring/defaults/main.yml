@@ -10,7 +10,6 @@ grafana_port: 3000
 grafana_data_dir: /opt/grafana/data
 grafana_provisioning_dir: /opt/grafana/provisioning
 grafana_dashboards_dir: /opt/grafana/provisioning/dashboards
-grafana_host: "grafana.tlesh.xyz"
 grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') }}"
 
 monitoring_network: monitoring

@@ -14,15 +14,21 @@ scrape_configs:
   - job_name: exportarr-sonarr
     static_configs:
       - targets:
-        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_sonarr_port }}"
+{% for host in groups['arr'] | default([]) %}
+        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_sonarr_port }}"
+{% endfor %}
 
   - job_name: exportarr-radarr
     static_configs:
       - targets:
-        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_radarr_port }}"
+{% for host in groups['arr'] | default([]) %}
+        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_radarr_port }}"
+{% endfor %}
 
   - job_name: exportarr-lidarr
     static_configs:
       - targets:
-        - "{{ hostvars[groups['arr'][0]]['ansible_host'] }}:{{ exportarr_lidarr_port }}"
+{% for host in groups['arr'] | default([]) %}
+        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_lidarr_port }}"
+{% endfor %}
 {% endif %}
