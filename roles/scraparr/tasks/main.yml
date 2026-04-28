@@ -1,0 +1,27 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy scraparr
+  community.docker.docker_container:
+    name: scraparr
+    image: "ghcr.io/thecfu/scraparr:{{ scraparr_version }}"
+    state: started
+    restart_policy: always
+    network_mode: host
+    # LXC containers lack AppArmor policy admin privileges; unconfined avoids load failure
+    security_opts:
+      - apparmor=unconfined
+    env:
+      SONARR_URL: "{{ scraparr_sonarr_url }}"
+      SONARR_API_KEY: "{{ scraparr_sonarr_api_key }}"
+      RADARR_URL: "{{ scraparr_radarr_url }}"
+      RADARR_API_KEY: "{{ scraparr_radarr_api_key }}"
+      LIDARR_URL: "{{ scraparr_lidarr_url }}"
+      LIDARR_API_KEY: "{{ scraparr_lidarr_api_key }}"
+  become: true
+  when: not ansible_check_mode
+  no_log: true

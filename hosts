@@ -54,3 +54,17 @@ arr
 uptime-kuma
 caddy
 minecraft
+
+[exporters:children]
+proxmox
+tailscale
+plex
+pi-hole
+arr
+uptime-kuma
+caddy
+minecraft
+kaz
+
+[monitoring:children]
+kaz

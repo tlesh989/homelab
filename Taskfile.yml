@@ -181,6 +181,16 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "minecraft", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  monitoring:
+    desc: Deploy Prometheus + Grafana monitoring stack
+    cmds:
+      - task: ping
+      - task: ansible
+        vars:
+          PLAYBOOK: "main.yml"
+          LIMIT: "monitoring,exporters,arr,caddy,pi-hole"
+          CLI_ARGS: "{{.CLI_ARGS}}"
+
   ping:
     desc: Test connectivity to all hosts
     cmds:

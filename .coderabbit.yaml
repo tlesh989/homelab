@@ -31,6 +31,7 @@ reviews:
     - "!.openpackage/**"
     - "!**/*.tfstate"
     - "!**/*.tfstate.backup"
+    - "!docs/superpowers/**"
 
   # Static analysis tools — supplement pre-commit with additional checks
   tools:
@@ -58,7 +59,7 @@ reviews:
         Ansible role review — enforce these rules strictly:
         - Every `shell`/`command` task MUST have a `changed_when` condition. Flag unconditionally changed tasks.
         - Prefer `ansible.builtin.*` FQCN for all core modules.
-        - File/dir tasks that set `owner`/`group` must use `ansible_user` or `root`, not bare strings.
+        - File/dir tasks that set `owner`/`group` must use `ansible_user` or `root`, not bare strings — exception: numeric UIDs are acceptable when explicitly required for Docker container bind-mount compatibility (e.g., 65534 for Prometheus nobody, 472 for Grafana).
         - Tasks writing to `/etc/sudoers.d/` MUST include `validate: visudo -cf %s`.
         - Each `notify:` must resolve to a handler `name:` or `listen:` label exactly.
         - Secrets must never be hardcoded — flag any literal passwords, tokens, or keys.

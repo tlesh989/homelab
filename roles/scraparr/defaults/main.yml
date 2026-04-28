@@ -1,0 +1,9 @@
+---
+scraparr_version: "3"
+scraparr_port: 7100
+scraparr_sonarr_url: "http://localhost:8989"
+scraparr_radarr_url: "http://localhost:7878"
+scraparr_lidarr_url: "http://localhost:8686"
+scraparr_sonarr_api_key: "{{ lookup('env', 'SONARR_API_KEY') }}"
+scraparr_radarr_api_key: "{{ lookup('env', 'RADARR_API_KEY') }}"
+scraparr_lidarr_api_key: "{{ lookup('env', 'LIDARR_API_KEY') }}"

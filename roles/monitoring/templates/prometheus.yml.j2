@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+scrape_configs:
+  - job_name: node
+    static_configs:
+      - targets:
+{% for host in groups['exporters'] | default([]) %}
+        - "{{ hostvars[host]['ansible_host'] }}:9100"
+{% endfor %}
+
+{% if groups['arr'] | default([]) | length > 0 %}
+  - job_name: scraparr
+    static_configs:
+      - targets:
+{% for host in groups['arr'] | default([]) %}
+        - "{{ hostvars[host]['ansible_host'] }}:{{ scraparr_port }}"
+{% endfor %}
+{% endif %}

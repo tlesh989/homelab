@@ -1,0 +1,16 @@
+---
+- name: Restart Prometheus
+  community.docker.docker_container:
+    name: prometheus
+    state: started
+    restart: true
+  become: true
+  when: not ansible_check_mode
+
+- name: Restart Grafana
+  community.docker.docker_container:
+    name: grafana
+    state: started
+    restart: true
+  become: true
+  when: not ansible_check_mode

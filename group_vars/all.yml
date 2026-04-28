@@ -85,6 +85,9 @@ unifi_port_forwards:
     fwd_port: "19132"
     enabled: true
 
+# scraparr role (port shared with monitoring role for Prometheus scrape config)
+scraparr_port: 7100
+
 # geerlingguy.ntp
 ntp_timezone: "America/Detroit"
 
