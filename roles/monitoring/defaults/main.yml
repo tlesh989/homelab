@@ -5,7 +5,7 @@ prometheus_config_dir: /opt/prometheus/config
 prometheus_data_dir: /opt/prometheus/data
 prometheus_retention: 30d
 
-grafana_version: "11"
+grafana_version: "13"
 grafana_port: 3000
 grafana_data_dir: /opt/grafana/data
 grafana_provisioning_dir: /opt/grafana/provisioning

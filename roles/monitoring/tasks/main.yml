@@ -76,9 +76,7 @@
     mode: "0644"
   loop:
     - node-exporter-full.json
-    - exportarr-sonarr.json
-    - exportarr-radarr.json
-    - exportarr-lidarr.json
+    - scraparr-dashboard.json
   become: true
   notify: Restart Grafana
 

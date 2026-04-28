@@ -144,12 +144,12 @@
     - role: packages
     - role: arr
 
-- name: deploy exportarr metrics exporters
+- name: deploy scraparr metrics exporter
   hosts: arr
   gather_facts: true
   become: true
   roles:
-    - role: exportarr
+    - role: scraparr
 
 - name: setup netdata agents on proxmox nodes
   hosts: proxmox

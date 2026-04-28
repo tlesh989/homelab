@@ -11,24 +11,10 @@ scrape_configs:
 {% endfor %}
 
 {% if groups['arr'] | default([]) | length > 0 %}
-  - job_name: exportarr-sonarr
+  - job_name: scraparr
     static_configs:
       - targets:
 {% for host in groups['arr'] | default([]) %}
-        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_sonarr_port }}"
-{% endfor %}
-
-  - job_name: exportarr-radarr
-    static_configs:
-      - targets:
-{% for host in groups['arr'] | default([]) %}
-        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_radarr_port }}"
-{% endfor %}
-
-  - job_name: exportarr-lidarr
-    static_configs:
-      - targets:
-{% for host in groups['arr'] | default([]) %}
-        - "{{ hostvars[host]['ansible_host'] }}:{{ exportarr_lidarr_port }}"
+        - "{{ hostvars[host]['ansible_host'] }}:{{ scraparr_port }}"
 {% endfor %}
 {% endif %}
