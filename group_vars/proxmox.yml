@@ -45,8 +45,3 @@ proxmox_storage_mtu: 9000
 truenas_iscsi_portal_ip: "192.168.220.6"
 truenas_iscsi_target_name: "proxmox"
 truenas_lvm_vg_name: "pve-iscsi"
-
-# Netdata child agent
-netdata_role: "child"
-netdata_parent_host: "192.168.233.23"
-netdata_parent_port: 19999

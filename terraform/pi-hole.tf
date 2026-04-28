@@ -34,6 +34,12 @@ resource "proxmox_virtual_environment_container" "pi_hole" {
     }
   }
 
+  cpu {
+    architecture = "amd64"
+    cores        = 1
+    units        = 1024
+  }
+
   memory {
     dedicated = 1024
     swap      = 512

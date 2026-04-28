@@ -225,9 +225,9 @@ pages:
               - title: Uptime Kuma
                 url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
                 icon: si:uptimekuma
-              - title: Netdata
-                url: https://netdata.tlesh.xyz
-                icon: si:netdata
+              - title: Grafana
+                url: https://grafana.tlesh.xyz
+                icon: si:grafana
               - title: Pi-hole
                 url: https://pihole.tlesh.xyz/admin
                 icon: si:pihole
@@ -255,20 +255,3 @@ pages:
               - title: Lidarr
                 url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8686
                 icon: si:lidarr
-
-          - type: custom-api
-            title: Netdata
-            cache: 1m
-            url: https://netdata.tlesh.xyz/api/v1/info
-            template: |
-              {% raw %}<div class="flex gap-2 items-center">
-                {{ $nodes := .JSON.Array "mirrored_hosts" }}
-                <span>{{ len $nodes }} nodes monitored | </span>
-                {{ if gt (.JSON.Int "alarms.critical") 0 }}
-                <span class="color-negative">{{ .JSON.Int "alarms.critical" }} critical</span>
-                {{ else if gt (.JSON.Int "alarms.warning") 0 }}
-                <span class="color-highlight">{{ .JSON.Int "alarms.warning" }} warning</span>
-                {{ else }}
-                <span class="color-positive">No active alerts</span>
-                {{ end }}
-              </div>{% endraw %}

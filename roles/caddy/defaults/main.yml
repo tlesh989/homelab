@@ -12,8 +12,6 @@ caddy_services:
     upstream: "192.168.233.3:8080"
   - name: pi-hole
     upstream: "192.168.233.3:8080"
-  - name: netdata
-    upstream: "192.168.233.23:19999"
   - name: glance
     upstream: "192.168.233.10:8080"
   - name: uptime-kuma

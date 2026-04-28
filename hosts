@@ -19,9 +19,6 @@ plex.tlesh.xyz ansible_host=192.168.233.12
 [pi-hole]
 pi-hole.tlesh.xyz ansible_host=192.168.233.3
 
-[netdata]
-netdata.tlesh.xyz ansible_host=192.168.233.23
-
 [arr]
 arr.tlesh.xyz ansible_host=192.168.233.24
 
@@ -49,7 +46,6 @@ sturm
 tailscale
 plex
 pi-hole
-netdata
 arr
 uptime-kuma
 caddy
