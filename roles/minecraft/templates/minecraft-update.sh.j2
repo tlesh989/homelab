@@ -60,6 +60,15 @@ done
 
 log "Stopping minecraft service"
 systemctl stop minecraft
+# Wait up to 30s for the service to fully stop before touching files
+for i in $(seq 1 30); do
+  systemctl is-active --quiet minecraft || break
+  sleep 1
+done
+if systemctl is-active --quiet minecraft; then
+  log "ERROR: minecraft service did not stop within 30s — aborting update" >&2
+  exit 1
+fi
 
 cp -a "${TMP_EXTRACT}/." "${INSTALL_DIR}/"
 
@@ -70,8 +79,8 @@ for item in "${PRESERVE_ITEMS[@]}"; do
   fi
 done
 
-chown -R minecraft:minecraft "${INSTALL_DIR}"
 echo "${LATEST_VERSION}" > "${VERSION_FILE}"
+chown -R minecraft:minecraft "${INSTALL_DIR}"
 
 log "Starting minecraft service"
 systemctl start minecraft
