@@ -78,11 +78,3 @@
     port: "{{ minecraft_port | string }}"
     proto: udp
   become: true
-
-- name: Allow Minecraft UDP port in UFW (IPv6)
-  community.general.ufw:
-    rule: allow
-    port: "{{ minecraft_port_v6 | default(minecraft_port) | string }}"
-    proto: udp
-    ipv6: true
-  become: true

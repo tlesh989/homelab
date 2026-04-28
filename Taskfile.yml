@@ -101,12 +101,6 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "plex", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  netdata:
-    desc: Deploy Netdata monitoring
-    cmds:
-      - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "netdata,proxmox", CLI_ARGS: "{{.CLI_ARGS}}" }
-
   arr:
     desc: Deploy arr media stack
     cmds:

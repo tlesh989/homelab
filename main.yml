@@ -127,15 +127,6 @@
     - role: geerlingguy.security
     - role: plex
 
-- name: setup netdata parent
-  hosts: netdata
-  become: true
-  roles:
-    - role: ansible_user
-    - role: packages
-    - role: users
-    - role: netdata
-
 - name: setup arr stack
   hosts: arr
   become: true
@@ -150,12 +141,6 @@
   become: true
   roles:
     - role: scraparr
-
-- name: setup netdata agents on proxmox nodes
-  hosts: proxmox
-  become: true
-  roles:
-    - role: netdata
 
 - name: setup pi-hole server
   hosts: pi-hole
