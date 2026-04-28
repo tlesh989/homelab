@@ -34,6 +34,12 @@ resource "proxmox_virtual_environment_container" "caddy" {
     }
   }
 
+  cpu {
+    architecture = "amd64"
+    cores        = 1
+    units        = 1024
+  }
+
   memory {
     dedicated = 512
     swap      = 256

@@ -27,6 +27,12 @@ resource "proxmox_virtual_environment_container" "tailscale" {
     }
   }
 
+  cpu {
+    architecture = "amd64"
+    cores        = 1
+    units        = 1024
+  }
+
   memory {
     dedicated = 2048
     swap      = 0
