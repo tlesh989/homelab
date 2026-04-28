@@ -35,3 +35,4 @@ pihole_local_hosts:
   - "192.168.233.17 glance.tlesh.xyz"
   - "192.168.233.17 uptime-kuma.tlesh.xyz"
   - "192.168.233.17 grafana.tlesh.xyz"
+  - "192.168.233.17 n8n.tlesh.xyz"
