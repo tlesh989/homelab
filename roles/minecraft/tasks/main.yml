@@ -28,12 +28,28 @@
     mode: "0755"
   become: true
 
+- name: Read installed BDS version
+  ansible.builtin.slurp:
+    src: "{{ minecraft_install_dir }}/.version"
+  register: minecraft_version_file
+  failed_when: false
+  changed_when: false
+  become: true
+
+- name: Set installed version fact
+  ansible.builtin.set_fact:
+    minecraft_installed_version: >-
+      {{ (minecraft_version_file.content | b64decode | trim)
+         if minecraft_version_file is success
+         else '0.0.0.0' }}
+
 - name: Download BDS archive
   ansible.builtin.get_url:
     url: "{{ minecraft_bds_download_url }}"
     dest: "/tmp/bedrock-server-{{ minecraft_bds_version }}.zip"
     mode: "0644"
   become: true
+  when: minecraft_bds_version is version(minecraft_installed_version, '>', strict=false)
 
 - name: Extract BDS archive
   ansible.builtin.unarchive:
@@ -44,6 +60,17 @@
     group: minecraft
   become: true
   notify: restart minecraft
+  when: minecraft_bds_version is version(minecraft_installed_version, '>', strict=false)
+
+- name: Write installed version file
+  ansible.builtin.copy:
+    content: "{{ minecraft_bds_version }}"
+    dest: "{{ minecraft_install_dir }}/.version"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  when: minecraft_bds_version is version(minecraft_installed_version, '>', strict=false)
 
 - name: Configure server.properties
   ansible.builtin.template:
@@ -54,6 +81,29 @@
     mode: "0644"
   become: true
   notify: restart minecraft
+
+- name: Validate minecraft_operator_xuid is set
+  ansible.builtin.assert:
+    that:
+      - minecraft_operator_xuid is not none
+      - minecraft_operator_xuid | string | length > 0
+    fail_msg: >
+      minecraft_operator_xuid is null or empty.
+      Set the MINECRAFT_OPERATOR_XUID environment variable (e.g., via Doppler)
+      or override minecraft_operator_xuid in group_vars before running this role.
+      An empty XUID would produce a broken permissions.json operator entry.
+    success_msg: "minecraft_operator_xuid is set ({{ minecraft_operator_xuid }})"
+
+- name: Configure permissions.json
+  ansible.builtin.template:
+    src: permissions.json.j2
+    dest: "{{ minecraft_install_dir }}/permissions.json"
+    owner: minecraft
+    group: minecraft
+    mode: "0644"
+  become: true
+  notify: restart minecraft
+  when: minecraft_operator_xuid is not none and minecraft_operator_xuid | string | length > 0
 
 - name: Install systemd unit
   ansible.builtin.template:
@@ -77,4 +127,23 @@
     rule: allow
     port: "{{ minecraft_port | string }}"
     proto: udp
+  become: true
+
+- name: Deploy BDS auto-update script
+  ansible.builtin.template:
+    src: minecraft-update.sh.j2
+    dest: /usr/local/bin/minecraft-update
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Schedule weekly BDS auto-update
+  ansible.builtin.cron:
+    name: minecraft-bds-auto-update
+    user: root
+    weekday: "{{ minecraft_update_weekday }}"
+    hour: "{{ minecraft_update_hour }}"
+    minute: "{{ minecraft_update_minute }}"
+    job: /usr/local/bin/minecraft-update >> /var/log/minecraft-update.log 2>&1
   become: true

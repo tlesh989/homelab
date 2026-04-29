@@ -5,6 +5,24 @@
     fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot deploy cloudflare_ddns container without it"
   when: not ansible_check_mode
 
+- name: Assert DDNS_DOMAINS is set
+  ansible.builtin.assert:
+    that: lookup('env', 'DDNS_DOMAINS') | length > 0
+    fail_msg: "DDNS_DOMAINS must be set in Doppler — comma-separated list of domains to update (e.g. mc.tlesh.net,684.tlesh.net,684.tlesh.xyz)"
+  when: not ansible_check_mode
+
+- name: Assert PUSHOVER_API_TOKEN is set
+  ansible.builtin.assert:
+    that: lookup('env', 'PUSHOVER_API_TOKEN') | length > 0
+    fail_msg: "PUSHOVER_API_TOKEN must be set in Doppler — required for shoutrrr Pushover notifications"
+  when: not ansible_check_mode
+
+- name: Assert PUSHOVER_USER_KEY is set
+  ansible.builtin.assert:
+    that: lookup('env', 'PUSHOVER_USER_KEY') | length > 0
+    fail_msg: "PUSHOVER_USER_KEY must be set in Doppler — required for shoutrrr Pushover notifications"
+  when: not ansible_check_mode
+
 - name: Install Docker Python SDK
   ansible.builtin.package:
     name: python3-docker
@@ -22,6 +40,7 @@
       DOMAINS: "{{ ddns_domains }}"
       PROXIED: "{{ ddns_proxied }}"
       IP6_PROVIDER: none
+      SHOUTRRR: "pushover://{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
   become: true
   when: not ansible_check_mode
   no_log: true

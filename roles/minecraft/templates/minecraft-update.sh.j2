@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+INSTALL_DIR="{{ minecraft_install_dir }}"
+VERSION_FILE="${INSTALL_DIR}/.version"
+PRESERVE_ITEMS=(
+  worlds
+  server.properties
+  allowlist.json
+  permissions.json
+  valid_known_packs.json
+)
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+
+# ---------------------------------------------------------------------------
+# get_latest_bds_url: scrape the Minecraft BDS download page for the latest
+# x86_64 zip URL.  This relies on Mojang's HTML layout, which can change
+# without notice and break the regex.  If it does:
+#   1. Check https://www.minecraft.net/en-us/download/server/bedrock manually
+#   2. Update the grep -oP pattern below to match the new URL scheme
+#   3. Alternatively pin minecraft_bds_version in defaults/main.yml and set
+#      minecraft_bds_download_url directly to skip the auto-update path.
+# ---------------------------------------------------------------------------
+get_latest_bds_url() {
+  local url
+  local attempt max_attempts=5
+  local delay=5
+  local page
+
+  for attempt in $(seq 1 "${max_attempts}"); do
+    log "Fetching BDS page (attempt ${attempt}/${max_attempts})"
+    page=$(curl -fsSL --connect-timeout 10 --max-time 60 \
+      -H "Accept-Language: en-US,en" \
+      -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0" \
+      "https://www.minecraft.net/en-us/download/server/bedrock" 2>&1) || {
+        log "WARNING: curl failed on attempt ${attempt} — response: ${page:0:200}"
+        sleep "${delay}"
+        delay=$(( delay * 2 ))  # exponential backoff
+        continue
+      }
+
+    url=$(echo "${page}" \
+      | grep -oP 'https://[^\s"'\''>]+bedrock-server-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.zip' \
+      | grep -v arm \
+      | head -1)
+
+    # Validate the extracted URL matches the expected pattern
+    if [[ -z "${url}" ]]; then
+      log "WARNING: No matching URL found on attempt ${attempt} — page may have changed"
+      sleep "${delay}"
+      delay=$(( delay * 2 ))
+      continue
+    fi
+
+    if ! [[ "${url}" =~ ^https://[a-zA-Z0-9._/-]+bedrock-server-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.zip$ ]]; then
+      log "ERROR: Extracted URL failed pattern validation: '${url}'" >&2
+      return 1
+    fi
+
+    echo "${url}"
+    return 0
+  done
+
+  log "ERROR: Could not determine latest BDS URL after ${max_attempts} attempts" >&2
+  return 1
+}
+
+LATEST_URL=$(get_latest_bds_url)
+
+LATEST_VERSION=$(echo "${LATEST_URL}" | grep -oP '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+INSTALLED_VERSION=$(cat "${VERSION_FILE}" 2>/dev/null || echo "0.0.0.0")
+
+if [[ "$(printf '%s\n%s\n' "${INSTALLED_VERSION}" "${LATEST_VERSION}" | sort -V | tail -n1)" == "${INSTALLED_VERSION}" ]]; then
+  log "Installed version (${INSTALLED_VERSION}) is >= latest discovered (${LATEST_VERSION}); skipping"
+  exit 0
+fi
+
+log "Updating BDS: ${INSTALLED_VERSION} -> ${LATEST_VERSION}"
+
+TMP_DIR=$(mktemp -d)
+TMP_ZIP="${TMP_DIR}/bedrock-server-${LATEST_VERSION}.zip"
+TMP_EXTRACT="${TMP_DIR}/extract"
+TMP_PRESERVE="${TMP_DIR}/preserve"
+
+cleanup() { rm -rf "${TMP_DIR}"; }
+trap cleanup EXIT
+
+log "Downloading ${LATEST_URL}"
+curl -fsSL --connect-timeout 10 --max-time 300 --retry 3 --retry-delay 5 \
+  -A "Mozilla/5.0 (X11; Linux x86_64)" -o "${TMP_ZIP}" "${LATEST_URL}"
+
+# Verify archive integrity before touching the live install directory.
+# Mojang does not publish a separate checksum file, so we validate that the
+# zip is structurally sound.  This catches truncated downloads and obvious
+# corruption before we stop the server and overwrite files.
+log "Verifying archive integrity: ${TMP_ZIP}"
+if ! unzip -t -q "${TMP_ZIP}" >/dev/null 2>&1; then
+  log "ERROR: Archive integrity check failed — zip appears corrupt or truncated" >&2
+  log "ERROR: Downloaded from: ${LATEST_URL}" >&2
+  exit 1
+fi
+log "Archive integrity OK"
+
+mkdir -p "${TMP_EXTRACT}" "${TMP_PRESERVE}"
+unzip -q "${TMP_ZIP}" -d "${TMP_EXTRACT}"
+
+log "Stopping minecraft service"
+systemctl stop minecraft
+# Wait up to 30s for the service to fully stop before touching files
+for i in $(seq 1 30); do
+  systemctl is-active --quiet minecraft || break
+  sleep 1
+done
+if systemctl is-active --quiet minecraft; then
+  log "ERROR: minecraft service did not stop within 30s — aborting update" >&2
+  exit 1
+fi
+
+# Backup preserved files after service has stopped
+for item in "${PRESERVE_ITEMS[@]}"; do
+  if [[ -e "${INSTALL_DIR}/${item}" ]]; then
+    cp -a "${INSTALL_DIR}/${item}" "${TMP_PRESERVE}/${item}"
+  fi
+done
+
+cp -a "${TMP_EXTRACT}/." "${INSTALL_DIR}/"
+
+# Restore preserved files
+for item in "${PRESERVE_ITEMS[@]}"; do
+  if [[ -e "${TMP_PRESERVE}/${item}" ]]; then
+    cp -a "${TMP_PRESERVE}/${item}" "${INSTALL_DIR}/${item}"
+  fi
+done
+
+echo "${LATEST_VERSION}" > "${VERSION_FILE}"
+chown -R minecraft:minecraft "${INSTALL_DIR}"
+
+log "Starting minecraft service"
+systemctl start minecraft
+
+log "Update complete: ${LATEST_VERSION}"
