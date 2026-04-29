@@ -82,6 +82,29 @@
   become: true
   notify: restart minecraft
 
+- name: Validate minecraft_operator_xuid is set
+  ansible.builtin.assert:
+    that:
+      - minecraft_operator_xuid is not none
+      - minecraft_operator_xuid | string | length > 0
+    fail_msg: >
+      minecraft_operator_xuid is null or empty.
+      Set the MINECRAFT_OPERATOR_XUID environment variable (e.g., via Doppler)
+      or override minecraft_operator_xuid in group_vars before running this role.
+      An empty XUID would produce a broken permissions.json operator entry.
+    success_msg: "minecraft_operator_xuid is set ({{ minecraft_operator_xuid }})"
+
+- name: Configure permissions.json
+  ansible.builtin.template:
+    src: permissions.json.j2
+    dest: "{{ minecraft_install_dir }}/permissions.json"
+    owner: minecraft
+    group: minecraft
+    mode: "0644"
+  become: true
+  notify: restart minecraft
+  when: minecraft_operator_xuid is not none and minecraft_operator_xuid | string | length > 0
+
 - name: Install systemd unit
   ansible.builtin.template:
     src: minecraft.service.j2
