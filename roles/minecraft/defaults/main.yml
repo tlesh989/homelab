@@ -5,7 +5,7 @@ minecraft_install_dir: /opt/minecraft/bedrock
 minecraft_port: 19132
 minecraft_server_name: "Cat's Cafe 2.0"
 minecraft_level_name: "Death Valley"
-minecraft_level_seed: "712225023315282"
+minecraft_level_seed: "1370927827048225416"
 minecraft_max_players: 10
 minecraft_online_mode: true
 minecraft_difficulty: easy
@@ -13,7 +13,7 @@ minecraft_gamemode: survival
 minecraft_update_weekday: "0"
 minecraft_update_hour: "3"
 minecraft_update_minute: "0"
-# Set to null by default; must be overridden (e.g., via group_vars or Doppler env).
-# An empty / unset XUID would produce a broken permissions.json, so tasks/main.yml
-# asserts this is non-null/non-empty before rendering the template.
-minecraft_operator_xuid:
+# Sourced from MINECRAFT_OPERATOR_XUID env var (injected via Doppler) or
+# overridden in group_vars/host_vars. An empty XUID would produce a broken
+# permissions.json, so tasks/main.yml asserts this is non-null/non-empty.
+minecraft_operator_xuid: "{{ lookup('env', 'MINECRAFT_OPERATOR_XUID') | default(None, true) }}"
