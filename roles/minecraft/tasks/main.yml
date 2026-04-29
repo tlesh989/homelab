@@ -32,7 +32,8 @@
   ansible.builtin.slurp:
     src: "{{ minecraft_install_dir }}/.version"
   register: minecraft_version_file
-  ignore_errors: true
+  failed_when: false
+  changed_when: false
   become: true
 
 - name: Set installed version fact
@@ -65,8 +66,8 @@
   ansible.builtin.copy:
     content: "{{ minecraft_bds_version }}"
     dest: "{{ minecraft_install_dir }}/.version"
-    owner: minecraft
-    group: minecraft
+    owner: root
+    group: root
     mode: "0644"
   become: true
   when: minecraft_bds_version is version(minecraft_installed_version, '>', strict=false)

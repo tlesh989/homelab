@@ -14,7 +14,7 @@ PRESERVE_ITEMS=(
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
 # Fetch latest x86_64 BDS download URL from Mojang
-LATEST_URL=$(curl -fsSL \
+LATEST_URL=$(curl -fsSL --connect-timeout 10 --max-time 60 --retry 3 --retry-delay 5 \
   -H "Accept-Language: en-US,en" \
   -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0" \
   "https://www.minecraft.net/en-us/download/server/bedrock" \
@@ -30,8 +30,8 @@ fi
 LATEST_VERSION=$(echo "${LATEST_URL}" | grep -oP '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
 INSTALLED_VERSION=$(cat "${VERSION_FILE}" 2>/dev/null || echo "0.0.0.0")
 
-if [[ "${INSTALLED_VERSION}" == "${LATEST_VERSION}" ]]; then
-  log "Already on latest version: ${LATEST_VERSION}"
+if [[ "$(printf '%s\n%s\n' "${INSTALLED_VERSION}" "${LATEST_VERSION}" | sort -V | tail -n1)" == "${INSTALLED_VERSION}" ]]; then
+  log "Installed version (${INSTALLED_VERSION}) is >= latest discovered (${LATEST_VERSION}); skipping"
   exit 0
 fi
 
@@ -46,17 +46,11 @@ cleanup() { rm -rf "${TMP_DIR}"; }
 trap cleanup EXIT
 
 log "Downloading ${LATEST_URL}"
-curl -fsSL -A "Mozilla/5.0 (X11; Linux x86_64)" -o "${TMP_ZIP}" "${LATEST_URL}"
+curl -fsSL --connect-timeout 10 --max-time 300 --retry 3 --retry-delay 5 \
+  -A "Mozilla/5.0 (X11; Linux x86_64)" -o "${TMP_ZIP}" "${LATEST_URL}"
 
 mkdir -p "${TMP_EXTRACT}" "${TMP_PRESERVE}"
 unzip -q "${TMP_ZIP}" -d "${TMP_EXTRACT}"
-
-# Backup preserved files before overwrite
-for item in "${PRESERVE_ITEMS[@]}"; do
-  if [[ -e "${INSTALL_DIR}/${item}" ]]; then
-    cp -a "${INSTALL_DIR}/${item}" "${TMP_PRESERVE}/${item}"
-  fi
-done
 
 log "Stopping minecraft service"
 systemctl stop minecraft
@@ -69,6 +63,13 @@ if systemctl is-active --quiet minecraft; then
   log "ERROR: minecraft service did not stop within 30s — aborting update" >&2
   exit 1
 fi
+
+# Backup preserved files after service has stopped
+for item in "${PRESERVE_ITEMS[@]}"; do
+  if [[ -e "${INSTALL_DIR}/${item}" ]]; then
+    cp -a "${INSTALL_DIR}/${item}" "${TMP_PRESERVE}/${item}"
+  fi
+done
 
 cp -a "${TMP_EXTRACT}/." "${INSTALL_DIR}/"
 
