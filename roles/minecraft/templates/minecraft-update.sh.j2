@@ -18,7 +18,7 @@ LATEST_URL=$(curl -fsSL --connect-timeout 10 --max-time 60 --retry 3 --retry-del
   -H "Accept-Language: en-US,en" \
   -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0" \
   "https://www.minecraft.net/en-us/download/server/bedrock" \
-  | grep -oP 'https://[^"]+bedrock-server-[0-9.]+\.zip' \
+  | grep -oP 'https://[^\s"'\''<>]+bedrock-server-[0-9.]+\.zip' \
   | grep -v arm \
   | head -1)
 

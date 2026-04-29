@@ -1,5 +1,5 @@
 ---
-minecraft_bds_version: "1.21.71.01"
+minecraft_bds_version: "1.26.14.1"
 minecraft_bds_download_url: "https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-{{ minecraft_bds_version }}.zip"
 minecraft_install_dir: /opt/minecraft/bedrock
 minecraft_port: 19132
