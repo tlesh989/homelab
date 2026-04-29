@@ -1,5 +1,5 @@
 ---
-# CF_DNS_API_TOKEN (Zone:DNS:Edit) must be set in Doppler — consumed by tasks/main.yml
+# Doppler secrets required: CF_DNS_API_TOKEN (Zone:DNS:Edit), DDNS_DOMAINS, PUSHOVER_API_TOKEN, PUSHOVER_USER_KEY
 ddns_image_version: "1"
 ddns_domains: "{{ lookup('env', 'DDNS_DOMAINS') }}"
 ddns_proxied: "false"
