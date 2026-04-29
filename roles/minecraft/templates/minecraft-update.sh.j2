@@ -20,7 +20,7 @@ LATEST_URL=$(curl -fsSL --connect-timeout 10 --max-time 60 --retry 3 --retry-del
   "https://www.minecraft.net/en-us/download/server/bedrock" \
   | grep -oP 'https://[^\s"'\''<>]+bedrock-server-[0-9.]+\.zip' \
   | grep -v arm \
-  | head -1)
+  | head -1) || true
 
 if [[ -z "${LATEST_URL}" ]]; then
   log "ERROR: Failed to determine latest BDS URL" >&2
