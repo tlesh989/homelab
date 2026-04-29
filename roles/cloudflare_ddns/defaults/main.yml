@@ -1,5 +1,5 @@
 ---
 # CF_DNS_API_TOKEN (Zone:DNS:Edit) must be set in Doppler — consumed by tasks/main.yml
 ddns_image_version: "1"
-ddns_domains: "mc.tlesh.net"
+ddns_domains: "{{ lookup('env', 'DDNS_DOMAINS') }}"
 ddns_proxied: "false"
