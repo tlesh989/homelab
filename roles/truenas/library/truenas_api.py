@@ -37,7 +37,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     """
     Perform a single authenticated call to a TrueNAS websocket API method and exit the Ansible module with the result.
-    
+
     This function parses module parameters (host, api_key, method, params, validate_certs), opens a websocket Client to wss://{host}/api/current, authenticates using the provided API key, invokes the requested method with the given positional parameters, and exits via module.exit_json(changed=False, result=result). The module will fail with a clear message if the required truenas_api_client package is not installed, if authentication fails, or if the API call raises an exception.
     """
     module = AnsibleModule(

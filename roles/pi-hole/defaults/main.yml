@@ -15,8 +15,11 @@ pihole_install_dir: /etc/pihole
 # FTL port format: <port>o (o = open/HTTP), e.g. "8080o" for HTTP-only on 8080
 pihole_port: "8080o"
 
-# Local DNS A records for homelab services (tlesh.xyz LAN domain)
-# Services proxied through Caddy (.25) resolve to Caddy IP, not their own IP
+# Local DNS A records — split-horizon DNS for homelab services.
+# Primary internal domain is tlesh.xyz, but some hosts use a different TLD
+# (e.g., mc.tlesh.net for the Minecraft public server via MINECRAFT_PUBLIC_SERVER).
+# Both TLDs are served here; public DNS for these names resolves differently
+# (split-horizon).  Services proxied through Caddy (.17) resolve to the Caddy IP.
 pihole_local_hosts:
   - "192.168.233.3 pi-hole.tlesh.xyz"
   - "192.168.233.7 tika.tlesh.xyz"
@@ -36,3 +39,4 @@ pihole_local_hosts:
   - "192.168.233.17 uptime-kuma.tlesh.xyz"
   - "192.168.233.17 grafana.tlesh.xyz"
   - "192.168.233.17 n8n.tlesh.xyz"
+  - "192.168.233.19 {{ lookup('env', 'MINECRAFT_SERVER') }}"
