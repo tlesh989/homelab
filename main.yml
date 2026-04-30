@@ -107,6 +107,7 @@
     - role: watchtower
     - role: glance
     - role: n8n
+    - role: freshrss
     - role: cloudflare_ddns
 
 - name: deploy monitoring stack

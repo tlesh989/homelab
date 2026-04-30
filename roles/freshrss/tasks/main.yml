@@ -1,0 +1,32 @@
+---
+- name: Create FreshRSS data directory
+  ansible.builtin.file:
+    path: "{{ freshrss_data_path }}"
+    state: directory
+    owner: "33"
+    group: "33"
+    mode: "0755"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy FreshRSS container
+  community.docker.docker_container:
+    name: freshrss
+    image: "freshrss/freshrss:{{ freshrss_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ freshrss_port | string }}:80"
+    volumes:
+      - "{{ freshrss_data_path }}:/var/www/FreshRSS/data"
+    env:
+      TZ: "America/New_York"
+      CRON_MIN: "*/15"
+      FRESHRSS_ENV: "production"
+  become: true
+  when: not ansible_check_mode
