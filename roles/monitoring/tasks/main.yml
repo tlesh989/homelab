@@ -76,7 +76,13 @@
     mode: "0644"
   loop:
     - node-exporter-full.json
-    - scraparr-dashboard.json
+  become: true
+  notify: Restart Grafana
+
+- name: Remove stale scraparr dashboard
+  ansible.builtin.file:
+    path: "{{ grafana_dashboards_dir }}/scraparr-dashboard.json"
+    state: absent
   become: true
   notify: Restart Grafana
 
