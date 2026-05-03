@@ -13,3 +13,6 @@ grafana_dashboards_dir: /opt/grafana/provisioning/dashboards
 grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') }}"
 
 monitoring_network: monitoring
+
+cadvisor_version: "v0.51"
+cadvisor_port: 8083

@@ -18,3 +18,8 @@ scrape_configs:
         - "{{ hostvars[host]['ansible_host'] }}:{{ scraparr_port }}"
 {% endfor %}
 {% endif %}
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+          - "{{ hostvars['kaz.tlesh.xyz']['ansible_host'] }}:{{ cadvisor_port }}"
