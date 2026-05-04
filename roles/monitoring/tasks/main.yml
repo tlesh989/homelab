@@ -123,6 +123,13 @@
   become: true
   when: not ansible_check_mode
 
+- name: Verify Grafana alerting secrets are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PUSHOVER_APP_TOKEN') | length > 0
+      - lookup('env', 'PUSHOVER_USER_KEY') | length > 0
+    fail_msg: "PUSHOVER_APP_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
+
 - name: Deploy Grafana container
   community.docker.docker_container:
     name: grafana
@@ -176,6 +183,13 @@
     mode: "0755"
   become: true
 
+- name: Verify pve-exporter credentials are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PVE_TOKEN_ID') | length > 0
+      - lookup('env', 'PVE_TOKEN_SECRET') | length > 0
+    fail_msg: "PVE_TOKEN_ID and PVE_TOKEN_SECRET must be set before templating pve-exporter config."
+
 - name: Template pve-exporter credentials config
   ansible.builtin.template:
     src: pve-exporter.yml.j2
@@ -184,6 +198,7 @@
     group: "65534"
     mode: "0600"
   become: true
+  no_log: true
   notify: Restart pve-exporter
 
 - name: Deploy pve-exporter container

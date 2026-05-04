@@ -21,3 +21,4 @@
     state: started
     restart: true
   become: true
+  when: not ansible_check_mode
