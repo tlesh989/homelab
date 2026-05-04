@@ -23,7 +23,6 @@
     fail_msg: "PUSHOVER_USER_KEY must be set in Doppler — required for shoutrrr Pushover notifications"
   when: not ansible_check_mode
 
-
 - name: Install Docker Python SDK
   ansible.builtin.package:
     name: python3-docker

@@ -11,7 +11,8 @@ PRESERVE_ITEMS=(
   valid_known_packs.json
 )
 
-log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+# All log output goes to stderr so command-substitution callers don't capture it.
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2; }
 
 # ---------------------------------------------------------------------------
 # get_latest_bds_url: scrape the Minecraft BDS download page for the latest
@@ -117,6 +118,16 @@ if systemctl is-active --quiet minecraft; then
   exit 1
 fi
 
+# If any subsequent step fails, attempt to restart the service before exiting
+# so that a failed update doesn't leave the server permanently down.
+restart_on_error() {
+  local code=$?
+  log "ERROR: update failed (exit ${code}) — attempting minecraft service restart"
+  systemctl start minecraft || log "ERROR: failed to restart minecraft after update failure"
+  exit "${code}"
+}
+trap restart_on_error ERR
+
 # Backup preserved files after service has stopped
 for item in "${PRESERVE_ITEMS[@]}"; do
   if [[ -e "${INSTALL_DIR}/${item}" ]]; then
@@ -124,6 +135,9 @@ for item in "${PRESERVE_ITEMS[@]}"; do
   fi
 done
 
+# Wipe install dir to prevent stale file drift from Mojang renames/removals,
+# then copy the fresh extract.
+find "${INSTALL_DIR}" -mindepth 1 -delete
 cp -a "${TMP_EXTRACT}/." "${INSTALL_DIR}/"
 
 # Restore preserved files
@@ -135,6 +149,8 @@ done
 
 echo "${LATEST_VERSION}" > "${VERSION_FILE}"
 chown -R minecraft:minecraft "${INSTALL_DIR}"
+
+trap - ERR  # clear error trap before the intentional service start
 
 log "Starting minecraft service"
 systemctl start minecraft
