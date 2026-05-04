@@ -28,6 +28,7 @@
     - "{{ grafana_data_dir }}"
     - "{{ grafana_provisioning_dir }}/datasources"
     - "{{ grafana_dashboards_dir }}"
+    - "{{ grafana_alerting_dir }}"
   become: true
 
 - name: Create monitoring Docker network
@@ -88,6 +89,19 @@
   become: true
   notify: Restart Grafana
 
+- name: Copy Grafana alerting provisioning files
+  ansible.builtin.copy:
+    src: "alerting/{{ item }}"
+    dest: "{{ grafana_alerting_dir }}/{{ item }}"
+    owner: "472"
+    group: "472"
+    mode: "0644"
+  loop:
+    - contact-points.yaml
+    - rules.yaml
+  become: true
+  notify: Restart Grafana
+
 - name: Deploy Prometheus container
   community.docker.docker_container:
     name: prometheus
@@ -123,9 +137,12 @@
       - "{{ grafana_data_dir }}:/var/lib/grafana"
       - "{{ grafana_provisioning_dir }}/datasources:/etc/grafana/provisioning/datasources:ro"
       - "{{ grafana_dashboards_dir }}:/etc/grafana/provisioning/dashboards:ro"
+      - "{{ grafana_alerting_dir }}:/etc/grafana/provisioning/alerting:ro"
     env:
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_USERS_ALLOW_SIGN_UP: "false"
+      PUSHOVER_APP_TOKEN: "{{ lookup('env', 'PUSHOVER_APP_TOKEN') }}"
+      PUSHOVER_USER_KEY: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
   become: true
   when: not ansible_check_mode
   no_log: true
