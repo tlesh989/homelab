@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~>1.14.0"
+  required_version = "~> 1.15.0"
   cloud {
     organization = "tlesh-net"
 
@@ -16,7 +16,7 @@ terraform {
 
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.104.0"
+      version = "0.105.0"
     }
   }
 }
