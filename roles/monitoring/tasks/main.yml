@@ -171,8 +171,8 @@
   ansible.builtin.file:
     path: "{{ pve_exporter_config_dir }}"
     state: directory
-    owner: "1000"
-    group: "1000"
+    owner: "65534"
+    group: "65534"
     mode: "0755"
   become: true
 
@@ -180,8 +180,8 @@
   ansible.builtin.template:
     src: pve-exporter.yml.j2
     dest: "{{ pve_exporter_config_dir }}/pve.yml"
-    owner: "1000"
-    group: "1000"
+    owner: "65534"
+    group: "65534"
     mode: "0600"
   become: true
 

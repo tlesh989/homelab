@@ -79,7 +79,7 @@ groups:
           severity: critical
         annotations:
           summary: "Host {{ $labels.instance }} is unreachable"
-        noDataState: Alerting
+        noDataState: NoData
         execErrState: Error
         isPaused: false
         notification_settings:
