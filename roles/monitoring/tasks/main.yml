@@ -126,9 +126,9 @@
 - name: Verify Grafana alerting secrets are set
   ansible.builtin.assert:
     that:
-      - lookup('env', 'PUSHOVER_APP_TOKEN') | length > 0
+      - lookup('env', 'PUSHOVER_API_TOKEN') | length > 0
       - lookup('env', 'PUSHOVER_USER_KEY') | length > 0
-    fail_msg: "PUSHOVER_APP_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
+    fail_msg: "PUSHOVER_API_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
 
 - name: Deploy Grafana container
   community.docker.docker_container:
@@ -148,7 +148,7 @@
     env:
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_USERS_ALLOW_SIGN_UP: "false"
-      PUSHOVER_APP_TOKEN: "{{ lookup('env', 'PUSHOVER_APP_TOKEN') }}"
+      PUSHOVER_API_TOKEN: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
       PUSHOVER_USER_KEY: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
   become: true
   when: not ansible_check_mode
@@ -210,6 +210,6 @@
     ports:
       - "{{ pve_exporter_port | string }}:9221"
     volumes:
-      - "{{ pve_exporter_config_dir }}/pve.yml:/etc/pve.yml:ro"
+      - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
   become: true
   when: not ansible_check_mode

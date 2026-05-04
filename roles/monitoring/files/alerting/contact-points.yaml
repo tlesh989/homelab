@@ -8,7 +8,7 @@ contactPoints:
       - uid: pushover-main
         type: pushover
         settings:
-          apiToken: $PUSHOVER_APP_TOKEN
+          apiToken: $PUSHOVER_API_TOKEN
           userKey: $PUSHOVER_USER_KEY
           priority: 0
           okPriority: -2

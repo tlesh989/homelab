@@ -815,7 +815,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "pve_cpu_usage_limit and on(id) pve_node_info",
+          "expr": "pve_cpu_usage_limit{instance=\"$instance\"} and on(id) pve_node_info",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
