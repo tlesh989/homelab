@@ -14,3 +14,10 @@
     restart: true
   become: true
   when: not ansible_check_mode
+
+- name: Restart pve-exporter
+  community.docker.docker_container:
+    name: pve-exporter
+    state: started
+    restart: true
+  become: true

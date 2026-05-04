@@ -2,4 +2,4 @@ default:
   user: "{{ lookup('env', 'PVE_TOKEN_ID') }}"
   token_name: "pve-exporter"
   token_value: "{{ lookup('env', 'PVE_TOKEN_SECRET') }}"
-  verify_ssl: false
+  verify_ssl: false  # Proxmox uses a self-signed cert in homelab; trusted internal network

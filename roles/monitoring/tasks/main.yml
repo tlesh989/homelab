@@ -163,7 +163,7 @@
       - "/dev/disk:/dev/disk:ro"
     devices:
       - "/dev/kmsg"
-    privileged: true
+    privileged: true # required for complete container metrics (cgroup, disk I/O)
   become: true
   when: not ansible_check_mode
 
@@ -184,6 +184,7 @@
     group: "65534"
     mode: "0600"
   become: true
+  notify: Restart pve-exporter
 
 - name: Deploy pve-exporter container
   community.docker.docker_container:
