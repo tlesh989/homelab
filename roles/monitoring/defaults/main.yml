@@ -15,7 +15,7 @@ grafana_alerting_dir: /opt/grafana/provisioning/alerting
 
 monitoring_network: monitoring
 
-cadvisor_version: "v0.51"
+cadvisor_version: "0.56"
 cadvisor_port: 8083
 
 pve_exporter_version: "3"

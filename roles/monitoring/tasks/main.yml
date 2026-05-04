@@ -157,7 +157,7 @@
 - name: Deploy cAdvisor container
   community.docker.docker_container:
     name: cadvisor
-    image: "gcr.io/cadvisor/cadvisor:{{ cadvisor_version }}"
+    image: "ghcr.io/google/cadvisor:{{ cadvisor_version }}"
     state: started
     restart_policy: always
     ports:
