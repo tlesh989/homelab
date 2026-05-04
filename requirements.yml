@@ -8,7 +8,7 @@ roles:
   - src: geerlingguy.pip
     version: "3.1.2"
   - src: geerlingguy.security
-    version: "3.0.0"
+    version: "3.0.1"
   - src: GROG.package
     version: "v1.4.1"
   # no tagged releases — unpinned
