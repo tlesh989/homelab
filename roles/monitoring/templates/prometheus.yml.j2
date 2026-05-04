@@ -23,3 +23,13 @@ scrape_configs:
     static_configs:
       - targets:
           - "{{ hostvars['kaz.tlesh.xyz']['ansible_host'] }}:{{ cadvisor_port }}"
+
+  - job_name: pve
+    static_configs:
+      - targets:
+          - "{{ hostvars['kaz.tlesh.xyz']['ansible_host'] }}:{{ pve_exporter_port }}"
+    metrics_path: /pve
+    params:
+      module: [default]
+      cluster: ['1']
+      node: ['1']

@@ -77,6 +77,7 @@
   loop:
     - node-exporter-full.json
     - cadvisor-dashboard.json
+    - proxmox-dashboard.json
   become: true
   notify: Restart Grafana
 
@@ -146,5 +147,36 @@
     devices:
       - "/dev/kmsg"
     privileged: true
+  become: true
+  when: not ansible_check_mode
+
+- name: Create pve-exporter config directory
+  ansible.builtin.file:
+    path: "{{ pve_exporter_config_dir }}"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: "0755"
+  become: true
+
+- name: Template pve-exporter credentials config
+  ansible.builtin.template:
+    src: pve-exporter.yml.j2
+    dest: "{{ pve_exporter_config_dir }}/pve.yml"
+    owner: "1000"
+    group: "1000"
+    mode: "0600"
+  become: true
+
+- name: Deploy pve-exporter container
+  community.docker.docker_container:
+    name: pve-exporter
+    image: "prompve/prometheus-pve-exporter:{{ pve_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ pve_exporter_port | string }}:9221"
+    volumes:
+      - "{{ pve_exporter_config_dir }}/pve.yml:/etc/pve.yml:ro"
   become: true
   when: not ansible_check_mode

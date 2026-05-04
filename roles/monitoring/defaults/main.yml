@@ -16,3 +16,7 @@ monitoring_network: monitoring
 
 cadvisor_version: "v0.51"
 cadvisor_port: 8083
+
+pve_exporter_version: "3"
+pve_exporter_port: 9221
+pve_exporter_config_dir: /opt/pve-exporter
