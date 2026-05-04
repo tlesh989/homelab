@@ -1,0 +1,125 @@
+---
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: infrastructure
+    folder: Infrastructure
+    interval: 1m
+    rules:
+      - uid: host-disk-full
+        title: Host Disk Full
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: '(node_filesystem_avail_bytes{fstype!="tmpfs",mountpoint="/"} / node_filesystem_size_bytes{fstype!="tmpfs",mountpoint="/"}) * 100'
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 15
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    type: last
+              refId: C
+              type: classic_conditions
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk below 15% on {{ $labels.instance }}"
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+        notification_settings:
+          receiver: Pushover
+
+      - uid: host-down
+        title: Host Down
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: 'up{job="node"}'
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    type: last
+              refId: C
+              type: classic_conditions
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host {{ $labels.instance }} is unreachable"
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+        notification_settings:
+          receiver: Pushover
+
+      - uid: high-memory-pressure
+        title: High Memory Pressure
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100"
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 10
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    type: last
+              refId: C
+              type: classic_conditions
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory below 10% available on {{ $labels.instance }}"
+        noDataState: NoData
+        execErrState: Error
+        isPaused: false
+        notification_settings:
+          receiver: Pushover
