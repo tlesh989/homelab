@@ -161,7 +161,7 @@
     state: started
     restart_policy: always
     ports:
-      - "127.0.0.1:{{ cadvisor_port | string }}:8080"
+      - "{{ cadvisor_port | string }}:8080"
     volumes:
       - "/:/rootfs:ro"
       - "/var/run:/var/run:ro"
@@ -208,7 +208,7 @@
     state: started
     restart_policy: always
     ports:
-      - "127.0.0.1:{{ pve_exporter_port | string }}:9221"
+      - "{{ pve_exporter_port | string }}:9221"
     volumes:
       - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
   become: true
