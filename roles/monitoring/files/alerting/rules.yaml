@@ -12,6 +12,9 @@ groups:
         condition: C
         data:
           - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
             datasourceUid: prometheus
             model:
               expr: '(node_filesystem_avail_bytes{fstype!="tmpfs",mountpoint="/"} / node_filesystem_size_bytes{fstype!="tmpfs",mountpoint="/"}) * 100'
@@ -51,6 +54,9 @@ groups:
         condition: C
         data:
           - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
             datasourceUid: prometheus
             model:
               expr: 'up{job="node"}'
@@ -90,6 +96,9 @@ groups:
         condition: C
         data:
           - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
             datasourceUid: prometheus
             model:
               expr: "(node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100"
