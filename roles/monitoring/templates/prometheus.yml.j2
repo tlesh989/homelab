@@ -23,14 +23,14 @@ scrape_configs:
     static_configs:
       - targets:
 {% for host in groups['kaz'] | default([]) %}
-          - "{{ hostvars[host]['ansible_host'] }}:{{ cadvisor_port }}"
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ cadvisor_port }}"
 {% endfor %}
 
   - job_name: pve
     static_configs:
       - targets:
 {% for host in groups['kaz'] | default([]) %}
-          - "{{ hostvars[host]['ansible_host'] }}:{{ pve_exporter_port }}"
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ pve_exporter_port }}"
 {% endfor %}
     metrics_path: /pve
     params:
