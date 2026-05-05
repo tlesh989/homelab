@@ -3,6 +3,8 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: No preparation required for cloudflare_ddns default scenario
-      ansible.builtin.debug:
-        msg: "cloudflare_ddns has no filesystem state to pre-seed"
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
