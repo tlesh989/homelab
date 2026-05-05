@@ -106,6 +106,11 @@ log "Archive integrity OK"
 mkdir -p "${TMP_EXTRACT}" "${TMP_PRESERVE}"
 unzip -q "${TMP_ZIP}" -d "${TMP_EXTRACT}"
 
+if [[ -z "${INSTALL_DIR}" || "${INSTALL_DIR}" == "/" ]]; then
+  log "ERROR: refusing to update with unsafe INSTALL_DIR='${INSTALL_DIR}'"
+  exit 1
+fi
+
 log "Stopping minecraft service"
 systemctl stop minecraft
 # Wait up to 30s for the service to fully stop before touching files

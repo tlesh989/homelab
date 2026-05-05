@@ -4,6 +4,7 @@
     name:
       - unzip
       - ufw
+      - curl
       - libcurl4
       - libssl3
       - libatomic1
@@ -92,7 +93,7 @@
       Set the MINECRAFT_OPERATOR_XUID environment variable (e.g., via Doppler)
       or override minecraft_operator_xuid in group_vars before running this role.
       An empty XUID would produce a broken permissions.json operator entry.
-    success_msg: "minecraft_operator_xuid is set ({{ minecraft_operator_xuid }})"
+    success_msg: "minecraft_operator_xuid is set"
 
 - name: Configure permissions.json
   ansible.builtin.template:
