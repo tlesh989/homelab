@@ -12,7 +12,7 @@
     - name: Assert minecraft user has nologin shell
       ansible.builtin.assert:
         that:
-          - minecraft_user.ansible_facts.getent_passwd['minecraft'][4] == '/usr/sbin/nologin'
+          - minecraft_user.ansible_facts.getent_passwd['minecraft'][5] == '/usr/sbin/nologin'
         fail_msg: "minecraft user does not exist or has wrong shell"
 
     - name: Verify install directory exists with correct ownership
