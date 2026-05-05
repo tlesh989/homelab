@@ -1,0 +1,135 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify minecraft system user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: minecraft
+      register: minecraft_user
+
+    - name: Assert minecraft user has nologin shell
+      ansible.builtin.assert:
+        that:
+          - minecraft_user.ansible_facts.getent_passwd['minecraft'][4] == '/usr/sbin/nologin'
+        fail_msg: "minecraft user does not exist or has wrong shell"
+
+    - name: Verify install directory exists with correct ownership
+      ansible.builtin.stat:
+        path: /opt/minecraft/bedrock
+      register: install_dir
+
+    - name: Assert install directory is owned by minecraft
+      ansible.builtin.assert:
+        that:
+          - install_dir.stat.exists
+          - install_dir.stat.isdir
+          - install_dir.stat.pw_name == 'minecraft'
+          - install_dir.stat.gr_name == 'minecraft'
+          - install_dir.stat.mode == '0755'
+        fail_msg: "Install directory missing or wrong ownership"
+
+    - name: Verify server.properties exists
+      ansible.builtin.stat:
+        path: /opt/minecraft/bedrock/server.properties
+      register: server_props
+
+    - name: Assert server.properties is owned by minecraft
+      ansible.builtin.assert:
+        that:
+          - server_props.stat.exists
+          - server_props.stat.pw_name == 'minecraft'
+          - server_props.stat.mode == '0644'
+        fail_msg: "server.properties missing or wrong ownership"
+
+    - name: Verify permissions.json exists
+      ansible.builtin.stat:
+        path: /opt/minecraft/bedrock/permissions.json
+      register: perms_json
+
+    - name: Assert permissions.json is owned by minecraft
+      ansible.builtin.assert:
+        that:
+          - perms_json.stat.exists
+          - perms_json.stat.pw_name == 'minecraft'
+        fail_msg: "permissions.json missing or wrong ownership"
+
+    - name: Verify systemd service file exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/minecraft.service
+      register: service_file
+
+    - name: Assert service file exists
+      ansible.builtin.assert:
+        that:
+          - service_file.stat.exists
+        fail_msg: "minecraft.service file not found"
+
+    - name: Read service file content
+      ansible.builtin.slurp:
+        src: /etc/systemd/system/minecraft.service
+      register: service_content
+
+    - name: Assert service has Restart=on-failure
+      ansible.builtin.assert:
+        that:
+          - "'Restart=on-failure' in (service_content.content | b64decode)"
+        fail_msg: "minecraft.service missing Restart=on-failure — service won't recover from crashes"
+
+    - name: Verify update script exists and is executable
+      ansible.builtin.stat:
+        path: /usr/local/bin/minecraft-update
+      register: update_script
+
+    - name: Assert update script is executable
+      ansible.builtin.assert:
+        that:
+          - update_script.stat.exists
+          - update_script.stat.executable
+        fail_msg: "minecraft-update script missing or not executable"
+
+    - name: Read update script content
+      ansible.builtin.slurp:
+        src: /usr/local/bin/minecraft-update
+      register: script_content
+
+    - name: Assert update script has set -euo pipefail
+      ansible.builtin.assert:
+        that:
+          - "'set -euo pipefail' in (script_content.content | b64decode)"
+        fail_msg: "minecraft-update missing set -euo pipefail"
+
+    - name: Run update script with unsafe INSTALL_DIR to trigger early-exit guard
+      ansible.builtin.command:
+        cmd: bash -c "INSTALL_DIR=/ /usr/local/bin/minecraft-update 2>&1 || true"
+      register: script_bad_input
+      changed_when: false
+
+    - name: Assert script produces output on bad input (no silent exit)
+      ansible.builtin.assert:
+        that:
+          - script_bad_input.stdout | length > 0
+        fail_msg: >
+          minecraft-update exited silently with INSTALL_DIR=/ —
+          the early-exit guard should print an error message before exiting.
+
+    - name: Check cron job via crontab
+      ansible.builtin.command:
+        cmd: crontab -l -u root
+      register: root_crontab
+      failed_when: false
+      changed_when: false
+
+    - name: Find cron.d entries as fallback
+      ansible.builtin.find:
+        paths: /etc/cron.d
+        patterns: "minecraft*"
+      register: cron_d_files
+      when: root_crontab.rc != 0
+
+    - name: Assert minecraft-update cron job is present
+      ansible.builtin.assert:
+        that:
+          - "'minecraft-update' in root_crontab.stdout or (cron_d_files is defined and cron_d_files.matched > 0)"
+        fail_msg: "minecraft-update cron job not found in crontab or /etc/cron.d"
