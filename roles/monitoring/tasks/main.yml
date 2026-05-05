@@ -36,7 +36,9 @@
     name: "{{ monitoring_network }}"
     state: present
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Template Prometheus config
   ansible.builtin.template:
@@ -121,7 +123,9 @@
       - "--storage.tsdb.retention.time={{ prometheus_retention }}"
       - "--web.enable-lifecycle"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Verify Grafana alerting secrets are set
   ansible.builtin.assert:
@@ -151,7 +155,9 @@
       PUSHOVER_API_TOKEN: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
       PUSHOVER_USER_KEY: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
   no_log: true
 
 - name: Deploy cAdvisor container
@@ -172,7 +178,9 @@
       - "/dev/kmsg"
     privileged: true # required for complete container metrics (cgroup, disk I/O)
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Create pve-exporter config directory
   ansible.builtin.file:
@@ -212,4 +220,6 @@
     volumes:
       - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
