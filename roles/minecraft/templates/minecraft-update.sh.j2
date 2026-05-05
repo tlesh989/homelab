@@ -3,7 +3,7 @@ set -euo pipefail
 
 INSTALL_DIR="{{ minecraft_install_dir }}"
 if [[ -z "${INSTALL_DIR}" || "${INSTALL_DIR}" == "/" ]]; then
-  log "ERROR: refusing to update with unsafe INSTALL_DIR='${INSTALL_DIR}'"
+  echo "ERROR: refusing to update with unsafe INSTALL_DIR='${INSTALL_DIR}'" >&2
   exit 1
 fi
 VERSION_FILE="${INSTALL_DIR}/.version"
@@ -132,6 +132,10 @@ restart_on_error() {
 }
 trap restart_on_error ERR
 
+# Disable ERR trap before mutating live install directory to prevent
+# restart_on_error from booting a partial install if any step fails.
+trap - ERR
+
 # Backup preserved files after service has stopped
 for item in "${PRESERVE_ITEMS[@]}"; do
   if [[ -e "${INSTALL_DIR}/${item}" ]]; then
@@ -153,6 +157,9 @@ done
 
 echo "${LATEST_VERSION}" > "${VERSION_FILE}"
 chown -R minecraft:minecraft "${INSTALL_DIR}"
+
+# Re-enable ERR trap now that install directory is in a consistent state
+trap restart_on_error ERR
 
 trap - ERR  # clear error trap before the intentional service start
 
