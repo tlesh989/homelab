@@ -1,0 +1,8 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: No prior state needed for monitoring default scenario
+      ansible.builtin.debug:
+        msg: "monitoring default scenario has no prior state to seed"
