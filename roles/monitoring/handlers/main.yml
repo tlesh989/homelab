@@ -5,7 +5,9 @@
     state: started
     restart: true
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Restart Grafana
   community.docker.docker_container:
@@ -13,7 +15,9 @@
     state: started
     restart: true
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Restart pve-exporter
   community.docker.docker_container:
@@ -21,4 +25,6 @@
     state: started
     restart: true
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
