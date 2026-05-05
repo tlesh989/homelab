@@ -1,0 +1,31 @@
+---
+role_name_check: 1
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: geerlingguy/docker-ubuntu2604-ansible:latest
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        molecule_testing: true
+        ddns_image_version: "1"
+        ddns_domains: fake.example.com
+        ddns_proxied: "false"
+  env:
+    CF_DNS_API_TOKEN: fake-cf-token
+    DDNS_DOMAINS: fake.example.com
+    PUSHOVER_API_TOKEN: fake-pushover-token
+    PUSHOVER_USER_KEY: fake-pushover-key
+verifier:
+  name: ansible
