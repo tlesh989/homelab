@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify Prometheus container is running
+      ansible.builtin.command:
+        cmd: docker ps --filter name=prometheus --format "{{ '{{' }}.Names{{ '}}' }}"
+      register: prometheus_status
+      changed_when: false
+
+    - name: Assert Prometheus is running
+      ansible.builtin.assert:
+        that:
+          - "'prometheus' in prometheus_status.stdout"
+        fail_msg: "Prometheus container is not running"
+
+    - name: Verify Grafana container is running
+      ansible.builtin.command:
+        cmd: docker ps --filter name=grafana --format "{{ '{{' }}.Names{{ '}}' }}"
+      register: grafana_status
+      changed_when: false
+
+    - name: Assert Grafana is running
+      ansible.builtin.assert:
+        that:
+          - "'grafana' in grafana_status.stdout"
+        fail_msg: "Grafana container is not running"

@@ -1,0 +1,29 @@
+---
+# Integration scenario: deploys real n8n container. Requires Docker socket.
+# Run manually: task molecule-integration -- ROLE=n8n
+role_name_check: 1
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: geerlingguy/docker-ubuntu2604-ansible:latest
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        n8n_data_path: /opt/n8n/data
+        n8n_port: 5678
+        n8n_host: localhost
+        n8n_version: "1"
+verifier:
+  name: ansible
