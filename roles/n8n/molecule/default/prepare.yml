@@ -3,6 +3,8 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: No prior state needed for n8n default scenario
-      ansible.builtin.debug:
-        msg: "n8n default scenario has no prior state to seed"
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true

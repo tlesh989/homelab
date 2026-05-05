@@ -3,6 +3,12 @@
   hosts: all
   gather_facts: false
   tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
     - name: Create minecraft install directory
       ansible.builtin.file:
         path: /opt/minecraft/bedrock
