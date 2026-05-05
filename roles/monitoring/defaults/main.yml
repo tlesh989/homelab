@@ -11,5 +11,13 @@ grafana_data_dir: /opt/grafana/data
 grafana_provisioning_dir: /opt/grafana/provisioning
 grafana_dashboards_dir: /opt/grafana/provisioning/dashboards
 grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') }}"
+grafana_alerting_dir: /opt/grafana/provisioning/alerting
 
 monitoring_network: monitoring
+
+cadvisor_version: "0.56"
+cadvisor_port: 8083
+
+pve_exporter_version: "3"
+pve_exporter_port: 9221
+pve_exporter_config_dir: /opt/pve-exporter

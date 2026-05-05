@@ -1,0 +1,15 @@
+---
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Pushover
+    receivers:
+      - uid: pushover-main
+        type: pushover
+        settings:
+          apiToken: $PUSHOVER_API_TOKEN
+          userKey: $PUSHOVER_USER_KEY
+          priority: 0
+          okPriority: -2
+        disableResolveMessage: false

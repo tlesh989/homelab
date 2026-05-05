@@ -1,0 +1,5 @@
+---
+freshrss_version: "1"
+freshrss_port: 8002
+freshrss_data_path: /opt/freshrss/data
+freshrss_host: "freshrss.tlesh.xyz"

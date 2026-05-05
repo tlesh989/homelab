@@ -17,7 +17,7 @@ pihole_port: "8080o"
 
 # Local DNS A records — split-horizon DNS for homelab services.
 # Primary internal domain is tlesh.xyz, but some hosts use a different TLD
-# (e.g., mc.tlesh.net for the Minecraft public server via MINECRAFT_PUBLIC_SERVER).
+# (e.g., minecraft.domain.tld for the Minecraft public server via MINECRAFT_SERVER).
 # Both TLDs are served here; public DNS for these names resolves differently
 # (split-horizon).  Services proxied through Caddy (.17) resolve to the Caddy IP.
 pihole_local_hosts:
@@ -39,4 +39,6 @@ pihole_local_hosts:
   - "192.168.233.17 uptime-kuma.tlesh.xyz"
   - "192.168.233.17 grafana.tlesh.xyz"
   - "192.168.233.17 n8n.tlesh.xyz"
+  - "192.168.233.17 freshrss.tlesh.xyz"
+  - "192.168.233.17 seerr.tlesh.xyz"
   - "192.168.233.19 {{ lookup('env', 'MINECRAFT_SERVER') }}"

@@ -20,3 +20,7 @@ caddy_services:
     upstream: "192.168.233.10:5678"
   - name: grafana
     upstream: "192.168.233.10:3000"
+  - name: freshrss
+    upstream: "192.168.233.10:8002"
+  - name: seerr
+    upstream: "192.168.233.24:5055"

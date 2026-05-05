@@ -28,6 +28,7 @@
     - "{{ grafana_data_dir }}"
     - "{{ grafana_provisioning_dir }}/datasources"
     - "{{ grafana_dashboards_dir }}"
+    - "{{ grafana_alerting_dir }}"
   become: true
 
 - name: Create monitoring Docker network
@@ -76,7 +77,28 @@
     mode: "0644"
   loop:
     - node-exporter-full.json
-    - scraparr-dashboard.json
+    - cadvisor-dashboard.json
+    - proxmox-dashboard.json
+  become: true
+  notify: Restart Grafana
+
+- name: Remove stale scraparr dashboard
+  ansible.builtin.file:
+    path: "{{ grafana_dashboards_dir }}/scraparr-dashboard.json"
+    state: absent
+  become: true
+  notify: Restart Grafana
+
+- name: Copy Grafana alerting provisioning files
+  ansible.builtin.copy:
+    src: "alerting/{{ item }}"
+    dest: "{{ grafana_alerting_dir }}/{{ item }}"
+    owner: "472"
+    group: "472"
+    mode: "0644"
+  loop:
+    - contact-points.yaml
+    - rules.yaml
   become: true
   notify: Restart Grafana
 
@@ -101,6 +123,13 @@
   become: true
   when: not ansible_check_mode
 
+- name: Verify Grafana alerting secrets are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PUSHOVER_API_TOKEN') | length > 0
+      - lookup('env', 'PUSHOVER_USER_KEY') | length > 0
+    fail_msg: "PUSHOVER_API_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
+
 - name: Deploy Grafana container
   community.docker.docker_container:
     name: grafana
@@ -115,9 +144,72 @@
       - "{{ grafana_data_dir }}:/var/lib/grafana"
       - "{{ grafana_provisioning_dir }}/datasources:/etc/grafana/provisioning/datasources:ro"
       - "{{ grafana_dashboards_dir }}:/etc/grafana/provisioning/dashboards:ro"
+      - "{{ grafana_alerting_dir }}:/etc/grafana/provisioning/alerting:ro"
     env:
       GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
       GF_USERS_ALLOW_SIGN_UP: "false"
+      PUSHOVER_API_TOKEN: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
+      PUSHOVER_USER_KEY: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
   become: true
   when: not ansible_check_mode
   no_log: true
+
+- name: Deploy cAdvisor container
+  community.docker.docker_container:
+    name: cadvisor
+    image: "ghcr.io/google/cadvisor:{{ cadvisor_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ cadvisor_port | string }}:8080"
+    volumes:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker:/var/lib/docker:ro"
+      - "/dev/disk:/dev/disk:ro"
+    devices:
+      - "/dev/kmsg"
+    privileged: true # required for complete container metrics (cgroup, disk I/O)
+  become: true
+  when: not ansible_check_mode
+
+- name: Create pve-exporter config directory
+  ansible.builtin.file:
+    path: "{{ pve_exporter_config_dir }}"
+    state: directory
+    owner: "65534"
+    group: "65534"
+    mode: "0755"
+  become: true
+
+- name: Verify pve-exporter credentials are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PVE_TOKEN_ID') | length > 0
+      - lookup('env', 'PVE_TOKEN_SECRET') | length > 0
+    fail_msg: "PVE_TOKEN_ID and PVE_TOKEN_SECRET must be set before templating pve-exporter config."
+
+- name: Template pve-exporter credentials config
+  ansible.builtin.template:
+    src: pve-exporter.yml.j2
+    dest: "{{ pve_exporter_config_dir }}/pve.yml"
+    owner: "65534"
+    group: "65534"
+    mode: "0600"
+  become: true
+  no_log: true
+  notify: Restart pve-exporter
+
+- name: Deploy pve-exporter container
+  community.docker.docker_container:
+    name: pve-exporter
+    image: "prompve/prometheus-pve-exporter:{{ pve_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ pve_exporter_port | string }}:9221"
+    volumes:
+      - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
+  become: true
+  when: not ansible_check_mode
