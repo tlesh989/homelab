@@ -316,14 +316,15 @@
 
 - name: Download UniFi Poller Grafana dashboard JSONs
   ansible.builtin.get_url:
-    url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/latest/download"
+    url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
     dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
     owner: "472"
     group: "472"
     mode: "0644"
   loop:
-    - { id: "11310", name: "unifi-poller-sites.json" }
-    - { id: "11315", name: "unifi-poller-clients.json" }
+    # rev pinned — verify latest at grafana.com/dashboards/<id> before bumping
+    - { id: "11310", rev: "9", name: "unifi-poller-sites.json" }
+    - { id: "11315", rev: "9", name: "unifi-poller-clients.json" }
   become: true
   notify: Restart Grafana
   when:
