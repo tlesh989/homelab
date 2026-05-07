@@ -224,14 +224,16 @@
     volumes:
       - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Create Dozzle data directory
   ansible.builtin.file:
     path: "{{ dozzle_data_dir }}"
     state: directory
-    owner: "0"
-    group: "0"
+    owner: root
+    group: root
     mode: "0755"
   become: true
 
@@ -252,3 +254,4 @@
   become: true
   when:
     - not ansible_check_mode
+    - not (molecule_testing | default(false))
