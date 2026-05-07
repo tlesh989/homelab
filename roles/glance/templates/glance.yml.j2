@@ -216,19 +216,19 @@ pages:
                 url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
                 icon: si:uptimekuma
               - title: Grafana
-                url: https://grafana.tlesh.xyz
+                url: http://{{ hostvars['kaz.tlesh.xyz'].ansible_host }}:{{ grafana_port }}
                 icon: si:grafana
               - title: Pi-hole
-                url: https://pihole.tlesh.xyz/admin
+                url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}:8080/admin
                 icon: si:pihole
               - title: n8n
-                url: https://n8n.tlesh.xyz
+                url: http://{{ hostvars['kaz.tlesh.xyz'].ansible_host }}:5678
                 icon: si:n8n
               - title: FreshRSS
-                url: https://freshrss.tlesh.xyz
+                url: http://{{ hostvars['kaz.tlesh.xyz'].ansible_host }}:8002
                 icon: https://freshrss.org/images/icon.svg
               - title: Seerr
-                url: https://seerr.tlesh.xyz
+                url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:5055
                 icon: si:seerr
               - title: Sonarr
                 url: http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:8989

@@ -51,3 +51,10 @@ scrape_configs:
 {% for host in groups['kaz'] | default([]) %}
           - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ unpoller_port }}"
 {% endfor %}
+
+  - job_name: pihole
+    static_configs:
+      - targets:
+{% for host in groups['kaz'] | default([]) %}
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ pihole_exporter_port }}"
+{% endfor %}

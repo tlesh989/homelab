@@ -81,6 +81,7 @@
     - node-exporter-full.json
     - cadvisor-dashboard.json
     - proxmox-dashboard.json
+    - pihole-dashboard.json
   become: true
   notify: Restart Grafana
 
@@ -321,6 +322,32 @@
       UP_UNIFI_DEFAULT_SAVE_ALARMS: "true"
       UP_INFLUXDB_DISABLE: "true"
       UP_PROMETHEUS_HTTP_LISTEN: "0.0.0.0:9130"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Verify Pi-hole password is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PIHOLE_PASSWORD') | length > 0
+    fail_msg: "PIHOLE_PASSWORD must be set in Doppler before deploying pihole-exporter."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy pihole-exporter container
+  community.docker.docker_container:
+    name: pihole-exporter
+    image: "ekofr/pihole-exporter:{{ pihole_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ pihole_exporter_port | string }}:9617"
+    env:
+      PIHOLE_HOSTNAME: "{{ hostvars['pi-hole.tlesh.xyz']['ansible_host'] }}"
+      PIHOLE_PASSWORD: "{{ lookup('env', 'PIHOLE_PASSWORD') }}"
+      PIHOLE_PORT: "8080"
   become: true
   when:
     - not ansible_check_mode

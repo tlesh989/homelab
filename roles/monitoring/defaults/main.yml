@@ -39,3 +39,7 @@ truenas_dashboard_ref: "8c8595330e9a7b99f385dbc7bf850da7f2ff2388"
 unpoller_version: "v2"
 unpoller_port: 9130
 unifi_controller_url: "https://192.168.233.1"
+
+# Pi-hole exporter — requires PIHOLE_PASSWORD in Doppler
+pihole_exporter_version: "0.4.0"
+pihole_exporter_port: 9617
