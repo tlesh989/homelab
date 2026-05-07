@@ -12,6 +12,7 @@ extract_images() {
     | sed 's/image:[[:space:]]*//' \
     | sed 's/"//g' \
     | sed 's/:.*//' \
+    | grep -vE '^(true|false|yes|no|null|~)$' \
     || true
 }
 

@@ -336,7 +336,7 @@
     mode: "0644"
   loop:
     # rev pinned — verify latest at grafana.com/dashboards/<id> before bumping
-    - { id: "11310", rev: "9", name: "unifi-poller-sites.json" }
+    - { id: "11310", rev: "5", name: "unifi-poller-sites.json" }
     - { id: "11315", rev: "9", name: "unifi-poller-clients.json" }
   become: true
   notify: Restart Grafana
