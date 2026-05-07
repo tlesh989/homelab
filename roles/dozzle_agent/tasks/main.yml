@@ -1,0 +1,23 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Dozzle agent container
+  community.docker.docker_container:
+    name: dozzle-agent
+    image: "amir20/dozzle:{{ dozzle_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ dozzle_agent_port | string }}:7007"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    env:
+      DOZZLE_MODE: "agent"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

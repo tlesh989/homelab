@@ -227,3 +227,31 @@
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
+
+- name: Create Dozzle data directory
+  ansible.builtin.file:
+    path: "{{ dozzle_data_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Deploy Dozzle container
+  community.docker.docker_container:
+    name: dozzle
+    image: "amir20/dozzle:{{ dozzle_version }}"
+    state: started
+    restart_policy: always
+    published_ports: []
+    networks:
+      - name: "{{ monitoring_network }}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ dozzle_data_dir }}:/data"
+    env:
+      DOZZLE_REMOTE_AGENT: "{{ dozzle_agent_host }}:{{ dozzle_agent_port | string }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
