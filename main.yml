@@ -145,6 +145,7 @@
 
 - name: deploy dozzle agent
   hosts: arr
+  become: true
   roles:
     - role: dozzle_agent
 
