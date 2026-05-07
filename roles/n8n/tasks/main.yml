@@ -36,4 +36,6 @@
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       N8N_GIT_NODE_DISABLE_BARE_REPOS: "true"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

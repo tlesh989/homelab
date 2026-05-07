@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+  vars:
+    molecule_testing: true
+  roles:
+    - role: monitoring

@@ -185,6 +185,28 @@ tasks:
           LIMIT: "monitoring,exporters,arr,caddy,pi-hole"
           CLI_ARGS: "{{.CLI_ARGS}}"
 
+  molecule-test:
+    desc: "Run Molecule default scenario for a role. Usage: task molecule-test ROLE=<role>"
+    cmds:
+      - cd roles/{{.ROLE}} && molecule test -s default
+
+  molecule-integration:
+    desc: "Run Molecule integration scenario for a role (requires Docker-in-Docker). Usage: task molecule-integration ROLE=<role>"
+    cmds:
+      - cd roles/{{.ROLE}} && molecule test -s integration
+
+  molecule-test-all:
+    desc: "Run Molecule default scenario for all four roles"
+    cmds:
+      - task: molecule-test
+        vars: { ROLE: cloudflare_ddns }
+      - task: molecule-test
+        vars: { ROLE: minecraft }
+      - task: molecule-test
+        vars: { ROLE: n8n }
+      - task: molecule-test
+        vars: { ROLE: monitoring }
+
   ping:
     desc: Test connectivity to all hosts
     cmds:

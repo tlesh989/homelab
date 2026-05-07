@@ -1,0 +1,26 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
+    - name: Create minecraft install directory
+      ansible.builtin.file:
+        path: /opt/minecraft/bedrock
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      become: true
+
+    - name: Write matching .version file to prevent BDS download
+      ansible.builtin.copy:
+        content: "1.26.14.1"
+        dest: /opt/minecraft/bedrock/.version
+        mode: "0644"
+      become: true

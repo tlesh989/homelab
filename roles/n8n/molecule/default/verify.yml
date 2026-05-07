@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify n8n data directory exists
+      ansible.builtin.stat:
+        path: /opt/n8n/data
+      register: n8n_dir
+
+    - name: Assert n8n data directory has correct mode and UID
+      ansible.builtin.assert:
+        that:
+          - n8n_dir.stat.exists
+          - n8n_dir.stat.isdir
+          - n8n_dir.stat.uid == 1000
+          - n8n_dir.stat.gid == 1000
+          - n8n_dir.stat.mode == '0700'
+        fail_msg: >
+          n8n data directory missing or wrong permissions.
+          Expected uid=1000 gid=1000 mode=0700,
+          got uid={{ n8n_dir.stat.uid }} gid={{ n8n_dir.stat.gid }} mode={{ n8n_dir.stat.mode }}
+
+    - name: Verify python3-docker is installed
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert python3-docker is present
+      ansible.builtin.assert:
+        that:
+          - "'python3-docker' in ansible_facts.packages"
+        fail_msg: "python3-docker was not installed by the n8n role"

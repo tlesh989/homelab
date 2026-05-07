@@ -42,5 +42,7 @@
       IP6_PROVIDER: none
       SHOUTRRR: "pushover://{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
   no_log: true
