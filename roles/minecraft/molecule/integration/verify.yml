@@ -23,7 +23,7 @@
     - name: Assert installed version matches requested
       ansible.builtin.assert:
         that:
-          - (installed_version.content | b64decode | trim) == "1.26.14.1"
+          - (installed_version.content | b64decode | trim) == minecraft_bds_version
         fail_msg: >
-          Version file mismatch. Expected 1.26.14.1,
+          Version file mismatch. Expected {{ minecraft_bds_version }},
           got {{ installed_version.content | b64decode | trim }}
