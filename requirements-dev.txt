@@ -1,0 +1,5 @@
+# requirements-dev.txt
+molecule
+molecule-plugins[docker]
+pytest-testinfra
+ansible-core

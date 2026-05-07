@@ -1,0 +1,15 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify python3-docker is installed
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert python3-docker package is present
+      ansible.builtin.assert:
+        that:
+          - "'python3-docker' in ansible_facts.packages"
+        fail_msg: "python3-docker was not installed by the cloudflare_ddns role"
+        success_msg: "python3-docker is installed"

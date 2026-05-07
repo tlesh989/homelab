@@ -36,7 +36,9 @@
     name: "{{ monitoring_network }}"
     state: present
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Template Prometheus config
   ansible.builtin.template:
@@ -121,7 +123,9 @@
       - "--storage.tsdb.retention.time={{ prometheus_retention }}"
       - "--web.enable-lifecycle"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Verify Grafana alerting secrets are set
   ansible.builtin.assert:
@@ -129,6 +133,8 @@
       - lookup('env', 'PUSHOVER_API_TOKEN') | length > 0
       - lookup('env', 'PUSHOVER_USER_KEY') | length > 0
     fail_msg: "PUSHOVER_API_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
+  when:
+    - not (molecule_testing | default(false))
 
 - name: Deploy Grafana container
   community.docker.docker_container:
@@ -151,7 +157,9 @@
       PUSHOVER_API_TOKEN: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
       PUSHOVER_USER_KEY: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
   no_log: true
 
 - name: Deploy cAdvisor container
@@ -172,7 +180,9 @@
       - "/dev/kmsg"
     privileged: true # required for complete container metrics (cgroup, disk I/O)
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
 
 - name: Create pve-exporter config directory
   ansible.builtin.file:
@@ -189,6 +199,8 @@
       - lookup('env', 'PVE_TOKEN_ID') | length > 0
       - lookup('env', 'PVE_TOKEN_SECRET') | length > 0
     fail_msg: "PVE_TOKEN_ID and PVE_TOKEN_SECRET must be set before templating pve-exporter config."
+  when:
+    - not (molecule_testing | default(false))
 
 - name: Template pve-exporter credentials config
   ansible.builtin.template:
@@ -212,4 +224,6 @@
     volumes:
       - "{{ pve_exporter_config_dir }}/pve.yml:/etc/prometheus/pve.yml:ro"
   become: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

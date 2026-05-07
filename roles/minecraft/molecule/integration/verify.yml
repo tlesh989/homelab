@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify BDS binary is present
+      ansible.builtin.stat:
+        path: /opt/minecraft/bedrock/bedrock_server
+      register: bds_binary
+
+    - name: Assert BDS binary exists and is executable
+      ansible.builtin.assert:
+        that:
+          - bds_binary.stat.exists
+          - bds_binary.stat.executable
+        fail_msg: "BDS binary not found after install"
+
+    - name: Verify version file matches requested version
+      ansible.builtin.slurp:
+        src: /opt/minecraft/bedrock/.version
+      register: installed_version
+
+    - name: Assert installed version matches requested
+      ansible.builtin.assert:
+        that:
+          - (installed_version.content | b64decode | trim) == minecraft_bds_version
+        fail_msg: >
+          Version file mismatch. Expected {{ minecraft_bds_version }},
+          got {{ installed_version.content | b64decode | trim }}

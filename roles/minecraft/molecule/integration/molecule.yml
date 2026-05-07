@@ -1,0 +1,41 @@
+---
+# Integration scenario: downloads real BDS binary. Requires internet access.
+# Run manually: task molecule-integration ROLE=minecraft
+role_name_check: 1
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: geerlingguy/docker-ubuntu2604-ansible:latest
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/../
+  inventory:
+    group_vars:
+      all:
+        minecraft_install_dir: /opt/minecraft/bedrock
+        minecraft_bds_version: "1.26.14.1"
+        minecraft_operator_xuid: "1234567890123456"
+        minecraft_update_weekday: "0"
+        minecraft_update_hour: "3"
+        minecraft_update_minute: "0"
+        minecraft_server_name: "Integration Test Server"
+        minecraft_gamemode: survival
+        minecraft_difficulty: normal
+        minecraft_max_players: 10
+        minecraft_level_seed: ""
+        minecraft_online_mode: false
+  env:
+    MINECRAFT_OPERATOR_XUID: "1234567890123456"
+verifier:
+  name: ansible
