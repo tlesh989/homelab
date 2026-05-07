@@ -134,6 +134,7 @@ repos:
         entry: scripts/check-urls.sh
         language: script
         files: \.(yml|yaml|md|j2|tf)$
+        exclude: ^docs/
         stages: [pre-commit]
       - id: check-docker-images
         name: check-docker-images

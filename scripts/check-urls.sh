@@ -7,13 +7,17 @@ FAILED=0
 declare -a CHECKED=()
 
 extract_urls() {
-  grep -oE 'https?://[^[:space:]"<>]+' "$1" 2>/dev/null || true
+  # Skip lines containing Jinja2 expressions — URLs on those lines are often
+  # truncated at '{' or embedded in string-concatenation expressions.
+  grep -vE '\{\{|\}\}' "$1" 2>/dev/null | grep -oE 'https?://[^[:space:]"<>]+' || true
 }
 
 is_skippable() {
   local url="$1"
-  # Skip Jinja2 template vars
+  # Skip Jinja2 template vars (belt-and-suspenders for inline expressions)
   [[ "$url" == *"{{"* ]] && return 0
+  # Skip regex patterns that were extracted as URLs (e.g. https://[^\s...)
+  [[ "$url" == *"["* ]] && return 0
   # Skip private/loopback addresses
   [[ "$url" =~ ^https?://(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.) ]] && return 0
   return 1
