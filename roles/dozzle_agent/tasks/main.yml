@@ -17,6 +17,8 @@
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     env:
       DOZZLE_MODE: "agent"
+    security_opts:
+      - "apparmor:unconfined"
   become: true
   when:
     - not ansible_check_mode
