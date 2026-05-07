@@ -24,7 +24,7 @@ Add two new exporter containers to the `monitoring` role, both running on `kaz`.
 
 ### UniFi Poller (`ghcr.io/unpoller/unpoller`)
 
-- Polls the UniFi controller (UE7 at `https://192.168.233.1`) using a dedicated read-only local user
+- Polls the UniFi controller (UE7, address set via `unifi_controller_url`) using a dedicated read-only local user
 - Credentials stored in Doppler as `UNIFI_RO_USERNAME` / `UNIFI_RO_PASSWORD`
 - Exposes client, site, and switch metrics on port 9130
 - InfluxDB output disabled; Prometheus output enabled
@@ -35,7 +35,7 @@ Add two new exporter containers to the `monitoring` role, both running on `kaz`.
 1. Create a read-only local UniFi user in the controller UI (not a Ubiquiti cloud account)
 2. Add `UNIFI_RO_USERNAME` and `UNIFI_RO_PASSWORD` to Doppler
 3. Generate a read-only TrueNAS API key under `Settings > API Keys` and add as `TRUENAS_PROM_KEY` to Doppler
-4. Ensure kaz can reach `192.168.233.1` (UniFi controller) and `192.168.233.6` (TrueNAS)
+4. Ensure kaz can reach the hosts defined by `unifi_controller_url` and `truenas_host` in role defaults
 
 ## Alternatives Considered
 

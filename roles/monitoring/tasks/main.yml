@@ -284,7 +284,7 @@
 
 - name: Download TrueNAS exporter Grafana dashboard JSON
   ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/Unknowlars/truenas-scale-api-prometheus-exporter/main/truenas-exporter-dashboard.json"
+    url: "https://raw.githubusercontent.com/Unknowlars/truenas-scale-api-prometheus-exporter/{{ truenas_dashboard_ref }}/truenas-exporter-dashboard.json"
     dest: "{{ grafana_dashboards_dir }}/truenas-exporter-dashboard.json"
     owner: "472"
     group: "472"

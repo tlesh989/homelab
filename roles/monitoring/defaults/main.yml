@@ -32,6 +32,8 @@ dozzle_data_dir: /opt/dozzle/data
 truenas_exporter_version: "latest"
 truenas_exporter_port: 9108
 truenas_host: "wss://192.168.233.6/api/current"
+# Dashboard pinned to a specific commit; bump after reviewing upstream changes
+truenas_dashboard_ref: "8c8595330e9a7b99f385dbc7bf850da7f2ff2388"
 
 # UniFi Poller (unpoller)
 unpoller_version: "v2"
