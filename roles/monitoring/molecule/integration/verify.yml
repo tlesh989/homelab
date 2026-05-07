@@ -4,8 +4,9 @@
   gather_facts: false
   tasks:
     - name: Verify Prometheus container is running
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: docker ps --filter name=prometheus --format "{{ '{{' }}.Names{{ '}}' }}"
+        executable: /bin/bash
       register: prometheus_status
       changed_when: false
 
@@ -16,8 +17,9 @@
         fail_msg: "Prometheus container is not running"
 
     - name: Verify Grafana container is running
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: docker ps --filter name=grafana --format "{{ '{{' }}.Names{{ '}}' }}"
+        executable: /bin/bash
       register: grafana_status
       changed_when: false
 

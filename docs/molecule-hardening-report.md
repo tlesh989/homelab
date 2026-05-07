@@ -19,6 +19,7 @@ All four roles pass `molecule test -s default`. Total iteration budget used: 10 
 
 **`roles_path` must be explicit in `molecule.yml`**
 Molecule cannot resolve in-repo roles by default. All four `molecule.yml` files now include:
+
 ```yaml
 provisioner:
   config_options:
@@ -59,7 +60,7 @@ Rich structural scenario: system user, directory ownership, config templates, sy
 |-----|------|----------------|
 | `getent_passwd` shell index corrected from `[4]` to `[5]` | `molecule/default/verify.yml` | TEST_BUG |
 
-**Details:** The Linux `/etc/passwd` format has fields: `[0]` username, `[1]` password, `[2]` uid, `[3]` gid, `[4]` gecos/comment, `[5]` home, `[6]` shell. The original assertion used index `[4]` (home directory) to check for `/usr/sbin/nologin` — this would silently pass on a user whose home happens to match that string. The fix uses index `[5]` (shell) which is the correct field.
+**Details:** Ansible's `getent_passwd` value is a list keyed by username; the list excludes the username itself: `[0]` password (x), `[1]` uid, `[2]` gid, `[3]` gecos/comment, `[4]` home, `[5]` shell. The original assertion used index `[4]` (home directory) to check for `/usr/sbin/nologin` — this would silently pass on a user whose home happens to match that string. The fix uses index `[5]` (shell), which is the correct field in `getent_passwd` list format.
 
 ---
 
@@ -89,12 +90,14 @@ Full observability stack structural test: Prometheus/Grafana/cAdvisor/pve-export
 The `roles/minecraft/templates/minecraft-update.sh.j2` script has:
 - `set -euo pipefail` at the top (errors surface immediately, no silent swallowing)
 - An explicit early-exit guard for unsafe `INSTALL_DIR`:
+
   ```bash
   if [[ -z "${INSTALL_DIR}" || "${INSTALL_DIR}" == "/" ]]; then
     echo "ERROR: refusing to update with unsafe INSTALL_DIR='${INSTALL_DIR}'" >&2
     exit 1
   fi
   ```
+
 - All `grep` calls in `get_latest_bds_url()` are wrapped in retry loops with explicit error logging — a grep miss produces a `WARNING` log and retries, never silently exits
 - The version-comparison `grep -oP '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'` runs on a validated URL string, so empty-match would propagate as an empty `LATEST_VERSION` and the version comparison would fall through to the "already up to date" path
 
@@ -110,10 +113,10 @@ All four roles have integration scenario stubs scaffolded at `roles/<role>/molec
 
 | Role            | Integration trigger |
 |-----------------|---------------------|
-| cloudflare_ddns | `doppler run -- task molecule-integration -- ROLE=cloudflare_ddns` |
-| minecraft       | `task molecule-integration -- ROLE=minecraft` (requires internet for BDS download) |
-| n8n             | `task molecule-integration -- ROLE=n8n` |
-| monitoring      | `doppler run -- task molecule-integration -- ROLE=monitoring` |
+| cloudflare_ddns | `doppler run -- task molecule-integration ROLE=cloudflare_ddns` |
+| minecraft       | `task molecule-integration ROLE=minecraft` (requires internet for BDS download) |
+| n8n             | `task molecule-integration ROLE=n8n` |
+| monitoring      | `doppler run -- task molecule-integration ROLE=monitoring` |
 
 **All integration scenarios must be run with `DOCKER_HOST=unix:///Users/tommy/.colima/default/docker.sock`.**
 

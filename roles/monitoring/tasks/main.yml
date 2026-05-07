@@ -133,6 +133,8 @@
       - lookup('env', 'PUSHOVER_API_TOKEN') | length > 0
       - lookup('env', 'PUSHOVER_USER_KEY') | length > 0
     fail_msg: "PUSHOVER_API_TOKEN and PUSHOVER_USER_KEY must be set before provisioning Grafana alerting."
+  when:
+    - not (molecule_testing | default(false))
 
 - name: Deploy Grafana container
   community.docker.docker_container:
@@ -197,6 +199,8 @@
       - lookup('env', 'PVE_TOKEN_ID') | length > 0
       - lookup('env', 'PVE_TOKEN_SECRET') | length > 0
     fail_msg: "PVE_TOKEN_ID and PVE_TOKEN_SECRET must be set before templating pve-exporter config."
+  when:
+    - not (molecule_testing | default(false))
 
 - name: Template pve-exporter credentials config
   ansible.builtin.template:

@@ -1,6 +1,6 @@
 ---
 # Integration scenario: downloads real BDS binary. Requires internet access.
-# Run manually: task molecule-integration -- ROLE=minecraft
+# Run manually: task molecule-integration ROLE=minecraft
 role_name_check: 1
 dependency:
   name: galaxy
@@ -17,6 +17,9 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/../
   inventory:
     group_vars:
       all:

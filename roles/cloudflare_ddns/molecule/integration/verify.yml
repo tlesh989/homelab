@@ -4,8 +4,9 @@
   gather_facts: false
   tasks:
     - name: Verify cloudflare-ddns container is running
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: docker ps --filter name=cloudflare-ddns --format "{{ '{{' }}.Names{{ '}}' }}"
+        executable: /bin/bash
       register: container_status
       changed_when: false
 

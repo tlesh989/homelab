@@ -1,6 +1,6 @@
 ---
 # Integration scenario: deploys real n8n container. Requires Docker socket.
-# Run manually: task molecule-integration -- ROLE=n8n
+# Run manually: task molecule-integration ROLE=n8n
 role_name_check: 1
 dependency:
   name: galaxy
@@ -18,6 +18,9 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/../
   inventory:
     group_vars:
       all:

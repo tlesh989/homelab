@@ -1,6 +1,6 @@
 ---
 # Integration scenario: requires Docker-in-Docker. Run manually with:
-#   doppler run -- task molecule-integration -- ROLE=cloudflare_ddns
+#   doppler run -- task molecule-integration ROLE=cloudflare_ddns
 role_name_check: 1
 dependency:
   name: galaxy
@@ -18,10 +18,13 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: ${MOLECULE_PROJECT_DIRECTORY}/../
   inventory:
     group_vars:
       all:
         ddns_image_version: "1"
-        ddns_proxied: "false"
+        ddns_proxied: false
 verifier:
   name: ansible

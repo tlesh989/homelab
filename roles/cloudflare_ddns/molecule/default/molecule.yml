@@ -24,7 +24,7 @@ provisioner:
         molecule_testing: true
         ddns_image_version: "1"
         ddns_domains: fake.example.com
-        ddns_proxied: "false"
+        ddns_proxied: false
   env:
     CF_DNS_API_TOKEN: fake-cf-token
     DDNS_DOMAINS: fake.example.com
