@@ -37,3 +37,17 @@ scrape_configs:
       module: [default]
       cluster: ['1']
       node: ['1']
+
+  - job_name: truenas
+    static_configs:
+      - targets:
+{% for host in groups['kaz'] | default([]) %}
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ truenas_exporter_port }}"
+{% endfor %}
+
+  - job_name: unifi
+    static_configs:
+      - targets:
+{% for host in groups['kaz'] | default([]) %}
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ unpoller_port }}"
+{% endfor %}

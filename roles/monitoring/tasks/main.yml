@@ -255,3 +255,76 @@
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
+
+- name: Verify TrueNAS API key is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'TRUENAS_API_KEY') | length > 0
+    fail_msg: "TRUENAS_API_KEY must be set in Doppler before deploying truenas-exporter."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy truenas-exporter container
+  community.docker.docker_container:
+    name: truenas-exporter
+    image: "ghcr.io/alecbcs/truenas-exporter:{{ truenas_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ truenas_exporter_port | string }}:9102"
+    env:
+      TRUENAS_BASEURL: "{{ truenas_host }}"
+      TRUENAS_API_KEY: "{{ lookup('env', 'TRUENAS_API_KEY') }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Verify UniFi read-only credentials are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'UNIFI_RO_USERNAME') | length > 0
+      - lookup('env', 'UNIFI_RO_PASSWORD') | length > 0
+    fail_msg: "UNIFI_RO_USERNAME and UNIFI_RO_PASSWORD must be set in Doppler before deploying unpoller."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy unpoller container
+  community.docker.docker_container:
+    name: unpoller
+    image: "ghcr.io/unpoller/unpoller:{{ unpoller_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ unpoller_port | string }}:9130"
+    env:
+      UP_UNIFI_DEFAULT_URL: "{{ unifi_controller_url }}"
+      UP_UNIFI_DEFAULT_USER: "{{ lookup('env', 'UNIFI_RO_USERNAME') }}"
+      UP_UNIFI_DEFAULT_PASS: "{{ lookup('env', 'UNIFI_RO_PASSWORD') }}"
+      UP_UNIFI_DEFAULT_SAVE_SITES: "true"
+      UP_UNIFI_DEFAULT_SAVE_IDS: "true"
+      UP_UNIFI_DEFAULT_SAVE_EVENTS: "true"
+      UP_UNIFI_DEFAULT_SAVE_ALARMS: "true"
+      UP_INFLUXDB_DISABLE: "true"
+      UP_PROMETHEUS_HTTP_LISTEN: "0.0.0.0:9130"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Download UniFi Poller Grafana dashboard JSONs
+  ansible.builtin.get_url:
+    url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/latest/download"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
+    owner: "472"
+    group: "472"
+    mode: "0644"
+  loop:
+    - { id: "11310", name: "unifi-poller-sites.json" }
+    - { id: "11315", name: "unifi-poller-clients.json" }
+  become: true
+  notify: Restart Grafana
+  when:
+    - not (molecule_testing | default(false))

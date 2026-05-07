@@ -27,3 +27,13 @@ dozzle_version: "v10.5.2"
 dozzle_agent_host: "192.168.233.24"
 dozzle_agent_port: 7007
 dozzle_data_dir: /opt/dozzle/data
+
+# TrueNAS exporter
+truenas_exporter_version: "1"
+truenas_exporter_port: 9102
+truenas_host: "http://192.168.233.6"
+
+# UniFi Poller (unpoller)
+unpoller_version: "v2"
+unpoller_port: 9130
+unifi_controller_url: "https://192.168.233.1"
