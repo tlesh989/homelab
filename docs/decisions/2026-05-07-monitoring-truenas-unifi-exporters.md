@@ -13,12 +13,14 @@ Two gaps remain: TrueNAS SCALE pool/dataset health and UniFi network device metr
 
 Add two new exporter containers to the `monitoring` role, both running on `kaz`.
 
-### TrueNAS exporter (`ghcr.io/alecbcs/truenas-exporter`)
+### TrueNAS exporter (`ghcr.io/unknowlars/truenas-scale-api-prometheus-exporter`)
 
-- Connects to TrueNAS SCALE WebSocket API using an API key (stored in Doppler as `TRUENAS_API_KEY`)
-- Exposes pool health, dataset usage, and system metrics on port 9102
-- Config via env vars: `TRUENAS_BASEURL` + `TRUENAS_API_KEY`
-- **Note**: verify image tag availability before first deploy; update `truenas_exporter_version` in defaults if needed
+- Source: https://github.com/Unknowlars/truenas-scale-api-prometheus-exporter
+- Connects to TrueNAS SCALE JSON-RPC WebSocket API (`wss://`) using a read-only API key
+- Doppler secret: `TRUENAS_PROM_KEY` (maps to container env `TRUENAS_API_KEY`; named distinctly to avoid collision with any admin key)
+- Exposes pool health, dataset usage, hardware, and system metrics on port 9108
+- Grafana dashboard bundled in repo — downloaded from GitHub raw at provision time
+- **Note**: upstream publishes no version tags; `latest` is the only available tag. Pin to a commit SHA via `truenas_exporter_version` if reproducibility is required.
 
 ### UniFi Poller (`ghcr.io/unpoller/unpoller`)
 
@@ -32,7 +34,7 @@ Add two new exporter containers to the `monitoring` role, both running on `kaz`.
 
 1. Create a read-only local UniFi user in the controller UI (not a Ubiquiti cloud account)
 2. Add `UNIFI_RO_USERNAME` and `UNIFI_RO_PASSWORD` to Doppler
-3. Generate a TrueNAS API key under `Settings > API Keys` and add as `TRUENAS_API_KEY` to Doppler
+3. Generate a read-only TrueNAS API key under `Settings > API Keys` and add as `TRUENAS_PROM_KEY` to Doppler
 4. Ensure kaz can reach `192.168.233.1` (UniFi controller) and `192.168.233.6` (TrueNAS)
 
 ## Alternatives Considered

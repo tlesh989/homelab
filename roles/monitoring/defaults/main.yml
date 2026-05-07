@@ -28,10 +28,10 @@ dozzle_agent_host: "192.168.233.24"
 dozzle_agent_port: 7007
 dozzle_data_dir: /opt/dozzle/data
 
-# TrueNAS exporter
-truenas_exporter_version: "1"
-truenas_exporter_port: 9102
-truenas_host: "http://192.168.233.6"
+# TrueNAS exporter — upstream publishes no version tags; pin SHA in CI if stability needed
+truenas_exporter_version: "latest"
+truenas_exporter_port: 9108
+truenas_host: "wss://192.168.233.6/api/current"
 
 # UniFi Poller (unpoller)
 unpoller_version: "v2"
