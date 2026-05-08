@@ -41,4 +41,5 @@ pihole_local_hosts:
   - "192.168.233.17 n8n.tlesh.xyz"
   - "192.168.233.17 freshrss.tlesh.xyz"
   - "192.168.233.17 seerr.tlesh.xyz"
+  - "192.168.233.17 dozzle.tlesh.xyz"
   - "192.168.233.19 {{ lookup('env', 'MINECRAFT_SERVER') }}"

@@ -209,7 +209,7 @@
     dest: "{{ pve_exporter_config_dir }}/pve.yml"
     owner: "65534"
     group: "65534"
-    mode: "0600"
+    mode: "0644"
   become: true
   no_log: true
   notify: Restart pve-exporter
@@ -244,7 +244,8 @@
     image: "amir20/dozzle:{{ dozzle_version }}"
     state: started
     restart_policy: always
-    published_ports: []
+    ports:
+      - "{{ dozzle_port | string }}:8080"
     networks:
       - name: "{{ monitoring_network }}"
     volumes:
