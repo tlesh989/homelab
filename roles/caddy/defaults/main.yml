@@ -24,3 +24,5 @@ caddy_services:
     upstream: "192.168.233.10:8002"
   - name: seerr
     upstream: "192.168.233.24:5055"
+  - name: dozzle
+    upstream: "192.168.233.10:8025"

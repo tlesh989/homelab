@@ -81,6 +81,7 @@
     - node-exporter-full.json
     - cadvisor-dashboard.json
     - proxmox-dashboard.json
+    - pihole-dashboard.json
   become: true
   notify: Restart Grafana
 
@@ -208,7 +209,7 @@
     dest: "{{ pve_exporter_config_dir }}/pve.yml"
     owner: "65534"
     group: "65534"
-    mode: "0600"
+    mode: "0644"
   become: true
   no_log: true
   notify: Restart pve-exporter
@@ -243,7 +244,8 @@
     image: "amir20/dozzle:{{ dozzle_version }}"
     state: started
     restart_policy: always
-    published_ports: []
+    ports:
+      - "{{ dozzle_port | string }}:8080"
     networks:
       - name: "{{ monitoring_network }}"
     volumes:
@@ -254,4 +256,117 @@
   become: true
   when:
     - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
+- name: Verify TrueNAS Prometheus API key is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'TRUENAS_PROM_KEY') | length > 0
+    fail_msg: "TRUENAS_PROM_KEY must be set in Doppler before deploying truenas-exporter."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy truenas-exporter container
+  community.docker.docker_container:
+    name: truenas-exporter
+    image: "ghcr.io/unknowlars/truenas-scale-api-prometheus-exporter:{{ truenas_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ truenas_exporter_port | string }}:9108"
+    env:
+      TRUENAS_WS_URL: "{{ truenas_host }}"
+      TRUENAS_API_KEY: "{{ lookup('env', 'TRUENAS_PROM_KEY') }}"
+      EXPORTER_PORT: "9108"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Download TrueNAS exporter Grafana dashboard JSON
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/Unknowlars/truenas-scale-api-prometheus-exporter/{{ truenas_dashboard_ref }}/grafana-dashboard/operations-center-dashboard.json"
+    dest: "{{ grafana_dashboards_dir }}/truenas-exporter-dashboard.json"
+    owner: "472"
+    group: "472"
+    mode: "0644"
+  become: true
+  notify: Restart Grafana
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Verify UniFi read-only credentials are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'UNIFI_RO_USERNAME') | length > 0
+      - lookup('env', 'UNIFI_RO_PASSWORD') | length > 0
+    fail_msg: "UNIFI_RO_USERNAME and UNIFI_RO_PASSWORD must be set in Doppler before deploying unpoller."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy unpoller container
+  community.docker.docker_container:
+    name: unpoller
+    image: "ghcr.io/unpoller/unpoller:{{ unpoller_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ unpoller_port | string }}:9130"
+    env:
+      UP_UNIFI_DEFAULT_URL: "{{ unifi_controller_url }}"
+      UP_UNIFI_DEFAULT_USER: "{{ lookup('env', 'UNIFI_RO_USERNAME') }}"
+      UP_UNIFI_DEFAULT_PASS: "{{ lookup('env', 'UNIFI_RO_PASSWORD') }}"
+      UP_UNIFI_DEFAULT_SAVE_SITES: "true"
+      UP_UNIFI_DEFAULT_SAVE_IDS: "true"
+      UP_UNIFI_DEFAULT_SAVE_EVENTS: "true"
+      UP_UNIFI_DEFAULT_SAVE_ALARMS: "true"
+      UP_INFLUXDB_DISABLE: "true"
+      UP_PROMETHEUS_HTTP_LISTEN: "0.0.0.0:9130"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Verify Pi-hole password is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PIHOLE_PASSWORD') | length > 0
+    fail_msg: "PIHOLE_PASSWORD must be set in Doppler before deploying pihole-exporter."
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Deploy pihole-exporter container
+  community.docker.docker_container:
+    name: pihole-exporter
+    image: "ekofr/pihole-exporter:{{ pihole_exporter_version }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ pihole_exporter_port | string }}:9617"
+    env:
+      PIHOLE_HOSTNAME: "{{ hostvars['pi-hole.tlesh.xyz']['ansible_host'] }}"
+      PIHOLE_PASSWORD: "{{ lookup('env', 'PIHOLE_PASSWORD') }}"
+      PIHOLE_PORT: "8080"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+  no_log: true
+
+- name: Download UniFi Poller Grafana dashboard JSONs
+  ansible.builtin.get_url:
+    url: "https://grafana.com/api/dashboards/{{ item.id }}/revisions/{{ item.rev }}/download"
+    dest: "{{ grafana_dashboards_dir }}/{{ item.name }}"
+    owner: "472"
+    group: "472"
+    mode: "0644"
+  loop:
+    # rev pinned — verify latest at grafana.com/dashboards/<id> before bumping
+    - { id: "11310", rev: "5", name: "unifi-poller-sites.json" }
+    - { id: "11315", rev: "9", name: "unifi-poller-clients.json" }
+  become: true
+  notify: Restart Grafana
+  when:
     - not (molecule_testing | default(false))

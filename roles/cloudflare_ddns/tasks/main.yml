@@ -40,7 +40,7 @@
       DOMAINS: "{{ ddns_domains }}"
       PROXIED: "{{ ddns_proxied }}"
       IP6_PROVIDER: none
-      SHOUTRRR: "pushover://{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
+      SHOUTRRR: "pushover://shoutrrr:{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
   become: true
   when:
     - not ansible_check_mode

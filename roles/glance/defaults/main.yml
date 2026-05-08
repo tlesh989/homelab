@@ -2,3 +2,4 @@
 glance_version: "v0.8.4"
 glance_port: 8080
 glance_data_dir: /opt/glance
+grafana_port: 3000

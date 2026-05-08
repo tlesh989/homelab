@@ -97,7 +97,7 @@ repos:
         stages: [pre-commit]
 
   - repo: https://github.com/bridgecrewio/checkov
-    rev: "3.2.517"
+    rev: "3.2.527"
     hooks:
       - id: checkov
         files: ^terraform/.*\.tf$
@@ -129,6 +129,19 @@ repos:
 
   - repo: local
     hooks:
+      - id: check-urls
+        name: check-urls
+        entry: scripts/check-urls.sh
+        language: script
+        files: \.(yml|yaml|md|j2|tf)$
+        exclude: ^docs/
+        stages: [pre-commit]
+      - id: check-docker-images
+        name: check-docker-images
+        entry: scripts/check-docker-images.sh
+        language: script
+        files: \.(yml|yaml)$
+        stages: [pre-commit]
       - id: beads-sync
         name: beads-sync
         entry: bash -c "command -v bd >/dev/null 2>&1 || exit 0; bd hooks run pre-commit"
