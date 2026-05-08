@@ -32,14 +32,14 @@ dozzle_data_dir: /opt/dozzle/data
 # TrueNAS exporter — upstream publishes no version tags; pin SHA in CI if stability needed
 truenas_exporter_version: "latest"
 truenas_exporter_port: 9108
-truenas_host: "wss://192.168.233.6/api/current"
+truenas_host: "{{ lookup('env', 'TRUENAS_HOST') }}"
 # Dashboard pinned to a specific commit; bump after reviewing upstream changes
 truenas_dashboard_ref: "8c8595330e9a7b99f385dbc7bf850da7f2ff2388"
 
 # UniFi Poller (unpoller)
 unpoller_version: "v2"
 unpoller_port: 9130
-unifi_controller_url: "https://192.168.233.1"
+unifi_controller_url: "{{ lookup('env', 'UNIFI_CONTROLLER_URL') }}"
 
 # Pi-hole exporter — requires PIHOLE_PASSWORD in Doppler
 pihole_exporter_version: "latest"
