@@ -5,14 +5,16 @@ Refined homelab infrastructure management (Proxmox, Terraform, Ansible).
 ## Core Principles
 
 - **Stability & Uptime**: Prioritize absolute reliability.
-- **KISS**: Simplicity over engineering.
+- **KISS**: Minimum change that solves the problem. No speculative features or abstractions.
 - **Doppler First**: All secrets come from Doppler. No local vaults.
 - **Efficiency**: Do not re-read files already read in this session unless the file may have changed. Prefer targeted edits over full rewrites.
+- **Think First**: State assumptions before touching infra. Ask when unclear — wrong assumptions break live services.
 
 ## Entry Points & Documentation
 
 Specialized rules:
 
+- **[Code Quality](.claude/rules/code-quality.md)**: Think first, surgical changes, goal-driven execution.
 - **[Ansible](.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
 - **[Terraform](.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
 - **[Gitflow](.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
