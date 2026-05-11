@@ -277,6 +277,7 @@
     env:
       TRUENAS_WS_URL: "{{ truenas_host }}"
       TRUENAS_API_KEY: "{{ lookup('env', 'TRUENAS_PROM_KEY') }}"
+      TRUENAS_VERIFY_TLS: "{{ truenas_verify_tls | string }}"
       EXPORTER_PORT: "9108"
   become: true
   when:
