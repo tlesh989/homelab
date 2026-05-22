@@ -16,9 +16,10 @@
   become: true
 
 - name: Dearmor Google signing key into keyring
-  ansible.builtin.command:
-    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/google.gpg /tmp/google-linux-signing-key.pub
+  ansible.builtin.shell:
+    cmd: set -o pipefail; gpg --batch --yes --dearmor -o /etc/apt/keyrings/google.gpg /tmp/google-linux-signing-key.pub
     creates: /etc/apt/keyrings/google.gpg
+    executable: /bin/bash
   become: true
   changed_when: false
 

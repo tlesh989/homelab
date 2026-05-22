@@ -178,6 +178,7 @@ tasks:
   barlo:
     desc: Deploy to barlo remote site server
     cmds:
+      - task: ping
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "barlo", CLI_ARGS: "{{.CLI_ARGS}}" }
 
