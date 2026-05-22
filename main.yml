@@ -191,6 +191,20 @@
     - role: geerlingguy.security
     - role: minecraft
 
+- name: setup barlo remote site server
+  hosts: barlo
+  become: true
+  roles:
+    - role: ansible_user
+    - role: packages
+    - role: users
+    - role: geerlingguy.ntp
+    - role: geerlingguy.security
+    - role: artis3n.tailscale.machine
+      when: not ansible_check_mode
+    - role: desktop
+    - role: uptime_kuma
+
 - name: configure unifi
   hosts: unifi
   connection: local
