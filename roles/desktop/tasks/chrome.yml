@@ -1,0 +1,38 @@
+---
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Download Google apt signing key
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    dest: /tmp/google-linux-signing-key.pub
+    mode: "0644"
+  become: true
+
+- name: Dearmor Google signing key into keyring
+  ansible.builtin.command:
+    cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/google.gpg /tmp/google-linux-signing-key.pub
+    creates: /etc/apt/keyrings/google.gpg
+  become: true
+
+- name: Add Google Chrome apt repository
+  ansible.builtin.copy:
+    content: "deb [arch=amd64 signed-by=/etc/apt/keyrings/google.gpg] https://dl.google.com/linux/chrome/deb/ stable main\n"
+    dest: /etc/apt/sources.list.d/google-chrome.list
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Install Google Chrome
+  ansible.builtin.apt:
+    name: google-chrome-stable
+    state: present
+    update_cache: true
+  become: true
