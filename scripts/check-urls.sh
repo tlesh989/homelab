@@ -20,8 +20,6 @@ is_skippable() {
   [[ "$url" == *"["* ]] && return 0
   # Skip private/loopback addresses
   [[ "$url" =~ ^https?://(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.) ]] && return 0
-  # Skip deb repository base URLs (these don't serve directly, only through apt)
-  [[ "$url" =~ /deb/?$ ]] && return 0
   return 1
 }
 
