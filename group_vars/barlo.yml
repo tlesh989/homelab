@@ -1,3 +1,5 @@
 ---
 uptime_kuma_timezone: America/Detroit
 tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+uptime_kuma_pushover_api_token: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
+uptime_kuma_pushover_user_key: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
