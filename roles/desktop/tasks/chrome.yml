@@ -20,10 +20,11 @@
     cmd: gpg --batch --yes --dearmor -o /etc/apt/keyrings/google.gpg /tmp/google-linux-signing-key.pub
     creates: /etc/apt/keyrings/google.gpg
   become: true
+  changed_when: false
 
 - name: Add Google Chrome apt repository
   ansible.builtin.copy:
-    content: "deb [arch=amd64 signed-by=/etc/apt/keyrings/google.gpg] https://dl.google.com/linux/chrome/deb/ stable main\n"
+    content: "deb [arch=amd64 signed-by=/etc/apt/keyrings/google.gpg] https://dl.google.com/linux/chrome/deb/ stable main\n" # nocheck: apt repo root returns 404; packages resolve correctly
     dest: /etc/apt/sources.list.d/google-chrome.list
     owner: root
     group: root

@@ -5,6 +5,8 @@ polkit.addRule(function(action, subject) {
         action.id == "org.freedesktop.color-manager.delete-profile" ||
         action.id == "org.freedesktop.color-manager.modify-device" ||
         action.id == "org.freedesktop.color-manager.modify-profile") {
-        return polkit.Result.YES;
+        if (subject.active && subject.local) {
+            return polkit.Result.YES;
+        }
     }
 });
