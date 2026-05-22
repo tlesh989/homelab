@@ -1,0 +1,15 @@
+---
+- name: Install GNOME minimal desktop packages
+  ansible.builtin.apt:
+    name: "{{ desktop_gnome_packages }}"
+    state: present
+    update_cache: true
+  become: true
+
+- name: Set GDM3 as default display manager
+  ansible.builtin.debconf:
+    name: gdm3
+    question: shared/default-x-display-manager
+    value: gdm3
+    vtype: select
+  become: true
