@@ -37,6 +37,9 @@ caddy.tlesh.xyz ansible_host=192.168.233.17
 [minecraft]
 minecraft.tlesh.xyz ansible_host=192.168.233.19
 
+[barlo]
+barlo.tlesh.xyz ansible_host=192.168.233.126
+
 [proxmox:children]
 tika
 bupu
@@ -61,6 +64,7 @@ uptime-kuma
 caddy
 minecraft
 kaz
+barlo
 
 [monitoring:children]
 kaz
