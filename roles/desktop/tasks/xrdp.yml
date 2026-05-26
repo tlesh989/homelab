@@ -1,0 +1,53 @@
+---
+- name: Install xrdp and xorgxrdp
+  ansible.builtin.apt:
+    name:
+      - xrdp
+      - xorgxrdp
+    state: present
+    update_cache: true
+  become: true
+
+- name: Add xrdp user to ssl-cert group
+  ansible.builtin.user:
+    name: xrdp
+    groups: ssl-cert
+    append: true
+  become: true
+
+- name: Deploy xrdp session start script
+  ansible.builtin.template:
+    src: startwm.sh.j2
+    dest: /etc/xrdp/startwm.sh
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+  notify: Restart xrdp
+
+- name: Ensure polkit rules directory exists
+  ansible.builtin.file:
+    path: /etc/polkit-1/rules.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Deploy colord polkit rule
+  ansible.builtin.copy:
+    src: 45-allow-colord.rules
+    dest: /etc/polkit-1/rules.d/45-allow-colord.rules
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Enable and start xrdp service
+  ansible.builtin.systemd:
+    name: xrdp
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true
+  when: not ansible_check_mode

@@ -9,7 +9,8 @@ declare -a CHECKED=()
 extract_urls() {
   # Skip lines containing Jinja2 expressions — URLs on those lines are often
   # truncated at '{' or embedded in string-concatenation expressions.
-  grep -vE '\{\{|\}\}' "$1" 2>/dev/null | grep -oE 'https?://[^[:space:]"<>]+' || true
+  # Skip lines with # nocheck annotation (for known URLs that return 404 at root).
+  grep -vE '\{\{|\}\}|#\s*nocheck' "$1" 2>/dev/null | grep -oE 'https?://[^[:space:]"<>]+' || true
 }
 
 is_skippable() {

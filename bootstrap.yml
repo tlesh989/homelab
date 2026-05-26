@@ -33,7 +33,7 @@
         name: ansible_user
 
 - name: Bootstrap LXC and VM hosts — create ansible service account
-  hosts: lxc:kaz
+  hosts: lxc:kaz:barlo
   gather_facts: false
   ignore_unreachable: true
   become: true

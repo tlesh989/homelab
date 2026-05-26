@@ -88,6 +88,13 @@ reviews:
         - Validate that variable names follow `snake_case`.
         - Flag any `vault_*` prefixed vars that appear unencrypted.
 
+    - path: "hosts"
+      instructions: |
+        Ansible inventory review:
+        - Hardcoded `ansible_host` IPs are intentional and acceptable in this homelab — do NOT flag them as secrets or suggest Doppler-backed variables for host addresses.
+        - Host groups must follow the established naming pattern (snake_case, matching the hostname prefix).
+        - Each host entry must have `ansible_host=<ip>` to avoid DNS dependency during provisioning.
+
     - path: "[a-z]*.yml"
       instructions: |
         Playbook review:
