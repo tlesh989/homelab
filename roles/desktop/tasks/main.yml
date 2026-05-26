@@ -1,0 +1,9 @@
+---
+- name: Install GNOME desktop
+  ansible.builtin.import_tasks: gnome.yml
+
+- name: Configure xrdp remote desktop
+  ansible.builtin.import_tasks: xrdp.yml
+
+- name: Install Google Chrome
+  ansible.builtin.import_tasks: chrome.yml

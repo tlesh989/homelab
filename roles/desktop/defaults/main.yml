@@ -1,0 +1,4 @@
+---
+desktop_xrdp_port: 3389
+desktop_gnome_packages:
+  - ubuntu-desktop-minimal
