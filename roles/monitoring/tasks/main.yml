@@ -400,6 +400,7 @@
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
+    - "'plex.tlesh.xyz' in hostvars"
   no_log: true
 
 - name: Download Plex exporter Grafana dashboard JSON
