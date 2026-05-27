@@ -46,3 +46,12 @@ unifi_controller_url: "{{ lookup('env', 'UNIFI_CONTROLLER_URL') }}"
 # Pi-hole exporter — requires PIHOLE_PASSWORD in Doppler
 pihole_exporter_version: "latest"
 pihole_exporter_port: 9617
+
+# Plex exporter — requires PLEX_TOKEN in Doppler
+plex_exporter_version: "1"
+plex_exporter_port: 9000
+# Dashboard pinned to main; pin to a commit SHA for production stability
+plex_dashboard_ref: "main"
+
+# Scraparr dashboard — grafana.com/dashboards/22934
+scraparr_dashboard_rev: "1"
