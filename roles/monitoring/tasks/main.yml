@@ -388,7 +388,7 @@
 - name: Deploy plex-exporter container
   community.docker.docker_container:
     name: plex-exporter
-    image: "ghcr.io/jsclayton/prometheus-plex-exporter:{{ plex_exporter_version }}"
+    image: "ghcr.io/jsclayton/prometheus-plex-exporter:latest"
     state: started
     restart_policy: always
     ports:
