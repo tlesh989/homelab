@@ -42,12 +42,11 @@
 - name: Install ax88179b DKMS module
   when: ax88179b_dkms_check.rc != 0
   block:
-    - name: Download ASIX driver tarball
-      ansible.builtin.get_url:
-        url: "{{ ax88179b_download_url }}"
+    - name: Copy ASIX driver tarball to remote
+      ansible.builtin.copy:
+        src: asix-ax88179b.tar.bz2
         dest: /tmp/asix-ax88179b.tar.bz2
         mode: "0644"
-        checksum: "{{ ax88179b_tarball_checksum | default('') }}"
 
     - name: Create DKMS source directory
       ansible.builtin.file:
