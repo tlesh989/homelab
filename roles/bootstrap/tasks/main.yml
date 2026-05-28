@@ -1,4 +1,20 @@
 ---
+- name: Check if host is already bootstrapped
+  ansible.builtin.command:
+    cmd: >
+      ssh -o BatchMode=yes -o ConnectTimeout=3 -o StrictHostKeyChecking=no
+      -i ~/.ssh/ansible_ed25519
+      ansible@{{ ansible_host | default(inventory_hostname) }} true
+  delegate_to: localhost
+  become: false
+  failed_when: false
+  register: _bootstrap_check
+  changed_when: false
+
+- name: Skip host — already bootstrapped
+  ansible.builtin.meta: end_host
+  when: _bootstrap_check.rc == 0
+
 - name: Ensure sudo package is installed
   ansible.builtin.apt:
     name: sudo
