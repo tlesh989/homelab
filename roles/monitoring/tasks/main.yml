@@ -390,6 +390,7 @@
   community.docker.docker_container:
     name: plex-exporter
     image: "ghcr.io/jsclayton/prometheus-plex-exporter:latest"
+    pull: true
     state: started
     restart_policy: always
     ports:
