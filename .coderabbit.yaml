@@ -65,6 +65,9 @@ reviews:
         - Secrets must never be hardcoded — flag any literal passwords, tokens, or keys.
         - Prefer `lineinfile`/`blockinfile` with `regexp:` + `validate:` over raw `shell` for config edits.
         - Service tasks should use `ansible.builtin.systemd` with `daemon_reload: true` where appropriate.
+        - Docker image tags: `:latest` is acceptable for homelab services where no versioned tags exist
+          or the image is rarely updated. Do NOT flag `:latest` as a violation in
+          `community.docker.docker_container` tasks.
 
     - path: "roles/*/tasks/**"
       instructions: |

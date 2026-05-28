@@ -67,3 +67,12 @@ scrape_configs:
 {% for host in groups['kaz'] | default([]) %}
           - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ pihole_exporter_port }}"
 {% endfor %}
+
+{% if groups['plex'] | default([]) | length > 0 %}
+  - job_name: plex
+    static_configs:
+      - targets:
+{% for host in groups['kaz'] | default([]) %}
+          - "{{ hostvars[host]['ansible_host'] | default(host) }}:{{ plex_exporter_port }}"
+{% endfor %}
+{% endif %}

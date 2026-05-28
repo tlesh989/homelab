@@ -85,12 +85,17 @@
   become: true
   notify: Restart Grafana
 
-- name: Remove stale scraparr dashboard
-  ansible.builtin.file:
-    path: "{{ grafana_dashboards_dir }}/scraparr-dashboard.json"
-    state: absent
+- name: Download scraparr Grafana dashboard JSON
+  ansible.builtin.get_url:
+    url: "https://grafana.com/api/dashboards/22934/revisions/{{ scraparr_dashboard_rev }}/download"
+    dest: "{{ grafana_dashboards_dir }}/scraparr-dashboard.json"
+    owner: "472"
+    group: "472"
+    mode: "0644"
   become: true
   notify: Restart Grafana
+  when:
+    - not (molecule_testing | default(false))
 
 - name: Copy Grafana alerting provisioning files
   ansible.builtin.copy:
@@ -367,6 +372,46 @@
     # rev pinned — verify latest at grafana.com/dashboards/<id> before bumping
     - { id: "11310", rev: "5", name: "unifi-poller-sites.json" }
     - { id: "11315", rev: "9", name: "unifi-poller-clients.json" }
+  become: true
+  notify: Restart Grafana
+  when:
+    - not (molecule_testing | default(false))
+
+- name: Verify Plex token is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PLEX_TOKEN') | length > 0
+    fail_msg: "PLEX_TOKEN must be set in Doppler before deploying plex-exporter."
+  when:
+    - not (molecule_testing | default(false))
+    - groups['plex'] | default([]) | length > 0
+
+- name: Deploy plex-exporter container
+  community.docker.docker_container:
+    name: plex-exporter
+    image: "ghcr.io/jsclayton/prometheus-plex-exporter:latest"
+    pull: true
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ plex_exporter_port | string }}:9000"
+    env:
+      PLEX_SERVER: "http://{{ hostvars['plex.tlesh.xyz']['ansible_host'] | default('plex.tlesh.xyz') }}:32400"
+      PLEX_TOKEN: "{{ lookup('env', 'PLEX_TOKEN') }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+    - groups['plex'] | default([]) | length > 0
+  no_log: true
+
+- name: Download Plex exporter Grafana dashboard JSON
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/jsclayton/prometheus-plex-exporter/{{ plex_dashboard_ref }}/examples/dashboards/Media%20Server.json"
+    dest: "{{ grafana_dashboards_dir }}/plex-dashboard.json"
+    owner: "472"
+    group: "472"
+    mode: "0644"
   become: true
   notify: Restart Grafana
   when:
