@@ -19,40 +19,45 @@ PRESERVE_ITEMS=(
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2; }
 
 # ---------------------------------------------------------------------------
-# get_latest_bds_url: scrape the Minecraft BDS download page for the latest
-# x86_64 zip URL.  This relies on Mojang's HTML layout, which can change
-# without notice and break the regex.  If it does:
-#   1. Check https://www.minecraft.net/en-us/download/server/bedrock manually
-#   2. Update the grep -oP pattern below to match the new URL scheme
-#   3. Alternatively pin minecraft_bds_version in defaults/main.yml and set
+# get_latest_bds_url: query the Mojang download API for the latest Linux BDS
+# zip URL.  The API endpoint is stable JSON — prefer this over HTML scraping.
+# If the endpoint changes:
+#   1. Check https://www.minecraft.net/en-us/download/server/bedrock to find
+#      the new API via browser devtools (Network tab, filter: download/links)
+#   2. Alternatively pin minecraft_bds_version in defaults/main.yml and set
 #      minecraft_bds_download_url directly to skip the auto-update path.
 # ---------------------------------------------------------------------------
 get_latest_bds_url() {
   local url
   local attempt max_attempts=5
   local delay=5
-  local page
+  local response
 
   for attempt in $(seq 1 "${max_attempts}"); do
-    log "Fetching BDS page (attempt ${attempt}/${max_attempts})"
-    page=$(curl -fsSL --connect-timeout 10 --max-time 60 \
-      -H "Accept-Language: en-US,en" \
-      -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0" \
-      "https://www.minecraft.net/en-us/download/server/bedrock" 2>&1) || {
-        log "WARNING: curl failed on attempt ${attempt} — response: ${page:0:200}"
+    log "Fetching BDS download links (attempt ${attempt}/${max_attempts})"
+    response=$(curl -fsSL --connect-timeout 10 --max-time 30 \
+      -H "Accept: application/json" \
+      -A "Mozilla/5.0 (X11; Linux x86_64)" \
+      "https://net-secondary.web.minecraft-services.net/api/v1.0/download/links" 2>&1) || {
+        log "WARNING: curl failed on attempt ${attempt} — ${response:0:200}"
         sleep "${delay}"
-        delay=$(( delay * 2 ))  # exponential backoff
+        delay=$(( delay * 2 ))
         continue
       }
 
-    url=$(echo "${page}" \
-      | grep -oP 'https://[^\s"'\''>]+bedrock-server-[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\.zip' \
-      | grep -v arm \
-      | head -1)
+    url=$(echo "${response}" \
+      | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+links = data.get('result', {}).get('links', [])
+for link in links:
+    if link.get('downloadType') == 'serverBedrockLinux':
+        print(link['downloadUrl'])
+        break
+" 2>/dev/null)
 
-    # Validate the extracted URL matches the expected pattern
     if [[ -z "${url}" ]]; then
-      log "WARNING: No matching URL found on attempt ${attempt} — page may have changed"
+      log "WARNING: No serverBedrockLinux URL in API response on attempt ${attempt}"
       sleep "${delay}"
       delay=$(( delay * 2 ))
       continue
