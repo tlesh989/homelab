@@ -135,6 +135,8 @@ dmypy.json
 # Ansible
 .ansible
 galaxy_roles/
+# Proprietary driver tarballs — download manually from vendor and place in roles/*/files/
+roles/ax88179b/files/*.tar.bz2
 
 user-data
 *.log
