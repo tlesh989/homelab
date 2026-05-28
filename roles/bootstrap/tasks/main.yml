@@ -7,7 +7,7 @@
       ansible@{{ ansible_host | default(inventory_hostname) }} true
   delegate_to: localhost
   become: false
-  ignore_errors: true
+  failed_when: false
   register: _bootstrap_check
   changed_when: false
 
