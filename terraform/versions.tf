@@ -11,12 +11,12 @@ terraform {
   required_providers {
     doppler = {
       source  = "DopplerHQ/doppler"
-      version = "1.21.2"
+      version = "1.21.3"
     }
 
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.107.0"
+      version = "0.109.0"
     }
   }
 }
