@@ -4,9 +4,3 @@ beszel_agent_version: "latest"
 beszel_data_dir: /opt/beszel
 beszel_hub_port: 8090
 beszel_agent_port: 45876
-beszel_admin_email: "{{ lookup('env', 'BESZEL_ADMIN_EMAIL') }}"
-beszel_admin_password: "{{ lookup('env', 'BESZEL_ADMIN_PASSWORD') }}"
-beszel_pushover_api_token: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
-beszel_pushover_user_key: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
-beszel_pushover_notification_url: >-
-  pushover://shoutrrr:{{ beszel_pushover_api_token }}@{{ beszel_pushover_user_key }}/

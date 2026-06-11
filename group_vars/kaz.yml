@@ -2,5 +2,3 @@
 # Kaz VM
 
 tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
-beszel_admin_email: "{{ lookup('env', 'BESZEL_ADMIN_EMAIL') }}"
-beszel_admin_password: "{{ lookup('env', 'BESZEL_ADMIN_PASSWORD') }}"

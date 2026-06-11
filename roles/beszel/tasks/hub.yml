@@ -21,18 +21,7 @@
       - "{{ beszel_data_dir }}:/beszel_data"
     env:
       APP_URL: "http://kaz.tlesh.xyz:{{ beszel_hub_port | string }}"
-      USER_EMAIL: "{{ beszel_admin_email }}"
-      USER_PASSWORD: "{{ beszel_admin_password }}"
   become: true
-  no_log: true
-
-- name: Configure Beszel notifications
-  ansible.builtin.include_tasks: configure_notifications.yml
-  when:
-    - beszel_admin_email | length > 0
-    - beszel_admin_password | length > 0
-    - beszel_pushover_api_token | length > 0
-    - beszel_pushover_user_key | length > 0
 
 - name: Deploy Beszel agent container on hub host
   community.docker.docker_container:
