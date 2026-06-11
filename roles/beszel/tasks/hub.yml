@@ -20,7 +20,7 @@
     volumes:
       - "{{ beszel_data_dir }}:/beszel_data"
     env:
-      APP_URL: "http://kaz.tlesh.xyz:{{ beszel_hub_port | string }}"
+      APP_URL: "http://{{ beszel_hub_hostname }}:{{ beszel_hub_port | string }}"
   become: true
 
 - name: Deploy Beszel agent container on hub host

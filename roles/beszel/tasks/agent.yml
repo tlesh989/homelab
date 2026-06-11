@@ -6,7 +6,8 @@
 
 - name: Download beszel-agent binary
   ansible.builtin.get_url:
-    url: "https://github.com/henrygd/beszel/releases/latest/download/beszel-agent_linux_{{ _beszel_arch }}.tar.gz"
+    url: "https://github.com/henrygd/beszel/releases/{{ 'latest' if beszel_agent_version == 'latest' else ('download/v' ~ beszel_agent_version) }}/download/beszel-agent_linux_{{
+      _beszel_arch }}.tar.gz"
     dest: /tmp/beszel-agent.tar.gz
     mode: "0644"
   become: true
@@ -37,7 +38,7 @@
       RestartSec=5
       Environment=KEY={{ lookup('env', 'BESZEL_KEY') }}
       Environment=TOKEN={{ lookup('env', 'BESZEL_TOKEN') }}
-      Environment=HUB_URL=http://kaz.tlesh.xyz:{{ beszel_hub_port }}
+      Environment=HUB_URL=http://{{ beszel_hub_hostname }}:{{ beszel_hub_port }}
       Environment=PORT={{ beszel_agent_port }}
       ExecStart=/usr/local/bin/beszel-agent
 

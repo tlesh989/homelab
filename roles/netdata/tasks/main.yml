@@ -9,7 +9,7 @@
 
 - name: Run Netdata kickstart uninstaller if present
   ansible.builtin.shell:
-    cmd: /usr/libexec/netdata/netdata-uninstaller.sh --yes --force 2>/dev/null || true
+    cmd: set -o pipefail && /usr/libexec/netdata/netdata-uninstaller.sh --yes --force 2>/dev/null || true
     executable: /bin/bash
   become: true
   changed_when: false
@@ -61,5 +61,12 @@
     name: netdata
     state: absent
     remove: true
+  failed_when: false
+  become: true
+
+- name: Remove netdata system group
+  ansible.builtin.group:
+    name: netdata
+    state: absent
   failed_when: false
   become: true

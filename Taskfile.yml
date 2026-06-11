@@ -199,7 +199,7 @@ tasks:
       - cd roles/{{.ROLE}} && molecule test -s integration
 
   molecule-test-all:
-    desc: "Run Molecule default scenario for all roles"
+    desc: "Run Molecule default scenario for roles with tests (cloudflare_ddns, minecraft, n8n)"
     cmds:
       - task: molecule-test
         vars: { ROLE: cloudflare_ddns }
