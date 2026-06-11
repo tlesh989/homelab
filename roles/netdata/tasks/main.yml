@@ -12,7 +12,7 @@
     cmd: /usr/libexec/netdata/netdata-uninstaller.sh --yes --force 2>/dev/null || true
     executable: /bin/bash
   become: true
-  changed_when: true
+  changed_when: false
 
 - name: Remove Netdata apt package if present
   ansible.builtin.apt:

@@ -173,7 +173,7 @@ tasks:
     desc: Deploy Beszel monitoring (hub on kaz, agents on all monitored hosts)
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", CLI_ARGS: "-t beszel {{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   minecraft:
     desc: Deploy Minecraft Bedrock server
