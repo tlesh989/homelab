@@ -1,0 +1,44 @@
+---
+- name: Wait for Beszel hub to be ready
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ beszel_hub_port }}/api/health"
+    status_code: 200
+  register: _beszel_health
+  until: _beszel_health.status == 200
+  retries: 12
+  delay: 5
+
+- name: Authenticate with Beszel hub
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ beszel_hub_port }}/api/collections/users/auth-with-password"
+    method: POST
+    body_format: json
+    body:
+      identity: "{{ beszel_admin_email }}"
+      password: "{{ beszel_admin_password }}"
+    status_code: 200
+  register: _beszel_auth
+  no_log: true
+
+- name: Fetch current user_settings record
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ beszel_hub_port }}/api/collections/user_settings/records?perPage=1&fields=id,settings"
+    method: GET
+    headers:
+      Authorization: "{{ _beszel_auth.json.token }}"
+    status_code: 200
+  register: _beszel_user_settings
+  no_log: true
+
+- name: Set Pushover notification URL in user_settings
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ beszel_hub_port }}/api/collections/user_settings/records/{{ _beszel_user_settings.json.items[0].id }}"
+    method: PATCH
+    body_format: json
+    body:
+      settings: "{{ _beszel_user_settings.json.items[0].settings | combine({'webhooks': [beszel_pushover_notification_url]}) }}"
+    headers:
+      Authorization: "{{ _beszel_auth.json.token }}"
+    status_code: 200
+  no_log: true
+  when: _beszel_user_settings.json.items | length > 0
