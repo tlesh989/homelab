@@ -219,7 +219,7 @@
   roles:
     - role: node_exporter
 
-- name: remove netdata from all hosts
+- name: Remove Netdata from all hosts
   hosts: exporters
   gather_facts: true
   become: true
