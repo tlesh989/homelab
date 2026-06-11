@@ -1,8 +1,0 @@
----
-- name: Cleanup
-  hosts: all
-  gather_facts: false
-  tasks:
-    - name: No cleanup required
-      ansible.builtin.debug:
-        msg: "Cleanup handled by molecule destroy"

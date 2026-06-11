@@ -65,6 +65,3 @@ caddy
 minecraft
 kaz
 barlo
-
-[monitoring:children]
-kaz
