@@ -37,7 +37,7 @@
       RestartSec=5
       Environment=KEY={{ lookup('env', 'BESZEL_KEY') }}
       Environment=TOKEN={{ lookup('env', 'BESZEL_TOKEN') }}
-      Environment=HUB_URL=http://kaz.tlesh.xyz:8090
+      Environment=HUB_URL=http://kaz.tlesh.xyz:{{ beszel_hub_port }}
       Environment=PORT={{ beszel_agent_port }}
       ExecStart=/usr/local/bin/beszel-agent
 
