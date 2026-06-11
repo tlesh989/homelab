@@ -218,3 +218,10 @@
   become: true
   roles:
     - role: node_exporter
+
+- name: remove netdata from all hosts
+  hosts: exporters
+  gather_facts: true
+  become: true
+  roles:
+    - role: netdata

@@ -1,123 +1,65 @@
 ---
-# tasks file for netdata
-
-- name: Install Netdata via kickstart script
-  ansible.builtin.shell:
-    cmd: |
-      set -o pipefail
-      wget -O /tmp/netdata-kickstart.sh https://get.netdata.cloud/kickstart.sh
-      bash /tmp/netdata-kickstart.sh --non-interactive --stable-channel 2>&1
-    executable: /bin/bash
-    creates: /usr/sbin/netdata
-  become: true
-  when: not ansible_check_mode
-
-- name: Configure Netdata streaming (child to parent)
-  ansible.builtin.blockinfile:
-    path: /etc/netdata/stream.conf
-    create: true
-    mode: "0640"
-    marker: "# {mark} ANSIBLE MANAGED STREAMING"
-    block: |
-      [stream]
-      enabled = yes
-      destination = {{ netdata_parent_host }}:{{ netdata_parent_port }}
-      api key = {{ netdata_stream_api_key }}
-  become: true
-  when: netdata_role == "child"
-  no_log: true
-  notify: Restart Netdata
-
-- name: Configure Netdata stream acceptance on parent
-  ansible.builtin.blockinfile:
-    path: /etc/netdata/stream.conf
-    create: true
-    mode: "0640"
-    marker: "# {mark} ANSIBLE MANAGED PARENT STREAM ACCEPTANCE"
-    block: |
-      [{{ netdata_stream_api_key }}]
-      enabled = yes
-      allow from = 192.168.233.*
-  become: true
-  when: netdata_role == "parent"
-  no_log: true
-  notify: Restart Netdata
-
-- name: Ensure Netdata is enabled and started
+- name: Stop Netdata service
   ansible.builtin.systemd:
     name: netdata
-    enabled: true
-    state: started
-  ignore_errors: "{{ ansible_check_mode }}"
+    state: stopped
+    enabled: false
+  failed_when: false
   become: true
 
-- name: Configure TrueNAS go.d collector
-  ansible.builtin.copy:
-    dest: /etc/netdata/go.d/truenas.conf
-    owner: netdata
-    group: netdata
-    mode: "0640"
-    content: |
-      jobs:
-        - name: truenas
-          url: "https://{{ truenas_host }}"
-          token: "{{ truenas_api_key_netdata }}"
-          tls_skip_verify: true
+- name: Run Netdata kickstart uninstaller if present
+  ansible.builtin.shell:
+    cmd: /usr/libexec/netdata/netdata-uninstaller.sh --yes --force 2>/dev/null || true
+    executable: /bin/bash
   become: true
-  when: netdata_role == "parent"
-  no_log: true
-  notify: Restart Netdata
+  changed_when: false
 
-- name: Create cert directory for acme deploy hook
+- name: Remove Netdata apt package if present
+  ansible.builtin.apt:
+    name:
+      - netdata
+      - netdata-core
+      - netdata-plugins-bash
+      - netdata-plugins-python
+    state: absent
+    purge: true
+  failed_when: false
+  become: true
+
+- name: Remove Netdata cron updater
   ansible.builtin.file:
-    path: "{{ netdata_cert_dir }}"
-    state: directory
-    mode: "0750"
-    owner: root
-    group: netdata
+    path: /etc/cron.daily/netdata-updater
+    state: absent
   become: true
-  when: netdata_role == "parent"
 
-- name: Add sudo rule for ansible user to refresh certificates
-  vars:
-    _sudo_rule: >-
-      {{ ansible_user }} ALL=(ALL) NOPASSWD:
-      /bin/mkdir -p {{ netdata_cert_dir }},
-      /bin/mv /tmp/acme-fullchain.pem {{ netdata_cert_dir }}/fullchain.pem,
-      /bin/mv /tmp/acme-privkey.pem {{ netdata_cert_dir }}/privkey.pem,
-      /bin/chown root:netdata {{ netdata_cert_dir }}/fullchain.pem,
-      /bin/chown root:netdata {{ netdata_cert_dir }}/privkey.pem,
-      /bin/chmod 640 {{ netdata_cert_dir }}/fullchain.pem,
-      /bin/chmod 640 {{ netdata_cert_dir }}/privkey.pem,
-      /bin/systemctl restart netdata
-  ansible.builtin.lineinfile:
+- name: Remove Netdata config directory
+  ansible.builtin.file:
+    path: /etc/netdata
+    state: absent
+  become: true
+
+- name: Remove Netdata data and lib directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /var/lib/netdata
+    - /var/cache/netdata
+    - /var/log/netdata
+    - /usr/libexec/netdata
+    - /usr/share/netdata
+  become: true
+
+- name: Remove Netdata sudoers file
+  ansible.builtin.file:
     path: /etc/sudoers.d/92-netdata-cert-refresh
-    line: "{{ _sudo_rule }}"
-    create: true
-    mode: "0440"
+    state: absent
   become: true
-  when:
-    - netdata_role == "parent"
-    - ansible_user is defined and ansible_user != "root"
 
-- name: Check if homelab cert has been deployed
-  ansible.builtin.stat:
-    path: "{{ netdata_cert_dir }}/fullchain.pem"
-  register: _netdata_cert
-  when: netdata_role == "parent"
-
-- name: Configure Netdata SSL (enabled once cert is present)
-  ansible.builtin.blockinfile:
-    path: /etc/netdata/netdata.conf
-    create: true
-    mode: "0640"
-    marker: "# {mark} ANSIBLE MANAGED SSL"
-    block: |
-      [web]
-          ssl key = {{ netdata_cert_dir }}/privkey.pem
-          ssl certificate = {{ netdata_cert_dir }}/fullchain.pem
+- name: Remove netdata system user
+  ansible.builtin.user:
+    name: netdata
+    state: absent
+    remove: true
+  failed_when: false
   become: true
-  when:
-    - netdata_role == "parent"
-    - _netdata_cert.stat.exists | default(false)
-  notify: Restart Netdata

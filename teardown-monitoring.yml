@@ -1,0 +1,41 @@
+---
+- name: Tear down Grafana/Prometheus monitoring stack
+  hosts: kaz
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install Docker Python SDK
+      ansible.builtin.package:
+        name: python3-docker
+        state: present
+
+    - name: Stop and remove monitoring containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - prometheus
+        - grafana
+        - cadvisor
+        - pve-exporter
+        - dozzle
+        - truenas-exporter
+        - unpoller
+        - pihole-exporter
+        - plex-exporter
+      failed_when: false
+
+    - name: Remove monitoring Docker network
+      community.docker.docker_network:
+        name: monitoring
+        state: absent
+      failed_when: false
+
+    - name: Remove monitoring data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /opt/prometheus
+        - /opt/grafana
+        - /opt/pve-exporter
