@@ -110,6 +110,12 @@
     - role: freshrss
     - role: cloudflare_ddns
 
+- name: deploy beszel monitoring
+  hosts: all
+  become: true
+  roles:
+    - role: beszel
+
 - name: setup plex server
   hosts: plex
   become: true
