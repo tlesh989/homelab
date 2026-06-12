@@ -33,7 +33,6 @@
       - netdata-plugins-python
     state: absent
     purge: true
-  failed_when: false
   become: true
 
 - name: Remove Netdata cron updater
@@ -71,12 +70,10 @@
     name: netdata
     state: absent
     remove: true
-  failed_when: false
   become: true
 
 - name: Remove netdata system group
   ansible.builtin.group:
     name: netdata
     state: absent
-  failed_when: false
   become: true
