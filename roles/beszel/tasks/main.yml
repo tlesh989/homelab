@@ -15,3 +15,5 @@
   when:
     - inventory_hostname in groups['beszel_agents']
     - inventory_hostname not in groups['beszel_hub']
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0

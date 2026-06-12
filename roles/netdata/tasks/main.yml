@@ -4,15 +4,25 @@
     name: netdata
     state: stopped
     enabled: false
-  failed_when: false
+  register: _netdata_stop
+  failed_when:
+    - _netdata_stop is failed
+    - "'Could not find the requested service' not in (_netdata_stop.msg | default(''))"
+  become: true
+
+- name: Check for Netdata uninstaller script
+  ansible.builtin.stat:
+    path: /usr/libexec/netdata/netdata-uninstaller.sh
+  register: _netdata_uninstaller
   become: true
 
 - name: Run Netdata kickstart uninstaller if present
   ansible.builtin.shell:
-    cmd: set -o pipefail && /usr/libexec/netdata/netdata-uninstaller.sh --yes --force 2>/dev/null || true
+    cmd: set -o pipefail && /usr/libexec/netdata/netdata-uninstaller.sh --yes --force
     executable: /bin/bash
+  when: _netdata_uninstaller.stat.exists
   become: true
-  changed_when: false
+  changed_when: true
 
 - name: Remove Netdata apt package if present
   ansible.builtin.apt:
