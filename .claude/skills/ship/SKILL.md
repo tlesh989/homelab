@@ -161,6 +161,15 @@ PR base is always `main`.
 🤖 Generated with [Claude Code](https://claude.ai/code)
 ```
 
+## Post-PR Cleanup
+
+After the PR is successfully created, delete the local branch immediately — the work is safe on the remote:
+
+```bash
+git checkout main
+git branch -d <branch>
+```
+
 ## Commit Message Format
 
 ```text
