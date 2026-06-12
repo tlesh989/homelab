@@ -1,0 +1,45 @@
+---
+- name: Create Beszel data directory
+  ansible.builtin.file:
+    path: "{{ beszel_data_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+- name: Deploy Beszel hub container
+  community.docker.docker_container:
+    name: beszel
+    image: "henrygd/beszel:{{ beszel_version }}"
+    state: started
+    restart_policy: unless-stopped
+    pull: true
+    ports:
+      - "{{ beszel_hub_port | string }}:8090"
+    volumes:
+      - "{{ beszel_data_dir }}:/beszel_data"
+    env:
+      APP_URL: "http://{{ beszel_hub_hostname }}:{{ beszel_hub_port | string }}"
+  become: true
+
+- name: Deploy Beszel agent container on hub host
+  community.docker.docker_container:
+    name: beszel-agent
+    image: "henrygd/beszel-agent:{{ beszel_agent_version }}"
+    state: started
+    restart_policy: unless-stopped
+    pull: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    env:
+      KEY: "{{ lookup('env', 'BESZEL_KEY') }}"
+      TOKEN: "{{ lookup('env', 'BESZEL_TOKEN') }}"
+      HUB_URL: "http://127.0.0.1:{{ beszel_hub_port | string }}"
+      PORT: "{{ beszel_agent_port | string }}"
+  become: true
+  no_log: true
+  when:
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0

@@ -110,12 +110,12 @@
     - role: freshrss
     - role: cloudflare_ddns
 
-- name: deploy monitoring stack
-  hosts: monitoring
+- name: Deploy Beszel monitoring
+  hosts: beszel_hub:beszel_agents
   gather_facts: true
   become: true
   roles:
-    - role: monitoring
+    - role: beszel
 
 - name: setup plex server
   hosts: plex
@@ -212,9 +212,9 @@
   roles:
     - role: unifi
 
-- name: deploy node exporter to all hosts
+- name: Remove Netdata from all hosts
   hosts: exporters
   gather_facts: true
   become: true
   roles:
-    - role: node_exporter
+    - role: netdata

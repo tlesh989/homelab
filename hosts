@@ -54,6 +54,20 @@ uptime-kuma
 caddy
 minecraft
 
+[beszel_hub]
+kaz.tlesh.xyz
+
+[beszel_agents:children]
+proxmox
+tailscale
+plex
+pi-hole
+arr
+uptime-kuma
+caddy
+minecraft
+barlo
+
 [exporters:children]
 proxmox
 tailscale
@@ -65,6 +79,3 @@ caddy
 minecraft
 kaz
 barlo
-
-[monitoring:children]
-kaz

@@ -1,0 +1,65 @@
+---
+- name: Get system architecture for beszel-agent
+  ansible.builtin.set_fact:
+    _beszel_arch: >-
+      {{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}
+
+- name: Download beszel-agent binary
+  ansible.builtin.get_url:
+    url: "https://github.com/henrygd/beszel/releases/{{ 'latest' if beszel_agent_version == 'latest' else ('download/v' ~ beszel_agent_version) }}/download/beszel-agent_linux_{{
+      _beszel_arch }}.tar.gz"
+    dest: /tmp/beszel-agent.tar.gz
+    mode: "0644"
+  become: true
+
+- name: Extract beszel-agent binary
+  ansible.builtin.unarchive:
+    src: /tmp/beszel-agent.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - beszel-agent
+    mode: "0755"
+  become: true
+  notify: Restart beszel-agent
+
+- name: Create beszel-agent systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/beszel-agent.service
+    mode: "0600"
+    owner: root
+    group: root
+    content: |
+      [Unit]
+      Description=Beszel Agent
+      After=network.target
+
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=5
+      Environment=KEY={{ lookup('env', 'BESZEL_KEY') }}
+      Environment=TOKEN={{ lookup('env', 'BESZEL_TOKEN') }}
+      Environment=HUB_URL=http://{{ beszel_hub_hostname }}:{{ beszel_hub_port }}
+      Environment=PORT={{ beszel_agent_port }}
+      ExecStart=/usr/local/bin/beszel-agent
+
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+  no_log: true
+  notify: Restart beszel-agent
+  when:
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0
+
+- name: Enable and start beszel-agent
+  ansible.builtin.systemd:
+    name: beszel-agent
+    state: started
+    enabled: true
+    daemon_reload: true
+  become: true
+  when:
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0

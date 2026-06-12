@@ -169,6 +169,13 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  beszel:
+    desc: Deploy Beszel monitoring (hub on kaz, agents on all monitored hosts)
+    cmds:
+      - doppler run -- ansible beszel_hub:beszel_agents -m ping
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   minecraft:
     desc: Deploy Minecraft Bedrock server
     cmds:
@@ -182,16 +189,6 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "barlo", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  monitoring:
-    desc: Deploy Prometheus + Grafana monitoring stack
-    cmds:
-      - task: ping
-      - task: ansible
-        vars:
-          PLAYBOOK: "main.yml"
-          LIMIT: "monitoring,exporters,arr,caddy,pi-hole"
-          CLI_ARGS: "{{.CLI_ARGS}}"
-
   molecule-test:
     desc: "Run Molecule default scenario for a role. Usage: task molecule-test ROLE=<role>"
     cmds:
@@ -203,7 +200,7 @@ tasks:
       - cd roles/{{.ROLE}} && molecule test -s integration
 
   molecule-test-all:
-    desc: "Run Molecule default scenario for all four roles"
+    desc: "Run Molecule default scenario for roles with tests (cloudflare_ddns, minecraft, n8n)"
     cmds:
       - task: molecule-test
         vars: { ROLE: cloudflare_ddns }
@@ -211,8 +208,6 @@ tasks:
         vars: { ROLE: minecraft }
       - task: molecule-test
         vars: { ROLE: n8n }
-      - task: molecule-test
-        vars: { ROLE: monitoring }
 
   ping:
     desc: Test connectivity to all hosts

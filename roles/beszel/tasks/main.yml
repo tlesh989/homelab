@@ -1,0 +1,19 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.apt:
+    name: python3-docker
+    state: present
+  become: true
+  when: inventory_hostname in groups['beszel_hub']
+
+- name: Deploy Beszel hub and co-located agent
+  ansible.builtin.include_tasks: hub.yml
+  when: inventory_hostname in groups['beszel_hub']
+
+- name: Deploy Beszel binary agent
+  ansible.builtin.include_tasks: agent.yml
+  when:
+    - inventory_hostname in groups['beszel_agents']
+    - inventory_hostname not in groups['beszel_hub']
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0

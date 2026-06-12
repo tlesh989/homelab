@@ -15,7 +15,7 @@
     uid: "{{ item.uid | default(omit) }}"
     group: "{{ item.group | default(item.username) }}"
     groups: "{{ item.groups | default(omit) }}"
-    append: true
+    append: "{{ item.groups is defined and (item.groups | length) > 0 }}"
     shell: "{{ item.shell | default('/bin/bash') }}"
     # Password must be pre-hashed (e.g., SHA-512) using mkpasswd or python -c 'import crypt; ...'
     password: "{{ item.password | default(omit) }}"

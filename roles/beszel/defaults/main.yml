@@ -1,0 +1,7 @@
+---
+beszel_version: "latest"
+beszel_agent_version: "latest"
+beszel_hub_hostname: kaz.tlesh.xyz
+beszel_data_dir: /opt/beszel
+beszel_hub_port: 8090
+beszel_agent_port: 45876
