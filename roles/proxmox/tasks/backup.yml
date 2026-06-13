@@ -1,0 +1,45 @@
+---
+# A vzdump backup job is stored in /etc/pve (cluster-wide), so it only needs to
+# be created once. Idempotent: skipped if a job with proxmox_backup_id exists.
+- name: Gather existing cluster backup jobs
+  ansible.builtin.command:
+    cmd: pvesh get /cluster/backup --output-format json
+  register: _proxmox_backup_jobs
+  changed_when: false
+  check_mode: false
+  run_once: true
+  become: true
+
+- name: Create cluster vzdump backup job
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - create
+      - /cluster/backup
+      - --id
+      - "{{ proxmox_backup_id }}"
+      - --schedule
+      - "{{ proxmox_backup_schedule }}"
+      - --storage
+      - "{{ proxmox_backup_storage }}"
+      - --mode
+      - "{{ proxmox_backup_mode }}"
+      - --all
+      - "1"
+      - --enabled
+      - "1"
+      - --notification-mode
+      - auto
+      - --notes-template
+      - "{{ '{{guestname}}' }}"
+      - --prune-backups
+      - "{{ proxmox_backup_prune }}"
+      - --comment
+      - Managed by Ansible
+  register: _proxmox_backup_create
+  changed_when: _proxmox_backup_create.rc == 0
+  run_once: true
+  become: true
+  when:
+    - proxmox_backup_enabled | bool
+    - proxmox_backup_id not in (_proxmox_backup_jobs.stdout | default('[]') | from_json | map(attribute='id') | list)

@@ -24,3 +24,12 @@ proxmox_sysctl_optimizations: true
 
 # Storage network bridge MTU — set to 9000 for jumbo frames on storage VLAN
 proxmox_storage_mtu: 9000
+
+# Cluster-wide vzdump backup job (created once via pvesh; idempotent by id).
+# Backs up all guests to the TrueNAS NFS storage with prune-based retention.
+proxmox_backup_enabled: true
+proxmox_backup_id: ansible-daily
+proxmox_backup_storage: proxmox-nfs
+proxmox_backup_schedule: "02:00"
+proxmox_backup_mode: snapshot
+proxmox_backup_prune: keep-daily=7,keep-weekly=4,keep-monthly=3
