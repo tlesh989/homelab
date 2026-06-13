@@ -38,10 +38,10 @@
       Type=simple
       Restart=always
       RestartSec=5
-      Environment=KEY={{ lookup('env', 'BESZEL_KEY') }}
-      Environment=TOKEN={{ lookup('env', 'BESZEL_TOKEN') }}
-      Environment=HUB_URL=http://{{ beszel_hub_hostname }}:{{ beszel_hub_port }}
-      Environment=PORT={{ beszel_agent_port }}
+      Environment="KEY={{ lookup('env', 'BESZEL_KEY') }}"
+      Environment="TOKEN={{ lookup('env', 'BESZEL_TOKEN') }}"
+      Environment="HUB_URL=http://{{ beszel_hub_hostname }}:{{ beszel_hub_port }}"
+      Environment="PORT={{ beszel_agent_port }}"
       ExecStart=/usr/local/bin/beszel-agent
 
       [Install]
