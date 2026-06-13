@@ -1,0 +1,8 @@
+---
+# Keep in lockstep with dozzle_agent (roles/dozzle_agent/defaults) — hub and
+# agents must share the same Dozzle major version.
+dozzle_hub_version: "v10.5.2"
+dozzle_hub_port: 8025
+dozzle_hub_data_dir: /opt/dozzle/data
+# Port the remote dozzle agents listen on (matches dozzle_agent_port).
+dozzle_hub_agent_port: 7007

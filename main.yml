@@ -109,6 +109,8 @@
     - role: n8n
     - role: freshrss
     - role: cloudflare_ddns
+    - role: dozzle_hub
+      tags: [dozzle]
 
 - name: Deploy Beszel monitoring
   hosts: beszel_hub:beszel_agents
@@ -137,9 +139,10 @@
     - role: geerlingguy.security
     - role: arr
 
-- name: deploy dozzle agent
-  hosts: arr
+- name: deploy dozzle agents
+  hosts: dozzle_agents
   become: true
+  tags: [dozzle]
   roles:
     - role: dozzle_agent
 

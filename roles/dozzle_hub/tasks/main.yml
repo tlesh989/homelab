@@ -1,0 +1,38 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Ensure Dozzle hub data directory exists
+  ansible.builtin.file:
+    path: "{{ dozzle_hub_data_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Deploy Dozzle hub container
+  community.docker.docker_container:
+    name: dozzle
+    image: "amir20/dozzle:{{ dozzle_hub_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ dozzle_hub_port | string }}:8080"
+    env:
+      # Local kaz containers are read via the mounted docker.sock below; remote
+      # hosts are reached through their dozzle agents (built from inventory).
+      DOZZLE_REMOTE_AGENT: >-
+        {{ groups['dozzle_agents']
+           | map('extract', hostvars)
+           | map(attribute='ansible_host')
+           | map('regex_replace', '$', ':' ~ dozzle_hub_agent_port)
+           | join(',') }}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ dozzle_hub_data_dir }}:/data"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
