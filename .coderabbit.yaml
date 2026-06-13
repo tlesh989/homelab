@@ -14,6 +14,13 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+    # Review PRs targeting feature branches too (not just main), so stacked
+    # PRs get reviewed before they retarget to main. Default is [] (main only).
+    base_branches:
+      - "feature/.*"
+      - "bugfix/.*"
+      - "chore/.*"
+      - "hotfix/.*"
 
   # Exclude vendor/generated/agent directories from review
   path_filters:
