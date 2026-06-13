@@ -134,6 +134,7 @@
   roles:
     - role: ansible_user
     - role: packages
+    - role: geerlingguy.security
     - role: arr
 
 - name: deploy dozzle agent
@@ -171,6 +172,7 @@
   roles:
     - role: ansible_user
     - role: packages
+    - role: geerlingguy.security
     - role: uptime_kuma
 
 - name: setup minecraft server
