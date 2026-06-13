@@ -35,6 +35,9 @@
 - name: Configure LXC device passthrough
   ansible.builtin.include_tasks: lxc-devices.yml
 
+- name: Configure cluster vzdump backup job
+  ansible.builtin.include_tasks: backup.yml
+
 - name: Add sudo rule for ansible user to refresh pveproxy certificates
   vars:
     _sudo_rule: >-

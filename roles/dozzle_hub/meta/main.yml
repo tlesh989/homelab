@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: tlesh989
+  description: Dozzle hub for aggregating Docker logs from local + remote agents
+  license: MIT
+  min_ansible_version: "2.15"
+collections:
+  - community.docker
