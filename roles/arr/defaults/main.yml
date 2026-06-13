@@ -1,4 +1,7 @@
 ---
+# Watchtower image (pinned per docker.md; matches watchtower role default)
+arr_watchtower_version: "1.18.1"
+
 # Storage paths
 arr_downloads_path: /data/downloads
 arr_media_path: /data/media

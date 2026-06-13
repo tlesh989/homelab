@@ -34,6 +34,15 @@
 		"tag:mcc":    ["group:owner"], // Only you
 	},
 
+	// Auto-approve the home LAN subnet route + exit node advertised by the
+	// tailscale subnet router so it comes online without manual admin approval.
+	"autoApprovers": {
+		"routes": {
+			"192.168.233.0/24": ["group:owner"],
+		},
+		"exitNode": ["group:owner"],
+	},
+
 	"nodeAttrs": [
 		{
 			"target": ["tag:streaming"],
