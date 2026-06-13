@@ -215,9 +215,6 @@ pages:
               - title: Uptime Kuma
                 url: http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001
                 icon: si:uptimekuma
-              - title: Grafana
-                url: http://{{ hostvars['kaz.tlesh.xyz'].ansible_host }}:{{ grafana_port }}
-                icon: si:grafana
               - title: Pi-hole
                 url: http://{{ hostvars['pi-hole.tlesh.xyz'].ansible_host }}:8080/admin
                 icon: si:pihole

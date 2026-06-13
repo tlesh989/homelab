@@ -136,13 +136,6 @@
     - role: packages
     - role: arr
 
-- name: deploy scraparr metrics exporter
-  hosts: arr
-  gather_facts: true
-  become: true
-  roles:
-    - role: scraparr
-
 - name: deploy dozzle agent
   hosts: arr
   become: true
@@ -211,10 +204,3 @@
   gather_facts: false
   roles:
     - role: unifi
-
-- name: Remove Netdata from all hosts
-  hosts: exporters
-  gather_facts: true
-  become: true
-  roles:
-    - role: netdata

@@ -67,15 +67,3 @@ uptime-kuma
 caddy
 minecraft
 barlo
-
-[exporters:children]
-proxmox
-tailscale
-plex
-pi-hole
-arr
-uptime-kuma
-caddy
-minecraft
-kaz
-barlo
