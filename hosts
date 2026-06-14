@@ -68,14 +68,9 @@ caddy
 minecraft
 barlo
 
-[exporters:children]
-proxmox
-tailscale
-plex
-pi-hole
+# Docker hosts running a Dozzle agent for the hub on kaz to connect to.
+# kaz itself is read locally via the hub's mounted docker.sock (no agent).
+# barlo deferred pending remote-site topology clarification (homelab-2w4).
+[dozzle_agents:children]
 arr
 uptime-kuma
-caddy
-minecraft
-kaz
-barlo

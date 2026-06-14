@@ -182,7 +182,7 @@ services:
     restart: unless-stopped
 
   watchtower:
-    image: ghcr.io/nicholas-fedor/watchtower:latest
+    image: ghcr.io/nicholas-fedor/watchtower:{{ arr_watchtower_version }}
     container_name: watchtower
     security_opt:
       - apparmor=unconfined

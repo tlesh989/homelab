@@ -21,6 +21,7 @@
   roles:
     - role: proxmox
     - role: packages
+    - role: geerlingguy.security
     - role: users
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
@@ -109,6 +110,8 @@
     - role: n8n
     - role: freshrss
     - role: cloudflare_ddns
+    - role: dozzle_hub
+      tags: [dozzle]
 
 - name: Deploy Beszel monitoring
   hosts: beszel_hub:beszel_agents
@@ -134,18 +137,13 @@
   roles:
     - role: ansible_user
     - role: packages
+    - role: geerlingguy.security
     - role: arr
 
-- name: deploy scraparr metrics exporter
-  hosts: arr
-  gather_facts: true
+- name: deploy dozzle agents
+  hosts: dozzle_agents
   become: true
-  roles:
-    - role: scraparr
-
-- name: deploy dozzle agent
-  hosts: arr
-  become: true
+  tags: [dozzle]
   roles:
     - role: dozzle_agent
 
@@ -178,6 +176,7 @@
   roles:
     - role: ansible_user
     - role: packages
+    - role: geerlingguy.security
     - role: uptime_kuma
 
 - name: setup minecraft server
@@ -211,10 +210,3 @@
   gather_facts: false
   roles:
     - role: unifi
-
-- name: Remove Netdata from all hosts
-  hosts: exporters
-  gather_facts: true
-  become: true
-  roles:
-    - role: netdata
