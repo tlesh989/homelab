@@ -25,3 +25,13 @@ truenas_lvm_vg_name: "pve-iscsi"
 
 # TLS verification — set to false for self-signed certs
 truenas_validate_certs: false
+
+# iSCSI CHAP authentication (homelab-1it).
+# DANGER: enabling CHAP on a target that backs live Proxmox VM disks (pve-iscsi
+# LVM) will break those disks unless the Proxmox initiators are configured with
+# the same credentials FIRST and the sessions re-login. Default OFF — flip to
+# true only during a supervised maintenance window. See runbook in iscsi_chap.yml.
+truenas_iscsi_chap_enabled: false
+truenas_iscsi_chap_tag: 1
+truenas_iscsi_chap_user: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_USER') | default('', true) }}"
+truenas_iscsi_chap_secret: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_SECRET') | default('', true) }}"

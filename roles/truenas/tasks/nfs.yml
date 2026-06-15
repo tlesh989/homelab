@@ -58,9 +58,12 @@
   loop: "{{ truenas_nfs_shares }}"
   loop_control:
     label: "{{ item.dataset }}"
+  # Match on the share path, not comment: existing shares (e.g. proxmox-nfs)
+  # may have an empty comment, and matching on comment would create a duplicate
+  # share for the same path. See homelab-1it.
   when: >-
     _truenas_nfs_shares.result
-    | selectattr('comment', 'equalto', item.comment)
+    | selectattr('path', 'equalto', '/mnt/' ~ item.dataset)
     | list | length == 0
   changed_when: true
   no_log: true

@@ -248,3 +248,9 @@
     | list | first).state != "RUNNING"
   changed_when: true
   no_log: true
+
+# ── CHAP authentication (opt-in, default OFF) ────────────────────────────────
+
+- name: Configure iSCSI CHAP authentication
+  ansible.builtin.include_tasks: iscsi_chap.yml
+  when: truenas_iscsi_chap_enabled | bool

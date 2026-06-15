@@ -1,0 +1,86 @@
+---
+# tasks file for truenas — iSCSI CHAP authentication (homelab-1it)
+#
+# DANGER / RUNBOOK — this target backs live Proxmox VM disks via the pve-iscsi
+# shared LVM VG. Enabling CHAP on the target while initiators have no credentials
+# will drop those disks on next session re-login. Correct order:
+#   1. Add TRUENAS_ISCSI_CHAP_USER + TRUENAS_ISCSI_CHAP_SECRET (12-16 chars) to Doppler.
+#   2. Configure the Proxmox initiators FIRST (proxmox role, same flag) — harmless
+#      while the target still accepts authmethod=NONE.
+#   3. Set truenas_iscsi_chap_enabled=true and apply this role (flips target to CHAP).
+#   4. Re-login the iSCSI sessions on each node (or reboot) so CHAP takes effect.
+# Only runs when truenas_iscsi_chap_enabled is true.
+
+- name: Validate CHAP credentials are present
+  ansible.builtin.assert:
+    that:
+      - truenas_iscsi_chap_user | length > 0
+      - truenas_iscsi_chap_secret | length >= 12
+      - truenas_iscsi_chap_secret | length <= 16
+    fail_msg: >-
+      Set TRUENAS_ISCSI_CHAP_USER and a 12-16 char TRUENAS_ISCSI_CHAP_SECRET in
+      Doppler before enabling iSCSI CHAP.
+  no_log: true
+
+- name: Get existing iSCSI auth entries
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: iscsi.auth.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_iscsi_auth
+  changed_when: false
+  no_log: true
+
+- name: Create iSCSI CHAP auth entry
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: iscsi.auth.create
+    params:
+      - tag: "{{ truenas_iscsi_chap_tag | int }}"
+        user: "{{ truenas_iscsi_chap_user }}"
+        secret: "{{ truenas_iscsi_chap_secret }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: >-
+    _truenas_iscsi_auth.result
+    | selectattr('tag', 'equalto', truenas_iscsi_chap_tag | int)
+    | list | length == 0
+  changed_when: true
+  no_log: true
+
+- name: Re-read target detail for CHAP group update
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: iscsi.target.query
+    params:
+      - - - id
+          - "="
+          - "{{ _truenas_target_id | int }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_target_detail_chap
+  changed_when: false
+  no_log: true
+
+- name: Enable CHAP on target portal group(s)
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: iscsi.target.update
+    params:
+      - "{{ _truenas_target_id | int }}"
+      # Preserve existing portal/initiator, set authmethod=CHAP + auth tag on each group.
+      - groups: >-
+          {{
+            ((_truenas_target_detail_chap.result | default([]) | first | default({})).groups | default([]))
+            | map('combine', {'authmethod': 'CHAP', 'auth': (truenas_iscsi_chap_tag | int)})
+            | list
+          }}
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: >-
+    ((_truenas_target_detail_chap.result | default([]) | first | default({})).groups | default([]))
+    | selectattr('authmethod', 'ne', 'CHAP')
+    | list | length > 0
+  changed_when: true
+  no_log: true

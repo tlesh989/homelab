@@ -21,7 +21,8 @@
     path: "{{ plex_media_path }}"
     src: "{{ plex_nfs_server }}:{{ plex_nfs_export }}"
     fstype: nfs
-    opts: defaults,_netdev,noatime
+    # Explicit hard mount, standardized across consumers (see homelab-1it).
+    opts: rw,noatime,nfsvers=4.2,hard,timeo=600,_netdev
     state: mounted
   become: true
 

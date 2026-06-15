@@ -17,8 +17,10 @@ arr_seerr_port: 5055
 arr_flaresolverr_port: 8191
 arr_lidarr_port: 8686
 
-# NFS mount options
-arr_nfs_mount_opts: rw,noatime,nfsvers=4.1,soft,timeo=30,_netdev,x-systemd.automount
+# NFS mount options — hard mount avoids silent I/O errors/corruption on a media
+# library if the NFS server blips (soft can return errors mid-write). Standardized
+# across all consumers: hard, NFSv4.2, timeo=600. See homelab-1it.
+arr_nfs_mount_opts: rw,noatime,nfsvers=4.2,hard,timeo=600,_netdev,x-systemd.automount
 
 # Container user/group (linuxserver PUID/PGID)
 arr_puid: "1000"
