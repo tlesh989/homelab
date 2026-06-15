@@ -137,6 +137,8 @@
 # TrueNAS target still accepts authmethod=NONE. Does NOT re-login sessions —
 # re-login (or reboot) per node in a window after the target is flipped to CHAP.
 
+# iscsiadm -o update accepts only ONE -n/-v pair per call, so set each field in
+# its own invocation. Values are quoted to avoid shell-expansion/exposure.
 - name: Set CHAP credentials on iSCSI node records
   ansible.builtin.shell:
     cmd: >-
@@ -145,15 +147,19 @@
       -T iqn.2005-10.org.freenas.ctl:{{ truenas_iscsi_target_name }}
       -p {{ truenas_iscsi_portal_ip }}:3260
       -o update
-      -n node.session.auth.authmethod -v CHAP
-      -n node.session.auth.username -v {{ proxmox_iscsi_chap_user }}
-      -n node.session.auth.password -v {{ proxmox_iscsi_chap_secret }}
+      -n {{ item.name | quote }} -v {{ item.value | quote }}
     executable: /bin/bash
-  register: _proxmox_iscsi_chap
-  changed_when: _proxmox_iscsi_chap.rc == 0
+  loop:
+    - { name: "node.session.auth.authmethod", value: "CHAP" }
+    - { name: "node.session.auth.username", value: "{{ proxmox_iscsi_chap_user }}" }
+    - { name: "node.session.auth.password", value: "{{ proxmox_iscsi_chap_secret }}" }
+  loop_control:
+    label: "{{ item.name }}"
+  changed_when: true
   no_log: true
   become: true
   when:
     - proxmox_iscsi_chap_enabled | bool
     - proxmox_iscsi_chap_user | length > 0
     - proxmox_iscsi_chap_secret | length >= 12
+    - proxmox_iscsi_chap_secret | length <= 16
