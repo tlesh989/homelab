@@ -32,7 +32,7 @@
       - pool: >-
           {{ (_truenas_pools.result
               | selectattr('name', 'equalto', item.pool)
-              | list | first).id | int }}
+              | list | first | default({'id': -1})).id | int }}
         threshold: "{{ item.threshold | default(35) | int }}"
         description: "{{ item.description | default('Managed by Ansible') }}"
         enabled: true

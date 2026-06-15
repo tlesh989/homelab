@@ -61,13 +61,15 @@
     validate_certs: "{{ truenas_validate_certs }}"
   # Keeps credentials in sync after a secret rotation (create is skipped once the
   # tag exists). The API doesn't expose the stored secret for comparison, so this
-  # reconciles every run when the tag is present.
+  # would always report changed — gate it behind an explicit tag so normal runs
+  # stay idempotent. Rotate with: ansible-playbook main.yml --tags chap-secret-rotation
   when: >-
     _truenas_iscsi_auth.result
     | selectattr('tag', 'equalto', truenas_iscsi_chap_tag | int)
     | list | length > 0
   changed_when: true
   no_log: true
+  tags: ["never", "chap-secret-rotation"]
 
 - name: Re-read target detail for CHAP group update
   truenas_api:
