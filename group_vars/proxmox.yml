@@ -41,6 +41,11 @@ proxmox_ceph_disabled: true
 proxmox_disable_ha: false
 proxmox_storage_mtu: 9000
 
+# Proxmox clustering REQUIRES key-based root SSH between nodes (live migration,
+# pvecm, HA). group_vars/all.yml sets this to "no", which breaks inter-node SSH.
+# Override to prohibit-password (key-only root, no password auth) for PVE nodes.
+security_ssh_permit_root_login: "prohibit-password"
+
 # Shared iSCSI storage variables (mirrors truenas role defaults)
 truenas_iscsi_portal_ip: "192.168.220.6"
 truenas_iscsi_target_name: "proxmox"
