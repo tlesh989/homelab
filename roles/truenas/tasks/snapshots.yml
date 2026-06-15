@@ -1,0 +1,38 @@
+---
+# tasks file for truenas — periodic ZFS snapshot tasks (data-safety, homelab-1it)
+# ZFS snapshots are copy-on-write: cheap deltas, fast rollback for accidental
+# deletion/ransomware. Idempotent: matched on dataset.
+
+- name: Get existing periodic snapshot tasks
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.snapshottask.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_snapshot_tasks
+  changed_when: false
+  no_log: true
+
+- name: Create periodic snapshot task
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.snapshottask.create
+    params:
+      - dataset: "{{ item.dataset }}"
+        recursive: "{{ item.recursive | default(true) }}"
+        lifetime_value: "{{ item.lifetime_value | default(2) | int }}"
+        lifetime_unit: "{{ item.lifetime_unit | default('WEEK') }}"
+        naming_schema: "{{ item.naming_schema | default('auto-%Y-%m-%d_%H-%M') }}"
+        enabled: true
+        schedule: "{{ item.schedule }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  loop: "{{ truenas_snapshot_tasks | default([]) }}"
+  loop_control:
+    label: "{{ item.dataset }}"
+  when: >-
+    _truenas_snapshot_tasks.result
+    | selectattr('dataset', 'equalto', item.dataset)
+    | list | length == 0
+  changed_when: true
+  no_log: true

@@ -13,3 +13,38 @@ truenas_nfs_shares:
       - "192.168.220.9" # sturm (storage network)
     maproot_user: "root"
     maproot_group: "wheel"
+  # Proxmox VM/backup storage (datastore_id proxmox-nfs in terraform/storage.tf).
+  # Pre-existing on TrueNAS; codified here so the dataset + share are managed.
+  - dataset: "wayreth/proxmox-nfs"
+    comment: "Proxmox NFS storage"
+    hosts:
+      - "192.168.220.7" # tika (storage network)
+      - "192.168.220.8" # bupu (storage network)
+      - "192.168.220.9" # sturm (storage network)
+    maproot_user: "root"
+    maproot_group: "wheel"
+
+# Periodic ZFS snapshots — recursive on wayreth/data covers media/home/public.
+# Daily at 02:00, 2-week retention (cheap CoW deltas; fast accidental-delete recovery).
+truenas_snapshot_tasks:
+  - dataset: "wayreth/data"
+    recursive: true
+    lifetime_value: 2
+    lifetime_unit: "WEEK"
+    schedule:
+      minute: "0"
+      hour: "2"
+      dom: "*"
+      month: "*"
+      dow: "*"
+
+# ZFS scrub schedule — weekly Sunday 00:00 (already configured live; codified here).
+truenas_scrub_tasks:
+  - pool: "wayreth"
+    threshold: 35
+    schedule:
+      minute: "0"
+      hour: "0"
+      dom: "*"
+      month: "*"
+      dow: "7"

@@ -45,3 +45,18 @@ proxmox_storage_mtu: 9000
 truenas_iscsi_portal_ip: "192.168.220.6"
 truenas_iscsi_target_name: "proxmox"
 truenas_lvm_vg_name: "pve-iscsi"
+
+# proxmox-nfs storage: enforce hard mount opts (was soft,timeo=30 on tika/bupu —
+# unsafe for VM-image/backup storage). terraform/storage.tf can't manage `options`
+# (provider bug, ignore_changes), so it's enforced here. See homelab-1it.
+# NOTE: changing this only updates storage.cfg; existing mounts must be remounted
+# per node (deactivate/reactivate or reboot) during a window to take effect.
+proxmox_nfs_storage_id: "proxmox-nfs"
+proxmox_nfs_storage_options: "hard,timeo=600"
+
+# iSCSI CHAP on the initiator side (homelab-1it). Default OFF — see runbook in
+# roles/truenas/tasks/iscsi_chap.yml. Configure initiators BEFORE flipping the
+# TrueNAS target to CHAP.
+proxmox_iscsi_chap_enabled: false
+proxmox_iscsi_chap_user: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_USER') | default('', true) }}"
+proxmox_iscsi_chap_secret: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_SECRET') | default('', true) }}"

@@ -9,3 +9,9 @@
 
 - name: Configure NFS shares
   ansible.builtin.include_tasks: nfs.yml
+
+- name: Configure periodic ZFS snapshots
+  ansible.builtin.include_tasks: snapshots.yml
+
+- name: Configure ZFS scrub schedule
+  ansible.builtin.include_tasks: scrub.yml

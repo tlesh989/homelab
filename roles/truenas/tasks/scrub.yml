@@ -1,0 +1,50 @@
+---
+# tasks file for truenas — ZFS scrub schedule (data-safety, homelab-1it)
+# Codifies the pool scrub task. Idempotent: matched on pool name (a scrub for
+# pool 'wayreth' already exists in the homelab and will be left untouched).
+
+- name: Get existing pools
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_pools
+  changed_when: false
+  no_log: true
+
+- name: Get existing scrub tasks
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.scrub.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_scrub_tasks
+  changed_when: false
+  no_log: true
+
+- name: Create pool scrub task
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: pool.scrub.create
+    params:
+      - pool: >-
+          {{ (_truenas_pools.result
+              | selectattr('name', 'equalto', item.pool)
+              | list | first | default({'id': -1})).id | int }}
+        threshold: "{{ item.threshold | default(35) | int }}"
+        description: "{{ item.description | default('Managed by Ansible') }}"
+        enabled: true
+        schedule: "{{ item.schedule }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  loop: "{{ truenas_scrub_tasks | default([]) }}"
+  loop_control:
+    label: "{{ item.pool }}"
+  when: >-
+    (_truenas_pools.result | selectattr('name', 'equalto', item.pool) | list | length > 0)
+    and (_truenas_scrub_tasks.result
+         | selectattr('pool_name', 'equalto', item.pool)
+         | list | length == 0)
+  changed_when: true
+  no_log: true
