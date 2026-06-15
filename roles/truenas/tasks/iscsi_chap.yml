@@ -49,6 +49,26 @@
   changed_when: true
   no_log: true
 
+- name: Reconcile iSCSI CHAP auth entry when tag already exists
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: iscsi.auth.update
+    params:
+      - "{{ (_truenas_iscsi_auth.result | selectattr('tag', 'equalto', truenas_iscsi_chap_tag | int) | first).id | int }}"
+      - user: "{{ truenas_iscsi_chap_user }}"
+        secret: "{{ truenas_iscsi_chap_secret }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  # Keeps credentials in sync after a secret rotation (create is skipped once the
+  # tag exists). The API doesn't expose the stored secret for comparison, so this
+  # reconciles every run when the tag is present.
+  when: >-
+    _truenas_iscsi_auth.result
+    | selectattr('tag', 'equalto', truenas_iscsi_chap_tag | int)
+    | list | length > 0
+  changed_when: true
+  no_log: true
+
 - name: Re-read target detail for CHAP group update
   truenas_api:
     host: "{{ truenas_host }}"
@@ -78,9 +98,17 @@
             | list
           }}
     validate_certs: "{{ truenas_validate_certs }}"
+  # Fire when any group isn't CHAP yet, or is CHAP but points at a different
+  # auth tag (handles tag changes after initial enable).
   when: >-
-    ((_truenas_target_detail_chap.result | default([]) | first | default({})).groups | default([]))
-    | selectattr('authmethod', 'ne', 'CHAP')
-    | list | length > 0
+    (
+      ((_truenas_target_detail_chap.result | default([]) | first | default({})).groups | default([]))
+      | selectattr('authmethod', 'ne', 'CHAP')
+      | list | length > 0
+    ) or (
+      ((_truenas_target_detail_chap.result | default([]) | first | default({})).groups | default([]))
+      | selectattr('auth', 'ne', truenas_iscsi_chap_tag | int)
+      | list | length > 0
+    )
   changed_when: true
   no_log: true

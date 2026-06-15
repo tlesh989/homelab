@@ -103,19 +103,22 @@
 # After this changes, remount /mnt/pve/proxmox-nfs per node in a maintenance window.
 
 - name: Get proxmox-nfs storage config
-  ansible.builtin.command:
-    cmd: "pvesh get /storage/{{ proxmox_nfs_storage_id }} --output-format json"
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && pvesh get /storage/{{ proxmox_nfs_storage_id }} --output-format json"
+    executable: /bin/bash
   register: _proxmox_nfs_storage
   changed_when: false
   failed_when: false
   run_once: true
 
 - name: Enforce hard NFS mount options on proxmox-nfs storage
-  ansible.builtin.command:
-    cmd: "pvesm set {{ proxmox_nfs_storage_id }} --options {{ proxmox_nfs_storage_options }}"
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && pvesm set {{ proxmox_nfs_storage_id }} --options {{ proxmox_nfs_storage_options }}"
+    executable: /bin/bash
   register: _proxmox_nfs_set
   changed_when: _proxmox_nfs_set.rc == 0
   run_once: true
+  become: true
   when:
     - _proxmox_nfs_storage.rc == 0
     - (_proxmox_nfs_storage.stdout | from_json).options | default('') != proxmox_nfs_storage_options
@@ -135,8 +138,9 @@
 # re-login (or reboot) per node in a window after the target is flipped to CHAP.
 
 - name: Set CHAP credentials on iSCSI node records
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: >-
+      set -o pipefail &&
       iscsiadm -m node
       -T iqn.2005-10.org.freenas.ctl:{{ truenas_iscsi_target_name }}
       -p {{ truenas_iscsi_portal_ip }}:3260
@@ -144,6 +148,7 @@
       -n node.session.auth.authmethod -v CHAP
       -n node.session.auth.username -v {{ proxmox_iscsi_chap_user }}
       -n node.session.auth.password -v {{ proxmox_iscsi_chap_secret }}
+    executable: /bin/bash
   register: _proxmox_iscsi_chap
   changed_when: _proxmox_iscsi_chap.rc == 0
   no_log: true
