@@ -34,7 +34,13 @@
     name: proxmox-default-headers
     state: present
     update_cache: false
+  register: _ax88179b_default_headers
   failed_when: false
+
+- name: Log proxmox-default-headers installation status
+  ansible.builtin.debug:
+    msg: "proxmox-default-headers installation {{ 'succeeded' if _ax88179b_default_headers is succeeded else 'failed or skipped' }}"
+  when: _ax88179b_default_headers is defined
 
 - name: Install DKMS build toolchain
   ansible.builtin.apt:
