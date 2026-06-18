@@ -25,7 +25,21 @@
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_config.stdout | length > 0
 
-- name: Set MTU on vmbr1 bridge member interfaces first
+- name: Set vmbr1 MTU to {{ proxmox_storage_mtu }}
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      pvesh set /nodes/{{ ansible_hostname }}/network/vmbr1
+      --type bridge
+      --mtu {{ proxmox_storage_mtu }}
+    executable: /bin/bash
+  when:
+    - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
+  changed_when: true
+  notify: Apply network config
+
+- name: Set MTU on vmbr1 bridge member interfaces
   ansible.builtin.shell:
     cmd: >-
       set -o pipefail &&
@@ -37,20 +51,6 @@
   when:
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_ports | length > 0
-    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
-  changed_when: true
-  notify: Apply network config
-
-- name: Set vmbr1 MTU to {{ proxmox_storage_mtu }}
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail &&
-      pvesh set /nodes/{{ ansible_hostname }}/network/vmbr1
-      --type bridge
-      --mtu {{ proxmox_storage_mtu }}
-    executable: /bin/bash
-  when:
-    - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   changed_when: true
   notify: Apply network config
