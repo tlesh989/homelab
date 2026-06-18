@@ -1,3 +1,7 @@
 ---
 # tika-specific overrides
 ax88179b_enabled: true
+# USB NIC: use standard MTU 1500 (not jumbo) for reliability. Even with the
+# ax88179b DKMS driver, jumbo can break on a kernel update if the module isn't
+# rebuilt. 1500 works across the storage segment via TCP MSS. See homelab-1it.
+proxmox_storage_mtu: 1500
