@@ -1,13 +1,17 @@
 ---
 # tasks file for ax88179b — ASIX AX88179B out-of-tree DKMS driver
 
+# Derive installed kernels from /lib/modules (each dir is an installed kernel,
+# and its name is exactly the proxmox-headers-<kver> package suffix). This is
+# naming-scheme independent — PVE 9 renamed kernel packages pve-kernel-* ->
+# proxmox-kernel-*, which broke the old `dpkg -l pve-kernel-*` detection and
+# left DKMS without headers (so the driver silently failed to build).
 - name: Get list of installed Proxmox kernel versions
   ansible.builtin.shell:
     cmd: >-
       set -o pipefail &&
-      dpkg -l 'pve-kernel-[0-9]*' 2>/dev/null
-      | awk '/^ii/ {print $2}'
-      | sed 's/pve-kernel-//'
+      ls -1 /lib/modules/ 2>/dev/null
+      | grep -E '^[0-9]+\.[0-9]+\.[0-9]+.*-pve$'
     executable: /bin/bash
   register: _ax88179b_installed_kernels
   changed_when: false
@@ -20,6 +24,25 @@
     update_cache: false
   loop: "{{ _ax88179b_installed_kernels.stdout_lines }}"
   failed_when: false
+
+# Track the default-kernel headers meta so future kernel auto-updates pull the
+# matching headers and trigger a DKMS rebuild — without this, an unattended
+# kernel upgrade leaves the USB-NIC driver unbuilt and it falls back to the
+# in-kernel driver on next reboot (see homelab-1it / homelab-yed).
+- name: Ensure proxmox-default-headers is installed (auto-rebuild on kernel updates)
+  ansible.builtin.apt:
+    name: proxmox-default-headers
+    state: present
+    update_cache: false
+  register: _ax88179b_default_headers
+  failed_when: false
+
+- name: Log proxmox-default-headers installation status
+  ansible.builtin.debug:
+    msg: >-
+      proxmox-default-headers installation
+      {{ 'succeeded' if _ax88179b_default_headers is succeeded else 'failed or skipped' }}
+  when: _ax88179b_default_headers is defined
 
 - name: Install DKMS build toolchain
   ansible.builtin.apt:
