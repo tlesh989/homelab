@@ -30,11 +30,21 @@ Run in parallel:
 ```bash
 gh api repos/tlesh989/homelab/pulls/<PR>/reviews
 gh api repos/tlesh989/homelab/pulls/<PR>/comments
+
+# Review-thread node IDs + their inline-comment databaseIds + resolved state.
+# Needed in Step 6 to reply-and-resolve the threads we skip.
+gh api graphql -f query='query($owner:String!,$repo:String!,$pr:Int!){
+  repository(owner:$owner,name:$repo){ pullRequest(number:$pr){
+    reviewThreads(first:100){ nodes{ id isResolved comments(first:1){ nodes{ databaseId path } } } } } } }' \
+  -F owner=tlesh989 -F repo=homelab -F pr=<PR>
 ```
 
 **Reviews** (`/reviews`): top-level review bodies from CodeRabbit or human reviewers.
 
 **Comments** (`/comments`): inline comments attached to specific file+line.
+
+Keep the `thread node ID → comment databaseId → file:line` mapping so each skipped
+finding can be resolved on its thread in Step 6.
 
 Group and display:
 
@@ -91,14 +101,58 @@ Push:
 git push
 ```
 
-## Step 6 — Report
+## Step 6 — Resolve & Dismiss Skipped Findings
 
-Print a summary:
+Don't leave skipped findings as unanswered open threads — reply with the reason and
+resolve them, so the PR shows every comment was considered.
+
+**Per skipped inline comment** — reply, then resolve the thread:
+
+```bash
+# Reply on the thread with the reason it was skipped.
+gh api repos/tlesh989/homelab/pulls/<PR>/comments/<COMMENT_ID>/replies \
+  -f body="Skipping: <reason>."
+
+# Resolve the thread (uses the thread's GraphQL node ID from Step 2).
+gh api graphql -f query='mutation($id:ID!){ resolveReviewThread(input:{threadId:$id}){ thread { isResolved } } }' -F id=<THREAD_NODE_ID>
+```
+
+**If a review is in `CHANGES_REQUESTED` state** and the skips mean it won't be fully
+satisfied, dismiss it **only if the reviewer is a bot** (e.g. `coderabbitai[bot]`):
+
+```bash
+gh api repos/tlesh989/homelab/pulls/<PR>/reviews \
+  --jq '.[] | select(.state=="CHANGES_REQUESTED") | {id, user: .user.login}'
+
+gh api --method PUT repos/tlesh989/homelab/pulls/<PR>/reviews/<REVIEW_ID>/dismissals \
+  -f message="Addressed N, skipped M with reasons resolved on-thread. Dismissing to unblock." \
+  -f event=DISMISS
+```
+
+Never auto-dismiss a **human** reviewer's review — reply with the reasoning and let
+them re-review.
+
+## Step 7 — Report
+
+Post a summary as a PR comment (so it's visible on the PR), then print it locally:
+
+```bash
+gh pr comment <PR> --body "$(cat <<'EOF'
+## Fix Summary
+
+**Fixed**
+- <issue 1>
+- <issue 2>
+
+**Skipped** (resolved on-thread with reasoning)
+- <comment> — <reason>
+EOF
+)"
+```
 
 ```
 Fixed N issues:
   ✓ <issue 1>
-  ✓ <issue 2>
 
 Skipped N comments:
   – <reason why skipped>
@@ -113,3 +167,4 @@ If you skipped any comments, explain briefly so the user can decide whether to o
 - NEVER apply a fix that contradicts the project's established patterns without flagging it
 - If a reviewer's suggestion would introduce a hardcoded secret, skip it and tell the user
 - If lint/validate loops more than 5 iterations without converging, stop and ask
+- NEVER auto-dismiss a human reviewer's review — only a bot's `CHANGES_REQUESTED`, with reasoning
