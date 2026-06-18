@@ -1,0 +1,7 @@
+---
+# bupu-specific overrides
+# USB NIC is an older ASIX AX88179 (0b95:1790) that can't do MTU 9000 (the
+# in-kernel driver caps at 4088 and the ax88179b vendor driver doesn't support
+# this older chip). Use standard MTU 1500 for the storage network; it works
+# across the segment via TCP MSS negotiation. See homelab-1it.
+proxmox_storage_mtu: 1500

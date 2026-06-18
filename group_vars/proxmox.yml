@@ -39,6 +39,10 @@ install_script_cron_enabled: true
 # proxmox
 proxmox_ceph_disabled: true
 proxmox_disable_ha: false
+# Storage network MTU. Default 9000 (jumbo) for hosts with stable internal NICs
+# (sturm). Nodes with USB NICs that can't reliably do jumbo override this to 1500
+# in their own group_vars (bupu, tika). Mixed MTU is safe here: storage is TCP
+# (per-connection MSS negotiation) and node-to-node traffic runs on the mgmt net.
 proxmox_storage_mtu: 9000
 
 # Proxmox clustering REQUIRES key-based root SSH between nodes (live migration,
