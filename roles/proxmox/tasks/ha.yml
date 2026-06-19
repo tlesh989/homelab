@@ -20,7 +20,9 @@
   loop: "{{ _proxmox_ha_status.results }}"
   loop_control:
     label: "{{ item.item.type }}:{{ item.item.vmid }}"
-  when: item.rc != 0
+  when:
+    - item.rc != 0
+    - (item.stderr | default('') | lower) is search('not found|no such')
   changed_when: true
   run_once: true
   become: true

@@ -11,7 +11,7 @@ proxmox_ceph_repo: true # Squid for PVE 9, Reef for PVE 8
 proxmox_remove_nag: true
 
 # High Availability
-proxmox_disable_ha: true # override false in group_vars for clusters
+proxmox_disable_ha: true # default; can be overridden by group_vars/host_vars
 proxmox_ha_guests: [] # list of {type: vm|ct, vmid: N} to enroll in ha-manager
 
 # Ceph Management

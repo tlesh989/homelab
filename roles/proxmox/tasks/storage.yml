@@ -148,7 +148,9 @@
     executable: /bin/bash
   register: _proxmox_iscsi_startup
   changed_when: false
-  failed_when: false
+  failed_when:
+    - _proxmox_iscsi_startup.rc != 0
+    - "'No records found' not in (_proxmox_iscsi_startup.stderr | default(''))"
   become: true
 
 - name: Set iSCSI node.startup to automatic
