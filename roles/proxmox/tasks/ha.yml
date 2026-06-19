@@ -3,7 +3,7 @@
 
 - name: Check HA enrollment for guests
   ansible.builtin.shell:
-    cmd: "pvesh get /cluster/ha/resources/{{ item.type }}:{{ item.vmid }} --output-format json"
+    cmd: "set -o pipefail && pvesh get /cluster/ha/resources/{{ item.type }}:{{ item.vmid }} --output-format json"
     executable: /bin/bash
   register: _proxmox_ha_status
   changed_when: false
