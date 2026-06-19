@@ -36,7 +36,7 @@
   when:
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
-  changed_when: true
+  changed_when: _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   notify: Apply network config
 
 - name: Set MTU on vmbr1 bridge member interfaces
@@ -47,12 +47,13 @@
       --type eth
       --mtu {{ proxmox_storage_mtu }}
     executable: /bin/bash
-  loop: "{{ _proxmox_vmbr1_ports.split() }}"
+  loop: "{{ _proxmox_vmbr1_ports.split() | reject('equalto', 'none') | list }}"
   when:
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_ports | length > 0
+    - _proxmox_vmbr1_ports != 'none'
     - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
-  changed_when: true
+  changed_when: _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   notify: Apply network config
 
 - name: Debug vmbr1 MTU result
