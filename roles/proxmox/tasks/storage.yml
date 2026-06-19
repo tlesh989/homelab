@@ -132,6 +132,41 @@
   run_once: true
   when: _proxmox_nfs_set is changed
 
+# ── iSCSI node.startup: automatic reconnect on boot/recovery (homelab-hy6) ───
+# Default is 'manual' — storage won't reconnect on reboot, so iSCSI-backed guests
+# (e.g. uptime-kuma) won't start after a node comes back. Set to 'automatic'.
+# This is per-node (iscsiadm DB is local), so it runs on all proxmox hosts.
+
+- name: Check iSCSI node.startup setting
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      iscsiadm -m node
+      -T iqn.2005-10.org.freenas.ctl:{{ truenas_iscsi_target_name }}
+      -p {{ truenas_iscsi_portal_ip }}:3260
+      -o show | grep '^node.startup' | awk -F'= ' '{print $2}'
+    executable: /bin/bash
+  register: _proxmox_iscsi_startup
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: Set iSCSI node.startup to automatic
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      iscsiadm -m node
+      -T iqn.2005-10.org.freenas.ctl:{{ truenas_iscsi_target_name }}
+      -p {{ truenas_iscsi_portal_ip }}:3260
+      -o update
+      -n node.startup -v automatic
+    executable: /bin/bash
+  changed_when: true
+  become: true
+  when:
+    - _proxmox_iscsi_startup.rc == 0
+    - _proxmox_iscsi_startup.stdout | trim != 'automatic'
+
 # ── iSCSI CHAP initiator config (opt-in, default OFF, homelab-1it) ────────────
 # Sets CHAP credentials on the Proxmox iSCSI node records. Harmless while the
 # TrueNAS target still accepts authmethod=NONE. Does NOT re-login sessions —

@@ -1,0 +1,26 @@
+---
+# ha-manager guest enrollment — cluster-wide config, so run_once throughout.
+
+- name: Check HA enrollment for guests
+  ansible.builtin.shell:
+    cmd: "pvesh get /cluster/ha/resources/{{ item.type }}:{{ item.vmid }} --output-format json"
+    executable: /bin/bash
+  register: _proxmox_ha_status
+  changed_when: false
+  failed_when: false
+  loop: "{{ proxmox_ha_guests }}"
+  loop_control:
+    label: "{{ item.type }}:{{ item.vmid }}"
+  run_once: true
+
+- name: Enroll guests in Proxmox HA
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && ha-manager add {{ item.item.type }}:{{ item.item.vmid }} --state started"
+    executable: /bin/bash
+  loop: "{{ _proxmox_ha_status.results }}"
+  loop_control:
+    label: "{{ item.item.type }}:{{ item.item.vmid }}"
+  when: item.rc != 0
+  changed_when: true
+  run_once: true
+  become: true
