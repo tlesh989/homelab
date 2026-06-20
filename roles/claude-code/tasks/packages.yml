@@ -63,13 +63,14 @@
     dest: /tmp/doppler.gpg.key
     mode: "0644"
   become: true
+  register: doppler_key_download
 
 - name: Dearmor Doppler GPG key
   ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg /tmp/doppler.gpg.key
-    creates: /usr/share/keyrings/doppler-archive-keyring.gpg
+    cmd: gpg --dearmor --yes -o /usr/share/keyrings/doppler-archive-keyring.gpg /tmp/doppler.gpg.key
   become: true
-  changed_when: true
+  when: doppler_key_download.changed
+  changed_when: doppler_key_download.changed # noqa: no-handler
 
 - name: Add Doppler apt repository
   ansible.builtin.apt_repository:
