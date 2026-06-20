@@ -1,0 +1,4 @@
+---
+- name: Placeholder for claude-code role
+  ansible.builtin.debug:
+    msg: "claude-code LXC configured"
