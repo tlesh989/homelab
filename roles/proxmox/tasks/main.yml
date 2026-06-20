@@ -38,6 +38,10 @@
 - name: Configure cluster vzdump backup job
   ansible.builtin.include_tasks: backup.yml
 
+- name: Enroll guests in Proxmox HA
+  ansible.builtin.include_tasks: ha.yml
+  when: not proxmox_disable_ha and proxmox_ha_guests | length > 0
+
 - name: Add sudo rule for ansible user to refresh pveproxy certificates
   vars:
     _sudo_rule: >-

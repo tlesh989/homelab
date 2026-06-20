@@ -39,6 +39,11 @@ install_script_cron_enabled: true
 # proxmox
 proxmox_ceph_disabled: true
 proxmox_disable_ha: false
+proxmox_ha_guests:
+  - { type: vm, vmid: 10 } # kaz — Docker host (n8n, glance, beszel, watchtower)
+  - { type: ct, vmid: 21 } # tailscale — VPN gateway
+  - { type: ct, vmid: 3 } # pi-hole — LAN DNS
+  - { type: ct, vmid: 117 } # caddy — reverse proxy
 # Storage network MTU. Default 9000 (jumbo) for hosts with stable internal NICs
 # (sturm). Nodes with USB NICs that can't reliably do jumbo override this to 1500
 # in their own group_vars (bupu, tika). Mixed MTU is safe here: storage is TCP

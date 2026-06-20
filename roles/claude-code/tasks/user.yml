@@ -1,0 +1,26 @@
+---
+- name: Create tommy user
+  ansible.builtin.user:
+    name: "{{ claude_code_user }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+  become: true
+
+- name: Allow tommy passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ claude_code_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    dest: /etc/sudoers.d/{{ claude_code_user }}
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: true
+
+- name: Add SSH authorized key for tommy
+  ansible.posix.authorized_key:
+    user: "{{ claude_code_user }}"
+    key: "{{ lookup('env', 'SSH_PUBLIC_KEY') }}"
+    state: present
+  become: true

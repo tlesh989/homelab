@@ -179,6 +179,15 @@
     - role: geerlingguy.security
     - role: uptime_kuma
 
+- name: Configure claude-code LXC
+  hosts: claude_code
+  gather_facts: true
+  roles:
+    - role: ansible_user
+    - role: packages
+    - role: geerlingguy.security
+    - role: claude-code
+
 - name: setup minecraft server
   hosts: minecraft
   become: true

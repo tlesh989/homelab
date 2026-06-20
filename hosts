@@ -37,6 +37,9 @@ caddy.tlesh.xyz ansible_host=192.168.233.17
 [minecraft]
 minecraft.tlesh.xyz ansible_host=192.168.233.19
 
+[claude_code]
+claude-code.tlesh.xyz ansible_host=192.168.233.25
+
 [barlo]
 barlo.tlesh.xyz ansible_host=192.168.233.126
 
@@ -52,6 +55,7 @@ pi-hole
 arr
 uptime-kuma
 caddy
+claude_code
 minecraft
 
 [beszel_hub]
@@ -65,6 +69,7 @@ pi-hole
 arr
 uptime-kuma
 caddy
+claude_code
 minecraft
 barlo
 

@@ -1,0 +1,3 @@
+---
+claude_code_user: "{{ lookup('env', 'SSH_USER') }}"
+claude_code_repo_dest: /home/{{ claude_code_user }}/homelab
