@@ -1,2 +1,26 @@
 ---
-# User configuration tasks - to be implemented in Task 3
+- name: Create tommy user
+  ansible.builtin.user:
+    name: tommy
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+  become: true
+
+- name: Allow tommy passwordless sudo
+  ansible.builtin.copy:
+    content: "tommy ALL=(ALL) NOPASSWD:ALL\n"
+    dest: /etc/sudoers.d/tommy
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: true
+
+- name: Add SSH authorized key for tommy
+  ansible.posix.authorized_key:
+    user: tommy
+    key: "{{ lookup('env', 'SSH_PUBLIC_KEY') }}"
+    state: present
+  become: true
