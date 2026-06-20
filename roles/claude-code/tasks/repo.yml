@@ -6,4 +6,4 @@
     version: main
     update: false
   become: true
-  become_user: tommy
+  become_user: "{{ claude_code_user }}"

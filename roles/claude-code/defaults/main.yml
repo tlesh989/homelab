@@ -1,2 +1,3 @@
 ---
-claude_code_repo_dest: /home/tommy/homelab
+claude_code_user: tommy
+claude_code_repo_dest: /home/{{ claude_code_user }}/homelab
