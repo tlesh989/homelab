@@ -1,0 +1,39 @@
+---
+- name: Ensure .ssh directory exists for tommy
+  ansible.builtin.file:
+    path: /home/{{ claude_code_user }}/.ssh
+    state: directory
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0700"
+  become: true
+
+- name: Assert ANSIBLE_SSH_PRIVATE_KEY is set
+  ansible.builtin.assert:
+    that: lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') != ''
+    fail_msg: "ANSIBLE_SSH_PRIVATE_KEY is empty — check Doppler secrets"
+
+- name: Write ansible SSH private key
+  ansible.builtin.copy:
+    content: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') | regex_replace('\\n*$', '\n') }}"
+    dest: /home/{{ claude_code_user }}/.ssh/ansible_ed25519
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0600"
+  become: true
+  no_log: true
+
+- name: Write SSH config for homelab hosts
+  ansible.builtin.blockinfile:
+    path: /home/{{ claude_code_user }}/.ssh/config
+    create: true
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0600"
+    block: |
+      Host *.tlesh.xyz 192.168.233.*
+        IdentityFile ~/.ssh/ansible_ed25519
+        IdentitiesOnly yes
+        StrictHostKeyChecking accept-new
+        User ansible
+  become: true
