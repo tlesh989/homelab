@@ -25,22 +25,6 @@
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_config.stdout | length > 0
 
-- name: Set MTU on vmbr1 bridge member interfaces first
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail &&
-      pvesh set /nodes/{{ ansible_hostname }}/network/{{ item }}
-      --type eth
-      --mtu {{ proxmox_storage_mtu }}
-    executable: /bin/bash
-  loop: "{{ _proxmox_vmbr1_ports.split() }}"
-  when:
-    - _proxmox_vmbr1_config.rc == 0
-    - _proxmox_vmbr1_ports | length > 0
-    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
-  changed_when: true
-  notify: Apply network config
-
 - name: Set vmbr1 MTU to {{ proxmox_storage_mtu }}
   ansible.builtin.shell:
     cmd: >-
@@ -52,7 +36,24 @@
   when:
     - _proxmox_vmbr1_config.rc == 0
     - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
-  changed_when: true
+  changed_when: _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
+  notify: Apply network config
+
+- name: Set MTU on vmbr1 bridge member interfaces
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail &&
+      pvesh set /nodes/{{ ansible_hostname }}/network/{{ item }}
+      --type eth
+      --mtu {{ proxmox_storage_mtu }}
+    executable: /bin/bash
+  loop: "{{ _proxmox_vmbr1_ports.split() | reject('equalto', 'none') | list }}"
+  when:
+    - _proxmox_vmbr1_config.rc == 0
+    - _proxmox_vmbr1_ports | length > 0
+    - _proxmox_vmbr1_ports != 'none'
+    - _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
+  changed_when: _proxmox_vmbr1_mtu | string != proxmox_storage_mtu | string
   notify: Apply network config
 
 - name: Debug vmbr1 MTU result
