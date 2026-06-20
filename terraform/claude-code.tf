@@ -62,5 +62,9 @@ resource "proxmox_virtual_environment_container" "claude_code" {
     ]
   }
 
+  features {
+    nesting = true
+  }
+
   tags = ["terraform"]
 }
