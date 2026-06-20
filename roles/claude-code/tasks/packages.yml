@@ -20,6 +20,7 @@
     cmd: gpg --dearmor -o /usr/share/keyrings/nodesource.gpg /tmp/nodesource-repo.gpg.key
     creates: /usr/share/keyrings/nodesource.gpg
   become: true
+  changed_when: true
 
 - name: Add NodeSource apt repository
   ansible.builtin.apt_repository:
@@ -40,6 +41,7 @@
     cmd: npm install -g @anthropic-ai/claude-code
     creates: /usr/local/bin/claude
   become: true
+  changed_when: true
 
 - name: Add GitHub CLI GPG key
   ansible.builtin.get_url:

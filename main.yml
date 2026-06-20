@@ -180,7 +180,7 @@
     - role: uptime_kuma
 
 - name: Configure claude-code LXC
-  hosts: claude-code
+  hosts: claude_code
   gather_facts: true
   roles:
     - role: ansible_user

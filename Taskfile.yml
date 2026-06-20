@@ -111,7 +111,7 @@ tasks:
     desc: Deploy Claude Code LXC
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "claude-code", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "main.yml", LIMIT: "claude_code", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   beets-import:
     desc: Run beets music import on the arr host (tags high-confidence, sweeps rest to music-review)

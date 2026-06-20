@@ -15,7 +15,7 @@
 
 - name: Write ansible SSH private key
   ansible.builtin.copy:
-    content: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') }}"
+    content: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') | regex_replace('\\n*$', '\n') }}"
     dest: /home/tommy/.ssh/ansible_ed25519
     owner: tommy
     group: tommy
@@ -34,6 +34,6 @@
       Host *.tlesh.xyz 192.168.233.*
         IdentityFile ~/.ssh/ansible_ed25519
         IdentitiesOnly yes
-        StrictHostKeyChecking no
+        StrictHostKeyChecking accept-new
         User ansible
   become: true
