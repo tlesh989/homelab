@@ -163,7 +163,9 @@ PR base is always `main`.
 
 ## Post-PR Cleanup
 
-After the PR is successfully created, delete the local branch immediately — the work is safe on the remote:
+After the PR is successfully created, **tell the user the PR is open and the branch is ready for testing**. Do NOT delete the local branch yet — the user may need it to run `task plan`, `task apply`, or push follow-up fixes.
+
+Only delete the local branch after the user confirms testing is complete or explicitly asks to clean up:
 
 ```bash
 git checkout main
