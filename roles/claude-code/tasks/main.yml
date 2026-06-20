@@ -1,4 +1,12 @@
 ---
-- name: Placeholder for claude-code role
-  ansible.builtin.debug:
-    msg: "claude-code LXC configured"
+- name: Install packages
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Configure user
+  ansible.builtin.import_tasks: user.yml
+
+- name: Configure SSH
+  ansible.builtin.import_tasks: ssh.yml
+
+- name: Clone repository
+  ansible.builtin.import_tasks: repo.yml
