@@ -1,2 +1,9 @@
 ---
-# Repository cloning tasks - to be implemented in Task 5
+- name: Clone homelab repository
+  ansible.builtin.git:
+    repo: https://github.com/tlesh989/homelab.git
+    dest: "{{ claude_code_repo_dest }}"
+    version: main
+    update: false
+  become: true
+  become_user: tommy
