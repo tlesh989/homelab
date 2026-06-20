@@ -121,6 +121,7 @@
   become: true
   when:
     - _proxmox_nfs_storage.rc == 0
+    - _proxmox_nfs_storage.stdout | default('') | length > 0
     - (_proxmox_nfs_storage.stdout | from_json).options | default('') != proxmox_nfs_storage_options
 
 - name: Warn — proxmox-nfs needs remount to apply new options # noqa: no-handler
