@@ -182,7 +182,6 @@
 - name: Configure claude-code LXC
   hosts: claude-code
   gather_facts: true
-  become: true
   roles:
     - role: ansible_user
     - role: packages

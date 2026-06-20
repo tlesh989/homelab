@@ -1,9 +1,24 @@
 ---
-- name: Add NodeSource GPG key
+- name: Install curl and gpg
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gpg
+    state: present
+    update_cache: true
+  become: true
+
+- name: Download NodeSource GPG key (ASCII-armored)
   ansible.builtin.get_url:
     url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-    dest: /usr/share/keyrings/nodesource.gpg
+    dest: /tmp/nodesource-repo.gpg.key
     mode: "0644"
+  become: true
+
+- name: Dearmor NodeSource GPG key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/nodesource.gpg /tmp/nodesource-repo.gpg.key
+    creates: /usr/share/keyrings/nodesource.gpg
   become: true
 
 - name: Add NodeSource apt repository

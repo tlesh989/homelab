@@ -8,6 +8,11 @@
     mode: "0700"
   become: true
 
+- name: Assert ANSIBLE_SSH_PRIVATE_KEY is set
+  ansible.builtin.assert:
+    that: lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') != ''
+    fail_msg: "ANSIBLE_SSH_PRIVATE_KEY is empty — check Doppler secrets"
+
 - name: Write ansible SSH private key
   ansible.builtin.copy:
     content: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') }}"
