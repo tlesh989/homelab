@@ -185,7 +185,7 @@ network_inventory:
       assignment: reservation
       managed_by: manual
       dns: [homeassistant.tlesh.xyz]
-      notes: "Raspberry Pi — pi-hole currently points HA DNS at .125 (DRIFT, resolve in Task 8)"
+      notes: "Raspberry Pi — DHCP reservation (.35)"
     - name: GymRoku
       ip: 192.168.233.79
       mac:
