@@ -2,6 +2,18 @@
 - name: bootstrap all hosts
   import_playbook: bootstrap.yml
 
+- name: Reset connections after bootstrap
+  hosts: all:!truenas:!unifi
+  gather_facts: false
+  tasks:
+    - name: Reset SSH connection
+      ansible.builtin.meta: reset_connection
+
+    - name: Wait for SSH to be ready as ansible user
+      ansible.builtin.wait_for_connection:
+        timeout: 30
+        sleep: 2
+
 - name: initial setup
   hosts: all
   tasks:
