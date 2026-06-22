@@ -236,3 +236,18 @@ tasks:
     desc: Lint the project
     cmds:
       - ansible-lint .
+
+  ip:check:
+    desc: "Repo-internal IP/DNS drift check (no network, CI-safe)"
+    cmds:
+      - .venv/bin/python scripts/ip_inventory.py check
+
+  ip:reconcile:
+    desc: "IP drift check + live UniFi reconcile (local only)"
+    cmds:
+      - .venv/bin/python scripts/ip_inventory.py reconcile
+
+  ip:next:
+    desc: "Next free static IP, or check one: task ip:next -- 192.168.233.42"
+    cmds:
+      - .venv/bin/python scripts/ip_inventory.py next {{.CLI_ARGS}}
