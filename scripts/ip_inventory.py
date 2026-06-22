@@ -2,7 +2,10 @@
 """Homelab IP inventory: drift detection and free-IP lookup (read-only)."""
 from dataclasses import dataclass
 import ipaddress
+import json
 import pathlib
+import subprocess
+import sys
 
 import yaml
 
@@ -141,18 +144,154 @@ def is_ip_free(ip, used):
     return ip not in set(used)
 
 
+class UnifiError(Exception):
+    pass
+
+
+def _run_unifly(unifly_args):
+    try:
+        result = subprocess.run(
+            ["unifly", *unifly_args],
+            capture_output=True, text=True, timeout=30,
+        )
+    except FileNotFoundError:
+        raise UnifiError("unifly not installed")
+    except subprocess.TimeoutExpired:
+        raise UnifiError("unifly timed out")
+    if result.returncode != 0:
+        raise UnifiError(result.stderr.strip() or "unifly returned non-zero")
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        raise UnifiError("unifly did not return JSON")
+
+
+def _records(payload):
+    # unifly may wrap results in {"data": [...]} or return a bare list.
+    if isinstance(payload, dict):
+        return payload.get("data", [])
+    return payload or []
+
+
+def _normalize(item):
+    return {
+        "mac": (item.get("mac") or "").lower() or None,
+        "ip": item.get("ip") or item.get("fixed_ip") or item.get("address"),
+        "name": item.get("name") or item.get("hostname") or item.get("display_name"),
+    }
+
+
+def fetch_unifi_clients():
+    # Confirmed: `unifly clients list -o json` (subcommand: clients, not client; flag: -o json, not --json)
+    return [_normalize(c) for c in _records(_run_unifly(["clients", "list", "-o", "json"]))]
+
+
+def fetch_unifi_reservations():
+    # Confirmed: `unifly clients reservations -o json` (reservations is under `clients`, not `dhcp`)
+    return [_normalize(r) for r in _records(_run_unifly(["clients", "reservations", "-o", "json"]))]
+
+
 def gather_unifi_used():
-    return set()
+    used = set()
+    try:
+        used |= {c["ip"] for c in fetch_unifi_clients() if c["ip"]}
+        used |= {r["ip"] for r in fetch_unifi_reservations() if r["ip"]}
+    except UnifiError as exc:
+        print(f"WARNING: UniFi unavailable ({exc}); using inventory only.", file=sys.stderr)
+    return used
+
+
+def check_reservations(inventory, reservations):
+    findings = []
+    res_by_mac = {r["mac"].lower(): r["ip"] for r in reservations if r.get("mac")}
+    for h in inventory.get("hosts", []):
+        if h.get("assignment") != "reservation":
+            continue
+        mac = (h.get("mac") or "").lower()
+        if not mac:
+            findings.append(Finding(BLOCKING, "missing-mac",
+                f"{h['name']} is assignment=reservation but has no MAC"))
+            continue
+        if mac not in res_by_mac:
+            findings.append(Finding(BLOCKING, "missing-reservation",
+                f"{h['name']} ({mac}) has no UniFi reservation"))
+        elif res_by_mac[mac] != h["ip"]:
+            findings.append(Finding(BLOCKING, "reservation-mismatch",
+                f"{h['name']}: UniFi reserves {res_by_mac[mac]}, inventory says {h['ip']}"))
+    return findings
+
+
+def check_static_range_dynamic(inventory, clients, reservations):
+    lo, hi = inventory["networks"]["main"]["static"]
+    static_ips = set(ips_in_range(lo, hi))
+    reserved = {r["ip"] for r in reservations if r.get("ip")}
+    static_hosts = {h["ip"] for h in inventory.get("hosts", [])
+                    if h.get("assignment") == "static"}
+    findings = []
+    for c in clients:
+        ip = c.get("ip")
+        if ip in static_ips and ip not in reserved and ip not in static_hosts:
+            findings.append(Finding(BLOCKING, "dynamic-in-static",
+                f"{c.get('name') or c['mac']} has dynamic lease {ip} inside static range {lo}-{hi}"))
+    return findings
+
+
+def find_undocumented_clients(inventory, clients):
+    known = inventory_ips(inventory)
+    return [
+        Finding(ADVISORY, "undocumented-client",
+                f"UniFi client {c.get('name') or c['mac']} ({c['ip']}) not in inventory")
+        for c in clients
+        if c.get("ip") and c["ip"] not in known
+    ]
+
+
+def cmd_reconcile(args):
+    inventory = load_inventory(INVENTORY_PATH)
+    findings = run_repo_checks(
+        inventory,
+        parse_pihole_records(PIHOLE_DEFAULTS),
+        parse_caddy_services(CADDY_DEFAULTS),
+    )
+    try:
+        clients = fetch_unifi_clients()
+        reservations = fetch_unifi_reservations()
+    except UnifiError as exc:
+        print(f"WARNING: UniFi unavailable ({exc}); ran repo checks only.", file=sys.stderr)
+        print(format_report(findings))
+        return 1 if has_blocking(findings) else 0
+    findings += check_reservations(inventory, reservations)
+    findings += check_static_range_dynamic(inventory, clients, reservations)
+    findings += find_undocumented_clients(inventory, clients)
+    print(format_report(findings))
+    return 1 if has_blocking(findings) else 0
 
 
 def cmd_next(args):
     inventory = load_inventory(INVENTORY_PATH)
     lo, hi = inventory["networks"]["main"]["static"]
     used = inventory_ips(inventory)
-    used |= gather_unifi_used()  # defined in Task 5; returns set(), warns on failure
+    used |= gather_unifi_used()  # returns set(), warns on UnifiError
     if args.ip:
         print(f"{args.ip}: {'FREE' if is_ip_free(args.ip, used) else 'IN USE'}")
         return 0
     nxt = next_free_ip(lo, hi, used)
     print(nxt or "No free IP in static range")
     return 0
+
+
+def main(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description="Homelab IP inventory tooling")
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("check", help="repo-internal drift check (no network)")
+    sub.add_parser("reconcile", help="repo check + live UniFi reconcile")
+    next_p = sub.add_parser("next", help="next free static IP, or check one")
+    next_p.add_argument("ip", nargs="?", default=None, help="optional IP to test")
+
+    args = parser.parse_args(argv)
+    return {"check": cmd_check, "reconcile": cmd_reconcile, "next": cmd_next}[args.command](args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

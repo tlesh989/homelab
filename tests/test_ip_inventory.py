@@ -157,3 +157,51 @@ def test_next_free_ip_none_when_full():
 def test_is_ip_free():
     assert is_ip_free("192.168.233.9", {"192.168.233.7"}) is True
     assert is_ip_free("192.168.233.7", {"192.168.233.7"}) is False
+
+
+from ip_inventory import (
+    check_reservations,
+    check_static_range_dynamic,
+    find_undocumented_clients,
+)
+
+RINV = {
+    "networks": {"main": {"static": ["192.168.233.1", "192.168.233.50"]}},
+    "hosts": [
+        {"name": "kaz", "ip": "192.168.233.10", "mac": "bc:24:11:10:00:01",
+         "assignment": "reservation"},
+        {"name": "tika", "ip": "192.168.233.7", "mac": None, "assignment": "static"},
+        {"name": "macbook", "ip": "192.168.233.25", "mac": None,
+         "assignment": "dynamic-noted"},
+    ],
+}
+
+def test_check_reservations_flags_missing():
+    findings = check_reservations(RINV, reservations=[])
+    assert any(f.category == "missing-reservation" and f.severity == BLOCKING
+               for f in findings)
+
+def test_check_reservations_flags_ip_mismatch():
+    res = [{"mac": "bc:24:11:10:00:01", "ip": "192.168.233.99", "name": "kaz"}]
+    findings = check_reservations(RINV, res)
+    assert any(f.category == "reservation-mismatch" for f in findings)
+
+def test_check_reservations_ok_on_match():
+    res = [{"mac": "BC:24:11:10:00:01", "ip": "192.168.233.10", "name": "kaz"}]
+    assert check_reservations(RINV, res) == []
+
+def test_check_static_range_dynamic_flags_macbook():
+    clients = [{"mac": "aa:bb:cc:dd:ee:ff", "ip": "192.168.233.25", "name": "macbook"}]
+    findings = check_static_range_dynamic(RINV, clients, reservations=[])
+    assert any(f.category == "dynamic-in-static" and f.severity == BLOCKING
+               for f in findings)
+
+def test_check_static_range_dynamic_ignores_reserved():
+    clients = [{"mac": "bc:24:11:10:00:01", "ip": "192.168.233.10", "name": "kaz"}]
+    res = [{"mac": "bc:24:11:10:00:01", "ip": "192.168.233.10", "name": "kaz"}]
+    assert check_static_range_dynamic(RINV, clients, res) == []
+
+def test_find_undocumented_clients_is_advisory():
+    clients = [{"mac": "11:22:33:44:55:66", "ip": "192.168.233.88", "name": "phone"}]
+    findings = find_undocumented_clients(RINV, clients)
+    assert findings and all(f.severity == ADVISORY for f in findings)
