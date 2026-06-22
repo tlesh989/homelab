@@ -57,16 +57,24 @@
     filename: github-cli
   become: true
 
-- name: Add Doppler GPG key
+- name: Download Doppler GPG key (ASCII-armored)
   ansible.builtin.get_url:
-    url: https://packages.doppler.com/public/cli/gpg.DE8DF2F2C3EB2B8B.key # nocheck
-    dest: /usr/share/keyrings/doppler.gpg
+    url: https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key # nocheck
+    dest: /tmp/doppler.gpg.key
     mode: "0644"
   become: true
+  register: doppler_key_download
+
+- name: Dearmor Doppler GPG key
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /usr/share/keyrings/doppler-archive-keyring.gpg /tmp/doppler.gpg.key
+  become: true
+  when: doppler_key_download.changed
+  changed_when: doppler_key_download.changed # noqa: no-handler
 
 - name: Add Doppler apt repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/doppler.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" # nocheck
+    repo: "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" # nocheck
     state: present
     filename: doppler
   become: true

@@ -1,0 +1,2 @@
+---
+ansible_user: "{{ lookup('env', 'SSH_USER') | default('ansible', true) }}"
