@@ -1,23 +1,32 @@
-import textwrap
 import argparse
+import textwrap
 import unittest.mock
 
 import pytest
 
 import ip_inventory
 from ip_inventory import (
-    _records,
-    UnifiError,
-)
-from ip_inventory import (
     ADVISORY,
     BLOCKING,
     Finding,
+    _records,
+    UnifiError,
+    check_reservations,
+    check_static_range_dynamic,
+    cross_check_caddy,
+    cross_check_pihole,
+    find_duplicate_ips,
+    find_undocumented_clients,
     format_report,
     has_blocking,
+    inventory_ips,
+    ips_in_range,
+    is_ip_free,
     load_inventory,
+    next_free_ip,
     parse_caddy_services,
     parse_pihole_records,
+    run_repo_checks,
 )
 
 
@@ -86,14 +95,6 @@ def test_format_report_ok_when_empty():
     assert "no drift" in format_report([]).lower()
 
 
-from ip_inventory import (
-    cross_check_caddy,
-    cross_check_pihole,
-    find_duplicate_ips,
-    inventory_ips,
-    run_repo_checks,
-)
-
 INV = {
     "networks": {"main": {"static": ["192.168.233.1", "192.168.233.50"]}},
     "hosts": [
@@ -146,9 +147,6 @@ def test_run_repo_checks_aggregates():
     assert has_blocking(findings)
 
 
-from ip_inventory import ips_in_range, is_ip_free, next_free_ip
-
-
 def test_ips_in_range_inclusive():
     rng = ips_in_range("192.168.233.1", "192.168.233.3")
     assert rng == ["192.168.233.1", "192.168.233.2", "192.168.233.3"]
@@ -168,12 +166,6 @@ def test_is_ip_free():
     assert is_ip_free("192.168.233.9", {"192.168.233.7"}) is True
     assert is_ip_free("192.168.233.7", {"192.168.233.7"}) is False
 
-
-from ip_inventory import (
-    check_reservations,
-    check_static_range_dynamic,
-    find_undocumented_clients,
-)
 
 RINV = {
     "networks": {"main": {"static": ["192.168.233.1", "192.168.233.50"]}},
