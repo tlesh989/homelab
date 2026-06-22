@@ -134,3 +134,26 @@ def test_run_repo_checks_aggregates():
         [("uptime-kuma", "192.168.233.16")],
     )
     assert has_blocking(findings)
+
+
+from ip_inventory import ips_in_range, is_ip_free, next_free_ip
+
+
+def test_ips_in_range_inclusive():
+    rng = ips_in_range("192.168.233.1", "192.168.233.3")
+    assert rng == ["192.168.233.1", "192.168.233.2", "192.168.233.3"]
+
+
+def test_next_free_ip_skips_used():
+    used = {"192.168.233.1", "192.168.233.2"}
+    assert next_free_ip("192.168.233.1", "192.168.233.5", used) == "192.168.233.3"
+
+
+def test_next_free_ip_none_when_full():
+    used = set(ips_in_range("192.168.233.1", "192.168.233.2"))
+    assert next_free_ip("192.168.233.1", "192.168.233.2", used) is None
+
+
+def test_is_ip_free():
+    assert is_ip_free("192.168.233.9", {"192.168.233.7"}) is True
+    assert is_ip_free("192.168.233.7", {"192.168.233.7"}) is False

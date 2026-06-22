@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Homelab IP inventory: drift detection and free-IP lookup (read-only)."""
 from dataclasses import dataclass
+import ipaddress
 import pathlib
 
 import yaml
@@ -120,3 +121,38 @@ def cmd_check(args):
     )
     print(format_report(findings))
     return 1 if has_blocking(findings) else 0
+
+
+def ips_in_range(lo, hi):
+    start = int(ipaddress.IPv4Address(lo))
+    end = int(ipaddress.IPv4Address(hi))
+    return [str(ipaddress.IPv4Address(i)) for i in range(start, end + 1)]
+
+
+def next_free_ip(lo, hi, used):
+    used = set(used)
+    for ip in ips_in_range(lo, hi):
+        if ip not in used:
+            return ip
+    return None
+
+
+def is_ip_free(ip, used):
+    return ip not in set(used)
+
+
+def gather_unifi_used():
+    return set()
+
+
+def cmd_next(args):
+    inventory = load_inventory(INVENTORY_PATH)
+    lo, hi = inventory["networks"]["main"]["static"]
+    used = inventory_ips(inventory)
+    used |= gather_unifi_used()  # defined in Task 5; returns set(), warns on failure
+    if args.ip:
+        print(f"{args.ip}: {'FREE' if is_ip_free(args.ip, used) else 'IN USE'}")
+        return 0
+    nxt = next_free_ip(lo, hi, used)
+    print(nxt or "No free IP in static range")
+    return 0
