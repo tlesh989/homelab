@@ -1,5 +1,14 @@
 import textwrap
+import argparse
+import unittest.mock
 
+import pytest
+
+import ip_inventory
+from ip_inventory import (
+    _records,
+    UnifiError,
+)
 from ip_inventory import (
     ADVISORY,
     BLOCKING,
@@ -205,3 +214,38 @@ def test_find_undocumented_clients_is_advisory():
     clients = [{"mac": "11:22:33:44:55:66", "ip": "192.168.233.88", "name": "phone"}]
     findings = find_undocumented_clients(RINV, clients)
     assert findings and all(f.severity == ADVISORY for f in findings)
+
+
+# --- Fix 1: _records behavior ---
+
+def test_records_bare_list_passes_through():
+    data = [{"ip": "1.2.3.4"}]
+    assert _records(data) == data
+
+
+def test_records_data_envelope_unwrapped():
+    assert _records({"data": [1, 2]}) == [1, 2]
+
+
+def test_records_unknown_dict_raises_unifi_error():
+    with pytest.raises(UnifiError):
+        _records({"clients": []})
+
+
+# --- Fix 3b: cmd_reconcile graceful degradation on UnifiError ---
+
+def test_cmd_reconcile_degrades_gracefully_on_unifi_error(capsys):
+    minimal_inventory = {
+        "networks": {"main": {"static": ["192.168.233.1", "192.168.233.50"]}},
+        "hosts": [{"name": "tika", "ip": "192.168.233.7", "mac": None,
+                   "assignment": "static", "dns": []}],
+    }
+    args = argparse.Namespace()
+    with unittest.mock.patch.object(ip_inventory, "load_inventory", return_value=minimal_inventory), \
+         unittest.mock.patch.object(ip_inventory, "parse_pihole_records", return_value=[]), \
+         unittest.mock.patch.object(ip_inventory, "parse_caddy_services", return_value=[]), \
+         unittest.mock.patch.object(ip_inventory, "fetch_unifi_clients", side_effect=UnifiError("boom")):
+        result = ip_inventory.cmd_reconcile(args)
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "UniFi unavailable" in captured.err

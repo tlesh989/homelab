@@ -167,9 +167,11 @@ def _run_unifly(unifly_args):
 
 
 def _records(payload):
-    # unifly may wrap results in {"data": [...]} or return a bare list.
+    # unifly may return a bare list or wrap results in {"data": [...]}.
     if isinstance(payload, dict):
-        return payload.get("data", [])
+        if "data" in payload:
+            return payload["data"]
+        raise UnifiError(f"unexpected JSON shape: keys={sorted(payload.keys())}")
     return payload or []
 
 
@@ -232,7 +234,7 @@ def check_static_range_dynamic(inventory, clients, reservations):
         ip = c.get("ip")
         if ip in static_ips and ip not in reserved and ip not in static_hosts:
             findings.append(Finding(BLOCKING, "dynamic-in-static",
-                f"{c.get('name') or c['mac']} has dynamic lease {ip} inside static range {lo}-{hi}"))
+                f"{c.get('name') or c.get('mac') or '<unknown>'} has dynamic lease {ip} inside static range {lo}-{hi}"))
     return findings
 
 
@@ -240,7 +242,7 @@ def find_undocumented_clients(inventory, clients):
     known = inventory_ips(inventory)
     return [
         Finding(ADVISORY, "undocumented-client",
-                f"UniFi client {c.get('name') or c['mac']} ({c['ip']}) not in inventory")
+                f"UniFi client {c.get('name') or c.get('mac') or '<unknown>'} ({c['ip']}) not in inventory")
         for c in clients
         if c.get("ip") and c["ip"] not in known
     ]
