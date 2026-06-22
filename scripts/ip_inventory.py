@@ -44,7 +44,8 @@ def format_report(findings):
 
 def load_inventory(path):
     with open(path) as fh:
-        return yaml.safe_load(fh)
+        data = yaml.safe_load(fh) or {}
+    return data.get("network_inventory", data)
 
 
 def parse_pihole_records(path):

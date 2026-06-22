@@ -2,215 +2,237 @@
 # Structured network inventory — source of truth for infrastructure.
 # Phase 1: consumed by scripts/ip_inventory.py for drift detection.
 # Phase 2 (future): render pihole_local_hosts / caddy_services / ip-address-map.md from this.
-network_inventory_version: 1
+network_inventory:
+  version: 1
 
-networks:
-  main:
-    cidr: 192.168.233.0/24
-    dhcp_pool: ["192.168.233.51", "192.168.233.220"]
-    static: ["192.168.233.1", "192.168.233.50"]
-    personal: ["192.168.233.240", "192.168.233.250"]
-  iot:
-    cidr: 192.168.40.0/24
-    dhcp_pool: ["192.168.40.10", "192.168.40.200"]
-  storage:
-    cidr: 192.168.220.0/24
+  networks:
+    main:
+      cidr: 192.168.233.0/24
+      dhcp_pool: ["192.168.233.51", "192.168.233.220"]
+      static: ["192.168.233.1", "192.168.233.50"]
+      personal: ["192.168.233.240", "192.168.233.250"]
+    iot:
+      cidr: 192.168.40.0/24
+      dhcp_pool: ["192.168.40.10", "192.168.40.200"]
+    storage:
+      cidr: 192.168.220.0/24
 
-hosts:
-  - name: gateway
-    ip: 192.168.233.1
-    mac:
-    assignment: static
-    managed_by: unifi
-    dns: []
-    notes: "UniFi Express 7 — router/controller"
-  - name: pi-hole
-    ip: 192.168.233.3
-    mac:
-    assignment: static
-    managed_by: ansible
-    dns: [pi-hole.tlesh.xyz]
-    notes: "Primary DNS (on tika)"
-  - name: ansalon
-    ip: 192.168.233.6
-    mac: "6c:1f:f7:76:99:8f"
-    assignment: reservation
-    managed_by: manual
-    dns: [ansalon.tlesh.xyz]
-    notes: ""
-  - name: tika
-    ip: 192.168.233.7
-    mac:
-    assignment: static
-    managed_by: terraform
-    dns: [tika.tlesh.xyz]
-    notes: "Proxmox node"
-  - name: bupu
-    ip: 192.168.233.8
-    mac:
-    assignment: static
-    managed_by: terraform
-    dns: [bupu.tlesh.xyz]
-    notes: "Proxmox node"
-  - name: sturm
-    ip: 192.168.233.9
-    mac:
-    assignment: static
-    managed_by: terraform
-    dns: [sturm.tlesh.xyz]
-    notes: "Proxmox node"
-  - name: kaz
-    ip: 192.168.233.10
-    mac: "bc:24:11:10:00:01"
-    assignment: reservation
-    managed_by: ansible
-    dns: [kaz.tlesh.xyz]
-    notes: "Docker host VM (on tika)"
-  - name: jetkvm
-    ip: 192.168.233.11
-    mac: "44:b7:d0:e7:82:89"
-    assignment: reservation
-    managed_by: manual
-    dns: [jetkvm.tlesh.xyz]
-    notes: "KVM-over-IP"
-  - name: plex
-    ip: 192.168.233.12
-    mac:
-    assignment: static
-    managed_by: ansible
-    dns: [plex.tlesh.xyz]
-    notes: "Media server (on sturm)"
-  - name: printer
-    ip: 192.168.233.15
-    mac: "54:35:30:68:19:38"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: "Brother printer"
-  - name: uptime-kuma
-    ip: 192.168.233.16
-    mac:
-    assignment: static # VERIFY actual IP/assignment
-    managed_by: ansible
-    dns: []
-    notes: "Fronted by Caddy (.17); VERIFY actual IP/assignment"
-  - name: caddy
-    ip: 192.168.233.17
-    mac:
-    assignment: static
-    managed_by: ansible
-    dns: [caddy.tlesh.xyz]
-    notes: "Reverse proxy; fronts most service hostnames"
-  - name: minecraft
-    ip: 192.168.233.19
-    mac: "bc:24:11:13:00:01"
-    assignment: reservation
-    managed_by: ansible
-    dns: []
-    notes: "Minecraft server VM"
-  - name: tailscale
-    ip: 192.168.233.21
-    mac: "ea:31:e7:19:05:63"
-    assignment: reservation
-    managed_by: ansible
-    dns: [tailscale.tlesh.xyz]
-    notes: "Subnet router (on tika)"
-  - name: glance
-    ip: 192.168.233.22
-    mac:
-    assignment: static
-    managed_by: ansible
-    dns: []
-    notes: "RETIRING — migrated to kaz (.10); decommission after kaz verified"
-  - name: netdata
-    ip: 192.168.233.23
-    mac:
-    assignment: static
-    managed_by: ansible
-    dns: []
-    notes: "Monitoring (on sturm)"
-  - name: arr
-    ip: 192.168.233.24
-    mac:
-    assignment: static # VERIFY actual IP/assignment
-    managed_by: ansible
-    dns: [arr.tlesh.xyz]
-    notes: "*arr stack; VERIFY actual IP/assignment"
-  - name: macbook
-    ip: 192.168.233.25
-    mac:
-    assignment: dynamic-noted
-    managed_by: manual
-    dns: []
-    notes: "Personal device — do not assign to infrastructure"
-  - name: claude-code
-    ip: 192.168.233.26
-    mac:
-    assignment: static
-    managed_by: terraform
-    dns: []
-    notes: "Claude Code LXC (on tika, vm_id 125)"
-  - name: drizzt
-    ip: 192.168.233.27
-    mac: "6c:6e:07:1e:39:74"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: ""
-  - name: magius
-    ip: 192.168.233.29
-    mac: "d0:37:45:cf:ce:4c"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: ""
-  - name: kaladin
-    ip: 192.168.233.30
-    mac: "c4:35:d9:89:4c:b4"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: ""
-  - name: kvothe
-    ip: 192.168.233.31
-    mac: "54:bf:64:2e:b2:51"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: ""
-  - name: homeassistant
-    ip: 192.168.233.35
-    mac: "b8:27:eb:75:3a:e3"
-    assignment: reservation
-    managed_by: manual
-    dns: [homeassistant.tlesh.xyz]
-    notes: "Raspberry Pi — pi-hole currently points HA DNS at .125 (DRIFT, resolve in Task 8)"
-  - name: solinari
-    ip: 192.168.233.200
-    mac: "00:11:32:8e:27:e1"
-    assignment: reservation
-    managed_by: manual
-    dns: []
-    notes: "UGREEN NAS — legacy, stays in dynamic range (Time Machine + iSCSI)"
-  # UniFi network gear — recorded so reconcile does not flag them as undocumented
-  - name: chimney-ap
-    ip: 192.168.233.139
-    mac:
-    assignment: dynamic-noted
-    managed_by: unifi
-    dns: []
-    notes: "UniFi AC Mesh AP"
-  - name: usw-flex-mini
-    ip: 192.168.233.185
-    mac:
-    assignment: dynamic-noted
-    managed_by: unifi
-    dns: []
-    notes: "UniFi switch"
-  - name: usw-pro-max-16
-    ip: 192.168.233.188
-    mac:
-    assignment: dynamic-noted
-    managed_by: unifi
-    dns: []
-    notes: "UniFi core switch"
+  hosts:
+    - name: gateway
+      ip: 192.168.233.1
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi Express 7 — router/controller"
+    - name: pi-hole
+      ip: 192.168.233.3
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: [pi-hole.tlesh.xyz]
+      notes: "Primary DNS (on tika)"
+    - name: ansalon
+      ip: 192.168.233.6
+      mac: "6c:1f:f7:76:99:8f"
+      assignment: reservation
+      managed_by: manual
+      dns: [ansalon.tlesh.xyz]
+      notes: ""
+    - name: tika
+      ip: 192.168.233.7
+      mac:
+      assignment: static
+      managed_by: terraform
+      dns: [tika.tlesh.xyz]
+      notes: "Proxmox node"
+    - name: bupu
+      ip: 192.168.233.8
+      mac:
+      assignment: static
+      managed_by: terraform
+      dns: [bupu.tlesh.xyz]
+      notes: "Proxmox node"
+    - name: sturm
+      ip: 192.168.233.9
+      mac:
+      assignment: static
+      managed_by: terraform
+      dns: [sturm.tlesh.xyz]
+      notes: "Proxmox node"
+    - name: kaz
+      ip: 192.168.233.10
+      mac: "bc:24:11:10:00:01"
+      assignment: reservation
+      managed_by: ansible
+      dns: [kaz.tlesh.xyz]
+      notes: "Docker host VM (on tika)"
+    - name: jetkvm
+      ip: 192.168.233.11
+      mac: "44:b7:d0:e7:82:89"
+      assignment: reservation
+      managed_by: manual
+      dns: [jetkvm.tlesh.xyz]
+      notes: "KVM-over-IP"
+    - name: plex
+      ip: 192.168.233.12
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: [plex.tlesh.xyz]
+      notes: "Media server (on sturm)"
+    - name: printer
+      ip: 192.168.233.15
+      mac: "54:35:30:68:19:38"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: "Brother printer"
+    - name: uptime-kuma
+      ip: 192.168.233.16
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: []
+      notes: "Fronted by Caddy (.17); VERIFY actual IP/assignment"
+    - name: caddy
+      ip: 192.168.233.17
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: [caddy.tlesh.xyz]
+      notes: "Reverse proxy; fronts most service hostnames"
+    - name: minecraft
+      ip: 192.168.233.19
+      mac: "bc:24:11:13:00:01"
+      assignment: reservation
+      managed_by: ansible
+      dns: []
+      notes: "Minecraft server VM"
+    - name: tailscale
+      ip: 192.168.233.21
+      mac: "ea:31:e7:19:05:63"
+      assignment: reservation
+      managed_by: ansible
+      dns: [tailscale.tlesh.xyz]
+      notes: "Subnet router (on tika)"
+    - name: glance
+      ip: 192.168.233.22
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: []
+      notes: "RETIRING — migrated to kaz (.10); decommission after kaz verified"
+    - name: netdata
+      ip: 192.168.233.23
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: []
+      notes: "Monitoring (on sturm)"
+    - name: arr
+      ip: 192.168.233.24
+      mac:
+      assignment: static
+      managed_by: ansible
+      dns: [arr.tlesh.xyz]
+      notes: "*arr stack; VERIFY actual IP/assignment"
+    - name: macbook
+      ip: 192.168.233.25
+      mac:
+      assignment: dynamic-noted
+      managed_by: manual
+      dns: []
+      notes: "Personal device — do not assign to infrastructure"
+    - name: claude-code
+      ip: 192.168.233.26
+      mac:
+      assignment: static
+      managed_by: terraform
+      dns: []
+      notes: "Claude Code LXC (on tika, vm_id 125)"
+    - name: drizzt
+      ip: 192.168.233.27
+      mac: "6c:6e:07:1e:39:74"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: ""
+    - name: magius
+      ip: 192.168.233.29
+      mac: "d0:37:45:cf:ce:4c"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: ""
+    - name: kaladin
+      ip: 192.168.233.30
+      mac: "c4:35:d9:89:4c:b4"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: ""
+    - name: kvothe
+      ip: 192.168.233.31
+      mac: "54:bf:64:2e:b2:51"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: ""
+    - name: homeassistant
+      ip: 192.168.233.35
+      mac: "b8:27:eb:75:3a:e3"
+      assignment: reservation
+      managed_by: manual
+      dns: [homeassistant.tlesh.xyz]
+      notes: "Raspberry Pi — pi-hole currently points HA DNS at .125 (DRIFT, resolve in Task 8)"
+    - name: GymRoku
+      ip: 192.168.233.79
+      mac:
+      assignment: dynamic-noted
+      managed_by: manual
+      dns: []
+      notes: "Media device — stays on main (Plex/DLNA)"
+    - name: Denon-AVR-S750H
+      ip: 192.168.233.156
+      mac:
+      assignment: dynamic-noted
+      managed_by: manual
+      dns: []
+      notes: "AV receiver — stays on main (Plex/DLNA)"
+    - name: solinari
+      ip: 192.168.233.200
+      mac: "00:11:32:8e:27:e1"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: "UGREEN NAS — legacy, stays in dynamic range (Time Machine + iSCSI)"
+    # UniFi network gear — recorded so reconcile does not flag them as undocumented
+    - name: chimney-ap
+      ip: 192.168.233.139
+      mac:
+      assignment: dynamic-noted
+      managed_by: unifi
+      dns: []
+      notes: "UniFi AC Mesh AP"
+    - name: usw-flex-mini
+      ip: 192.168.233.185
+      mac:
+      assignment: dynamic-noted
+      managed_by: unifi
+      dns: []
+      notes: "UniFi switch"
+    - name: usw-pro-max-16
+      ip: 192.168.233.188
+      mac:
+      assignment: dynamic-noted
+      managed_by: unifi
+      dns: []
+      notes: "UniFi core switch"
+    - name: coltons-tablet
+      ip: 192.168.233.240
+      mac: "da:4d:62:21:d6:88"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: "Tablet — personal device pool (.240-.250)"

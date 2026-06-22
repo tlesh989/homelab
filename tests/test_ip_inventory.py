@@ -24,10 +24,11 @@ from ip_inventory import (
 def test_load_inventory_reads_yaml(tmp_path):
     p = tmp_path / "inv.yml"
     p.write_text(textwrap.dedent("""
-        networks:
-          main: {cidr: 192.168.233.0/24, static: ["192.168.233.1", "192.168.233.50"]}
-        hosts:
-          - {name: tika, ip: 192.168.233.7, mac: null, assignment: static, dns: [tika.tlesh.xyz]}
+        network_inventory:
+          networks:
+            main: {cidr: 192.168.233.0/24, static: ["192.168.233.1", "192.168.233.50"]}
+          hosts:
+            - {name: tika, ip: 192.168.233.7, mac: null, assignment: static, dns: [tika.tlesh.xyz]}
     """))
     inv = load_inventory(str(p))
     assert inv["hosts"][0]["name"] == "tika"
