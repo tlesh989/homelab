@@ -5,6 +5,7 @@ exclude_paths:
   - .serena
   - galaxy_roles
   - galaxy_collections
+  - group_vars/all/network_inventory.yml
 
 skip_list:
   - "name[casing]"
