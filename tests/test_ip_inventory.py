@@ -74,3 +74,63 @@ def test_format_report_groups_blocking_first():
 
 def test_format_report_ok_when_empty():
     assert "no drift" in format_report([]).lower()
+
+
+from ip_inventory import (
+    cross_check_caddy,
+    cross_check_pihole,
+    find_duplicate_ips,
+    inventory_ips,
+    run_repo_checks,
+)
+
+INV = {
+    "networks": {"main": {"static": ["192.168.233.1", "192.168.233.50"]}},
+    "hosts": [
+        {"name": "tika", "ip": "192.168.233.7", "dns": ["tika.tlesh.xyz"]},
+        {"name": "caddy", "ip": "192.168.233.17", "dns": ["caddy.tlesh.xyz"]},
+        {"name": "homeassistant", "ip": "192.168.233.35", "dns": ["homeassistant.tlesh.xyz"]},
+    ],
+}
+
+
+def test_inventory_ips():
+    assert inventory_ips(INV) == {"192.168.233.7", "192.168.233.17", "192.168.233.35"}
+
+
+def test_find_duplicate_ips_flags_collision():
+    inv = {"hosts": [
+        {"name": "a", "ip": "192.168.233.7"},
+        {"name": "b", "ip": "192.168.233.7"},
+    ]}
+    findings = find_duplicate_ips(inv)
+    assert len(findings) == 1
+    assert findings[0].severity == BLOCKING
+    assert findings[0].category == "duplicate-ip"
+
+
+def test_cross_check_pihole_blocks_unknown_ip():
+    # homeassistant actually points at .125 in pi-hole; inventory says .35
+    records = [("192.168.233.125", "homeassistant.tlesh.xyz"),
+               ("192.168.233.17", "caddy.tlesh.xyz")]
+    findings = cross_check_pihole(INV, records)
+    assert [f.message for f in findings if f.severity == BLOCKING]
+    assert any("192.168.233.125" in f.message for f in findings)
+    # .17 is a known host -> no finding for it
+    assert not any("192.168.233.17" in f.message for f in findings)
+
+
+def test_cross_check_caddy_blocks_unknown_ip():
+    services = [("uptime-kuma", "192.168.233.16"), ("n8n", "192.168.233.7")]
+    findings = cross_check_caddy(INV, services)
+    assert any(f.severity == BLOCKING and "192.168.233.16" in f.message for f in findings)
+    assert not any("192.168.233.7" in f.message for f in findings)
+
+
+def test_run_repo_checks_aggregates():
+    findings = run_repo_checks(
+        INV,
+        [("192.168.233.125", "homeassistant.tlesh.xyz")],
+        [("uptime-kuma", "192.168.233.16")],
+    )
+    assert has_blocking(findings)
