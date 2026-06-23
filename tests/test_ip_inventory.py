@@ -71,6 +71,19 @@ def test_parse_caddy_services_extracts_ip(tmp_path):
     assert ("n8n", "192.168.233.10") in services
 
 
+def test_parse_caddy_services_skips_templated_and_malformed(tmp_path):
+    p = tmp_path / "caddy.yml"
+    p.write_text(textwrap.dedent("""
+        caddy_services:
+          - {name: good, upstream: "192.168.233.10:8080"}
+          - {name: templated, upstream: "{{ some_ip }}:8080"}
+          - {name: missing_upstream}
+          - {upstream: "192.168.233.99:80"}
+    """))
+    services = parse_caddy_services(str(p))
+    assert services == [("good", "192.168.233.10")]
+
+
 def test_has_blocking_true_when_any_blocking():
     findings = [Finding(ADVISORY, "x", "a"), Finding(BLOCKING, "y", "b")]
     assert has_blocking(findings) is True

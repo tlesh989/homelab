@@ -68,8 +68,12 @@ def parse_caddy_services(path):
         data = yaml.safe_load(fh) or {}
     services = []
     for svc in data.get("caddy_services", []):
-        ip = svc["upstream"].split(":")[0]
-        services.append((svc["name"], ip))
+        upstream = svc.get("upstream", "")
+        name = svc.get("name")
+        if not upstream or not name or "{{" in upstream:
+            continue
+        ip = upstream.split(":")[0]
+        services.append((name, ip))
     return services
 
 

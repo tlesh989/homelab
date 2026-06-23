@@ -245,9 +245,9 @@ tasks:
   ip:reconcile:
     desc: "IP drift check + live UniFi reconcile (local only)"
     cmds:
-      - .venv/bin/python scripts/ip_inventory.py reconcile
+      - doppler run -- .venv/bin/python scripts/ip_inventory.py reconcile
 
   ip:next:
     desc: "Next free static IP, or check one: task ip:next -- 192.168.233.42"
     cmds:
-      - .venv/bin/python scripts/ip_inventory.py next {{.CLI_ARGS}}
+      - doppler run -- .venv/bin/python scripts/ip_inventory.py next {{.CLI_ARGS}}
