@@ -237,6 +237,16 @@ def test_records_unknown_dict_raises_unifi_error():
         _records({"clients": []})
 
 
+@pytest.mark.parametrize("payload", ["ok", 1, 42, 3.14, True])
+def test_records_scalar_raises_unifi_error(payload):
+    with pytest.raises(UnifiError):
+        _records(payload)
+
+
+def test_records_none_returns_empty():
+    assert _records(None) == []
+
+
 # --- Fix 3b: cmd_reconcile graceful degradation on UnifiError ---
 
 def test_cmd_reconcile_degrades_gracefully_on_unifi_error(capsys):

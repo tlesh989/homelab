@@ -177,7 +177,11 @@ def _records(payload):
         if "data" in payload:
             return payload["data"]
         raise UnifiError(f"unexpected JSON shape: keys={sorted(payload.keys())}")
-    return payload or []
+    if payload is None:
+        return []
+    if not isinstance(payload, list):
+        raise UnifiError(f"unexpected JSON shape: {type(payload).__name__}")
+    return payload
 
 
 def _normalize(item):
@@ -280,6 +284,11 @@ def cmd_next(args):
     used = inventory_ips(inventory)
     used |= gather_unifi_used()  # returns set(), warns on UnifiError
     if args.ip:
+        try:
+            ipaddress.IPv4Address(args.ip)
+        except ipaddress.AddressValueError:
+            print(f"{args.ip}: not a valid IPv4 address", file=sys.stderr)
+            return 2
         print(f"{args.ip}: {'FREE' if is_ip_free(args.ip, used) else 'IN USE'}")
         return 0
     nxt = next_free_ip(lo, hi, used)
