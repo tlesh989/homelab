@@ -1,0 +1,7 @@
+---
+- name: Deploy Beszel monitoring
+  hosts: beszel_hub:beszel_agents
+  gather_facts: true
+  become: true
+  roles:
+    - role: beszel

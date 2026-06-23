@@ -180,7 +180,7 @@ tasks:
     cmds:
       - doppler run -- ansible beszel_hub:beszel_agents -m ping
       - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "beszel.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   minecraft:
     desc: Deploy Minecraft Bedrock server
