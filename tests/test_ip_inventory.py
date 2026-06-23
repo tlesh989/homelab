@@ -2,15 +2,14 @@ import argparse
 import textwrap
 import unittest.mock
 
-import pytest
-
 import ip_inventory
+import pytest
 from ip_inventory import (
     ADVISORY,
     BLOCKING,
     Finding,
-    _records,
     UnifiError,
+    _records,
     check_reservations,
     check_static_range_dynamic,
     cross_check_caddy,

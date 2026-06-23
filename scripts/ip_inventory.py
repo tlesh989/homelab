@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Homelab IP inventory: drift detection and free-IP lookup (read-only)."""
-from dataclasses import dataclass
 import ipaddress
 import json
 import pathlib
 import subprocess
 import sys
+from dataclasses import dataclass
 
 import yaml
 
@@ -160,15 +160,15 @@ def _run_unifly(unifly_args):
             capture_output=True, text=True, timeout=30,
         )
     except FileNotFoundError:
-        raise UnifiError("unifly not installed")
+        raise UnifiError("unifly not installed") from None
     except subprocess.TimeoutExpired:
-        raise UnifiError("unifly timed out")
+        raise UnifiError("unifly timed out") from None
     if result.returncode != 0:
         raise UnifiError(result.stderr.strip() or "unifly returned non-zero")
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError:
-        raise UnifiError("unifly did not return JSON")
+        raise UnifiError("unifly did not return JSON") from None
 
 
 def _records(payload):
