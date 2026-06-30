@@ -1,0 +1,9 @@
+# Ruff config — lints the project's Python (scripts/, tests/).
+# Ansible/Terraform/docs are linted by their own tools (see .pre-commit-config.yaml).
+line-length = 120
+target-version = "py312"
+
+[lint]
+# Default rules (pyflakes + a focused pycodestyle subset incl. E402 import-order)
+# plus import sorting and common bug patterns.
+select = ["E", "F", "W", "I", "B"]
