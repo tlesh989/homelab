@@ -38,7 +38,7 @@ reviews:
     - "!.openpackage/**"
     - "!**/*.tfstate"
     - "!**/*.tfstate.backup"
-    - "!docs/superpowers/**"
+    - "!docs/archive/**"
 
   # Static analysis tools — supplement pre-commit with additional checks
   tools:
