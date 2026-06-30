@@ -24,8 +24,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
 | .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
-| .22 | glance | Glance LXC *(retiring)* | Migrated to kaz (.10); decommission after kaz verified |
-| .23 | netdata | Netdata LXC | Monitoring (on sturm) |
+| .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
 | .27 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
 | .29 | magius | Machine | DHCP reservation (MAC: d0:37:45:cf:ce:4c) |
 | .30 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
