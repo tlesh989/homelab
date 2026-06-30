@@ -116,20 +116,13 @@ network_inventory:
       managed_by: ansible
       dns: [tailscale.tlesh.xyz]
       notes: "Subnet router (on tika)"
-    - name: glance
+    - name: claude-code
       ip: 192.168.233.22
       mac:
       assignment: static
-      managed_by: ansible
+      managed_by: terraform
       dns: []
-      notes: "RETIRING — migrated to kaz (.10); decommission after kaz verified"
-    - name: netdata
-      ip: 192.168.233.23
-      mac:
-      assignment: static
-      managed_by: ansible
-      dns: []
-      notes: "Monitoring (on sturm)"
+      notes: "Claude Code LXC (on tika, vm_id 125); reclaimed from decommissioned glance LXC"
     - name: arr
       ip: 192.168.233.24
       mac:
@@ -144,13 +137,6 @@ network_inventory:
       managed_by: manual
       dns: []
       notes: "Personal device — do not assign to infrastructure"
-    - name: claude-code
-      ip: 192.168.233.26
-      mac:
-      assignment: static
-      managed_by: terraform
-      dns: []
-      notes: "Claude Code LXC (on tika, vm_id 125)"
     - name: drizzt
       ip: 192.168.233.27
       mac: "6c:6e:07:1e:39:74"
