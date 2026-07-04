@@ -115,20 +115,14 @@ Once all pre-flight checks pass:
 
    If rejected (non-fast-forward): investigate before force-pushing.
 
-### 6. CodeRabbit gate (blocking — runs before PR creation)
+### 6. Code review
 
-```bash
-coderabbit review --plain --base main
-```
-
-- This takes ~60 seconds. Run it on committed changes before opening the PR.
-- If CodeRabbit surfaces **Blocking** issues: fix them, commit, and re-run before proceeding.
-- If only Advisory issues: surface them to the user and proceed if they confirm.
-- If CodeRabbit is not installed or exits non-zero for tool reasons: warn the user and continue.
+Do **not** run the CodeRabbit CLI locally. CodeRabbit reviews the PR
+automatically on GitHub once it is opened; running it locally too would
+review the same diff twice and burn the free-plan quota (~3 reviews/hour).
+After the PR is open, address CodeRabbit's comments with `/fix-pr`.
 
 ## Create PR
-
-Only open the PR after the CodeRabbit gate passes.
 
 ```bash
 gh pr create --base main --title "<title>" --body "<body>"
@@ -152,7 +146,6 @@ PR base is always `main`.
 - [x] ansible-lint clean (or no Ansible files changed)
 - [x] No hardcoded secrets detected
 - [x] Gone branches cleaned up
-- [x] CodeRabbit review clean (or advisory issues acknowledged)
 
 ## Test Plan
 
