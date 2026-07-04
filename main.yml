@@ -27,6 +27,19 @@
           - processor
           - os_family
 
+# Base configuration shared by standard servers that connect as `ansible` with
+# privilege escalation. Runs before the per-service plays so each of those only
+# carries its own roles. Deliberately excludes: proxmox (custom role order),
+# tailscale (apt-source cleanup must precede package installs), claude_code
+# (connects as a human user, no become), truenas/unifi (API/local connection).
+- name: base configuration for standard servers
+  hosts: lxc:kaz:barlo:!claude_code:!tailscale
+  become: true
+  roles:
+    - role: ansible_user
+    - role: packages
+    - role: geerlingguy.security
+
 - name: setup proxmox hosts
   hosts: proxmox
   become: true
@@ -109,11 +122,8 @@
         state: started
         enabled: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: users
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: geerlingguy.docker
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
@@ -126,30 +136,20 @@
       tags: [dozzle]
 
 - name: Deploy Beszel monitoring
-  hosts: beszel_hub:beszel_agents
-  gather_facts: true
-  become: true
-  roles:
-    - role: beszel
+  import_playbook: beszel.yml
 
 - name: setup plex server
   hosts: plex
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: users
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: plex
 
 - name: setup arr stack
   hosts: arr
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
-    - role: geerlingguy.security
     - role: arr
 
 - name: deploy dozzle agents
@@ -163,10 +163,7 @@
   hosts: pi-hole
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: users
     - role: pi-hole
     - role: acme
@@ -175,10 +172,7 @@
   hosts: caddy
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: users
     - role: caddy
 
@@ -186,9 +180,6 @@
   hosts: uptime-kuma
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
-    - role: geerlingguy.security
     - role: uptime_kuma
 
 - name: Configure claude-code LXC
@@ -204,22 +195,16 @@
   hosts: minecraft
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: users
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: minecraft
 
 - name: setup barlo remote site server
   hosts: barlo
   become: true
   roles:
-    - role: ansible_user
-    - role: packages
     - role: users
     - role: geerlingguy.ntp
-    - role: geerlingguy.security
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
     - role: desktop
