@@ -14,7 +14,7 @@
 2. Review existing patterns and list your plan.
 3. Obtain explicit approval before editing.
 4. Verify your branch.
-5. **PR Review**: Always run `coderabbit review --plain --base main` on committed changes before creating a PR with `/ship`.
+5. **PR Review**: CodeRabbit reviews the PR automatically on GitHub after `/ship` opens it — no local CLI run (conserves the free-plan review quota). Fetch and address its comments with `/fix-pr`.
 
 ## Automation
 
