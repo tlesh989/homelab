@@ -109,16 +109,10 @@ The `verify.yml` silent-exit test confirmed this: running with `INSTALL_DIR=/` p
 
 ## Integration Scenarios
 
-All four roles have integration scenario stubs scaffolded at `roles/<role>/molecule/integration/`. These require Docker-in-Docker (or Docker socket mount) and — for cloudflare_ddns and monitoring — real Doppler secrets.
-
-| Role            | Integration trigger |
-|-----------------|---------------------|
-| cloudflare_ddns | `doppler run -- task molecule-integration ROLE=cloudflare_ddns` |
-| minecraft       | `task molecule-integration ROLE=minecraft` (requires internet for BDS download) |
-| n8n             | `task molecule-integration ROLE=n8n` |
-| monitoring      | `doppler run -- task molecule-integration ROLE=monitoring` |
-
-**All integration scenarios must be run with `DOCKER_HOST=unix:///Users/tommy/.colima/default/docker.sock`.**
+Removed. The `integration/` stubs were scaffolded but never implemented (no
+assertions, never run in CI, required Docker-in-Docker + Doppler to execute).
+They were deleted as speculative scaffolding; the `default/` scenarios remain.
+Re-add a real integration scenario when there's a concrete flow to assert.
 
 ---
 
@@ -132,4 +126,3 @@ None. All four roles reached green within the 10-iteration budget.
 
 1. **Add `DOCKER_HOST` to shell profile** or a `.env` file sourced by `task` so `task molecule-test` works without manual prefix.
 2. **Add molecule to CI** — the default scenarios are lightweight enough for GitHub Actions. Add a `molecule.yml` workflow triggered on changes to `roles/**`.
-3. **Implement integration scenarios** — the stubs are ready; add real assertions and test them manually with Doppler credentials.
