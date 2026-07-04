@@ -49,12 +49,11 @@ task apply  # Requires task plan first
 - Integration branch: `main`. Never commit directly to `main`.
 - Branch types: `feature/*`, `bugfix/*`, `chore/*`, `hotfix/*`.
 - Commit prefixes: `feat:`, `fix:`, `chore:`.
-- Run `coderabbit review --plain --base main` on committed changes before opening a PR.
+- CodeRabbit reviews the PR automatically on GitHub — do not run the CLI locally (conserves free-plan quota). Address its comments after the PR is open.
 - **Work is not done until `git push` succeeds.**
 
 ## Definition of Done
 
 1. `task syntax && task lint` pass (Ansible) or `task test` (Terraform).
 2. `task check` dry-run shows only expected changes.
-3. `coderabbit review` run if changing logic.
-4. Commit, push, PR merged.
+3. Commit, push, PR merged (CodeRabbit reviews the PR on GitHub).
