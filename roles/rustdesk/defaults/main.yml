@@ -1,0 +1,4 @@
+---
+rustdesk_version: "1"
+rustdesk_tailscale_ip: "100.70.205.92"
+rustdesk_data_path: /opt/rustdesk/data
