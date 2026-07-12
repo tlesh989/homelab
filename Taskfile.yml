@@ -200,11 +200,6 @@ tasks:
     cmds:
       - cd roles/{{.ROLE}} && molecule test -s default
 
-  molecule-integration:
-    desc: "Run Molecule integration scenario for a role (requires Docker-in-Docker). Usage: task molecule-integration ROLE=<role>"
-    cmds:
-      - cd roles/{{.ROLE}} && molecule test -s integration
-
   molecule-test-all:
     desc: "Run Molecule default scenario for roles with tests (cloudflare_ddns, minecraft, n8n)"
     cmds:
