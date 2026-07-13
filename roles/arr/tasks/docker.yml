@@ -5,6 +5,7 @@
       - ca-certificates
       - curl
       - gnupg
+      - python3-debian
     state: present
 
 - name: Create Docker keyring directory
@@ -22,13 +23,15 @@
 - name: Add Docker apt repository
   vars:
     _docker_arch: "{{ ansible_architecture | replace('x86_64', 'amd64') | replace('aarch64', 'arm64') }}"
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [arch={{ _docker_arch }} signed-by=/etc/apt/keyrings/docker.asc]
-      https://download.docker.com/linux/{{ ansible_distribution | lower }}
-      {{ ansible_distribution_release }} stable
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    uris: "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    architectures: "{{ _docker_arch }}"
+    signed_by: /etc/apt/keyrings/docker.asc
     state: present
-    filename: docker
 
 - name: Install Docker CE and Compose plugin
   ansible.builtin.package:
