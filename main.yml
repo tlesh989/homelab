@@ -130,6 +130,7 @@
     - role: watchtower
     - role: glance
     - role: n8n
+    - role: rustdesk
     - role: freshrss
     - role: cloudflare_ddns
     - role: dozzle_hub
