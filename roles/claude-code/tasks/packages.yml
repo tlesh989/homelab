@@ -4,6 +4,7 @@
     name:
       - curl
       - gpg
+      - python3-debian
     state: present
     update_cache: true
   become: true
@@ -23,10 +24,14 @@
   changed_when: true
 
 - name: Add NodeSource apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" # nocheck
+  ansible.builtin.deb822_repository:
+    name: nodesource
+    types: deb
+    uris: https://deb.nodesource.com/node_20.x # nocheck
+    suites: nodistro
+    components: main
+    signed_by: /usr/share/keyrings/nodesource.gpg
     state: present
-    filename: nodesource
   become: true
 
 - name: Install Node.js
@@ -51,10 +56,15 @@
   become: true
 
 - name: Add GitHub CLI apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" # nocheck
+  ansible.builtin.deb822_repository:
+    name: github-cli
+    types: deb
+    uris: https://cli.github.com/packages # nocheck
+    suites: stable
+    components: main
+    architectures: amd64
+    signed_by: /usr/share/keyrings/githubcli-archive-keyring.gpg
     state: present
-    filename: github-cli
   become: true
 
 - name: Download Doppler GPG key (ASCII-armored)
@@ -73,10 +83,14 @@
   changed_when: doppler_key_download.changed # noqa: no-handler
 
 - name: Add Doppler apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" # nocheck
+  ansible.builtin.deb822_repository:
+    name: doppler
+    types: deb
+    uris: https://packages.doppler.com/public/cli/deb/debian # nocheck
+    suites: any-version
+    components: main
+    signed_by: /usr/share/keyrings/doppler-archive-keyring.gpg
     state: present
-    filename: doppler
   become: true
 
 - name: Install gh, git, and doppler
