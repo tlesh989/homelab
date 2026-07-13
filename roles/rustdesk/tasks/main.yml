@@ -13,3 +13,39 @@
     name: python3-docker
     state: present
   become: true
+
+- name: Deploy hbbs container (RustDesk rendezvous/ID server)
+  community.docker.docker_container:
+    name: hbbs
+    image: "rustdesk/rustdesk-server:{{ rustdesk_version }}"
+    command: ["hbbs", "-r", "{{ rustdesk_tailscale_ip }}:21117"]
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ rustdesk_tailscale_ip }}:21115:21115/tcp"
+      - "{{ rustdesk_tailscale_ip }}:21116:21116/tcp"
+      - "{{ rustdesk_tailscale_ip }}:21116:21116/udp"
+      - "{{ rustdesk_tailscale_ip }}:21118:21118/tcp"
+    volumes:
+      - "{{ rustdesk_data_path }}:/root"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
+- name: Deploy hbbr container (RustDesk relay)
+  community.docker.docker_container:
+    name: hbbr
+    image: "rustdesk/rustdesk-server:{{ rustdesk_version }}"
+    command: ["hbbr"]
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ rustdesk_tailscale_ip }}:21117:21117/tcp"
+      - "{{ rustdesk_tailscale_ip }}:21119:21119/tcp"
+    volumes:
+      - "{{ rustdesk_data_path }}:/root"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
