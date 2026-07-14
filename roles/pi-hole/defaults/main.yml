@@ -29,6 +29,7 @@ pihole_local_hosts:
   - "192.168.233.11 jetkvm.tlesh.xyz"
   - "192.168.233.12 plex.tlesh.xyz"
   - "192.168.233.21 tailscale.tlesh.xyz"
+  - "192.168.233.22 claude-code.tlesh.xyz"
   - "192.168.233.24 arr.tlesh.xyz"
   - "192.168.233.10 kaz.tlesh.xyz"
   - "192.168.233.35 homeassistant.tlesh.xyz"
