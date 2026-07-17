@@ -177,6 +177,7 @@
     content: |
       #!/bin/sh
       for p in /sys/devices/system/cpu/cpufreq/policy*; do
+        [ -r "$p/scaling_driver" ] || continue
         case "$(cat "$p/scaling_driver")" in
           intel_pstate|amd-pstate-epp) gov=powersave ;;
           *) gov=schedutil ;;
