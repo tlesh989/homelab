@@ -35,3 +35,7 @@
   ansible.builtin.command:
     cmd: pct restart 103
   changed_when: true
+
+- name: Apply CPU governor
+  ansible.builtin.command: /usr/local/bin/set-cpu-governor.sh
+  changed_when: true
