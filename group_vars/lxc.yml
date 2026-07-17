@@ -1,7 +1,7 @@
 ---
 # proxmox lxc container
 
-# grog.package
+# roles/packages
 package_list:
   - name: curl
   - name: git

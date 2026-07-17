@@ -41,7 +41,8 @@ minecraft.tlesh.xyz ansible_host=192.168.233.19
 claude-code.tlesh.xyz ansible_host=192.168.233.22
 
 [barlo]
-barlo.tlesh.xyz ansible_host=192.168.233.126
+# Remote site — only reachable over Tailscale, not the LAN
+barlo.tlesh.xyz ansible_host=100.104.158.42
 
 [proxmox:children]
 tika
