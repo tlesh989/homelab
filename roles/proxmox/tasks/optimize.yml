@@ -207,6 +207,8 @@
     enabled: true
     state: started
     daemon_reload: true
+  # In check mode the unit file above is never written, so systemd can't find it
+  when: not ansible_check_mode
 
 - name: Check for Proxmox Cluster configuration
   ansible.builtin.stat:
