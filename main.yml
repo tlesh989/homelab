@@ -54,8 +54,6 @@
     - role: ax88179b
       when: ax88179b_enabled | default(false)
       tags: [ax88179b]
-    - role: r8152
-      tags: [r8152]
     - role: ansible_user
 
 - name: configure truenas

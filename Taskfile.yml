@@ -83,12 +83,6 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "unifi", CLI_ARGS: "{{.CLI_ARGS}}" }
 
-  r8152:
-    desc: Install Realtek r8152 DKMS driver on Proxmox hosts
-    cmds:
-      - task: ansible
-        vars: { PLAYBOOK: "main.yml", LIMIT: "proxmox", CLI_ARGS: "--tags r8152 {{.CLI_ARGS}}" }
-
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:
