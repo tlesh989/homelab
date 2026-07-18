@@ -5,10 +5,25 @@
     fail_msg: "CF_DNS_API_TOKEN_NET must be set in Doppler — cannot deploy cloudflare_ddns container without it"
   when: not ansible_check_mode
 
+- name: Assert CF_DNS_API_TOKEN is set
+  ansible.builtin.assert:
+    that: lookup('env', 'CF_DNS_API_TOKEN') | length > 0
+    fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot deploy cloudflare_ddns container without it"
+  when: not ansible_check_mode
+
 - name: Assert DDNS_DOMAINS is set
   ansible.builtin.assert:
     that: lookup('env', 'DDNS_DOMAINS') | length > 0
     fail_msg: "DDNS_DOMAINS must be set in Doppler — comma-separated list of domains to update (e.g. mc.tlesh.net,684.tlesh.net,684.tlesh.xyz)"
+  when: not ansible_check_mode
+
+- name: Assert every DDNS domain matched a known zone
+  ansible.builtin.assert:
+    that: >-
+      (ddns_domains_net.split(',') | reject('equalto', '') | list | length)
+      + (ddns_domains_xyz.split(',') | reject('equalto', '') | list | length)
+      == (ddns_domains.split(',') | reject('equalto', '') | list | length)
+    fail_msg: "DDNS_DOMAINS contains a domain outside tlesh.net/tlesh.xyz — no scoped token available for it: {{ ddns_domains }}"
   when: not ansible_check_mode
 
 - name: Assert PUSHOVER_API_TOKEN is set
@@ -29,7 +44,7 @@
     state: present
   become: true
 
-- name: Deploy Cloudflare DDNS container
+- name: Deploy Cloudflare DDNS container (tlesh.net)
   community.docker.docker_container:
     name: cloudflare-ddns
     image: "favonia/cloudflare-ddns:{{ ddns_image_version }}"
@@ -37,7 +52,7 @@
     restart_policy: always
     env:
       CF_API_TOKEN: "{{ lookup('env', 'CF_DNS_API_TOKEN_NET') }}"
-      DOMAINS: "{{ ddns_domains }}"
+      DOMAINS: "{{ ddns_domains_net }}"
       PROXIED: "{{ ddns_proxied }}"
       IP6_PROVIDER: none
       SHOUTRRR: "pushover://shoutrrr:{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
@@ -45,4 +60,24 @@
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
+    - ddns_domains_net | length > 0
+  no_log: true
+
+- name: Deploy Cloudflare DDNS container (tlesh.xyz)
+  community.docker.docker_container:
+    name: cloudflare-ddns-xyz
+    image: "favonia/cloudflare-ddns:{{ ddns_image_version }}"
+    state: started
+    restart_policy: always
+    env:
+      CF_API_TOKEN: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
+      DOMAINS: "{{ ddns_domains_xyz }}"
+      PROXIED: "{{ ddns_proxied }}"
+      IP6_PROVIDER: none
+      SHOUTRRR: "pushover://shoutrrr:{{ lookup('env', 'PUSHOVER_API_TOKEN') }}@{{ lookup('env', 'PUSHOVER_USER_KEY') }}/"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+    - ddns_domains_xyz | length > 0
   no_log: true
