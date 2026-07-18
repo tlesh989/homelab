@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 # Managed by Ansible — runs after acme.sh issues or renews *.{{ acme_domain }}
-# TLS deployment is now handled by Caddy (roles/caddy).
-# acme.sh continues to issue/renew certs; this hook is a no-op.
+# Pushes the renewed cert to every host that terminates TLS for this domain
+# and reloads its web server. See roles/caddy for the receiving side.
+set -euo pipefail
 
 log() { echo "[acme-deploy] $*"; }
 
-log "cert renewed at {{ acme_cert_dir }} — Caddy handles deployment"
+ssh_opts=(-i "{{ acme_deploy_key_path }}" -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+
+{% for host in acme_deploy_target_hosts %}
+log "pushing cert to {{ host }}"
+scp "${ssh_opts[@]}" \
+  "{{ acme_cert_dir }}/fullchain.pem" "{{ acme_cert_dir }}/privkey.pem" \
+  "{{ acme_deploy_remote_user }}@{{ host }}:{{ acme_deploy_remote_tls_dir }}/"
+ssh "${ssh_opts[@]}" "{{ acme_deploy_remote_user }}@{{ host }}" \
+  "chmod 640 {{ acme_deploy_remote_tls_dir }}/fullchain.pem {{ acme_deploy_remote_tls_dir }}/privkey.pem && sudo systemctl reload caddy"
+log "reloaded caddy on {{ host }}"
+{% endfor %}

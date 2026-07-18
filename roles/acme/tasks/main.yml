@@ -61,7 +61,7 @@
 
 - name: Authorize deploy key on cert-consuming hosts
   ansible.posix.authorized_key:
-    user: "{{ ansible_user | default('ansible') }}"
+    user: "{{ acme_deploy_remote_user }}"
     key: "{{ _acme_deploy_pubkey.content | b64decode | trim }}"
     comment: "acme-deploy from pi-hole"
     state: present

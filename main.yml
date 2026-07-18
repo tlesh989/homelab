@@ -157,6 +157,16 @@
   roles:
     - role: dozzle_agent
 
+# Runs before pi-hole: acme's deploy hook (pi-hole) authorizes an SSH key
+# against caddy's acme-deploy user, which this play creates.
+- name: setup caddy reverse proxy
+  hosts: caddy
+  become: true
+  roles:
+    - role: geerlingguy.ntp
+    - role: users
+    - role: caddy
+
 - name: setup pi-hole server
   hosts: pi-hole
   become: true
@@ -165,14 +175,6 @@
     - role: users
     - role: pi-hole
     - role: acme
-
-- name: setup caddy reverse proxy
-  hosts: caddy
-  become: true
-  roles:
-    - role: geerlingguy.ntp
-    - role: users
-    - role: caddy
 
 - name: setup uptime-kuma server
   hosts: uptime-kuma
