@@ -4,8 +4,17 @@ caddy_data_dir: /var/lib/caddy
 caddy_log_dir: /var/log/caddy
 caddy_acme_email: "thomas.lesh@gmail.com"
 caddy_domain: "tlesh.xyz"
-caddy_cf_api_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
 caddy_download_url: "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fcaddy-dns%2Fcloudflare"
+
+# Cert is pushed here by acme.sh's deploy hook on pi-hole (roles/acme) — see
+# homelab-dt8 for why Caddy doesn't self-manage ACME via caddy-dns/cloudflare
+# (open upstream bug misdetects the zone for *.tlesh.xyz).
+caddy_tls_dir: "{{ caddy_install_dir }}/tls"
+# Restricted account that receives the cert push over SSH. Deliberately not
+# the shared `ansible` service account: ansible_user's authorized_key task
+# uses exclusive:true, which would silently strip this key on any future
+# `task caddy` run that re-applies the base LXC play.
+caddy_deploy_user: acme-deploy
 
 caddy_services:
   - name: pihole

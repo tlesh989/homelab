@@ -1,9 +1,4 @@
 ---
-- name: Assert CF_DNS_API_TOKEN is set
-  ansible.builtin.assert:
-    that: caddy_cf_api_token | length > 0
-    fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot configure Caddy without Cloudflare DNS token"
-
 - name: Create caddy system group
   ansible.builtin.group:
     name: caddy
@@ -30,6 +25,37 @@
     - { path: "{{ caddy_data_dir }}", owner: caddy, mode: "0750" }
     - { path: "{{ caddy_log_dir }}", owner: caddy, mode: "0750" }
 
+- name: Create acme-deploy group
+  ansible.builtin.group:
+    name: "{{ caddy_deploy_user }}"
+    system: true
+
+- name: Create acme-deploy system user (receives cert push from pi-hole)
+  ansible.builtin.user:
+    name: "{{ caddy_deploy_user }}"
+    group: "{{ caddy_deploy_user }}"
+    groups: caddy
+    append: true
+    system: true
+    shell: /bin/bash
+    home: "/home/{{ caddy_deploy_user }}"
+    create_home: true
+
+- name: Create Caddy TLS directory (setgid so pushed certs inherit caddy group)
+  ansible.builtin.file:
+    path: "{{ caddy_tls_dir }}"
+    state: directory
+    owner: "{{ caddy_deploy_user }}"
+    group: caddy
+    mode: "2750"
+
+- name: Allow acme-deploy to reload caddy without a password
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ caddy_deploy_user }}"
+    content: "{{ caddy_deploy_user }} ALL=(root) NOPASSWD: /usr/bin/systemctl reload caddy\n"
+    mode: "0440"
+    validate: "visudo -cf %s"
+
 - name: Check if Caddy is installed
   ansible.builtin.stat:
     path: /usr/local/bin/caddy
@@ -43,15 +69,6 @@
     owner: root
     group: root
   when: not _caddy_binary.stat.exists
-  notify: Restart caddy
-
-- name: Template Caddy environment file
-  ansible.builtin.template:
-    src: caddy.env.j2
-    dest: "{{ caddy_install_dir }}/caddy.env"
-    owner: root
-    group: caddy
-    mode: "0640"
   notify: Restart caddy
 
 - name: Template Caddyfile

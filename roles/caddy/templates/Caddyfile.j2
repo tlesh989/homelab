@@ -4,9 +4,9 @@
 }
 
 *.{{ caddy_domain }} {
-	tls {
-		dns cloudflare {$CF_DNS_API_TOKEN}
-	}
+	# Cert is issued by acme.sh on pi-hole and pushed here by its deploy hook
+	# (roles/acme) — see homelab-dt8 for why Caddy no longer self-manages ACME.
+	tls {{ caddy_tls_dir }}/fullchain.pem {{ caddy_tls_dir }}/privkey.pem
 {% for service in caddy_services %}
 
 	@{{ service.name | replace('-', '_') }} host {{ service.name }}.{{ caddy_domain }}
