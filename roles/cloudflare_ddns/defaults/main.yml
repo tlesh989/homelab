@@ -1,5 +1,13 @@
 ---
-# Doppler secrets required: CF_DNS_API_TOKEN (Zone:DNS:Edit), DDNS_DOMAINS, PUSHOVER_API_TOKEN, PUSHOVER_USER_KEY
+# Doppler secrets required: CF_DNS_API_TOKEN (tlesh.xyz-scoped), CF_DNS_API_TOKEN_NET
+# (tlesh.net-scoped), DDNS_DOMAINS, PUSHOVER_API_TOKEN, PUSHOVER_USER_KEY
+#
+# DDNS_DOMAINS is a single comma-separated list spanning both zones (e.g.
+# mc.tlesh.net,684.tlesh.net,684.tlesh.xyz). Each zone's tokens is scoped to
+# just that zone, so the list is split by suffix below and run as two
+# containers, each with the token that can actually write its domains.
 ddns_image_version: "1"
 ddns_domains: "{{ lookup('env', 'DDNS_DOMAINS') }}"
+ddns_domains_net: "{{ ddns_domains.split(',') | select('match', '.*\\.tlesh\\.net$') | list | join(',') }}"
+ddns_domains_xyz: "{{ ddns_domains.split(',') | select('match', '.*\\.tlesh\\.xyz$') | list | join(',') }}"
 ddns_proxied: "false"

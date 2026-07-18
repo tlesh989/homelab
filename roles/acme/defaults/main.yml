@@ -5,7 +5,7 @@ acme_cert_dir: "/etc/ssl/homelab"
 acme_acmesh_home: "/root/.acme.sh"
 acme_email: "thomas.lesh@gmail.com"
 
-# Cloudflare API token (Zone:DNS:Edit for tlesh.xyz) — from Doppler as CF_DNS_API_TOKEN
+# Cloudflare API token, scoped to tlesh.xyz only (Zone:DNS:Edit) — from Doppler as CF_DNS_API_TOKEN
 acme_cf_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
 
 # SSH keypair used by deploy hook — retained so acme tasks don't fail on undefined var.
