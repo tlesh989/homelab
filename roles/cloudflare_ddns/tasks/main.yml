@@ -1,8 +1,8 @@
 ---
-- name: Assert CF_DNS_API_TOKEN is set
+- name: Assert CF_DNS_API_TOKEN_NET is set
   ansible.builtin.assert:
-    that: lookup('env', 'CF_DNS_API_TOKEN') | length > 0
-    fail_msg: "CF_DNS_API_TOKEN must be set in Doppler — cannot deploy cloudflare_ddns container without it"
+    that: lookup('env', 'CF_DNS_API_TOKEN_NET') | length > 0
+    fail_msg: "CF_DNS_API_TOKEN_NET must be set in Doppler — cannot deploy cloudflare_ddns container without it"
   when: not ansible_check_mode
 
 - name: Assert DDNS_DOMAINS is set
@@ -36,7 +36,7 @@
     state: started
     restart_policy: always
     env:
-      CF_API_TOKEN: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
+      CF_API_TOKEN: "{{ lookup('env', 'CF_DNS_API_TOKEN_NET') }}"
       DOMAINS: "{{ ddns_domains }}"
       PROXIED: "{{ ddns_proxied }}"
       IP6_PROVIDER: none

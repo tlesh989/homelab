@@ -26,7 +26,7 @@ provisioner:
         ddns_domains: fake.example.com
         ddns_proxied: false
   env:
-    CF_DNS_API_TOKEN: fake-cf-token
+    CF_DNS_API_TOKEN_NET: fake-cf-token
     DDNS_DOMAINS: fake.example.com
     PUSHOVER_API_TOKEN: fake-pushover-token
     PUSHOVER_USER_KEY: fake-pushover-key
