@@ -20,7 +20,7 @@ https://kaz.tlesh.xyz:8090
    - `PUSHOVER_USER_KEY` from Doppler (Pushover *user* key)
 2. In Beszel: **Settings > Notifications**, add a URL of the form:
 
-   ```
+   ```text
    pushover://shoutrrr:<PUSHOVER_API_TOKEN>@<PUSHOVER_USER_KEY>/
    ```
 
@@ -35,6 +35,7 @@ https://kaz.tlesh.xyz:8090
 
 ## Recovery
 
-If the Beszel hub's data volume (`/opt/beszel` on kaz) is ever lost, the notification URL and
-per-system thresholds are stored in Beszel's database and must be re-entered manually using the
-steps above.
+If the Beszel hub's data volume (`/opt/beszel` on kaz) is ever lost, first restore it from a
+Beszel backup (`Settings > Backups` in the hub UI, or a filesystem-level copy of `/opt/beszel`)
+if one exists — it contains the notification URL and thresholds already. Only re-enter them
+manually using the steps above if no usable backup is available.
