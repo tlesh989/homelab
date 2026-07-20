@@ -96,7 +96,7 @@
         cmd: |
           set -o pipefail
           dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" 2>/dev/null \
-            | grep -q . \
+            | grep . >/dev/null \
             || dkms add -m {{ ax88179b_dkms_name }} -v {{ ax88179b_driver_version }}
           RUNNING_KVER=$(uname -r)
           INSTALLED=0
@@ -106,7 +106,7 @@
             [ -d "/lib/modules/$kver/build" ] || continue
             MODPATH="/lib/modules/$kver/updates/dkms/{{ ax88179b_module_name }}.ko"
             if dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
-              2>/dev/null | grep -q installed; then
+              2>/dev/null | grep installed >/dev/null; then
               # dkms bookkeeping can go stale (e.g. a build interrupted by power loss
               # leaves a prior kernel's .ko in place while status still says "installed") —
               # verify the installed module actually matches this kernel before trusting it.
@@ -156,3 +156,4 @@
     mode: "0644"
     content: |
       blacklist ax88179_178a
+  notify: Update initramfs
