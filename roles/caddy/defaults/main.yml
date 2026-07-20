@@ -33,3 +33,15 @@ caddy_services:
     upstream: "192.168.233.24:5055"
   - name: dozzle
     upstream: "192.168.233.10:8025"
+  - name: beszel
+    upstream: "192.168.233.10:8090"
+  - name: sonarr
+    upstream: "192.168.233.24:8989"
+  - name: radarr
+    upstream: "192.168.233.24:7878"
+  - name: prowlarr
+    upstream: "192.168.233.24:9696"
+  - name: bazarr
+    upstream: "192.168.233.24:6767"
+  - name: lidarr
+    upstream: "192.168.233.24:8686"
