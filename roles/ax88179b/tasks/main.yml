@@ -104,12 +104,19 @@
             kver="${kver%/}"
             kver="${kver##*/}"
             [ -d "/lib/modules/$kver/build" ] || continue
-            dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
-              2>/dev/null | grep -q installed && continue
-            dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+            MODPATH="/lib/modules/$kver/updates/dkms/{{ ax88179b_module_name }}.ko"
+            if dkms status "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+              2>/dev/null | grep -q installed; then
+              # dkms bookkeeping can go stale (e.g. a build interrupted by power loss
+              # leaves a prior kernel's .ko in place while status still says "installed") —
+              # verify the installed module actually matches this kernel before trusting it.
+              ACTUAL_VERMAGIC=$(modinfo -F vermagic "$MODPATH" 2>/dev/null | awk '{print $1}')
+              [ "$ACTUAL_VERMAGIC" = "$kver" ] && continue
+            fi
+            dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force \
               2>/dev/null \
               || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
-            dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" \
+            dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force \
               2>/dev/null \
               || { [ "$kver" = "$RUNNING_KVER" ] && exit 1; true; }
             INSTALLED=$((INSTALLED + 1))
@@ -138,3 +145,14 @@
       # Device: ASIX AX88179B (0b95:1790) — do NOT expand to other USB IDs.
       ACTION=="bind", SUBSYSTEM=="usb", ATTR{idVendor}=="0b95", ATTR{idProduct}=="1790", DRIVER=="cdc_ncm", RUN+="/bin/sh -c 'echo %k > /sys/bus/usb/drivers/cdc_ncm/unbind; echo %k > /sys/bus/usb/drivers/ax_usb_nic/bind'"
   notify: Reload udev rules
+
+# This role only runs on tika (ax88179b_enabled opt-in), so this is safe to blacklist
+# host-wide: bupu's non-B AX88179 adapter still uses ax88179_178a normally. Without this,
+# the in-tree driver can win the race and silently claim the AX88179B — it doesn't handle
+# the B revision correctly, which is why this DKMS driver exists in the first place.
+- name: Blacklist in-tree ax88179_178a driver (conflicts with AX88179B)
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/blacklist-ax88179-intree.conf
+    mode: "0644"
+    content: |
+      blacklist ax88179_178a
