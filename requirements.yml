@@ -10,7 +10,7 @@ roles:
 
 collections:
   - name: community.general
-    version: "13.1.0"
+    version: "13.2.0"
   - name: ansible.posix
     version: "2.2.2"
   - name: artis3n.tailscale
