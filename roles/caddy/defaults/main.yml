@@ -45,3 +45,5 @@ caddy_services:
     upstream: "192.168.233.24:6767"
   - name: lidarr
     upstream: "192.168.233.24:8686"
+  - name: beets
+    upstream: "192.168.233.24:8337"

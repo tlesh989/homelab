@@ -28,7 +28,7 @@ Personal homelab infrastructure managed as code — three Proxmox nodes running 
 | pve-exporter | `kaz` (Docker) | Proxmox node metrics |
 | Dozzle | `kaz` (Docker) | Centralized Docker log aggregation (v10 agent mode) |
 | Watchtower | `kaz` (Docker) | Automated Docker image updates |
-| Arr stack | `bupu` (LXC) | Sonarr, Radarr, Lidarr, Beets, FileBot, Scraparr |
+| Arr stack | `bupu` (LXC) | Sonarr, Radarr, Lidarr, Beets, FileBot |
 | Minecraft | `bupu` (LXC) | Bedrock Dedicated Server with auto-update |
 | FreshRSS | `bupu` (LXC) | Self-hosted RSS aggregator |
 

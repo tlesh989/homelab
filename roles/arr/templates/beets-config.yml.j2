@@ -7,4 +7,8 @@ import:
   quiet: yes
   log: /config/import.log
 
-plugins: fetchart embedart
+plugins: fetchart embedart web
+
+web:
+  host: 0.0.0.0
+  port: {{ arr_beets_port }}

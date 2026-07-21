@@ -138,6 +138,8 @@ services:
     volumes:
       - "{{ arr_config_path }}/beets:/config"
       - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_beets_port }}:{{ arr_beets_port }}"
     restart: unless-stopped
 
   filebot:
