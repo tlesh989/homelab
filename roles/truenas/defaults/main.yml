@@ -26,6 +26,14 @@ truenas_lvm_vg_name: "pve-iscsi"
 # TLS verification — set to false for self-signed certs
 truenas_validate_certs: false
 
+# Beszel agent — deployed as a custom TrueNAS SCALE app (see beszel_agent.yml)
+# Mirrors roles/beszel/defaults/main.yml (the truenas role's play doesn't load
+# that role's defaults, since it never runs the beszel role directly)
+truenas_beszel_app_name: "beszel-agent"
+truenas_beszel_hub_hostname: "kaz.tlesh.xyz"
+truenas_beszel_hub_port: 8090
+truenas_beszel_agent_port: 45876
+
 # iSCSI CHAP authentication (homelab-1it).
 # DANGER: enabling CHAP on a target that backs live Proxmox VM disks (pve-iscsi
 # LVM) will break those disks unless the Proxmox initiators are configured with
