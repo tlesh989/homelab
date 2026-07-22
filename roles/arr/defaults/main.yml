@@ -16,6 +16,7 @@ arr_bazarr_port: 6767
 arr_seerr_port: 5055
 arr_flaresolverr_port: 8191
 arr_lidarr_port: 8686
+arr_beets_port: 8337
 
 # NFS mount options — hard mount avoids silent I/O errors/corruption on a media
 # library if the NFS server blips (soft can return errors mid-write). Standardized
