@@ -1,0 +1,47 @@
+---
+# tasks file for truenas — Beszel agent as a TrueNAS SCALE custom Docker app
+# (ansalon has no SSH/systemd access; deployed via app.create like the rest
+# of this role, mirroring the working docker-compose config already running
+# on kaz: network_mode host + read-only docker.sock mount)
+
+- name: Get existing TrueNAS apps
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: app.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_apps
+  changed_when: false
+  no_log: true
+
+- name: Create Beszel agent custom app
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: app.create
+    params:
+      - app_name: "{{ truenas_beszel_app_name }}"
+        custom_app: true
+        custom_compose_config_string: |
+          services:
+            beszel-agent:
+              image: henrygd/beszel-agent:latest
+              network_mode: host
+              restart: unless-stopped
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+              environment:
+                KEY: "{{ lookup('env', 'BESZEL_KEY') }}"
+                TOKEN: "{{ lookup('env', 'BESZEL_TOKEN') }}"
+                HUB_URL: "http://{{ truenas_beszel_hub_hostname }}:{{ truenas_beszel_hub_port }}"
+                PORT: "{{ truenas_beszel_agent_port | string }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  when:
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0
+    - >-
+      _truenas_apps.result
+      | selectattr('name', 'equalto', truenas_beszel_app_name)
+      | list | length == 0
+  changed_when: true
+  no_log: true

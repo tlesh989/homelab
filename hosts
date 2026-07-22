@@ -73,6 +73,10 @@ caddy
 claude_code
 minecraft
 barlo
+# truenas deliberately excluded: ansalon uses ansible_connection=local, so the
+# binary/systemd agent.yml task would run on the Ansible controller itself.
+# Its Beszel agent is deployed as a TrueNAS SCALE custom app via the truenas
+# role instead (roles/truenas/tasks/beszel_agent.yml).
 
 # Docker hosts running a Dozzle agent for the hub on kaz to connect to.
 # kaz itself is read locally via the hub's mounted docker.sock (no agent).
