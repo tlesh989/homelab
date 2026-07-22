@@ -15,3 +15,9 @@
 
 - name: Configure ZFS scrub schedule
   ansible.builtin.include_tasks: scrub.yml
+
+- name: Deploy Beszel agent as a custom app
+  ansible.builtin.include_tasks: beszel_agent.yml
+  when:
+    - lookup('env', 'BESZEL_KEY') | length > 0
+    - lookup('env', 'BESZEL_TOKEN') | length > 0
