@@ -1,12 +1,16 @@
 ---
-- name: Create Wallos data directories
+- name: Create Wallos database directory
   ansible.builtin.file:
-    path: "{{ wallos_data_dir }}/{{ item }}"
+    path: "{{ wallos_data_dir }}/db"
+    state: directory
+    mode: "0700"
+  become: true
+
+- name: Create Wallos logos directory
+  ansible.builtin.file:
+    path: "{{ wallos_data_dir }}/logos"
     state: directory
     mode: "0755"
-  loop:
-    - db
-    - logos
   become: true
 
 - name: Install Docker Python SDK
