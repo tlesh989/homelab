@@ -130,7 +130,7 @@
     - role: n8n
     - role: freshrss
     - role: wallos
-    - role: syncthing
+    - role: couchdb
     - role: cloudflare_ddns
     - role: dozzle_hub
       tags: [dozzle]

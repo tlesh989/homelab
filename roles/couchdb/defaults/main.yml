@@ -1,0 +1,4 @@
+---
+couchdb_version: "3"
+couchdb_port: 5984
+couchdb_data_dir: /opt/couchdb
