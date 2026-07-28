@@ -1,0 +1,40 @@
+---
+- name: Create Syncthing data directory
+  ansible.builtin.file:
+    path: "{{ syncthing_data_dir }}"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: "0700"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Syncthing container
+  community.docker.docker_container:
+    name: syncthing
+    image: "syncthing/syncthing:{{ syncthing_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ syncthing_gui_port | string }}:8384"
+      - "{{ syncthing_sync_port | string }}:22000/tcp"
+      - "{{ syncthing_sync_port | string }}:22000/udp"
+      - "{{ syncthing_discovery_port | string }}:21027/udp"
+    volumes:
+      - "{{ syncthing_data_dir }}:/var/syncthing"
+    env:
+      PUID: "1000"
+      PGID: "1000"
+    command:
+      - "--gui-address=0.0.0.0:8384"
+      - "--gui-user={{ lookup('env', 'SYNCTHING_GUI_USER') }}"
+      - "--gui-password={{ lookup('env', 'SYNCTHING_GUI_PASSWORD') }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
