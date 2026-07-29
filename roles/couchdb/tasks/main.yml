@@ -39,7 +39,7 @@
     state: started
     restart_policy: unless-stopped
     ports:
-      - "{{ couchdb_port | string }}:5984"
+      - "{{ couchdb_bind_address }}:{{ couchdb_port | string }}:5984"
     volumes:
       - "{{ couchdb_data_dir }}/data:/opt/couchdb/data"
       - "{{ couchdb_data_dir }}/etc/local.ini:/opt/couchdb/etc/local.d/local.ini"
@@ -47,6 +47,7 @@
       COUCHDB_USER: "{{ lookup('env', 'COUCHDB_USER') }}"
       COUCHDB_PASSWORD: "{{ lookup('env', 'COUCHDB_PASSWORD') }}"
   become: true
+  no_log: true
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
