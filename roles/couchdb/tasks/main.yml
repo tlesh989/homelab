@@ -1,0 +1,53 @@
+---
+- name: Create CouchDB data directory
+  ansible.builtin.file:
+    path: "{{ couchdb_data_dir }}/data"
+    state: directory
+    owner: "5984"
+    group: "5984"
+    mode: "0700"
+  become: true
+
+- name: Create CouchDB config directory
+  ansible.builtin.file:
+    path: "{{ couchdb_data_dir }}/etc"
+    state: directory
+    owner: "5984"
+    group: "5984"
+    mode: "0700"
+  become: true
+
+- name: Template CouchDB local.ini
+  ansible.builtin.template:
+    src: local.ini.j2
+    dest: "{{ couchdb_data_dir }}/etc/local.ini"
+    owner: "5984"
+    group: "5984"
+    mode: "0600"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy CouchDB container
+  community.docker.docker_container:
+    name: couchdb
+    image: "couchdb:{{ couchdb_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ couchdb_bind_address }}:{{ couchdb_port | string }}:5984"
+    volumes:
+      - "{{ couchdb_data_dir }}/data:/opt/couchdb/data"
+      - "{{ couchdb_data_dir }}/etc/local.ini:/opt/couchdb/etc/local.d/local.ini"
+    env:
+      COUCHDB_USER: "{{ lookup('env', 'COUCHDB_USER') }}"
+      COUCHDB_PASSWORD: "{{ lookup('env', 'COUCHDB_PASSWORD') }}"
+  become: true
+  no_log: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

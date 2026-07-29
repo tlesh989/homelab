@@ -169,6 +169,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  syncthing:
+    desc: Deploy Syncthing file sync to kaz
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "syncthing.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   beszel:
     desc: Deploy Beszel monitoring (hub on kaz, agents on all monitored hosts)
     cmds:
