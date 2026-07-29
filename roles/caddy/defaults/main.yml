@@ -51,3 +51,5 @@ caddy_services:
     upstream: "192.168.233.10:8282"
   - name: syncthing
     upstream: "192.168.233.10:8384"
+  - name: couchdb
+    upstream: "192.168.233.10:5984"
