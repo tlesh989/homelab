@@ -1,0 +1,38 @@
+---
+- name: Mount NFS media share
+  ansible.builtin.import_tasks: nfs.yml
+
+- name: Create Calibre-Web config directory
+  ansible.builtin.file:
+    path: "{{ calibre_web_config_dir }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ calibre_web_puid }}"
+    group: "{{ calibre_web_pgid }}"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Calibre-Web container
+  community.docker.docker_container:
+    name: calibre-web
+    image: "linuxserver/calibre-web:{{ calibre_web_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ calibre_web_port | string }}:8083"
+    volumes:
+      - "{{ calibre_web_config_dir }}:/config"
+      - "{{ calibre_web_books_path }}:/books"
+    env:
+      PUID: "{{ calibre_web_puid }}"
+      PGID: "{{ calibre_web_pgid }}"
+      TZ: "{{ calibre_web_timezone }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

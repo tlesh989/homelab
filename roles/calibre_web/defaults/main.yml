@@ -1,0 +1,15 @@
+---
+calibre_web_version: "0.6.26"
+calibre_web_port: 8083
+calibre_web_config_dir: /opt/calibre-web/config
+calibre_web_books_path: /data/media/books
+calibre_web_timezone: America/Detroit
+calibre_web_puid: "1000"
+calibre_web_pgid: "1000"
+
+# NFS mount — shares the same wayreth/data/media export as arr/plex; books/
+# is this host's own subfolder within it.
+calibre_web_media_path: /data/media
+calibre_web_nfs_server: 192.168.220.6
+calibre_web_nfs_export: /mnt/wayreth/data/media
+calibre_web_nfs_mount_opts: rw,noatime,nfsvers=4.2,hard,timeo=600,_netdev,x-systemd.automount

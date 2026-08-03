@@ -1,0 +1,31 @@
+---
+- name: Install NFS client
+  ansible.builtin.package:
+    name: nfs-common
+    state: present
+  become: true
+
+- name: Create NFS mount point
+  ansible.builtin.file:
+    path: "{{ calibre_web_media_path }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Mount TrueNAS NFS media share
+  ansible.posix.mount:
+    path: "{{ calibre_web_media_path }}"
+    src: "{{ calibre_web_nfs_server }}:{{ calibre_web_nfs_export }}"
+    fstype: nfs
+    opts: "{{ calibre_web_nfs_mount_opts }}"
+    state: mounted
+  become: true
+
+- name: Create books library directory
+  ansible.builtin.file:
+    path: "{{ calibre_web_books_path }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ calibre_web_puid }}"
+    group: "{{ calibre_web_pgid }}"
+  become: true
