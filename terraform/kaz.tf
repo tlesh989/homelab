@@ -42,6 +42,12 @@ resource "proxmox_virtual_environment_vm" "kaz" {
       }
     }
 
+    ip_config {
+      ipv4 {
+        address = "192.168.220.10/24"
+      }
+    }
+
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.ANSIBLE_SSH_PUBLIC_KEY)]
       password = data.doppler_secrets.this.map.ROOT_PASSWORD
@@ -53,6 +59,12 @@ resource "proxmox_virtual_environment_vm" "kaz" {
     bridge      = "vmbr0"
     firewall    = true
     mac_address = "BC:24:11:10:00:01"
+  }
+
+  network_device {
+    bridge      = "vmbr1"
+    firewall    = false
+    mac_address = "BC:24:11:10:00:02"
   }
 
   operating_system {

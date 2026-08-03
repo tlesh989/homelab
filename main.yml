@@ -130,6 +130,7 @@
     - role: n8n
     - role: freshrss
     - role: wallos
+    - role: calibre_web
     - role: couchdb
     - role: cloudflare_ddns
     - role: dozzle_hub
