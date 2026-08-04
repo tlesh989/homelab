@@ -47,7 +47,7 @@ tasks:
   bootstrap:
     desc: Bootstrap new servers (run once on fresh deployments)
     cmds:
-      - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
+      - doppler run -- ansible-playbook playbooks/bootstrap.yml --tags bootstrap {{.CLI_ARGS}}
 
   bootstrap-lxc:
     desc: "Bootstrap a new LXC (run once). Usage: task bootstrap-lxc -- <hostname>"
@@ -55,7 +55,7 @@ tasks:
       - sh: '[ -n "{{.CLI_ARGS}}" ]'
         msg: "Usage: task bootstrap-lxc -- <hostname>"
     cmds:
-      - doppler run -- ansible-playbook bootstrap.yml --tags bootstrap --limit "{{.CLI_ARGS}}" -e "ansible_user=root"
+      - doppler run -- ansible-playbook playbooks/bootstrap.yml --tags bootstrap --limit "{{.CLI_ARGS}}" -e "ansible_user=root"
 
   deploy:
     desc: "Deploy to any Ansible host group (usage: task deploy -- <group> [extra-args])"
@@ -173,14 +173,14 @@ tasks:
     desc: Deploy Syncthing file sync to kaz
     cmds:
       - task: ansible
-        vars: { PLAYBOOK: "syncthing.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "playbooks/syncthing.yml", LIMIT: "kaz", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   beszel:
     desc: Deploy Beszel monitoring (hub on kaz, agents on all monitored hosts)
     cmds:
       - doppler run -- ansible beszel_hub:beszel_agents -m ping
       - task: ansible
-        vars: { PLAYBOOK: "beszel.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
+        vars: { PLAYBOOK: "playbooks/beszel.yml", LIMIT: "beszel_hub,beszel_agents", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   minecraft:
     desc: Deploy Minecraft Bedrock server

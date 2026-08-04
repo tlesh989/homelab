@@ -25,7 +25,7 @@
   ansible.builtin.file:
     path: "{{ calibre_web_books_path }}"
     state: directory
-    mode: "0755"
+    mode: "0777"
     owner: "{{ calibre_web_puid }}"
     group: "{{ calibre_web_pgid }}"
   become: true

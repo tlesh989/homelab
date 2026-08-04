@@ -15,7 +15,7 @@ git diff --name-only origin/main...HEAD
 ```
 
 Store the full list. Classify:
-- **Ansible files**: any path under `roles/`, `group_vars/`, `host_vars/`, or matching `main.yml`, `bootstrap.yml`
+- **Ansible files**: any path under `roles/`, `group_vars/`, `host_vars/`, `playbooks/`, or matching `main.yml`
 - **Docker Compose files**: any file named `docker-compose*.yml`
 - **All YAML**: any `.yml` or `.yaml` file
 
