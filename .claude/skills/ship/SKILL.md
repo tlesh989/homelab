@@ -49,7 +49,7 @@ cd terraform && terraform validate
 
 Fix all errors. Re-run until exit 0. Then `terraform fmt -recursive`.
 
-For any files under `roles/`, `group_vars/`, `main.yml`, `bootstrap.yml`:
+For any files under `roles/`, `group_vars/`, `main.yml`, `playbooks/`:
 
 ```bash
 ansible-lint <file>

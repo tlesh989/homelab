@@ -1,6 +1,6 @@
 ---
 - name: bootstrap all hosts
-  import_playbook: bootstrap.yml
+  import_playbook: playbooks/bootstrap.yml
 
 - name: Reset connections after bootstrap
   hosts: all:!truenas:!unifi
@@ -137,7 +137,7 @@
       tags: [dozzle]
 
 - name: Deploy Beszel monitoring
-  import_playbook: beszel.yml
+  import_playbook: playbooks/beszel.yml
 
 - name: setup plex server
   hosts: plex

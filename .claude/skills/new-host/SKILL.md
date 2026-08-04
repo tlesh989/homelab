@@ -51,7 +51,7 @@ Wait for the LXC to be created. Confirm the container appears in Proxmox.
 ## Step 4 — Bootstrap Ansible User
 
 ```bash
-doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
+doppler run -- ansible-playbook -b playbooks/bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
 ```
 
 - SSH auth uses root on first boot — this creates the `ansible` service account.

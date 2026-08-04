@@ -10,7 +10,7 @@ task reqs                   # Install Ansible Galaxy dependencies
 task check                  # Dry-run check mode for ALL hosts
 
 # Bootstrap a new LXC (first-time only)
-doppler run -- ansible-playbook -b bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
+doppler run -- ansible-playbook -b playbooks/bootstrap.yml --limit <hostname> --tags bootstrap -e "ansible_user=root"
 ```
 
 ## Standards
