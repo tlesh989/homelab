@@ -17,22 +17,39 @@
     state: present
   become: true
 
-- name: Deploy Calibre-Web container
+- name: Deploy Calibre-Web Automated container
   community.docker.docker_container:
     name: calibre-web
-    image: "linuxserver/calibre-web:{{ calibre_web_version }}"
+    image: "crocodilestick/calibre-web-automated:{{ calibre_web_version }}"
     state: started
     restart_policy: unless-stopped
     ports:
       - "{{ calibre_web_port | string }}:8083"
     volumes:
       - "{{ calibre_web_config_dir }}:/config"
-      - "{{ calibre_web_books_path }}:/books"
+      - "{{ calibre_web_books_path }}:/calibre-library"
+      - "{{ calibre_web_ingest_path }}:/cwa-book-ingest"
+      - "{{ calibre_web_processed_books_path }}:/config/processed_books"
     env:
       PUID: "{{ calibre_web_puid }}"
       PGID: "{{ calibre_web_pgid }}"
       TZ: "{{ calibre_web_timezone }}"
+      NETWORK_SHARE_MODE: "{{ calibre_web_network_share_mode | string | lower }}"
   become: true
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
+
+# NETWORK_SHARE_MODE=true skips CWA's own chown, so files it imports into the
+# library or writes to processed_books land root-owned and block writes from
+# other users on the NFS share.
+- name: Schedule periodic ownership fix for library imports
+  ansible.builtin.cron:
+    name: "calibre-web library ownership fix"
+    minute: "*/15"
+    job: >-
+      find {{ calibre_web_books_path }} {{ calibre_web_processed_books_path }}
+      ! -user {{ calibre_web_puid }}
+      -exec chown {{ calibre_web_puid }}:{{ calibre_web_pgid }} {} + >/dev/null 2>&1
+    user: root
+  become: true

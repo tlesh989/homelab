@@ -29,3 +29,40 @@
     owner: "{{ calibre_web_puid }}"
     group: "{{ calibre_web_pgid }}"
   become: true
+
+- name: Create ingest directory
+  ansible.builtin.file:
+    path: "{{ calibre_web_ingest_path }}"
+    state: directory
+    mode: "0777"
+    owner: "{{ calibre_web_puid }}"
+    group: "{{ calibre_web_pgid }}"
+  become: true
+
+# CWA keeps up to 3 backup copies (pre-fix, post-import, failed) of every book
+# it processes. That's too much for kaz's small local disk at any real import
+# volume, so it lives on NFS alongside books/ and books-ingest/ instead.
+- name: Create processed_books backup directory
+  ansible.builtin.file:
+    path: "{{ calibre_web_processed_books_path }}"
+    state: directory
+    mode: "0777"
+    owner: "{{ calibre_web_puid }}"
+    group: "{{ calibre_web_pgid }}"
+  become: true
+
+# TrueNAS applies its dataset default ACL on directory creation over NFS,
+# which silently overrides the mode set above. A second pass on the
+# already-existing directory re-asserts it correctly.
+- name: Re-assert directory modes (TrueNAS NFS ACL-on-create workaround)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0777"
+    owner: "{{ calibre_web_puid }}"
+    group: "{{ calibre_web_pgid }}"
+  loop:
+    - "{{ calibre_web_books_path }}"
+    - "{{ calibre_web_ingest_path }}"
+    - "{{ calibre_web_processed_books_path }}"
+  become: true
