@@ -2,6 +2,7 @@
 calibre_web_version: "v4.0.6"
 calibre_web_port: 8083
 calibre_web_config_dir: /opt/calibre-web/config
+calibre_web_ownership_fix_script: /opt/calibre-web/ownership_fix.sh
 calibre_web_books_path: /data/media/books
 calibre_web_ingest_path: /data/media/books-ingest
 calibre_web_processed_books_path: /data/media/books-processed
