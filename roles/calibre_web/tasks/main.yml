@@ -35,11 +35,15 @@
 - name: Migrate legacy local processed_books to NFS # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: >-
+      set -o pipefail;
       rsync -a --remove-source-files
       {{ calibre_web_config_dir }}/processed_books/
       {{ calibre_web_processed_books_path }}/
       && find {{ calibre_web_config_dir }}/processed_books -mindepth 1 -type d -empty -delete
+    executable: /bin/bash
     creates: "{{ calibre_web_config_dir }}/.processed_books_migrated"
+  register: calibre_web_processed_books_migration
+  changed_when: calibre_web_processed_books_migration.rc == 0
   when: calibre_web_legacy_processed_books.stat.exists and calibre_web_legacy_processed_books.stat.isdir
   become: true
 
@@ -100,15 +104,22 @@
 # imported/fixed_originals/converted are CWA's own per-book backup copies with
 # no built-in retention; failed/ is excluded since it's small and useful for
 # diagnosing ingest failures.
+- name: Deploy backup-retention script
+  ansible.builtin.template:
+    src: backup_retention.sh.j2
+    dest: "{{ calibre_web_backup_retention_script }}"
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+# Shares the ownership-fix lock so the two NFS-scanning crons never overlap.
 - name: Schedule retention cleanup for processed-book backups
   ansible.builtin.cron:
     name: "calibre-web backup retention cleanup"
     minute: "0"
     hour: "4"
     job: >-
-      find {{ calibre_web_processed_books_path }}/imported
-      {{ calibre_web_processed_books_path }}/fixed_originals
-      {{ calibre_web_processed_books_path }}/converted
-      -type f -mtime +{{ calibre_web_backup_retention_days }} -delete
+      flock -n /run/calibre-web-ownership-fix.lock {{ calibre_web_backup_retention_script }}
     user: root
   become: true
