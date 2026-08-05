@@ -96,3 +96,19 @@
       flock -n /run/calibre-web-ownership-fix.lock {{ calibre_web_ownership_fix_script }}
     user: root
   become: true
+
+# imported/fixed_originals/converted are CWA's own per-book backup copies with
+# no built-in retention; failed/ is excluded since it's small and useful for
+# diagnosing ingest failures.
+- name: Schedule retention cleanup for processed-book backups
+  ansible.builtin.cron:
+    name: "calibre-web backup retention cleanup"
+    minute: "0"
+    hour: "4"
+    job: >-
+      find {{ calibre_web_processed_books_path }}/imported
+      {{ calibre_web_processed_books_path }}/fixed_originals
+      {{ calibre_web_processed_books_path }}/converted
+      -type f -mtime +{{ calibre_web_backup_retention_days }} -delete
+    user: root
+  become: true
