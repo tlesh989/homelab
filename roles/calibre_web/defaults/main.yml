@@ -1,14 +1,25 @@
 ---
-calibre_web_version: "0.6.26"
+# ponytail: testing pre-release fix for ingest phantom-loop bug (upstream #656/#1276);
+# pin to next stable v4.0.7+ once released
+calibre_web_version: "dev-410"
 calibre_web_port: 8083
 calibre_web_config_dir: /opt/calibre-web/config
+calibre_web_ownership_fix_script: /opt/calibre-web/ownership_fix.sh
+calibre_web_backup_retention_script: /opt/calibre-web/backup_retention.sh
 calibre_web_books_path: /data/media/books
+calibre_web_ingest_path: /data/media/books-ingest
+calibre_web_processed_books_path: /data/media/books-processed
+# imported/fixed_originals/converted backups older than this are pruned;
+# failed/ is kept for diagnostics
+calibre_web_backup_retention_days: 30
 calibre_web_timezone: America/Detroit
 calibre_web_puid: "1000"
 calibre_web_pgid: "1000"
+# Library and ingest dir are on NFS — disables SQLite WAL + recursive chown, uses polling watcher
+calibre_web_network_share_mode: true
 
-# NFS mount — shares the same wayreth/data/media export as arr/plex; books/
-# is this host's own subfolder within it.
+# NFS mount — shares the same wayreth/data/media export as arr/plex; books/,
+# books-ingest/, and books-processed/ are this host's own subfolders within it.
 calibre_web_media_path: /data/media
 calibre_web_nfs_server: 192.168.220.6
 calibre_web_nfs_export: /mnt/wayreth/data/media
