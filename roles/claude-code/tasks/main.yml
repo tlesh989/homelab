@@ -11,6 +11,22 @@
 - name: Clone repository
   ansible.builtin.import_tasks: repo.yml
 
+- name: Fetch latest main (for mise.toml refresh only) # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd: git fetch origin main
+    chdir: "{{ claude_code_repo_dest }}"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  changed_when: false
+
+- name: Refresh mise.toml from latest main without touching other local changes # noqa: command-instead-of-module
+  ansible.builtin.command:
+    cmd: git checkout origin/main -- mise.toml
+    chdir: "{{ claude_code_repo_dest }}"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  changed_when: false
+
 - name: Install pinned tool versions via mise
   ansible.builtin.command:
     cmd: mise install
