@@ -10,3 +10,11 @@
 
 - name: Clone repository
   ansible.builtin.import_tasks: repo.yml
+
+- name: Install pinned tool versions via mise
+  ansible.builtin.command:
+    cmd: /home/{{ claude_code_user }}/.local/bin/mise install
+    chdir: "{{ claude_code_repo_dest }}"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  changed_when: true

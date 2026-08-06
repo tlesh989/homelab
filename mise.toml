@@ -1,0 +1,5 @@
+[tools]
+terraform = "1.10.5"
+task = "3.52.0"
+direnv = "latest"
+gh = "latest"

@@ -26,11 +26,16 @@ Specialized rules:
 ## Primary Commands
 
 ```bash
+mise install                # Install pinned tool versions (terraform, task, direnv, gh)
 task check                  # Dry-run verify all hosts
 task syntax && task lint    # Fast linting/syntax checks
 task ping                   # Verify host connectivity
 doppler run -- ...          # Run any command with secrets
 ```
+
+Tool versions (terraform, task, direnv, gh) are pinned in `mise.toml` and shared across
+dev machines and the claude-code LXC — run `mise install` after cloning. `task` remains
+the task runner (Taskfile.yml); mise only manages tool versions.
 
 ## Definition of Done
 
