@@ -22,12 +22,14 @@
 
 - name: Activate mise shims in bash sessions
   ansible.builtin.lineinfile:
-    path: /home/{{ claude_code_user }}/{{ item }}
-    line: eval "$(mise activate bash)"
+    path: /home/{{ claude_code_user }}/{{ item.file }}
+    line: "{{ item.line }}"
     create: true
     mode: "0644"
   become: true
   become_user: "{{ claude_code_user }}"
   loop:
-    - .bashrc
-    - .profile
+    - { file: .bashrc, line: 'eval "$(mise activate bash)"' }
+    - { file: .profile, line: 'eval "$(mise activate bash --shims)"' }
+  loop_control:
+    label: "{{ item.file }}"

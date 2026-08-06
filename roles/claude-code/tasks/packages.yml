@@ -1,4 +1,16 @@
 ---
+- name: Remove obsolete GitHub CLI apt repository (superseded by mise)
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/github-cli.sources
+    state: absent
+  become: true
+
+- name: Remove obsolete GitHub CLI apt keyring (superseded by mise)
+  ansible.builtin.file:
+    path: /usr/share/keyrings/githubcli-archive-keyring.gpg
+    state: absent
+  become: true
+
 - name: Install curl and gpg
   ansible.builtin.apt:
     name:
@@ -83,31 +95,21 @@
     update_cache: true
   become: true
 
-- name: Remove obsolete GitHub CLI apt repository (superseded by mise)
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/github-cli.sources
-    state: absent
-  become: true
-
-- name: Remove obsolete GitHub CLI apt keyring (superseded by mise)
-  ansible.builtin.file:
-    path: /usr/share/keyrings/githubcli-archive-keyring.gpg
-    state: absent
-  become: true
-
 - name: Download mise GPG key (ASCII-armored)
   ansible.builtin.get_url:
     url: https://mise.jdx.dev/gpg-key.pub
     dest: /tmp/mise-gpg-key.pub
     mode: "0644"
+    force: true
   become: true
+  register: mise_key_download
 
 - name: Dearmor mise GPG key
   ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/mise-archive-keyring.gpg /tmp/mise-gpg-key.pub
-    creates: /usr/share/keyrings/mise-archive-keyring.gpg
+    cmd: gpg --dearmor --yes -o /usr/share/keyrings/mise-archive-keyring.gpg /tmp/mise-gpg-key.pub
   become: true
-  changed_when: true
+  when: mise_key_download.changed
+  changed_when: mise_key_download.changed # noqa: no-handler
 
 - name: Add mise apt repository
   ansible.builtin.deb822_repository:
