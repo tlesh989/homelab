@@ -1,14 +1,26 @@
 ---
-- name: Remove obsolete GitHub CLI apt repository (superseded by mise)
+- name: Remove obsolete GitHub CLI apt repository files (superseded by mise)
   ansible.builtin.file:
-    path: /etc/apt/sources.list.d/github-cli.sources
+    path: "{{ item }}"
     state: absent
+  loop:
+    - /etc/apt/sources.list.d/github-cli.sources
+    - /etc/apt/sources.list.d/github-cli.list
   become: true
 
 - name: Remove obsolete GitHub CLI apt keyring (superseded by mise)
   ansible.builtin.file:
     path: /usr/share/keyrings/githubcli-archive-keyring.gpg
     state: absent
+  become: true
+
+- name: Remove legacy one-line apt list files superseded by deb822 sources
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/nodesource.list
+    - /etc/apt/sources.list.d/doppler.list
   become: true
 
 - name: Install curl and gpg
