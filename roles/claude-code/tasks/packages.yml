@@ -83,17 +83,46 @@
     update_cache: true
   become: true
 
-- name: Download mise install script
+- name: Remove obsolete GitHub CLI apt repository (superseded by mise)
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/github-cli.sources
+    state: absent
+  become: true
+
+- name: Remove obsolete GitHub CLI apt keyring (superseded by mise)
+  ansible.builtin.file:
+    path: /usr/share/keyrings/githubcli-archive-keyring.gpg
+    state: absent
+  become: true
+
+- name: Download mise GPG key (ASCII-armored)
   ansible.builtin.get_url:
-    url: https://mise.run
-    dest: /tmp/mise-install.sh
-    mode: "0755"
+    url: https://mise.jdx.dev/gpg-key.pub
+    dest: /tmp/mise-gpg-key.pub
+    mode: "0644"
+  become: true
+
+- name: Dearmor mise GPG key
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/mise-archive-keyring.gpg /tmp/mise-gpg-key.pub
+    creates: /usr/share/keyrings/mise-archive-keyring.gpg
+  become: true
+  changed_when: true
+
+- name: Add mise apt repository
+  ansible.builtin.deb822_repository:
+    name: mise
+    types: deb
+    uris: https://mise.jdx.dev/deb # nocheck
+    suites: stable
+    components: main
+    signed_by: /usr/share/keyrings/mise-archive-keyring.gpg
+    state: present
   become: true
 
 - name: Install mise
-  ansible.builtin.command:
-    cmd: /tmp/mise-install.sh
-    creates: /home/{{ claude_code_user }}/.local/bin/mise
+  ansible.builtin.apt:
+    name: mise
+    state: present
+    update_cache: true
   become: true
-  become_user: "{{ claude_code_user }}"
-  changed_when: true

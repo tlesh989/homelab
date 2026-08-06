@@ -13,8 +13,21 @@
 
 - name: Install pinned tool versions via mise
   ansible.builtin.command:
-    cmd: /home/{{ claude_code_user }}/.local/bin/mise install
+    cmd: mise install
     chdir: "{{ claude_code_repo_dest }}"
   become: true
   become_user: "{{ claude_code_user }}"
-  changed_when: true
+  register: mise_install_result
+  changed_when: "'installed' in mise_install_result.stdout"
+
+- name: Activate mise shims in bash sessions
+  ansible.builtin.lineinfile:
+    path: /home/{{ claude_code_user }}/{{ item }}
+    line: eval "$(mise activate bash)"
+    create: true
+    mode: "0644"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  loop:
+    - .bashrc
+    - .profile
