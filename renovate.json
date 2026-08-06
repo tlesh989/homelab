@@ -66,6 +66,18 @@
       ],
       "groupName": "pre-commit minor/patch",
       "automerge": true
+    },
+    {
+      "description": "Group minor and patch updates for mise-managed tools",
+      "matchManagers": [
+        "mise"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "mise minor/patch",
+      "automerge": true
     }
   ]
 }

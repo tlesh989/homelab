@@ -1,4 +1,16 @@
 ---
+- name: Remove obsolete GitHub CLI apt repository (superseded by mise)
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/github-cli.sources
+    state: absent
+  become: true
+
+- name: Remove obsolete GitHub CLI apt keyring (superseded by mise)
+  ansible.builtin.file:
+    path: /usr/share/keyrings/githubcli-archive-keyring.gpg
+    state: absent
+  become: true
+
 - name: Install curl and gpg
   ansible.builtin.apt:
     name:
@@ -48,25 +60,6 @@
   become: true
   changed_when: true
 
-- name: Add GitHub CLI GPG key
-  ansible.builtin.get_url:
-    url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
-    mode: "0644"
-  become: true
-
-- name: Add GitHub CLI apt repository
-  ansible.builtin.deb822_repository:
-    name: github-cli
-    types: deb
-    uris: https://cli.github.com/packages # nocheck
-    suites: stable
-    components: main
-    architectures: amd64
-    signed_by: /usr/share/keyrings/githubcli-archive-keyring.gpg
-    state: present
-  become: true
-
 - name: Download Doppler GPG key (ASCII-armored)
   ansible.builtin.get_url:
     url: https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key # nocheck
@@ -93,12 +86,45 @@
     state: present
   become: true
 
-- name: Install gh, git, and doppler
+- name: Install git and doppler
   ansible.builtin.apt:
     name:
-      - gh
       - git
       - doppler
+    state: present
+    update_cache: true
+  become: true
+
+- name: Download mise GPG key (ASCII-armored)
+  ansible.builtin.get_url:
+    url: https://mise.jdx.dev/gpg-key.pub
+    dest: /tmp/mise-gpg-key.pub
+    mode: "0644"
+    force: true
+  become: true
+  register: mise_key_download
+
+- name: Dearmor mise GPG key
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /usr/share/keyrings/mise-archive-keyring.gpg /tmp/mise-gpg-key.pub
+  become: true
+  when: mise_key_download.changed
+  changed_when: mise_key_download.changed # noqa: no-handler
+
+- name: Add mise apt repository
+  ansible.builtin.deb822_repository:
+    name: mise
+    types: deb
+    uris: https://mise.jdx.dev/deb # nocheck
+    suites: stable
+    components: main
+    signed_by: /usr/share/keyrings/mise-archive-keyring.gpg
+    state: present
+  become: true
+
+- name: Install mise
+  ansible.builtin.apt:
+    name: mise
     state: present
     update_cache: true
   become: true
