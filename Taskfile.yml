@@ -101,6 +101,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "arr", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  tdarr-node:
+    desc: Deploy Tdarr transcode node (sturm)
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "tdarr-node", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   claude-code:
     desc: Deploy Claude Code LXC
     cmds:

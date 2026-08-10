@@ -1,0 +1,7 @@
+---
+- name: Restart tdarr-node
+  community.docker.docker_compose_v2:
+    project_src: "{{ tdarr_node_config_path }}/compose"
+    state: restarted
+  listen: restart tdarr-node
+  when: not ansible_check_mode

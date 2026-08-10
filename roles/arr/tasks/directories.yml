@@ -29,6 +29,9 @@
     - "{{ arr_config_path }}/lidarr"
     - "{{ arr_config_path }}/beets"
     - "{{ arr_config_path }}/filebot"
+    - "{{ arr_config_path }}/tdarr/server"
+    - "{{ arr_config_path }}/tdarr/configs"
+    - "{{ arr_config_path }}/tdarr/logs"
 
 - name: Migrate overseerr config to seerr if needed
   ansible.builtin.shell:

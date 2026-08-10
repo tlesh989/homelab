@@ -1,0 +1,21 @@
+# Managed by Ansible — do not edit manually
+services:
+  tdarr-node:
+    image: "{{ tdarr_node_image }}"
+    container_name: tdarr-node
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      TZ: "{{ tdarr_node_timezone }}"
+      PUID: "{{ tdarr_node_puid }}"
+      PGID: "{{ tdarr_node_pgid }}"
+      UMASK_SET: "002"
+      nodeID: "{{ tdarr_node_id }}"
+      serverIP: "{{ tdarr_node_server_ip }}"
+      serverPort: "{{ tdarr_node_server_port }}"
+      inContainer: "true"
+    volumes:
+      - "{{ tdarr_node_config_path }}/configs:/app/configs"
+      - "{{ tdarr_node_config_path }}/logs:/app/logs"
+      - "{{ tdarr_node_media_path }}:{{ tdarr_node_media_path }}"

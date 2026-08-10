@@ -153,6 +153,14 @@
   roles:
     - role: arr
 
+- name: setup tdarr transcode node
+  hosts: tdarr-node
+  become: true
+  roles:
+    - role: users
+    - role: geerlingguy.ntp
+    - role: tdarr_node
+
 - name: deploy dozzle agents
   hosts: dozzle_agents
   become: true

@@ -1,0 +1,12 @@
+---
+# VAAPI drivers for host-side verification (vainfo). The tdarr_node container
+# accesses /dev/dri directly via the compose `devices:` passthrough, so no
+# host user/group changes are needed — only the driver + device node matter.
+
+- name: Install VAAPI drivers
+  ansible.builtin.apt:
+    name:
+      - vainfo
+      - mesa-va-drivers
+    state: present
+  become: true

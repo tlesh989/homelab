@@ -88,6 +88,13 @@ network_inventory:
       managed_by: manual
       dns: []
       notes: "Brother printer"
+    - name: tdarr-node
+      ip: 192.168.233.18
+      mac: "bc:24:11:18:00:01"
+      assignment: static
+      managed_by: terraform
+      dns: [tdarr-node.tlesh.xyz]
+      notes: "Tdarr transcode node, GPU/VAAPI (on sturm, vm_id 118)"
     - name: uptime-kuma
       ip: 192.168.233.16
       mac:

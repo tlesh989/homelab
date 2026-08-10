@@ -48,6 +48,7 @@ No modules.
 | [proxmox_virtual_environment_container.pi_hole](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.plex](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_container.tdarr_node](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.uptime_kuma](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_vm.kaz](https://registry.terraform.io/providers/bpg/proxmox/0.111.1/docs/resources/virtual_environment_vm) | resource |
 | [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.21.4/docs/data-sources/secrets) | data source |
