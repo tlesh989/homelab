@@ -151,6 +151,7 @@
   hosts: arr
   become: true
   roles:
+    - role: geerlingguy.docker
     - role: arr
 
 - name: setup tdarr transcode node
@@ -159,6 +160,7 @@
   roles:
     - role: users
     - role: geerlingguy.ntp
+    - role: geerlingguy.docker
     - role: tdarr_node
 
 - name: deploy dozzle agents

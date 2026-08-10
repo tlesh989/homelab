@@ -1,5 +1,5 @@
 ---
-- name: Install Docker
+- name: Install Docker Python SDK
   ansible.builtin.import_tasks: docker.yml
 
 - name: Mount NFS media share
