@@ -34,3 +34,10 @@ proxmox_backup_storage: proxmox-nfs
 proxmox_backup_schedule: "02:00"
 proxmox_backup_mode: snapshot
 proxmox_backup_prune: keep-daily=7,keep-weekly=4,keep-monthly=3
+
+# NUT client — monitors the TrueNAS UPS server (homelab-hms) and shuts this
+# node down when it reports low battery. Credentials shared with
+# roles/truenas/defaults/main.yml (same Doppler secret).
+proxmox_nut_server_host: "192.168.233.6"
+proxmox_nut_monuser: "upsmon"
+proxmox_nut_monpwd: "{{ lookup('env', 'NUT_MONPWD') }}"

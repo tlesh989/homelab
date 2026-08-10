@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+
+MONITOR ups@{{ proxmox_nut_server_host }} 1 {{ proxmox_nut_monuser }} {{ proxmox_nut_monpwd }} slave
+MINSUPPLIES 1
+SHUTDOWNCMD "/sbin/shutdown -h +0"
+POLLFREQ 15
+POLLFREQALERT 5
+HOSTSYNC 15
+DEADTIME 15
+RUN_AS_USER root
+NOTIFYFLAG ONLINE  SYSLOG+WALL
+NOTIFYFLAG ONBATT  SYSLOG+WALL
+NOTIFYFLAG LOWBATT SYSLOG+WALL
+NOTIFYFLAG FSD     SYSLOG+WALL

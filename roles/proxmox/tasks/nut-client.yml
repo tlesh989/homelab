@@ -1,0 +1,34 @@
+---
+# tasks file for proxmox — NUT client (homelab-hms)
+# Monitors the TrueNAS UPS server (roles/truenas/tasks/ups.yml) as a NUT
+# slave and shuts this node down when the UPS reports low battery.
+
+- name: Install nut-client
+  ansible.builtin.package:
+    name: nut-client
+    state: present
+
+- name: Set NUT client mode
+  ansible.builtin.lineinfile:
+    path: /etc/nut/nut.conf
+    regexp: "^MODE="
+    line: "MODE=netclient"
+    create: true
+    mode: "0644"
+  notify: Restart nut-monitor
+
+- name: Configure upsmon
+  ansible.builtin.template:
+    src: upsmon.conf.j2
+    dest: /etc/nut/upsmon.conf
+    owner: root
+    group: root
+    mode: "0640"
+  notify: Restart nut-monitor
+
+- name: Enable and start nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor
+    enabled: true
+    state: started
+  when: not ansible_check_mode

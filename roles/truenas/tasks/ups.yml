@@ -1,0 +1,79 @@
+---
+# tasks file for truenas — NUT/UPS monitoring (homelab-hms)
+# CyberPower PR1500LCDRT2U over USB, driver/port identified via nut-scanner.
+# rmonitor lets the Proxmox nodes (NUT slaves, see
+# roles/proxmox/tasks/nut-client.yml) poll status and shut themselves down
+# when the UPS reports LOWBATT.
+
+- name: Get current UPS config
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: ups.config
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_ups_config
+  changed_when: false
+  no_log: true
+
+- name: Configure UPS (NUT)
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: ups.update
+    params:
+      - driver: "{{ truenas_ups_driver }}"
+        port: "{{ truenas_ups_port }}"
+        identifier: "{{ truenas_ups_identifier }}"
+        description: "{{ truenas_ups_description }}"
+        mode: "{{ truenas_ups_mode }}"
+        shutdown: "{{ truenas_ups_shutdown_mode }}"
+        rmonitor: "{{ truenas_ups_rmonitor }}"
+        monuser: "{{ truenas_ups_monuser }}"
+        monpwd: "{{ truenas_ups_monpwd }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: >-
+    truenas_ups_driver != _truenas_ups_config.result.driver
+    or truenas_ups_port != _truenas_ups_config.result.port
+    or truenas_ups_identifier != _truenas_ups_config.result.identifier
+    or truenas_ups_mode != _truenas_ups_config.result.mode
+    or truenas_ups_shutdown_mode != _truenas_ups_config.result.shutdown
+    or truenas_ups_rmonitor != _truenas_ups_config.result.rmonitor
+    or truenas_ups_monuser != _truenas_ups_config.result.monuser
+  changed_when: true
+  no_log: true
+
+- name: Get service states
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_services
+  changed_when: false
+
+- name: Determine UPS service state
+  ansible.builtin.set_fact:
+    _truenas_ups_service: "{{ _truenas_services.result | selectattr('service', 'equalto', 'ups') | list | first }}"
+
+- name: Enable UPS service on boot
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.update
+    params:
+      - "{{ _truenas_ups_service.id }}"
+      - enable: true
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: not _truenas_ups_service.enable
+  changed_when: true
+
+- name: Start UPS service
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: service.start
+    params:
+      - ups
+    validate_certs: "{{ truenas_validate_certs }}"
+  when: _truenas_ups_service.state != 'RUNNING'
+  changed_when: true
