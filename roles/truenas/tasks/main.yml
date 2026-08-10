@@ -16,6 +16,9 @@
 - name: Configure ZFS scrub schedule
   ansible.builtin.include_tasks: scrub.yml
 
+- name: Configure UPS (NUT) monitoring
+  ansible.builtin.include_tasks: ups.yml
+
 - name: Deploy Beszel agent as a custom app
   ansible.builtin.include_tasks: beszel_agent.yml
   when:
