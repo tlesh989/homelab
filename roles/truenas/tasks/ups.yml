@@ -5,6 +5,12 @@
 # roles/proxmox/tasks/nut-client.yml) poll status and shut themselves down
 # when the UPS reports LOWBATT.
 
+- name: Assert NUT monitor password is set
+  ansible.builtin.assert:
+    that: truenas_ups_monpwd | length > 0
+    fail_msg: "truenas_ups_monpwd is empty — check the NUT_MONPWD Doppler secret."
+  no_log: true
+
 - name: Get current UPS config
   truenas_api:
     host: "{{ truenas_host }}"
@@ -35,10 +41,12 @@
     truenas_ups_driver != _truenas_ups_config.result.driver
     or truenas_ups_port != _truenas_ups_config.result.port
     or truenas_ups_identifier != _truenas_ups_config.result.identifier
+    or truenas_ups_description != _truenas_ups_config.result.description
     or truenas_ups_mode != _truenas_ups_config.result.mode
     or truenas_ups_shutdown_mode != _truenas_ups_config.result.shutdown
     or truenas_ups_rmonitor != _truenas_ups_config.result.rmonitor
     or truenas_ups_monuser != _truenas_ups_config.result.monuser
+    or truenas_ups_force_update
   changed_when: true
   no_log: true
 
