@@ -14,6 +14,7 @@ truenas_nfs_shares:
       - "192.168.220.10" # kaz (storage network, Calibre-Web)
       - "192.168.220.12" # plex (storage network)
       - "192.168.220.24" # arr (storage network)
+      - "192.168.220.18" # tdarr-node (storage network)
     maproot_user: "root"
     maproot_group: "wheel"
   # Proxmox VM/backup storage (datastore_id proxmox-nfs in terraform/storage.tf).
