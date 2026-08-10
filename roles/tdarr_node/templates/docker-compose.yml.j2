@@ -4,6 +4,11 @@ services:
     image: "{{ tdarr_node_image }}"
     container_name: tdarr-node
     restart: unless-stopped
+    # AppArmor can't load the docker-default profile inside this LXC
+    # (apparmor_parser requires policy admin privileges). Same fix as arr's
+    # compose stack — see roles/arr/templates/docker-compose.yml.j2.
+    security_opt:
+      - apparmor=unconfined
     devices:
       - /dev/dri:/dev/dri
     group_add:
