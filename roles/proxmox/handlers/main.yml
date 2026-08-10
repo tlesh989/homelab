@@ -39,3 +39,8 @@
 - name: Apply CPU governor
   ansible.builtin.command: /usr/local/bin/set-cpu-governor.sh
   changed_when: true
+
+- name: Restart nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor
+    state: restarted

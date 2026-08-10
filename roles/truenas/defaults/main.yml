@@ -43,3 +43,11 @@ truenas_iscsi_chap_enabled: false
 truenas_iscsi_chap_tag: 1
 truenas_iscsi_chap_user: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_USER') | default('', true) }}"
 truenas_iscsi_chap_secret: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_SECRET') | default('', true) }}"
+
+# NUT/UPS monitor credentials (homelab-hms). Shared with the Proxmox NUT
+# slaves (roles/proxmox/defaults/main.yml) — same Doppler secret.
+truenas_ups_monuser: "upsmon"
+truenas_ups_monpwd: "{{ lookup('env', 'NUT_MONPWD') }}"
+# Set to true (via -e) when rotating NUT_MONPWD to force TrueNAS to pick up
+# the new password — ups.config masks monpwd so it can't be diffed normally.
+truenas_ups_force_update: false

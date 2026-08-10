@@ -51,3 +51,16 @@ truenas_scrub_tasks:
       dom: "*"
       month: "*"
       dow: "7"
+
+# NUT/UPS monitoring — CyberPower PR1500LCDRT2U replaced the failing APC unit
+# (homelab-hms). driver/port identified via `nut-scanner -U` over USB.
+# shutdown=LOWBATT: TrueNAS only triggers its own shutdown sequence (and
+# broadcasts FSD to Proxmox NUT slaves) once the UPS reports low battery,
+# not on every switch to battery power.
+truenas_ups_driver: "usbhid-ups$PR1500LCDRT2U"
+truenas_ups_port: "auto"
+truenas_ups_identifier: "ups"
+truenas_ups_description: "CyberPower PR1500LCDRT2U"
+truenas_ups_mode: "MASTER"
+truenas_ups_shutdown_mode: "LOWBATT"
+truenas_ups_rmonitor: true
