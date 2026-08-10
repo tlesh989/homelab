@@ -1,0 +1,5 @@
+---
+# NFS mount for media library (storage network)
+tdarr_node_nfs_server: 192.168.220.6
+tdarr_node_nfs_export: /mnt/wayreth/data/media
+tdarr_node_media_path: /data/media

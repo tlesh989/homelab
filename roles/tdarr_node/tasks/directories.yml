@@ -1,0 +1,12 @@
+---
+- name: Create tdarr-node config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ tdarr_node_puid }}"
+    group: "{{ tdarr_node_pgid }}"
+  loop:
+    - "{{ tdarr_node_config_path }}/compose"
+    - "{{ tdarr_node_config_path }}/configs"
+    - "{{ tdarr_node_config_path }}/logs"

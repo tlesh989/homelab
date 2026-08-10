@@ -1,0 +1,14 @@
+---
+tdarr_node_config_path: /opt/tdarr-node
+tdarr_node_timezone: America/Detroit
+
+# Container user/group (linuxserver-style PUID/PGID)
+tdarr_node_puid: 1000
+tdarr_node_pgid: 1000
+
+# Tdarr server this node registers with (arr host, storage network)
+tdarr_node_server_ip: 192.168.220.24
+tdarr_node_server_port: 8266
+tdarr_node_id: tdarr-node-sturm
+
+tdarr_node_image: haveagitgat/tdarr_node:latest

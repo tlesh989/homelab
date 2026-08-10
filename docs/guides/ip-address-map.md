@@ -22,6 +22,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .11 | jetkvm | JetKVM | DHCP reservation (MAC: 44:b7:d0:e7:82:89) — KVM-over-IP |
 | .12 | plex | Plex LXC | Media server (on sturm) |
 | .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
+| .18 | tdarr-node | Tdarr transcode node LXC | Terraform-managed (on sturm, vm_id 118) — GPU/VAAPI transcode |
 | .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |

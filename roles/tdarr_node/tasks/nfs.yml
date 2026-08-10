@@ -1,0 +1,26 @@
+---
+# Media is served via NFS from TrueNAS over the storage network (eth1, 192.168.220.x).
+
+- name: Install NFS client
+  ansible.builtin.apt:
+    name: nfs-common
+    state: present
+    update_cache: true
+  become: true
+
+- name: Create NFS mount point
+  ansible.builtin.file:
+    path: "{{ tdarr_node_media_path }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Mount TrueNAS NFS media share
+  ansible.posix.mount:
+    path: "{{ tdarr_node_media_path }}"
+    src: "{{ tdarr_node_nfs_server }}:{{ tdarr_node_nfs_export }}"
+    fstype: nfs
+    # Explicit hard mount, standardized across consumers (see homelab-1it).
+    opts: rw,noatime,nfsvers=4.2,hard,timeo=600,_netdev
+    state: mounted
+  become: true
