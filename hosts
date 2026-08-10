@@ -22,7 +22,7 @@ pi-hole.tlesh.xyz ansible_host=192.168.233.3
 [arr]
 arr.tlesh.xyz ansible_host=192.168.233.24
 
-[tdarr-node]
+[tdarr_node]
 tdarr-node.tlesh.xyz ansible_host=192.168.233.18
 
 [uptime-kuma]
@@ -61,7 +61,7 @@ uptime-kuma
 caddy
 claude_code
 minecraft
-tdarr-node
+tdarr_node
 
 [beszel_hub]
 kaz.tlesh.xyz
@@ -76,7 +76,7 @@ uptime-kuma
 caddy
 claude_code
 minecraft
-tdarr-node
+tdarr_node
 barlo
 # truenas deliberately excluded: ansalon uses ansible_connection=local, so the
 # binary/systemd agent.yml task would run on the Ansible controller itself.
@@ -89,4 +89,4 @@ barlo
 [dozzle_agents:children]
 arr
 uptime-kuma
-tdarr-node
+tdarr_node

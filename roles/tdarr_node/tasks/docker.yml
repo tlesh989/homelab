@@ -46,8 +46,9 @@
   when: not ansible_check_mode
 
 - name: Ensure Docker service is enabled and started
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: docker
     state: started
     enabled: true
+    daemon_reload: true
   when: not ansible_check_mode

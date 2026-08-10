@@ -6,12 +6,14 @@ services:
     restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri
+    group_add:
+      - "{{ tdarr_node_render_gid }}"
     environment:
       TZ: "{{ tdarr_node_timezone }}"
       PUID: "{{ tdarr_node_puid }}"
       PGID: "{{ tdarr_node_pgid }}"
       UMASK_SET: "002"
-      nodeID: "{{ tdarr_node_id }}"
+      nodeName: "{{ tdarr_node_id }}"
       serverIP: "{{ tdarr_node_server_ip }}"
       serverPort: "{{ tdarr_node_server_port }}"
       inContainer: "true"

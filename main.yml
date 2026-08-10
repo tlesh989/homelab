@@ -154,7 +154,7 @@
     - role: arr
 
 - name: setup tdarr transcode node
-  hosts: tdarr-node
+  hosts: tdarr_node
   become: true
   roles:
     - role: users

@@ -7,6 +7,16 @@ resource "proxmox_virtual_environment_container" "tdarr_node" {
     nesting = true
   }
 
+  # Intel iGPU passthrough for VAAPI hardware transcode (matches sturm's
+  # /dev/dri layout used by Plex).
+  device_passthrough {
+    path = "/dev/dri/renderD128"
+  }
+
+  device_passthrough {
+    path = "/dev/dri/card0"
+  }
+
   cpu {
     architecture = "amd64"
     cores        = 4
