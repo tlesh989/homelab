@@ -26,16 +26,18 @@ Specialized rules:
 ## Primary Commands
 
 ```bash
-mise install                # Install pinned tool versions (terraform, task, direnv, gh)
+mise install                # Install pinned tool versions (terraform, task, direnv, gh, bun, ansible, ansible-lint)
 task check                  # Dry-run verify all hosts
 task syntax && task lint    # Fast linting/syntax checks
 task ping                   # Verify host connectivity
 doppler run -- ...          # Run any command with secrets
 ```
 
-Tool versions (terraform, task, direnv, gh) are pinned in `mise.toml` and shared across
-dev machines and the claude-code LXC — run `mise install` after cloning. `task` remains
-the task runner (Taskfile.yml); mise only manages tool versions.
+Tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint) are pinned
+in `mise.toml` and shared across dev machines and the claude-code LXC — run `mise install`
+after cloning. `task` remains the task runner (Taskfile.yml); mise only manages tool versions.
+Ansible itself is installed via mise's `pipx:` backend (needs `uv`, also mise-managed) —
+there is no separate apt/pip install step for ansible.
 
 ## Definition of Done
 
