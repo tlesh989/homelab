@@ -26,7 +26,7 @@ Specialized rules:
 ## Primary Commands
 
 ```bash
-mise install                # Install pinned tool versions (terraform, task, direnv, gh, bun, ansible, ansible-lint)
+mise install                # Install pinned tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint)
 task check                  # Dry-run verify all hosts
 task syntax && task lint    # Fast linting/syntax checks
 task ping                   # Verify host connectivity
