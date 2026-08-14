@@ -18,7 +18,7 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK (proxmox role backup.yml)"
     block: |
       tmpdir: {{ proxmox_backup_tmpdir }}
-      exclude-path: {{ proxmox_backup_exclude_path | join(',') }}
+      exclude-path: {{ proxmox_backup_exclude_path | join(' ') }}
   become: true
 
 # A vzdump backup job is stored in /etc/pve (cluster-wide), so it only needs to
