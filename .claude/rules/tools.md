@@ -1,6 +1,6 @@
 # Tooling & Security Conventions
 
-- **Tool versions**: Pinned in `mise.toml` (terraform, task, direnv, gh). Run `mise install` after cloning. `task` stays the task runner.
+- **Tool versions**: Pinned in `mise.toml` (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint). Run `mise install` after cloning. `task` stays the task runner. Ansible is installed via mise's `pipx:` backend, not apt/pip.
 - **Secrets**: Use `doppler run -- <command>`. NO local vaults.
 - **Docs**: Proactively use Context7 for SDK/API references.
 - **Shell**: Use `gh` for GitHub, prefix tools with `rtk` where applicable. Run `task` for operations.

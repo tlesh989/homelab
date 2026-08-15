@@ -35,7 +35,8 @@ Personal homelab infrastructure managed as code — three Proxmox nodes running 
 ## Tech Stack
 
 - **Provisioning**: [Terraform](https://www.terraform.io/) with [`bpg/proxmox`](https://github.com/bpg/terraform-provider-proxmox) provider; state in Terraform Cloud
-- **Configuration**: [Ansible](https://docs.ansible.com/) with custom roles
+- **Configuration**: [Ansible](https://docs.ansible.com/) with custom roles (installed via mise's `pipx:` backend)
+- **Tooling**: [mise](https://mise.jdx.dev/) pins tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint)
 - **Secrets**: [Doppler](https://www.doppler.com/) — all secrets injected at runtime, nothing stored locally
 - **Automation**: [Task](https://taskfile.dev/) for orchestrating all operations
 - **Networking**: Tailscale for remote access; VLAN 233 (`192.168.233.0/24`) for homelab traffic
@@ -46,7 +47,10 @@ Personal homelab infrastructure managed as code — three Proxmox nodes running 
 ## Quick Start
 
 ```bash
-# Install dependencies
+# Install pinned tool versions (terraform, task, ansible, ansible-lint, etc.)
+mise install
+
+# Install Ansible Galaxy roles/collections
 task reqs
 
 # Validate everything

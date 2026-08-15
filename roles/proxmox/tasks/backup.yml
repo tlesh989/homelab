@@ -1,4 +1,26 @@
 ---
+# Local (non-NFS) tmpdir for vzdump's working files, and exclude-path entries
+# for unprivileged-container spool/cache paths that fail with "permission
+# denied" during tar. Written to /etc/vzdump.conf on every node since these
+# are host-local settings, independent of the cluster-wide backup job below.
+- name: Ensure local vzdump tmpdir exists
+  ansible.builtin.file:
+    path: "{{ proxmox_backup_tmpdir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+  become: true
+
+- name: Configure vzdump tmpdir and permission-denied excludes
+  ansible.builtin.blockinfile:
+    path: /etc/vzdump.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (proxmox role backup.yml)"
+    block: |
+      tmpdir: {{ proxmox_backup_tmpdir }}
+      exclude-path: {{ proxmox_backup_exclude_path | join(' ') }}
+  become: true
+
 # A vzdump backup job is stored in /etc/pve (cluster-wide), so it only needs to
 # be created once. Idempotent: skipped if a job with proxmox_backup_id exists.
 - name: Gather existing cluster backup jobs
