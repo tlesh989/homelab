@@ -68,27 +68,39 @@ DNS: `192.168.233.3` (pi-hole), `192.168.40.1` (fallback)
 
 ### IoT Devices (connect to `ginkgo` SSID)
 
-Migrate these from main network → ginkgo SSID in their respective apps:
+Live-checked against the UniFi controller (`/proxy/network/integration/v1/sites/.../clients`) on 2026-08-15.
+Migration from `ginseng` → `ginkgo` happens **only in each device's own app** — WiFi credentials
+are paired into the device at setup time, and UniFi can't reassign a client to a different SSID
+from the network side. Re-pairing steps: open the vendor app → device settings → change WiFi
+network → select `ginkgo` → re-enter password. Some Wyze/Tapo devices require "forget device" +
+full re-add instead of an in-place network change.
 
 | Device | Type | MAC | Status |
 |--------|------|-----|--------|
-| ESP_433ABC | ESP32 sensor | 5c:cf:7f:43:3a:bc | Needs migration |
-| KP303 fb:60 | Kasa power strip | e4:fa:c4:3f:fb:60 | Needs migration |
-| KP303 a5:67 | Kasa power strip | 3c:84:6a:66:a5:67 | Needs migration |
-| TP15 5e:e6 | Tapo smart plug | 3c:52:a1:3a:5e:e6 | Needs migration |
-| TP15 67:a3 | Tapo smart plug | 3c:52:a1:3a:67:a3 | Needs migration |
+| ESP_433ABC | ESP32 sensor | 5c:cf:7f:43:3a:bc | ❌ On main (.155) — needs migration |
+| KP303 fb:60 | Kasa power strip | e4:fa:c4:3f:fb:60 | ✅ On IoT (.161) |
+| KP303 a5:67 | Kasa power strip | 3c:84:6a:66:a5:67 | ❌ On main (.128) — needs migration |
+| TP15 5e:e6 | Tapo smart plug | 3c:52:a1:3a:5e:e6 | ✅ On IoT (.76) |
+| TP15 67:a3 | Tapo smart plug | 3c:52:a1:3a:67:a3 | ✅ On IoT (.18) |
 | TP15 65:65 | Tapo smart plug | 3c:52:a1:3a:65:65 | ✅ On IoT (.166) |
-| TP15 65:b2 | Tapo smart plug | 3c:52:a1:3a:65:b2 | ✅ On IoT (.52) |
+| TP15 65:b2 | Tapo smart plug | 3c:52:a1:3a:65:b2 | ⚠️ Offline — last known on IoT (.52), unverified |
 | Etekcity-Outlet | Smart outlet | 2c:3a:e8:22:e7:a9 | ✅ On IoT (.97) |
-| Wyze Video Doorbell | Camera | 2c:aa:8e:a7:bd:bf | Needs migration |
-| Wyze Outdoor Plug | Smart plug | 7c:78:b2:61:97:0a | Needs migration |
-| WYZE_CAKP2JFUS | Wyze camera | 7c:78:b2:23:b6:72 | Needs migration |
-| TwinCam | Wyze camera | 2c:aa:8e:24:1f:9a | Needs migration |
-| GE_Light_1B77 | Smart light | 80:8a:f7:01:fd:fc | Needs migration |
-| Govee Lyra | Smart light | d0:c9:07:82:94:5a | Needs migration |
-| Amazon Echo Dot (4th Gen) | Smart speaker | b0:73:9c:5b:77:de | Needs migration |
-| Amazon Echo Dot (2nd Gen) | Smart speaker | fc:a6:67:3d:f7:9c | Needs migration |
-| Echo Show | Smart display | 08:91:a3:88:88:73 | Needs migration |
+| Wyze Video Doorbell | Camera | 2c:aa:8e:a7:bd:bf | ⚠️ Offline — network unverified |
+| Wyze Outdoor Plug | Smart plug | 7c:78:b2:61:97:0a | ⚠️ Offline — network unverified |
+| WYZE_CAKP2JFUS | Wyze camera | 7c:78:b2:23:b6:72 | ✅ On IoT (.109) |
+| TwinCam | Wyze camera | 2c:aa:8e:24:1f:9a | ✅ On IoT (.110) |
+| GE_Light_1B77 | Smart light | 80:8a:f7:01:fd:fc | ❌ On main (.67) — needs migration |
+| Govee Lyra | Smart light | d0:c9:07:82:94:5a | ✅ On IoT (.88) |
+| Amazon Echo Dot (4th Gen) 77:de | Smart speaker | b0:73:9c:5b:77:de | ❌ On main (.58) — needs migration |
+| Amazon Echo Dot (2nd Gen) f7:9c | Smart speaker | fc:a6:67:3d:f7:9c | ❌ On main (.193) — needs migration |
+| Echo Show | Smart display | 08:91:a3:88:88:73 | ❌ On main (.68) — needs migration |
+| Wyze Plug 85:43 | Smart plug | 2c:aa:8e:e9:85:43 | ❌ On main (.183) — needs migration *(newly found)* |
+| WYZE_CAKP2JFUS 42:69 | Wyze camera | 2c:aa:8e:fb:42:69 | ❌ On main (.187) — needs migration *(newly found)* |
+| Amazon Echo Dot (3rd Gen) ca:5b | Smart speaker | 08:a6:bc:75:ca:5b | ❌ On main (.177) — needs migration *(newly found)* |
+| Amazon Echo Dot (4th Gen) e9:b2 | Smart speaker | 34:25:be:75:e9:b2 | ❌ On main (.84) — needs migration *(newly found)* |
+
+Intentionally staying on main (streaming devices need Plex/DLNA reachability, not IoT-isolated):
+RokuUltra (.189), RokuTCL (.53) — same rationale as GymRoku above.
 
 ---
 
