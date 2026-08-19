@@ -158,6 +158,8 @@ galaxy_collections/
 
 # Claude Code local settings (project-specific permissions, not for sharing)
 .claude/settings.local.json
+.claude/config.local.json
+.claude/db/
 CLAUDE.local.md
 .aider*
 
