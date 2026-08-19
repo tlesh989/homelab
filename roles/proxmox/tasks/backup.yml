@@ -3,14 +3,38 @@
 # for unprivileged-container spool/cache paths that fail with "permission
 # denied" during tar. Written to /etc/vzdump.conf on every node since these
 # are host-local settings, independent of the cluster-wide backup job below.
+#
+# Suspend-mode backups of unprivileged containers rsync files into this
+# tmpdir as real root, then tar them via `lxc-usernsexec -m u:0:100000:65536`,
+# which runs tar as host uid proxmox_backup_unpriv_uid. A root-only (0700) dir
+# blocks that mapped uid from entering, failing with "tar: Cannot open:
+# Permission denied". Snapshot-mode backups are unaffected since they tar from
+# the LVM snapshot mount instead of this tmpdir.
+#
+# Grant that uid access via ACL rather than opening the mode to all users, so
+# other local accounts can't read staged container files. The default ACL
+# makes new vzdumptmp_* subdirs (created per-backup by rsync) inherit it too.
 - name: Ensure local vzdump tmpdir exists
   ansible.builtin.file:
     path: "{{ proxmox_backup_tmpdir }}"
     state: directory
     owner: root
     group: root
-    mode: "0700"
+    mode: "0750"
   become: true
+
+- name: Grant unprivileged-container mapped uid access to vzdump tmpdir
+  ansible.posix.acl:
+    path: "{{ proxmox_backup_tmpdir }}"
+    entity: "{{ proxmox_backup_unpriv_uid }}"
+    etype: user
+    permissions: rx
+    default: "{{ item }}"
+    state: present
+  become: true
+  loop:
+    - false
+    - true
 
 - name: Configure vzdump tmpdir and permission-denied excludes
   ansible.builtin.blockinfile:
