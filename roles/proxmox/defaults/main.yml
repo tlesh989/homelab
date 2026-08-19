@@ -47,6 +47,11 @@ proxmox_nut_monpwd: "{{ lookup('env', 'NUT_MONPWD') }}"
 # NFS drive and the "temporary directory ... on NFS" vzdump warning.
 proxmox_backup_tmpdir: /var/tmp/vzdump
 
+# Host uid that unprivileged LXC root (uid 0 in-container) maps to, per the
+# default lxc-usernsexec subuid range (u:0:100000:65536). Suspend-mode backups
+# tar the tmpdir as this uid, so it needs an ACL entry on proxmox_backup_tmpdir.
+proxmox_backup_unpriv_uid: 100000
+
 # Container spool/cache paths that are unreadable by the host during backup
 # (permission denied on unprivileged LXC spool/lock files) and safe to skip
 # since they're regenerated at runtime. See vzdump.conf(5) exclude-path.
