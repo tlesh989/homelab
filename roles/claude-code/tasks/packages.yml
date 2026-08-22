@@ -29,6 +29,7 @@
       - curl
       - gpg
       - python3-debian
+      - locales
     state: present
     update_cache: true
   become: true
