@@ -38,7 +38,7 @@
   when: bd_npm_check.rc == 0
   changed_when: true
 
-- name: Remove obsolete Node.js and Doppler packages (superseded by mise / no longer needed)
+- name: Remove obsolete Node.js and Doppler apt packages (superseded by mise)
   ansible.builtin.apt:
     name:
       - nodejs
@@ -46,7 +46,7 @@
     state: absent
   become: true
 
-- name: Remove obsolete NodeSource and Doppler apt repository files (superseded by mise / no longer needed)
+- name: Remove obsolete NodeSource and Doppler apt repository files (superseded by mise)
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
@@ -55,7 +55,7 @@
     - /etc/apt/sources.list.d/doppler.sources
   become: true
 
-- name: Remove obsolete NodeSource and Doppler apt keyrings (superseded by mise / no longer needed)
+- name: Remove obsolete NodeSource and Doppler apt keyrings (superseded by mise)
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
