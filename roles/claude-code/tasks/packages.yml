@@ -23,6 +23,32 @@
     - /etc/apt/sources.list.d/doppler.list
   become: true
 
+- name: Remove obsolete Node.js and Doppler packages (superseded by mise / no longer needed)
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - doppler
+    state: absent
+  become: true
+
+- name: Remove obsolete NodeSource and Doppler apt repository files (superseded by mise / no longer needed)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/nodesource.sources
+    - /etc/apt/sources.list.d/doppler.sources
+  become: true
+
+- name: Remove obsolete NodeSource and Doppler apt keyrings (superseded by mise / no longer needed)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/share/keyrings/nodesource.gpg
+    - /usr/share/keyrings/doppler-archive-keyring.gpg
+  become: true
+
 - name: Install curl and gpg
   ansible.builtin.apt:
     name:
@@ -54,51 +80,6 @@
     label: "{{ item.key }}"
   become: true
 
-- name: Download NodeSource GPG key (ASCII-armored)
-  ansible.builtin.get_url:
-    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-    dest: /tmp/nodesource-repo.gpg.key
-    mode: "0644"
-  become: true
-
-- name: Dearmor NodeSource GPG key
-  ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/nodesource.gpg /tmp/nodesource-repo.gpg.key
-    creates: /usr/share/keyrings/nodesource.gpg
-  become: true
-  changed_when: true
-
-- name: Add NodeSource apt repository
-  ansible.builtin.deb822_repository:
-    name: nodesource
-    types: deb
-    uris: https://deb.nodesource.com/node_20.x # nocheck
-    suites: nodistro
-    components: main
-    signed_by: /usr/share/keyrings/nodesource.gpg
-    state: present
-  become: true
-
-- name: Install Node.js
-  ansible.builtin.apt:
-    name: nodejs
-    state: present
-    update_cache: true
-  become: true
-
-- name: Check for legacy npm-installed Claude Code CLI
-  ansible.builtin.stat:
-    path: /usr/local/bin/claude
-  become: true
-  register: claude_code_npm_bin
-
-- name: Remove legacy npm-installed Claude Code CLI (superseded by native installer)
-  ansible.builtin.command:
-    cmd: npm uninstall -g @anthropic-ai/claude-code
-  become: true
-  when: claude_code_npm_bin.stat.exists
-  changed_when: true
-
 - name: Install Claude Code CLI via native installer # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: set -o pipefail && curl -fsSL https://claude.ai/install.sh | bash
@@ -123,37 +104,9 @@
   when: bd_npm_check.rc == 0
   changed_when: true
 
-- name: Download Doppler GPG key (ASCII-armored)
-  ansible.builtin.get_url:
-    url: https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key # nocheck
-    dest: /tmp/doppler.gpg.key
-    mode: "0644"
-  become: true
-  register: doppler_key_download
-
-- name: Dearmor Doppler GPG key
-  ansible.builtin.command:
-    cmd: gpg --dearmor --yes -o /usr/share/keyrings/doppler-archive-keyring.gpg /tmp/doppler.gpg.key
-  become: true
-  when: doppler_key_download.changed
-  changed_when: doppler_key_download.changed # noqa: no-handler
-
-- name: Add Doppler apt repository
-  ansible.builtin.deb822_repository:
-    name: doppler
-    types: deb
-    uris: https://packages.doppler.com/public/cli/deb/debian # nocheck
-    suites: any-version
-    components: main
-    signed_by: /usr/share/keyrings/doppler-archive-keyring.gpg
-    state: present
-  become: true
-
-- name: Install git and doppler
+- name: Install git
   ansible.builtin.apt:
-    name:
-      - git
-      - doppler
+    name: git
     state: present
     update_cache: true
   become: true
