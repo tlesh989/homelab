@@ -108,11 +108,17 @@
   become_user: "{{ claude_code_user }}"
   changed_when: true
 
-- name: Install bd (beads) issue tracker
-  ansible.builtin.command:
-    cmd: npm install -g @beads/bd
-    creates: /usr/bin/bd
+- name: Check for legacy npm-installed bd (beads) CLI
+  ansible.builtin.stat:
+    path: /usr/bin/bd
   become: true
+  register: bd_npm_bin
+
+- name: Remove legacy npm-installed bd (beads) CLI (superseded by mise)
+  ansible.builtin.command:
+    cmd: npm uninstall -g @beads/bd
+  become: true
+  when: bd_npm_bin.stat.exists
   changed_when: true
 
 - name: Download Doppler GPG key (ASCII-armored)
