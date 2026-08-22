@@ -33,6 +33,26 @@
     update_cache: true
   become: true
 
+- name: Generate en_US.UTF-8 locale
+  community.general.locale_gen:
+    name: en_US.UTF-8
+    state: present
+  become: true
+
+- name: Set en_US.UTF-8 as system default locale
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+    create: true
+    mode: "0644"
+  loop:
+    - { key: LANG, value: en_US.UTF-8 }
+    - { key: LC_ALL, value: en_US.UTF-8 }
+  loop_control:
+    label: "{{ item.key }}"
+  become: true
+
 - name: Download NodeSource GPG key (ASCII-armored)
   ansible.builtin.get_url:
     url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
