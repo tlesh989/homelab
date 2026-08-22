@@ -23,6 +23,21 @@
     - /etc/apt/sources.list.d/doppler.list
   become: true
 
+- name: Check for legacy npm-installed bd (beads) CLI
+  ansible.builtin.command:
+    cmd: npm list -g --depth=0 @beads/bd
+  become: true
+  register: bd_npm_check
+  changed_when: false
+  failed_when: false
+
+- name: Remove legacy npm-installed bd (beads) CLI (superseded by mise)
+  ansible.builtin.command:
+    cmd: npm uninstall -g @beads/bd
+  become: true
+  when: bd_npm_check.rc == 0
+  changed_when: true
+
 - name: Remove obsolete Node.js and Doppler packages (superseded by mise / no longer needed)
   ansible.builtin.apt:
     name:
@@ -87,21 +102,6 @@
     executable: /bin/bash
   become: true
   become_user: "{{ claude_code_user }}"
-  changed_when: true
-
-- name: Check for legacy npm-installed bd (beads) CLI
-  ansible.builtin.command:
-    cmd: npm list -g --depth=0 @beads/bd
-  become: true
-  register: bd_npm_check
-  changed_when: false
-  failed_when: false
-
-- name: Remove legacy npm-installed bd (beads) CLI (superseded by mise)
-  ansible.builtin.command:
-    cmd: npm uninstall -g @beads/bd
-  become: true
-  when: bd_npm_check.rc == 0
   changed_when: true
 
 - name: Install git
