@@ -1,0 +1,11 @@
+---
+- name: Install Antigravity Remote Control headless daemon # noqa: command-instead-of-module
+  ansible.builtin.shell:
+    cmd: >
+      set -o pipefail && curl -fsSL https://antigravity.google/cli/agy-daemon.sh
+      | bash -s -- install --name "{{ claude_code_antigravity_name }}" --no-prompt
+    creates: /home/{{ claude_code_user }}/.gemini/config/config.json
+    executable: /bin/bash
+  become: true
+  become_user: "{{ claude_code_user }}"
+  changed_when: true

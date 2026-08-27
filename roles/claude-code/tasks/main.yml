@@ -49,3 +49,6 @@
     - { file: .profile, line: 'eval "$(mise activate bash --shims)"' }
   loop_control:
     label: "{{ item.file }}"
+
+- name: Install Antigravity Remote Control daemon
+  ansible.builtin.import_tasks: antigravity.yml
