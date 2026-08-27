@@ -1,3 +1,8 @@
+---
+paths:
+  - "terraform/**"
+---
+
 # Terraform Conventions
 
 ## Commands

@@ -19,6 +19,7 @@ resource "proxmox_virtual_environment_vm" "kaz" {
 
   memory {
     dedicated = 4096
+    floating  = 2048
   }
 
   disk {
