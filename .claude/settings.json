@@ -1,8 +1,4 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/statusline.sh"
-  },
   "deniedMcpServers": [
     {
       "serverName": "claude_ai_Google_Calendar"
