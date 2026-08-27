@@ -1,3 +1,12 @@
+---
+paths:
+  - "roles/**"
+  - "playbooks/**"
+  - "group_vars/**"
+  - "host_vars/**"
+  - "hosts"
+---
+
 # Ansible Conventions
 
 ## Commands

@@ -17,7 +17,7 @@ pveum aclmod / -user terraform-prov@pve -role TerraformProv
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.15.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.16.0 |
 | <a name="requirement_doppler"></a> [doppler](#requirement\_doppler) | 1.21.4 |
 | <a name="requirement_proxmox"></a> [proxmox](#requirement\_proxmox) | 0.111.1 |
 

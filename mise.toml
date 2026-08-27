@@ -1,10 +1,10 @@
 [tools]
-terraform = "1.15.9"
+terraform = "1.16.0"
 task = "3.53.1"
 direnv = "2.37.1"
 gh = "2.98.0"
 bun = "1.4.0"
-uv = "0.12.5"
+uv = "0.12.6"
 "pipx:ansible-core" = "2.21.3"
 "pipx:ansible-lint" = "26.8.0"
 "aqua:dolthub/dolt" = "latest"
