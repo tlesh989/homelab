@@ -1,4 +1,8 @@
 ---
+# First run requires interactive OAuth sign-in (no TTY over Ansible's shell module),
+# so this fails until someone SSHes in and runs the installer manually once:
+#   ssh {{ claude_code_user }}@<host> 'bash <(curl -fsSL https://antigravity.google/cli/agy-daemon.sh) install --name "<name>"'
+# Reruns after that succeed because the `creates` guard is already satisfied.
 - name: Install Antigravity Remote Control headless daemon # noqa: command-instead-of-module
   ansible.builtin.shell:
     cmd: >
@@ -9,3 +13,4 @@
   become: true
   become_user: "{{ claude_code_user }}"
   changed_when: true
+  failed_when: false
