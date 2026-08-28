@@ -36,6 +36,13 @@
   register: mise_install_result
   changed_when: "'installed' in mise_install_result.stdout"
 
+- name: Symlink /usr/bin/node to mise shim (for hardcoded plugin hooks)
+  ansible.builtin.file:
+    src: /home/{{ claude_code_user }}/.local/share/mise/shims/node
+    dest: /usr/bin/node
+    state: link
+  become: true
+
 - name: Activate mise shims in bash sessions
   ansible.builtin.lineinfile:
     path: /home/{{ claude_code_user }}/{{ item.file }}
