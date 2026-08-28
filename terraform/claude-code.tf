@@ -36,8 +36,8 @@ resource "proxmox_virtual_environment_container" "claude_code" {
   }
 
   memory {
-    dedicated = 2048
-    swap      = 0
+    dedicated = 4096
+    swap      = 512
   }
 
   network_interface {
