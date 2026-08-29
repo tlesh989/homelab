@@ -212,6 +212,14 @@
     - role: geerlingguy.ntp
     - role: minecraft
 
+- name: setup minecraft2 server
+  hosts: minecraft2
+  become: true
+  roles:
+    - role: users
+    - role: geerlingguy.ntp
+    - role: minecraft
+
 - name: setup barlo remote site server
   hosts: barlo
   become: true
