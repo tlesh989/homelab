@@ -53,6 +53,9 @@ unifi_dhcp_reservations:
   - name: minecraft
     mac: "bc:24:11:13:00:01"
     ip: "192.168.233.19"
+  - name: minecraft2
+    mac: "bc:24:11:13:00:02"
+    ip: "192.168.233.20"
   - name: tailscale
     mac: "ea:31:e7:19:05:63"
     ip: "192.168.233.21"
@@ -83,6 +86,12 @@ unifi_port_forwards:
     proto: udp
     dst_port: "19132"
     fwd: "192.168.233.19"
+    fwd_port: "19132"
+    enabled: true
+  - name: minecraft2
+    proto: udp
+    dst_port: "19133"
+    fwd: "192.168.233.20"
     fwd_port: "19132"
     enabled: true
 

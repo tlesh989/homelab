@@ -116,6 +116,13 @@ network_inventory:
       managed_by: ansible
       dns: []
       notes: "Minecraft server VM"
+    - name: minecraft2
+      ip: 192.168.233.20
+      mac: "bc:24:11:13:00:02"
+      assignment: reservation
+      managed_by: ansible
+      dns: []
+      notes: "Boot's Paradise Minecraft server VM; external UDP 19133 -> internal 19132"
     - name: tailscale
       ip: 192.168.233.21
       mac: "ea:31:e7:19:05:63"

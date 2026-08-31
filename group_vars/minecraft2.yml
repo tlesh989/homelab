@@ -1,0 +1,6 @@
+---
+minecraft_server_name: "Boot's Paradise"
+minecraft_level_name: "Boot's Paradise"
+minecraft_level_seed: "sulfur caves"
+minecraft_gamemode: creative
+minecraft_operator_xuid: "{{ lookup('env', 'MINECRAFT2_OPERATOR_XUID') | default(None, true) }}"
