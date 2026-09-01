@@ -1,0 +1,73 @@
+---
+- name: Create BookOrbit data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ bookorbit_puid }}"
+    group: "{{ bookorbit_pgid }}"
+  loop:
+    - "{{ bookorbit_data_dir }}/app"
+    - "{{ bookorbit_data_dir }}/postgres"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Create BookOrbit docker network
+  community.docker.docker_network:
+    name: bookorbit_net
+  become: true
+
+- name: Deploy BookOrbit Postgres container
+  community.docker.docker_container:
+    name: bookorbit-db
+    image: "pgvector/pgvector:{{ bookorbit_postgres_version }}"
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: bookorbit_net
+    volumes:
+      - "{{ bookorbit_data_dir }}/postgres:/var/lib/postgresql/data"
+    env:
+      POSTGRES_USER: "{{ bookorbit_postgres_user }}"
+      POSTGRES_PASSWORD: "{{ lookup('env', 'BOOKORBIT_POSTGRES_PASSWORD') }}"
+      POSTGRES_DB: "{{ bookorbit_postgres_db }}"
+      PGDATA: /var/lib/postgresql/data/pgdata
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
+- name: Deploy BookOrbit app container
+  community.docker.docker_container:
+    name: bookorbit-app
+    image: "ghcr.io/bookorbit/bookorbit:{{ bookorbit_app_version }}"
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: bookorbit_net
+    ports:
+      - "{{ bookorbit_port | string }}:3000"
+    volumes:
+      - "{{ bookorbit_books_path }}:/books:ro"
+      - "{{ bookorbit_data_dir }}/app:/data"
+    env:
+      POSTGRES_HOST: bookorbit-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "{{ bookorbit_postgres_user }}"
+      POSTGRES_PASSWORD: "{{ lookup('env', 'BOOKORBIT_POSTGRES_PASSWORD') }}"
+      POSTGRES_DB: "{{ bookorbit_postgres_db }}"
+      JWT_SECRET: "{{ lookup('env', 'BOOKORBIT_JWT_SECRET') }}"
+      SETUP_BOOTSTRAP_TOKEN: "{{ lookup('env', 'BOOKORBIT_SETUP_BOOTSTRAP_TOKEN') }}"
+      APP_URL: "https://{{ bookorbit_host }}"
+      TZ: "{{ bookorbit_timezone }}"
+      PUID: "{{ bookorbit_puid }}"
+      PGID: "{{ bookorbit_pgid }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

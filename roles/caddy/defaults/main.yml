@@ -55,3 +55,5 @@ caddy_services:
     upstream: "192.168.233.10:5984"
   - name: calibre
     upstream: "192.168.233.10:8083"
+  - name: bookorbit
+    upstream: "192.168.233.10:8091"

@@ -1,0 +1,20 @@
+---
+# ponytail: trial deployment alongside calibre-web (homelab-2y1); promote or
+# remove once Kobo sync / conversion needs are validated.
+bookorbit_app_version: "2.8.1"
+bookorbit_postgres_version: "pg18"
+
+bookorbit_port: 8091
+bookorbit_host: "bookorbit.tlesh.xyz"
+bookorbit_data_dir: /opt/bookorbit
+bookorbit_timezone: America/Detroit
+bookorbit_puid: "1000"
+bookorbit_pgid: "1000"
+
+bookorbit_postgres_db: bookorbit
+bookorbit_postgres_user: bookorbit
+
+# Same host path the calibre_web role already mounts from TrueNAS (must run
+# first in main.yml). Bind-mounted read-only into the container below so this
+# trial can't write into or corrupt the existing library.
+bookorbit_books_path: /data/media/books
