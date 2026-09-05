@@ -2,6 +2,10 @@
 # Watchtower image (pinned per docker.md; matches watchtower role default)
 arr_watchtower_version: "1.18.1"
 
+# Tdarr server image (pinned per docker.md; workersToArray TypeError bug is
+# upstream in this release, not caused by this pin — see PR description)
+arr_tdarr_server_version: "2.86.01"
+
 # Storage paths
 arr_downloads_path: /data/downloads
 arr_media_path: /data/media

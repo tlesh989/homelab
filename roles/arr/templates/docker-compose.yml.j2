@@ -159,7 +159,7 @@ services:
     restart: unless-stopped
 
   tdarr-server:
-    image: haveagitgat/tdarr:latest
+    image: haveagitgat/tdarr:{{ arr_tdarr_server_version }}
     container_name: tdarr-server
     security_opt:
       - apparmor=unconfined
