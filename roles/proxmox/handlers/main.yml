@@ -33,7 +33,7 @@
 
 - name: Restart pve-lxc plex
   ansible.builtin.command:
-    cmd: pct restart 103
+    cmd: pct reboot 103
   changed_when: true
 
 - name: Apply CPU governor
@@ -44,3 +44,8 @@
   ansible.builtin.systemd:
     name: nut-monitor
     state: restarted
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true

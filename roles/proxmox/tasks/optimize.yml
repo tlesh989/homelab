@@ -86,7 +86,7 @@
     regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
-      intel_pstate=disable nofb nomodeset video=efifb:off
+      intel_pstate=disable
       systemd.unified_cgroup_hierarchy=1"
     state: present
   notify: Update grub
@@ -102,7 +102,7 @@
     regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
-      kvm.ignore_msrs=1 kvm.report_ignored_msrs=0 nofb nomodeset video=efifb:off
+      kvm.ignore_msrs=1 kvm.report_ignored_msrs=0
       systemd.unified_cgroup_hierarchy=1"
     state: present
   notify: Update grub
@@ -120,50 +120,16 @@
     state: present
   notify: Update grub
 
-- name: Get PCI devices information
-  ansible.builtin.command: lspci -nn
-  register: proxmox_lspci_output
-  changed_when: false
-  check_mode: false
-
-- name: Extract GPU and Audio device IDs
-  ansible.builtin.set_fact:
-    proxmox_gpu_devices_raw: "{{ proxmox_lspci_output.stdout | regex_findall('(\\[\\w+:\\w+\\])') | map('regex_replace', '[\\[\\]]', '') | list }}"
-    proxmox_gpu_vga_id: "{{ proxmox_lspci_output.stdout | regex_search('VGA.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
-    proxmox_gpu_audio_id: "{{ proxmox_lspci_output.stdout | regex_search('Audio.*\\[(\\w+):(\\w+)\\]', '\\1', '\\2') | join(':') }}"
-  when: proxmox_lspci_output.stdout is search('VGA')
-
-- name: Set combined VFIO IDs
-  ansible.builtin.set_fact:
-    proxmox_vfio_ids: "{{ [proxmox_gpu_vga_id, proxmox_gpu_audio_id] | select('defined') | select('ne', '') | join(',') }}"
-  when: proxmox_gpu_vga_id is defined and proxmox_gpu_vga_id != ""
-
-- name: Blacklist host GPU drivers
-  when: proxmox_vfio_ids is defined and proxmox_vfio_ids != ""
-  ansible.builtin.copy:
-    dest: /etc/modprobe.d/blacklist.conf
-    content: |
-      blacklist nouveau
-      blacklist nvidia
-      blacklist nvidiafb
-      blacklist amdgpu
-      blacklist radeon
-    mode: "0644"
-  notify: Update initramfs
-
-- name: Configure modprobe for GPU passthrough
-  when: proxmox_vfio_ids is defined and proxmox_vfio_ids != ""
-  ansible.builtin.copy:
-    dest: /etc/modprobe.d/vfio.conf
-    content: |
-      options vfio-pci ids={{ proxmox_vfio_ids }} disable_vga=1
-      softdep nvidia pre: vfio-pci
-      softdep nouveau pre: vfio-pci
-      softdep radeon pre: vfio-pci
-      softdep amdgpu pre: vfio-pci
-      options kvm ignore_msrs=1
-      options kvm report_ignored_msrs=0
-    mode: "0644"
+# No VM uses hostpci passthrough; the host iGPUs feed LXCs via /dev/dri (plex,
+# tdarr-node on sturm; i915 SR-IOV on tika/bupu). The old VFIO block blacklisted
+# amdgpu and set nomodeset, which removed /dev/dri on the first reboot.
+- name: Remove legacy GPU passthrough modprobe config
+  ansible.builtin.file:
+    path: "/etc/modprobe.d/{{ item }}"
+    state: absent
+  loop:
+    - blacklist.conf
+    - vfio.conf
   notify: Update initramfs
 
 # Power saving: nodes idle most of the time. powersave is HWP-managed (good)
