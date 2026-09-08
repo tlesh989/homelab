@@ -131,6 +131,7 @@
     - role: freshrss
     - role: wallos
     - role: calibre_web
+    - role: bookorbit
     - role: couchdb
     - role: cloudflare_ddns
     - role: dozzle_hub
