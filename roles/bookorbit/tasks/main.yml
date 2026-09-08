@@ -22,11 +22,29 @@
     name: bookorbit_net
   become: true
 
+- name: Assert required BookOrbit secrets are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'BOOKORBIT_POSTGRES_PASSWORD') | length > 0
+      - lookup('env', 'BOOKORBIT_JWT_SECRET') | length > 0
+      - lookup('env', 'BOOKORBIT_SETUP_BOOTSTRAP_TOKEN') | length > 0
+    fail_msg: "BOOKORBIT_POSTGRES_PASSWORD, BOOKORBIT_JWT_SECRET, and BOOKORBIT_SETUP_BOOTSTRAP_TOKEN must all be set via Doppler."
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
 - name: Deploy BookOrbit Postgres container
   community.docker.docker_container:
     name: bookorbit-db
     image: "pgvector/pgvector:{{ bookorbit_postgres_version }}"
-    state: started
+    state: healthy
+    healthy_wait_timeout: 60
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ bookorbit_postgres_user }} -d {{ bookorbit_postgres_db }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     restart_policy: unless-stopped
     networks:
       - name: bookorbit_net
@@ -38,6 +56,7 @@
       POSTGRES_DB: "{{ bookorbit_postgres_db }}"
       PGDATA: /var/lib/postgresql/data/pgdata
   become: true
+  no_log: true
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
@@ -68,6 +87,7 @@
       PUID: "{{ bookorbit_puid }}"
       PGID: "{{ bookorbit_pgid }}"
   become: true
+  no_log: true
   when:
     - not ansible_check_mode
     - not (molecule_testing | default(false))
