@@ -26,3 +26,24 @@
   changed_when: true
   run_once: true
   become: true
+
+# NUT shuts every node down at once. The default shutdown_policy 'conditional'
+# migrates HA services off a node on poweroff; with all nodes going down the
+# migrations fail and services are parked in 'error' across reboots (2026-09-08
+# outage). 'freeze' stops them and resumes on the same node after boot.
+- name: Check HA shutdown policy
+  ansible.builtin.command:
+    cmd: pvesh get /cluster/options --output-format json
+  register: _proxmox_cluster_options
+  changed_when: false
+  check_mode: false
+  run_once: true
+  become: true
+
+- name: Set HA shutdown policy to freeze
+  ansible.builtin.command:
+    cmd: pvesh set /cluster/options --ha shutdown_policy=freeze
+  when: ((_proxmox_cluster_options.stdout | from_json).ha | default({}, true)).shutdown_policy | default('') != 'freeze'
+  changed_when: true
+  run_once: true
+  become: true

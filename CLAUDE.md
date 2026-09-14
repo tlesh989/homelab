@@ -17,6 +17,7 @@ Specialized rules:
 - **[Code Quality](.claude/rules/code-quality.md)**: Think first, surgical changes, goal-driven execution.
 - **[Ansible](.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
 - **[Terraform](.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
+- **[Shell](.claude/rules/shell.md)**: Bash strict mode, timeouts, exit-code gating.
 - **[Gitflow](.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
 - **[Tooling](.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
 - **[RTK](.claude/rules/rtk.md)**: Token-optimized command instructions.
