@@ -39,6 +39,7 @@
 	"autoApprovers": {
 		"routes": {
 			"192.168.233.0/24": ["group:owner"],
+			"192.168.101.0/24": ["group:owner"],
 		},
 		"exitNode": ["group:owner"],
 	},
