@@ -128,6 +128,7 @@
     - role: watchtower
     - role: glance
     - role: n8n
+    - role: rustdesk
     - role: freshrss
     - role: wallos
     - role: calibre_web
