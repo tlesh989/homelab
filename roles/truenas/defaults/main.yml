@@ -26,6 +26,14 @@ truenas_lvm_vg_name: "pve-iscsi"
 # TLS verification — set to false for self-signed certs
 truenas_validate_certs: false
 
+# Beszel agent — deployed as a custom TrueNAS SCALE app (see beszel_agent.yml)
+# Mirrors roles/beszel/defaults/main.yml (the truenas role's play doesn't load
+# that role's defaults, since it never runs the beszel role directly)
+truenas_beszel_app_name: "beszel-agent"
+truenas_beszel_hub_hostname: "kaz.tlesh.xyz"
+truenas_beszel_hub_port: 8090
+truenas_beszel_agent_port: 45876
+
 # iSCSI CHAP authentication (homelab-1it).
 # DANGER: enabling CHAP on a target that backs live Proxmox VM disks (pve-iscsi
 # LVM) will break those disks unless the Proxmox initiators are configured with
@@ -35,3 +43,11 @@ truenas_iscsi_chap_enabled: false
 truenas_iscsi_chap_tag: 1
 truenas_iscsi_chap_user: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_USER') | default('', true) }}"
 truenas_iscsi_chap_secret: "{{ lookup('env', 'TRUENAS_ISCSI_CHAP_SECRET') | default('', true) }}"
+
+# NUT/UPS monitor credentials (homelab-hms). Shared with the Proxmox NUT
+# slaves (roles/proxmox/defaults/main.yml) — same Doppler secret.
+truenas_ups_monuser: "upsmon"
+truenas_ups_monpwd: "{{ lookup('env', 'NUT_MONPWD') }}"
+# Set to true (via -e) when rotating NUT_MONPWD to force TrueNAS to pick up
+# the new password — ups.config masks monpwd so it can't be diffed normally.
+truenas_ups_force_update: false

@@ -1,3 +1,8 @@
+---
+paths:
+  - "terraform/**"
+---
+
 # Terraform Conventions
 
 ## Commands
@@ -25,7 +30,7 @@ task ci     # CI check (no Doppler)
 - **State**: Managed in Terraform Cloud (`tlesh-net` org).
 - **Secrets**: Source all secrets from **Doppler**. Never use `.tfvars` or hardcode values.
 - **Documentation**: All variables and outputs MUST have `description` fields.
-- **Versions**: Use Terraform `>= 1.10`, Google Provider `~> 7.x`. Pin all provider versions in `versions.tf`.
+- **Versions**: Terraform CLI version is pinned in `mise.toml` (source of truth) and mirrored in `versions.tf`'s `required_version` (`~> <minor>.0`, e.g. `~> 1.16.0`) — Renovate does not auto-bump `required_version`, so bump it manually to match `mise.toml` whenever `mise.toml`'s pin crosses a minor version. Pin all provider versions in `versions.tf`.
 
 ## Verification (Definition of Done)
 

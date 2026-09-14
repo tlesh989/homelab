@@ -105,14 +105,14 @@ reviews:
         - Host groups must follow the established naming pattern (snake_case, matching the hostname prefix).
         - Each host entry must have `ansible_host=<ip>` to avoid DNS dependency during provisioning.
 
-    - path: "[a-z]*.yml"
+    - path: "{[a-z]*.yml,playbooks/*.yml}"
       instructions: |
         Playbook review:
         - Ensure `hosts:` targets are explicit (avoid bare `all` without justification).
         - Verify `become: true` is set at the play or task level as appropriate.
         - Confirm role references exist in `roles/` or `galaxy_roles/`.
 
-    - path: "bootstrap.yml"
+    - path: "playbooks/bootstrap.yml"
       instructions: |
         Bootstrap playbook — extra scrutiny:
         - Must be idempotent on re-runs against already-bootstrapped hosts.

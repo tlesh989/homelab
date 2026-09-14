@@ -138,6 +138,8 @@ services:
     volumes:
       - "{{ arr_config_path }}/beets:/config"
       - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_beets_port }}:{{ arr_beets_port }}"
     restart: unless-stopped
 
   filebot:
@@ -154,6 +156,30 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     entrypoint: ["sleep"]
     command: ["infinity"]
+    restart: unless-stopped
+
+  tdarr-server:
+    image: haveagitgat/tdarr:{{ arr_tdarr_server_version }}
+    container_name: tdarr-server
+    security_opt:
+      - apparmor=unconfined
+    environment:
+      PUID: "{{ arr_puid }}"
+      PGID: "{{ arr_pgid }}"
+      TZ: "{{ arr_timezone }}"
+      UMASK_SET: "002"
+      serverIP: "0.0.0.0"
+      serverPort: "{{ arr_tdarr_server_port }}"
+      webUIPort: "{{ arr_tdarr_webui_port }}"
+      internalNode: "false"
+    volumes:
+      - "{{ arr_config_path }}/tdarr/server:/app/server"
+      - "{{ arr_config_path }}/tdarr/configs:/app/configs"
+      - "{{ arr_config_path }}/tdarr/logs:/app/logs"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
+    ports:
+      - "{{ arr_tdarr_webui_port }}:{{ arr_tdarr_webui_port }}"
+      - "{{ arr_tdarr_server_port }}:{{ arr_tdarr_server_port }}"
     restart: unless-stopped
 
   seerr:

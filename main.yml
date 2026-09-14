@@ -1,6 +1,6 @@
 ---
 - name: bootstrap all hosts
-  import_playbook: bootstrap.yml
+  import_playbook: playbooks/bootstrap.yml
 
 - name: Reset connections after bootstrap
   hosts: all:!truenas:!unifi
@@ -54,8 +54,6 @@
     - role: ax88179b
       when: ax88179b_enabled | default(false)
       tags: [ax88179b]
-    - role: r8152
-      tags: [r8152]
     - role: ansible_user
 
 - name: configure truenas
@@ -132,12 +130,16 @@
     - role: n8n
     - role: rustdesk
     - role: freshrss
+    - role: wallos
+    - role: calibre_web
+    - role: bookorbit
+    - role: couchdb
     - role: cloudflare_ddns
     - role: dozzle_hub
       tags: [dozzle]
 
 - name: Deploy Beszel monitoring
-  import_playbook: beszel.yml
+  import_playbook: playbooks/beszel.yml
 
 - name: setup plex server
   hosts: plex
@@ -151,7 +153,17 @@
   hosts: arr
   become: true
   roles:
+    - role: geerlingguy.docker
     - role: arr
+
+- name: setup tdarr transcode node
+  hosts: tdarr_node
+  become: true
+  roles:
+    - role: users
+    - role: geerlingguy.ntp
+    - role: geerlingguy.docker
+    - role: tdarr_node
 
 - name: deploy dozzle agents
   hosts: dozzle_agents
@@ -159,6 +171,16 @@
   tags: [dozzle]
   roles:
     - role: dozzle_agent
+
+# Runs before pi-hole: acme's deploy hook (pi-hole) authorizes an SSH key
+# against caddy's acme-deploy user, which this play creates.
+- name: setup caddy reverse proxy
+  hosts: caddy
+  become: true
+  roles:
+    - role: geerlingguy.ntp
+    - role: users
+    - role: caddy
 
 - name: setup pi-hole server
   hosts: pi-hole
@@ -168,14 +190,6 @@
     - role: users
     - role: pi-hole
     - role: acme
-
-- name: setup caddy reverse proxy
-  hosts: caddy
-  become: true
-  roles:
-    - role: geerlingguy.ntp
-    - role: users
-    - role: caddy
 
 - name: setup uptime-kuma server
   hosts: uptime-kuma
@@ -194,6 +208,14 @@
 
 - name: setup minecraft server
   hosts: minecraft
+  become: true
+  roles:
+    - role: users
+    - role: geerlingguy.ntp
+    - role: minecraft
+
+- name: setup minecraft2 server
+  hosts: minecraft2
   become: true
   roles:
     - role: users

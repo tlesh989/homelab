@@ -18,5 +18,5 @@
     weekday: "{{ install_script_cron_weekday }}"
     user: "{{ install_script_cron_user }}"
     job: "{{ install_script_cron_job }}"
-    state: "{{ install_script_cron_state }}"
+    state: present
   when: install_script_cron_enabled

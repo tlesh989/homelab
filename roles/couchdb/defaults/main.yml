@@ -1,0 +1,8 @@
+---
+couchdb_version: "3"
+couchdb_port: 5984
+couchdb_data_dir: /opt/couchdb
+# Bind to kaz's LAN address only — matches the Caddy upstream in
+# roles/caddy/defaults/main.yml, so the unauthenticated-by-default transport
+# boundary isn't reachable on every interface.
+couchdb_bind_address: "192.168.233.10"

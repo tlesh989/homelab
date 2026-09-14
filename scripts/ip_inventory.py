@@ -145,10 +145,6 @@ def next_free_ip(lo, hi, used):
     return None
 
 
-def is_ip_free(ip, used):
-    return ip not in set(used)
-
-
 class UnifiError(Exception):
     pass
 
@@ -289,7 +285,7 @@ def cmd_next(args):
         except ipaddress.AddressValueError:
             print(f"{args.ip}: not a valid IPv4 address", file=sys.stderr)
             return 2
-        print(f"{args.ip}: {'FREE' if is_ip_free(args.ip, used) else 'IN USE'}")
+        print(f"{args.ip}: {'FREE' if args.ip not in used else 'IN USE'}")
         return 0
     nxt = next_free_ip(lo, hi, used)
     print(nxt or "No free IP in static range")

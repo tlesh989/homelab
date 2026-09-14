@@ -1,0 +1,4 @@
+---
+syncthing_version: "1"
+syncthing_data_dir: /opt/syncthing
+syncthing_gui_port: 8384

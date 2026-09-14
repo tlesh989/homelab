@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,subprocess; params=json.load(sys.stdin); cmd=params.get('tool_input',{}).get('command','') or params.get('tool_input',{}).get('CommandLine',''); is_git=cmd.lstrip().startswith('git '); sys.exit(0) if not is_git else None; print('BLOCKED: --no-verify bypasses pre-commit hooks and is never allowed. Fix the hook failures instead.') if '--no-verify' in cmd else None; sys.exit(2) if '--no-verify' in cmd else None; sys.exit(0) if 'git commit' not in cmd else None; r=subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True); branch=r.stdout.strip(); print(f'BLOCKED: direct commits to {branch} are not allowed. Use a feature/* branch.') if branch in ('dev','main') else None; sys.exit(2) if branch in ('dev','main') else sys.exit(0)\"",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|replace_file_content|write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path','') or params.get('tool_input',{}).get('TargetFile',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(1) if any(b in path for b in blocked) else sys.exit(0)\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "(Edit|Write|replace_file_content|write_to_file).*\\.ya?ml",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"${CLAUDE_TOOL_INPUT_FILE_PATH:-$TARGET_FILE}\"; case \"$file\" in */roles/*|*/group_vars/*|*/host_vars/*|*/playbooks/*|*/tasks/*|*/handlers/*|*/defaults/*) ansible-lint \"$file\" 2>&1 | head -30 ;; esac"
+          }
+        ]
+      },
+      {
+        "matcher": "(Edit|Write|replace_file_content|write_to_file).*\\.tf",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terraform fmt -check -diff \"${CLAUDE_TOOL_INPUT_FILE_PATH:-$TARGET_FILE}\" 2>&1 | head -20"
+          }
+        ]
+      }
+    ]
+  }
+}

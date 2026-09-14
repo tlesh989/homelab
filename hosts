@@ -22,6 +22,9 @@ pi-hole.tlesh.xyz ansible_host=192.168.233.3
 [arr]
 arr.tlesh.xyz ansible_host=192.168.233.24
 
+[tdarr_node]
+tdarr-node.tlesh.xyz ansible_host=192.168.233.18
+
 [uptime-kuma]
 uptime-kuma.tlesh.xyz ansible_host=192.168.233.16
 
@@ -37,11 +40,15 @@ caddy.tlesh.xyz ansible_host=192.168.233.17
 [minecraft]
 minecraft.tlesh.xyz ansible_host=192.168.233.19
 
+[minecraft2]
+minecraft2.tlesh.xyz ansible_host=192.168.233.20
+
 [claude_code]
 claude-code.tlesh.xyz ansible_host=192.168.233.22
 
 [barlo]
-barlo.tlesh.xyz ansible_host=192.168.233.126
+# Remote site — only reachable over Tailscale, not the LAN
+barlo.tlesh.xyz ansible_host=100.104.158.42
 
 [proxmox:children]
 tika
@@ -57,6 +64,8 @@ uptime-kuma
 caddy
 claude_code
 minecraft
+minecraft2
+tdarr_node
 
 [beszel_hub]
 kaz.tlesh.xyz
@@ -71,7 +80,13 @@ uptime-kuma
 caddy
 claude_code
 minecraft
+minecraft2
+tdarr_node
 barlo
+# truenas deliberately excluded: ansalon uses ansible_connection=local, so the
+# binary/systemd agent.yml task would run on the Ansible controller itself.
+# Its Beszel agent is deployed as a TrueNAS SCALE custom app via the truenas
+# role instead (roles/truenas/tasks/beszel_agent.yml).
 
 # Docker hosts running a Dozzle agent for the hub on kaz to connect to.
 # kaz itself is read locally via the hub's mounted docker.sock (no agent).
@@ -79,3 +94,4 @@ barlo
 [dozzle_agents:children]
 arr
 uptime-kuma
+tdarr_node

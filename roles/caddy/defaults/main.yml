@@ -4,8 +4,17 @@ caddy_data_dir: /var/lib/caddy
 caddy_log_dir: /var/log/caddy
 caddy_acme_email: "thomas.lesh@gmail.com"
 caddy_domain: "tlesh.xyz"
-caddy_cf_api_token: "{{ lookup('env', 'CF_DNS_API_TOKEN') }}"
 caddy_download_url: "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fcaddy-dns%2Fcloudflare"
+
+# Cert is pushed here by acme.sh's deploy hook on pi-hole (roles/acme) — see
+# homelab-dt8 for why Caddy doesn't self-manage ACME via caddy-dns/cloudflare
+# (open upstream bug misdetects the zone for *.tlesh.xyz).
+caddy_tls_dir: "{{ caddy_install_dir }}/tls"
+# Restricted account that receives the cert push over SSH. Deliberately not
+# the shared `ansible` service account: ansible_user's authorized_key task
+# uses exclusive:true, which would silently strip this key on any future
+# `task caddy` run that re-applies the base LXC play.
+caddy_deploy_user: acme-deploy
 
 caddy_services:
   - name: pihole
@@ -24,3 +33,27 @@ caddy_services:
     upstream: "192.168.233.24:5055"
   - name: dozzle
     upstream: "192.168.233.10:8025"
+  - name: beszel
+    upstream: "192.168.233.10:8090"
+  - name: sonarr
+    upstream: "192.168.233.24:8989"
+  - name: radarr
+    upstream: "192.168.233.24:7878"
+  - name: prowlarr
+    upstream: "192.168.233.24:9696"
+  - name: bazarr
+    upstream: "192.168.233.24:6767"
+  - name: lidarr
+    upstream: "192.168.233.24:8686"
+  - name: beets
+    upstream: "192.168.233.24:8337"
+  - name: wallos
+    upstream: "192.168.233.10:8282"
+  - name: syncthing
+    upstream: "192.168.233.10:8384"
+  - name: couchdb
+    upstream: "192.168.233.10:5984"
+  - name: calibre
+    upstream: "192.168.233.10:8083"
+  - name: bookorbit
+    upstream: "192.168.233.10:8091"

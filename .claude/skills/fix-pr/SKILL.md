@@ -75,7 +75,7 @@ If unsure: apply it — reviewer feedback is usually worth taking.
 Apply fixes file by file. After editing each file:
 
 - For `.tf` files: `cd terraform && terraform validate && terraform fmt -recursive`
-- For `roles/`, `group_vars/`, `main.yml`, `bootstrap.yml`: `ansible-lint <file>`
+- For `roles/`, `group_vars/`, `main.yml`, `playbooks/`: `ansible-lint <file>`
 
 Fix all lint/validate errors before moving to the next comment.
 

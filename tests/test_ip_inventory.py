@@ -20,7 +20,6 @@ from ip_inventory import (
     has_blocking,
     inventory_ips,
     ips_in_range,
-    is_ip_free,
     load_inventory,
     next_free_ip,
     parse_caddy_services,
@@ -172,11 +171,6 @@ def test_next_free_ip_skips_used():
 def test_next_free_ip_none_when_full():
     used = set(ips_in_range("192.168.233.1", "192.168.233.2"))
     assert next_free_ip("192.168.233.1", "192.168.233.2", used) is None
-
-
-def test_is_ip_free():
-    assert is_ip_free("192.168.233.9", {"192.168.233.7"}) is True
-    assert is_ip_free("192.168.233.7", {"192.168.233.7"}) is False
 
 
 RINV = {

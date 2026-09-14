@@ -1,0 +1,57 @@
+---
+- name: Create Syncthing data directory
+  ansible.builtin.file:
+    path: "{{ syncthing_data_dir }}"
+    state: directory
+    owner: "1000"
+    group: "1000"
+    mode: "0700"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+# `syncthing serve` (the container's default subcommand) has no --gui-user/
+# --gui-password flags — those only exist on `syncthing generate`. Bake the
+# GUI credentials into config.xml once, ahead of time, via stdin so they never
+# appear in `docker inspect`/process listings.
+- name: Generate Syncthing config with GUI credentials
+  ansible.builtin.command:
+    cmd: >
+      docker run --rm
+      -v {{ syncthing_data_dir }}:/var/syncthing
+      -e PUID=1000 -e PGID=1000
+      syncthing/syncthing:{{ syncthing_version }}
+      generate --gui-user={{ lookup('env', 'SYNCTHING_GUI_USER') }} --gui-password=-
+    stdin: "{{ lookup('env', 'SYNCTHING_GUI_PASSWORD') }}"
+  args:
+    creates: "{{ syncthing_data_dir }}/config.xml"
+  become: true
+  no_log: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
+# Host networking per Syncthing's own Docker guidance — bridge mode hides LAN
+# interfaces from the container, breaking local discovery/advertisement.
+- name: Deploy Syncthing container
+  community.docker.docker_container:
+    name: syncthing
+    image: "syncthing/syncthing:{{ syncthing_version }}"
+    state: started
+    restart_policy: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ syncthing_data_dir }}:/var/syncthing"
+    env:
+      PUID: "1000"
+      PGID: "1000"
+    command:
+      - "--gui-address=0.0.0.0:{{ syncthing_gui_port }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

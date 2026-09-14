@@ -13,5 +13,4 @@ install_script_cron_month: "*"
 install_script_cron_weekday: "*"
 install_script_cron_user: root
 install_script_cron_job: "/root/install_script.sh > /tmp/test.txt"
-install_script_cron_state: present
 install_script_cron_enabled: false

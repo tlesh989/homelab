@@ -1,5 +1,5 @@
 resource "proxmox_virtual_environment_container" "caddy" {
-  node_name    = "tika"
+  node_name    = "sturm"
   vm_id        = 117
   unprivileged = true
 

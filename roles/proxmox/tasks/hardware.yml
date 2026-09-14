@@ -84,7 +84,7 @@
       ansible.builtin.shell: |
         set -o pipefail
         VER=$(grep '^PACKAGE_VERSION=' /usr/src/i915-sriov-dkms/dkms.conf | cut -d= -f2 | tr -d '"')
-        dkms add -m i915-sriov-dkms -v "$VER" || true
+        dkms add . || true
         dkms install -m i915-sriov-dkms -v "$VER"
       args:
         executable: /bin/bash

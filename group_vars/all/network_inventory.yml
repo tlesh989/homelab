@@ -88,6 +88,13 @@ network_inventory:
       managed_by: manual
       dns: []
       notes: "Brother printer"
+    - name: tdarr-node
+      ip: 192.168.233.18
+      mac: "bc:24:11:18:00:01"
+      assignment: static
+      managed_by: terraform
+      dns: [tdarr-node.tlesh.xyz]
+      notes: "Tdarr transcode node, GPU/VAAPI (on sturm, vm_id 118)"
     - name: uptime-kuma
       ip: 192.168.233.16
       mac:
@@ -109,6 +116,13 @@ network_inventory:
       managed_by: ansible
       dns: []
       notes: "Minecraft server VM"
+    - name: minecraft2
+      ip: 192.168.233.20
+      mac: "bc:24:11:13:00:02"
+      assignment: reservation
+      managed_by: ansible
+      dns: []
+      notes: "Boot's Paradise Minecraft server VM; external UDP 19133 -> internal 19132"
     - name: tailscale
       ip: 192.168.233.21
       mac: "ea:31:e7:19:05:63"

@@ -1,0 +1,38 @@
+---
+- name: Create Wallos database directory
+  ansible.builtin.file:
+    path: "{{ wallos_data_dir }}/db"
+    state: directory
+    mode: "0700"
+  become: true
+
+- name: Create Wallos logos directory
+  ansible.builtin.file:
+    path: "{{ wallos_data_dir }}/logos"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Deploy Wallos container
+  community.docker.docker_container:
+    name: wallos
+    image: "bellamy/wallos:{{ wallos_version }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ wallos_port | string }}:80"
+    volumes:
+      - "{{ wallos_data_dir }}/db:/var/www/html/db"
+      - "{{ wallos_data_dir }}/logos:/var/www/html/images/uploads/logos"
+    env:
+      TZ: "{{ wallos_timezone }}"
+  become: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

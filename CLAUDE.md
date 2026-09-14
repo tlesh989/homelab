@@ -17,6 +17,7 @@ Specialized rules:
 - **[Code Quality](.claude/rules/code-quality.md)**: Think first, surgical changes, goal-driven execution.
 - **[Ansible](.claude/rules/ansible.md)**: Role patterns, chown rules, linting.
 - **[Terraform](.claude/rules/terraform.md)**: Resource naming, providers, Task commands.
+- **[Shell](.claude/rules/shell.md)**: Bash strict mode, timeouts, exit-code gating.
 - **[Gitflow](.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
 - **[Tooling](.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
 - **[RTK](.claude/rules/rtk.md)**: Token-optimized command instructions.
@@ -26,15 +27,22 @@ Specialized rules:
 ## Primary Commands
 
 ```bash
+mise install                # Install pinned tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint)
 task check                  # Dry-run verify all hosts
 task syntax && task lint    # Fast linting/syntax checks
 task ping                   # Verify host connectivity
 doppler run -- ...          # Run any command with secrets
 ```
 
+Tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint) are pinned
+in `mise.toml` and shared across dev machines and the claude-code LXC — run `mise install`
+after cloning. `task` remains the task runner (Taskfile.yml); mise only manages tool versions.
+Ansible itself is installed via mise's `pipx:` backend (needs `uv`, also mise-managed) —
+there is no separate apt/pip install step for ansible.
+
 ## Definition of Done
 
 1. **Verify**: Run `task syntax`, `task lint`, and `task test` (TF).
-2. **Review**: Always run `coderabbit review --plain --base main` before creating a PR.
+2. **Review**: CodeRabbit reviews the PR automatically on GitHub — no local run. Address its comments with `/fix-pr`.
 3. **Commit**: Use `feat:`, `fix:`, or `chore:` prefixes.
 4. **Push**: Work is NOT complete until `git push` succeeds (see `AGENTS.md`).

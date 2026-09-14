@@ -1,0 +1,22 @@
+---
+# VAAPI drivers for host-side verification (vainfo), plus the host render
+# group's GID so the container's PUID/PGID user can actually open /dev/dri —
+# device passthrough alone doesn't grant permission on the device node.
+
+- name: Install VAAPI drivers
+  ansible.builtin.apt:
+    name:
+      - vainfo
+      - mesa-va-drivers
+    state: present
+  become: true
+
+- name: Look up host render group GID for Docker device passthrough
+  ansible.builtin.getent:
+    database: group
+    key: render
+  become: true
+
+- name: Set render group GID fact for compose template
+  ansible.builtin.set_fact:
+    tdarr_node_render_gid: "{{ getent_group.render[1] }}"

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Managed by Ansible (calibre_web role) — do not edit directly.
+set -euo pipefail
+
+LOG=/var/log/calibre-web-backup-retention.log
+
+if ! mountpoint -q {{ calibre_web_media_path }}; then
+  echo "$(date -Is): {{ calibre_web_media_path }} not mounted, skipping backup retention cleanup" >> "$LOG"
+  exit 1
+fi
+
+# -mtime +N is whole-day granularity (files can live up to ~1 extra day past
+# calibre_web_backup_retention_days) — acceptable grace period for a
+# convenience cleanup of backup copies, not a strict retention guarantee.
+find {{ calibre_web_processed_books_path }}/imported \
+  {{ calibre_web_processed_books_path }}/fixed_originals \
+  {{ calibre_web_processed_books_path }}/converted \
+  -type f -mtime +{{ calibre_web_backup_retention_days }} -delete >> "$LOG" 2>&1

@@ -1,0 +1,16 @@
+---
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ tdarr_node_config_path }}/compose/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart tdarr-node
+
+- name: Start tdarr-node Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ tdarr_node_config_path }}/compose"
+    state: present
+    pull: missing
+  when: not ansible_check_mode

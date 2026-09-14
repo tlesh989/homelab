@@ -34,3 +34,31 @@ proxmox_backup_storage: proxmox-nfs
 proxmox_backup_schedule: "02:00"
 proxmox_backup_mode: snapshot
 proxmox_backup_prune: keep-daily=7,keep-weekly=4,keep-monthly=3
+
+# NUT client — monitors the TrueNAS UPS server (homelab-hms) and shuts this
+# node down when it reports low battery. Credentials shared with
+# roles/truenas/defaults/main.yml (same Doppler secret).
+proxmox_nut_server_host: "192.168.233.6"
+proxmox_nut_monuser: "upsmon"
+proxmox_nut_monpwd: "{{ lookup('env', 'NUT_MONPWD') }}"
+
+# vzdump writes its working files here during a backup. Default is local disk
+# (not the NFS-backed proxmox-nfs storage) to avoid extra load on the failing
+# NFS drive and the "temporary directory ... on NFS" vzdump warning.
+proxmox_backup_tmpdir: /var/tmp/vzdump
+
+# Host uid that unprivileged LXC root (uid 0 in-container) maps to, per the
+# default lxc-usernsexec subuid range (u:0:100000:65536). Suspend-mode backups
+# tar the tmpdir as this uid, so it needs an ACL entry on proxmox_backup_tmpdir.
+proxmox_backup_unpriv_uid: 100000
+
+# Container spool/cache paths that are unreadable by the host during backup
+# (permission denied on unprivileged LXC spool/lock files) and safe to skip
+# since they're regenerated at runtime. See vzdump.conf(5) exclude-path.
+proxmox_backup_exclude_path:
+  - /var/spool/postfix/*
+  - /var/spool/rsyslog
+  - /var/cache/apt/archives/partial
+  - /var/lib/apt/lists/partial
+  - /var/lib/ubuntu-advantage/apt-esm/var/lib/apt/lists/partial
+  - /var/lib/postfix/master.lock

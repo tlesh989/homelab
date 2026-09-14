@@ -1,0 +1,6 @@
+---
+- name: setup syncthing on kaz
+  hosts: kaz
+  become: true
+  roles:
+    - role: syncthing

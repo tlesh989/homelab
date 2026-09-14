@@ -1,0 +1,14 @@
+#!/bin/bash
+# Managed by Ansible (calibre_web role) — do not edit directly.
+set -euo pipefail
+
+LOG=/var/log/calibre-web-ownership-fix.log
+
+if ! mountpoint -q {{ calibre_web_media_path }}; then
+  echo "$(date -Is): {{ calibre_web_media_path }} not mounted, skipping ownership fix" >> "$LOG"
+  exit 1
+fi
+
+find {{ calibre_web_books_path }} {{ calibre_web_processed_books_path }} \
+  \( ! -user {{ calibre_web_puid }} -o ! -group {{ calibre_web_pgid }} \) ! -type l \
+  -exec chown {{ calibre_web_puid }}:{{ calibre_web_pgid }} {} + >> "$LOG" 2>&1

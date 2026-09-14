@@ -32,6 +32,9 @@
 - name: Configure NFS mounts
   ansible.builtin.include_tasks: nfs-mounts.yml
 
+- name: Configure NUT client (UPS monitoring)
+  ansible.builtin.include_tasks: nut-client.yml
+
 - name: Configure LXC device passthrough
   ansible.builtin.include_tasks: lxc-devices.yml
 

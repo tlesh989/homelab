@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.15.0"
+  required_version = "~> 1.16.0"
   cloud {
     organization = "tlesh-net"
 
@@ -11,12 +11,12 @@ terraform {
   required_providers {
     doppler = {
       source  = "DopplerHQ/doppler"
-      version = "1.21.4"
+      version = "1.21.5"
     }
 
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.111.0"
+      version = "0.113.1"
     }
   }
 }

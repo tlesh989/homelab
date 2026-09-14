@@ -68,6 +68,29 @@
   changed_when: true
   no_log: true
 
+- name: Update NFS share hosts if changed
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: sharing.nfs.update
+    params:
+      - "{{ (_truenas_nfs_shares.result | selectattr('path', 'equalto', '/mnt/' ~ item.dataset) | list | first).id }}"
+      - hosts: "{{ item.hosts }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  loop: "{{ truenas_nfs_shares }}"
+  loop_control:
+    label: "{{ item.dataset }}"
+  when: >-
+    (_truenas_nfs_shares.result
+    | selectattr('path', 'equalto', '/mnt/' ~ item.dataset)
+    | list | length == 1)
+    and
+    ((_truenas_nfs_shares.result
+    | selectattr('path', 'equalto', '/mnt/' ~ item.dataset)
+    | list | first).hosts | sort != item.hosts | sort)
+  changed_when: true
+  no_log: true
+
 - name: Get NFS service state
   truenas_api:
     host: "{{ truenas_host }}"

@@ -36,6 +36,7 @@ Use this document to recreate all monitors if the Uptime Kuma data volume is los
 | Pi-hole | http://pi-hole.tlesh.xyz/admin | |
 | Glance | http://glance.tlesh.xyz:8080 | |
 | Netdata | http://netdata.tlesh.xyz:19999 | |
+| Wallos | http://wallos.tlesh.xyz | |
 
 ## Infrastructure
 

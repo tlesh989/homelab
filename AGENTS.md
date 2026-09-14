@@ -21,19 +21,15 @@ task ping               # Test connectivity
 doppler run -- <cmd>    # Inject secrets
 ```
 
-## Git Workflow (gitnow)
+## Rules & Standards
 
-```bash
-feature <name>   # Start feature branch
-bugfix <name>    # Start bugfix branch
-hotfix <name>    # Start hotfix branch
-chore/<name>    # Chore: git checkout -b chore/<name>
-
-# Pre-branch (replaces fetch+checkout+pull):
-/clean_gone       # Prune deleted remotes
-move dev          # Switch to dev with autostash
-pull              # Rebase pull
-```
+- **[Code Quality](.agents/rules/code-quality.md)**: Think first, surgical changes, goal-driven execution.
+- **[Ansible](.agents/rules/ansible.md)**: Role patterns, chown rules, linting, symmetric package removal.
+- **[Terraform](.agents/rules/terraform.md)**: Resource naming (`snake_case`/`kebab-case`), providers, Task commands.
+- **[Gitflow](.agents/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
+- **[Tooling](.agents/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
+- **[Docker](.agents/rules/docker.md)**: Image tags, Watchtower, service checklist.
+- **[RTK](.agents/rules/rtk.md)**: Token-optimized command instructions.
 
 ## Skills Available
 

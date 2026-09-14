@@ -5,7 +5,7 @@ resource "proxmox_virtual_environment_container" "claude_code" {
 
   cpu {
     architecture = "amd64"
-    cores        = 1
+    cores        = 2
     units        = 1024
   }
 
@@ -36,7 +36,7 @@ resource "proxmox_virtual_environment_container" "claude_code" {
   }
 
   memory {
-    dedicated = 1024
+    dedicated = 2048
     swap      = 0
   }
 
