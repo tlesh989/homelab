@@ -3,6 +3,7 @@
 # The bpg/proxmox provider does not support LXC device blocks; configure via lxc.conf directly.
 
 - name: Configure VAAPI device passthrough for Plex LXC (103)
+  become: true
   ansible.builtin.blockinfile:
     path: /etc/pve/lxc/103.conf
     marker: "# {mark} ANSIBLE MANAGED VAAPI"
