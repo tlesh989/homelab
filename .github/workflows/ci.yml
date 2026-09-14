@@ -105,11 +105,22 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.14'
-          cache: 'pip'
+
+      - name: Cache Ansible venv
+        id: venv-cache
+        uses: actions/cache@v6
+        with:
+          path: .venv
+          key: ${{ runner.os }}-ansible-venv-${{ hashFiles('requirements.txt') }}
 
       - name: Install Ansible and Lint
+        if: steps.venv-cache.outputs.cache-hit != 'true'
         run: |
-          pip install -r requirements.txt
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Add venv to PATH
+        run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
 
       - name: Cache Ansible Galaxy Roles/Collections
         uses: actions/cache@v6
