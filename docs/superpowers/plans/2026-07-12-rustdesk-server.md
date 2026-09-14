@@ -188,7 +188,7 @@ Expected: no errors reported for `roles/rustdesk` or `main.yml`
 - [ ] **Step 4: Run a dry-run against kaz**
 
 Run: `cd /Users/tommy/repos/tlesh989/homelab && task kaz -- --check`
-Expected: dry-run completes; `hbbs`/`hbbr` container tasks show as would-be `changed` (they don't exist yet), no errors
+Expected: dry-run completes with no errors; `hbbs`/`hbbr` container tasks show as `skipped` (guarded by `not ansible_check_mode`)
 
 - [ ] **Step 5: Commit**
 

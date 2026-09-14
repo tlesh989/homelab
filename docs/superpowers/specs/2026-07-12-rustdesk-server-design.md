@@ -53,10 +53,11 @@ following the existing `roles/n8n` Ansible role pattern for Docker services on k
   the LAN interface entirely — Tailscale-only, no public exposure, no port forwarding.
 - Ports (default RustDesk scheme): `21115/tcp`, `21116/tcp+udp`, `21117/tcp`,
   `21118/tcp`, `21119/tcp`
-- Named Docker volume for `hbbs`'s persistent ed25519 keypair. This is the trust root
-  for the whole setup — losing it breaks every client's saved server connection, and
-  leaking it lets someone stand up a rogue relay your clients would trust. Generated
-  in-container on first run; not templated, stored in Doppler, or committed to the repo.
+- Host bind mount (`{{ rustdesk_data_path }}:/root`) for `hbbs`'s persistent ed25519
+  keypair. This is the trust root for the whole setup — losing it breaks every client's
+  saved server connection, and leaking it lets someone stand up a rogue relay your
+  clients would trust. Generated in-container on first run; not templated, stored in
+  Doppler, or committed to the repo.
 
 ## Variables (`roles/rustdesk/defaults/main.yml`)
 
@@ -94,8 +95,9 @@ conventions.
 ## Security
 
 - No public or LAN exposure — ports are bound only to the Tailscale interface IP.
-- The `hbbs` keypair is not shared via bind-mount, Doppler, or committed anywhere; it
-  stays host-local in the named volume.
+- The `hbbs` keypair is not shared via Doppler or committed anywhere; it stays
+  host-local, backed up as part of the host's normal backup boundary rather than
+  Docker-managed volume backup.
 
 ## Verification
 
