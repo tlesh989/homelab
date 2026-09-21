@@ -2,26 +2,34 @@
 - name: Get system architecture for beszel-agent
   ansible.builtin.set_fact:
     _beszel_arch: >-
-      {{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}
+      {{ 'arm64' if ansible_facts.architecture == 'aarch64' else 'amd64' }}
 
-- name: Download beszel-agent binary
-  ansible.builtin.get_url:
-    url: "https://github.com/henrygd/beszel/releases/{{ 'latest' if beszel_agent_version == 'latest' else ('download/v' ~ beszel_agent_version) }}/download/beszel-agent_linux_{{
-      _beszel_arch }}.tar.gz"
-    dest: /tmp/beszel-agent.tar.gz
-    mode: "0644"
-  become: true
+- name: Check installed beszel-agent version
+  ansible.builtin.command:
+    cmd: /usr/local/bin/beszel-agent -v
+  register: _beszel_installed
+  changed_when: false
+  failed_when: false
 
-- name: Extract beszel-agent binary
-  ansible.builtin.unarchive:
-    src: /tmp/beszel-agent.tar.gz
-    dest: /usr/local/bin/
-    remote_src: true
-    include:
-      - beszel-agent
-    mode: "0755"
+- name: Install beszel-agent binary
+  when: beszel_agent_version not in (_beszel_installed.stdout | default(''))
   become: true
-  notify: Restart beszel-agent
+  block:
+    - name: Download beszel-agent binary
+      ansible.builtin.get_url:
+        url: "https://github.com/henrygd/beszel/releases/download/v{{ beszel_agent_version }}/beszel-agent_linux_{{ _beszel_arch }}.tar.gz"
+        dest: /tmp/beszel-agent.tar.gz
+        mode: "0644"
+
+    - name: Extract beszel-agent binary
+      ansible.builtin.unarchive:
+        src: /tmp/beszel-agent.tar.gz
+        dest: /usr/local/bin/
+        remote_src: true
+        include:
+          - beszel-agent
+        mode: "0755"
+      notify: Restart beszel-agent
 
 - name: Create beszel-agent systemd unit
   ansible.builtin.copy:

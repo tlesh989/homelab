@@ -19,4 +19,4 @@
 
 - name: Set render group GID fact for compose template
   ansible.builtin.set_fact:
-    tdarr_node_render_gid: "{{ getent_group.render[1] }}"
+    tdarr_node_render_gid: "{{ ansible_facts.getent_group.render[1] }}"

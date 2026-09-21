@@ -3,3 +3,6 @@
 plex_nfs_server: 192.168.220.6
 plex_nfs_export: /mnt/wayreth/data/media
 plex_media_path: /data/media
+
+# LXC has no CAP_SYS_TIME; ntpsec cannot start and the host clock is shared.
+ntp_enabled: false

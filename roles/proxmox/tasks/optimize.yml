@@ -87,7 +87,7 @@
     line: >-
       GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
       intel_pstate=disable
-      systemd.unified_cgroup_hierarchy=1"
+      systemd.unified_cgroup_hierarchy=1{{ ' i915.enable_guc=3 i915.max_vfs=7' if proxmox_enable_sriov | bool else '' }}"
     state: present
   notify: Update grub
 
