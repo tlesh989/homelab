@@ -84,6 +84,7 @@ resource "proxmox_virtual_environment_container" "plex" {
       operating_system[0].template_file_id,
       initialization[0].user_account,
       mount_point,
+      description, # Ansible-managed VAAPI block lives here
     ]
   }
 

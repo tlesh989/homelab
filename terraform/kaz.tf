@@ -78,6 +78,7 @@ resource "proxmox_virtual_environment_vm" "kaz" {
     ignore_changes = [
       node_name,
       disk[0].file_id,
+      initialization[0].user_account,
     ]
   }
 }
