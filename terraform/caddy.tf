@@ -1,5 +1,5 @@
 resource "proxmox_virtual_environment_container" "caddy" {
-  node_name    = "sturm"
+  node_name    = "bupu"
   vm_id        = 117
   unprivileged = true
 
