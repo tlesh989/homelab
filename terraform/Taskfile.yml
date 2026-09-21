@@ -29,7 +29,7 @@ tasks:
   plan:
     desc: Format, validate, and plan Terraform changes
     cmds:
-      - terraform init -upgrade
+      - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform init -upgrade'
       - terraform fmt -check -recursive
       - terraform validate
       - doppler run -- sh -c 'TF_TOKEN_app_terraform_io=$TF_TOKEN terraform plan -out=tfplan.out'
