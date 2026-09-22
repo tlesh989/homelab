@@ -1,9 +1,11 @@
 ---
 # Watchtower image (pinned per docker.md; matches watchtower role default)
+# renovate: datasource=docker depName=ghcr.io/nicholas-fedor/watchtower
 arr_watchtower_version: "1.18.1"
 
 # Tdarr server image (pinned per docker.md; workersToArray TypeError bug is
 # upstream in this release, not caused by this pin — see PR description)
+# renovate: datasource=docker depName=haveagitgat/tdarr
 arr_tdarr_server_version: "2.86.01"
 
 # Storage paths

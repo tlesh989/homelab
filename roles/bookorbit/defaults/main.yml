@@ -1,7 +1,9 @@
 ---
 # ponytail: trial deployment alongside calibre-web (homelab-2y1); promote or
 # remove once Kobo sync / conversion needs are validated.
+# renovate: datasource=docker depName=ghcr.io/bookorbit/bookorbit
 bookorbit_app_version: "2.8.1"
+# Floating major tag (pgvector track) — not an exact version, no renovate pin.
 bookorbit_postgres_version: "pg18"
 
 bookorbit_port: 8091

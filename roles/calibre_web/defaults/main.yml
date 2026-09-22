@@ -1,6 +1,9 @@
 ---
 # ponytail: testing pre-release fix for ingest phantom-loop bug (upstream #656/#1276);
 # pin to next stable v4.0.7+ once released
+# No renovate annotation: this is a deliberate pre-release pin, not a stable
+# version to auto-bump — Renovate would just chase newer dev-NNN tags against
+# the intent above. Re-pin to the stable v4.0.7+ tag manually and annotate then.
 calibre_web_version: "dev-410"
 calibre_web_port: 8083
 calibre_web_config_dir: /opt/calibre-web/config

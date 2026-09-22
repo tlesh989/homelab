@@ -1,5 +1,6 @@
 ---
 # Watchtower image (pinned per docker.md; matches watchtower role default)
+# renovate: datasource=docker depName=ghcr.io/nicholas-fedor/watchtower
 uptime_kuma_watchtower_version: "1.18.1"
 
 uptime_kuma_base_path: /opt/uptime-kuma
