@@ -10,6 +10,18 @@
     "before 9am on monday"
   ],
   "platformAutomerge": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Version pins annotated with a '# renovate:' comment in role defaults",
+      "managerFilePatterns": [
+        "/^roles/[^/]+/defaults/main\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\n\\s*\\S+: \"?(?<currentValue>[^\"\\s]+)\"?"
+      ]
+    }
+  ],
   "packageRules": [
     {
       "description": "Automerge pinning and digest updates",

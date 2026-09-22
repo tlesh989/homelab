@@ -61,7 +61,7 @@
   ansible.builtin.template:
     src: setupVars.conf.j2
     dest: "{{ pihole_install_dir }}/setupVars.conf"
-    mode: "0644"
+    mode: "0640"
   notify: Restart pihole-FTL
 
 - name: Ensure pihole-FTL is enabled and running

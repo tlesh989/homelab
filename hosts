@@ -48,7 +48,7 @@ claude-code.tlesh.xyz ansible_host=192.168.233.22
 
 [barlo]
 # Remote site — only reachable over Tailscale, not the LAN
-barlo.tlesh.xyz ansible_host=100.104.158.42
+# barlo.tlesh.xyz ansible_host=100.104.158.42  # offline since ~2026-08-09; uncomment when back on Tailscale (homelab-gan)
 
 [proxmox:children]
 tika

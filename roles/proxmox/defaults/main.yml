@@ -21,6 +21,8 @@ proxmox_ceph_enabled: false
 proxmox_zfs_arc_limit: true
 proxmox_zfs_arc_max: 0 # 0 means automatic (2GB for <16GB RAM, 4GB for 32GB+)
 proxmox_enable_sriov: true # Intel iGPU SR-IOV (Experimental)
+# i915-sriov-dkms commit (2026.09.16). Bump deliberately — a change rebuilds the GPU module.
+proxmox_sriov_dkms_version: c613c76e2e7023b1617bed346b9d35bf871fb958
 proxmox_sysctl_optimizations: true
 
 # Storage network bridge MTU — set to 9000 for jumbo frames on storage VLAN
