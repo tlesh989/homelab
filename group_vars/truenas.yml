@@ -11,7 +11,7 @@ truenas_nfs_shares:
       - "192.168.220.7" # tika (storage network)
       - "192.168.220.8" # bupu (storage network)
       - "192.168.220.9" # sturm (storage network)
-      - "192.168.220.10" # kaz (storage network, Calibre-Web)
+      - "192.168.220.10" # kaz (storage network, BookOrbit)
       - "192.168.220.12" # plex (storage network)
       - "192.168.220.24" # arr (storage network)
       - "192.168.220.18" # tdarr-node (storage network)

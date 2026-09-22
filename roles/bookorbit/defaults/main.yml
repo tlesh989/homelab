@@ -1,6 +1,4 @@
 ---
-# ponytail: trial deployment alongside calibre-web (homelab-2y1); promote or
-# remove once Kobo sync / conversion needs are validated.
 # renovate: datasource=docker depName=ghcr.io/bookorbit/bookorbit
 bookorbit_app_version: "2.8.1"
 # Floating major tag (pgvector track) — not an exact version, no renovate pin.
@@ -16,7 +14,14 @@ bookorbit_pgid: "1000"
 bookorbit_postgres_db: bookorbit
 bookorbit_postgres_user: bookorbit
 
-# Same host path the calibre_web role already mounts from TrueNAS (must run
-# first in main.yml). Bind-mounted read-only into the container below so this
-# trial can't write into or corrupt the existing library.
+# Bind-mounted read-only into the container below so this trial can't write
+# into or corrupt the existing library. qbittorrent (arr host) writes into
+# this same NFS folder directly.
 bookorbit_books_path: /data/media/books
+
+# NFS mount — shares the same wayreth/data/media export as arr/plex; books/
+# is this host's own subfolder within it.
+bookorbit_media_path: /data/media
+bookorbit_nfs_server: 192.168.220.6
+bookorbit_nfs_export: /mnt/wayreth/data/media
+bookorbit_nfs_mount_opts: rw,noatime,nfsvers=4.2,hard,timeo=600,_netdev

@@ -40,6 +40,7 @@ services:
     volumes:
       - "{{ arr_config_path }}/qbittorrent:/config"
       - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
+      - "{{ arr_media_path }}:{{ arr_media_path }}"
     depends_on:
       - gluetun
     restart: unless-stopped
