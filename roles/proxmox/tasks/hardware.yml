@@ -69,7 +69,7 @@
       ansible.builtin.git:
         repo: https://github.com/strongtz/i915-sriov-dkms.git
         dest: /usr/src/i915-sriov-dkms
-        version: master
+        version: "{{ proxmox_sriov_dkms_version }}"
       register: proxmox_sriov_repo
 
     - name: Check if i915-sriov-dkms is already installed
@@ -92,14 +92,6 @@
       when: proxmox_dkms_status.rc != 0 or (proxmox_sriov_repo.changed | default(false))
       changed_when: true
       notify: Update initramfs
-
-    - name: Configure SR-IOV Kernel Parameters
-      ansible.builtin.lineinfile:
-        path: /etc/default/grub
-        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((?!.*i915\.enable_guc).*)"\s*$'
-        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 i915.enable_guc=3 i915.max_vfs=7"'
-        backrefs: true
-      notify: Update grub
 
     - name: Load i915 module with SR-IOV support
       ansible.builtin.copy:

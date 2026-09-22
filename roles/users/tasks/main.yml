@@ -21,6 +21,8 @@
     password: "{{ item.password | default(omit) }}"
     state: present
   loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
   when: users_list | length > 0
 
 - name: Manage SSH authorized keys
@@ -30,6 +32,8 @@
     state: present
     exclusive: "{{ users_ssh_exclusive | default(false) }}"
   loop: "{{ users_list }}"
+  loop_control:
+    label: "{{ item.username }}"
   when:
     - users_list | length > 0
     - item.authorized_keys is defined
