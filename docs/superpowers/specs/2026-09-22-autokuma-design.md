@@ -85,13 +85,18 @@ directly to its `docker-compose.yml.j2` (or `docker_container` task)
 alongside its existing port/env vars — no new role variables needed since
 labels reference variables already defined in each template.
 
-Monitor `<id>` = container name (already unique per role). Type `http`,
-pointed at the container's internal port:
+Monitor `<id>` = container name (already unique per role). Type `http`.
+
+Kuma's server does the actual HTTP polling from the central
+`uptime-kuma.tlesh.xyz` host, not from inside each container's own Docker
+network — so the URL must be the **host's LAN IP + published port**, the
+same pattern Glance's monitor widget and Caddy's upstreams already use for
+these services, not a container-internal DNS name:
 
 ```yaml
 labels:
   kuma.qbittorrent.http.name: "qBittorrent"
-  kuma.qbittorrent.http.url: "http://qbittorrent:{{ arr_qbittorrent_port }}"
+  kuma.qbittorrent.http.url: "http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_qbittorrent_port }}"
 ```
 
 Tagged by host so Kuma's dashboard stays organized the way manually
@@ -104,7 +109,8 @@ grouped monitors are today:
 Services in scope (every container with a web UI, across all Docker
 roles): arr stack (qbittorrent, sonarr, radarr, prowlarr, bazarr, seerr,
 lidarr, beets, tdarr webui), bookorbit-app, uptime-kuma itself, n8n,
-freshrss, wallos, rustdesk, syncthing, dozzle_hub. Background-only
+freshrss, wallos, syncthing, dozzle_hub, beszel (hub). rustdesk (hbbs/hbbr)
+has no web UI — excluded, same as other background-only containers. Background-only
 containers (gluetun, watchtower, dozzle-agent, beszel-agent,
 cloudflare_ddns, autokuma itself) get no labels — see Non-goals.
 
