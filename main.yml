@@ -125,6 +125,7 @@
     - role: geerlingguy.docker
     - role: artis3n.tailscale.machine
       when: not ansible_check_mode
+    - role: autokuma
     - role: watchtower
     - role: glance
     - role: n8n
@@ -152,6 +153,7 @@
   become: true
   roles:
     - role: geerlingguy.docker
+    - role: autokuma
     - role: arr
 
 - name: setup tdarr transcode node
@@ -161,6 +163,7 @@
     - role: users
     - role: geerlingguy.ntp
     - role: geerlingguy.docker
+    - role: autokuma
     - role: tdarr_node
 
 - name: deploy dozzle agents
@@ -193,6 +196,7 @@
   hosts: uptime-kuma
   become: true
   roles:
+    - role: autokuma
     - role: uptime_kuma
 
 - name: Configure claude-code LXC

@@ -1,0 +1,9 @@
+---
+# renovate: datasource=docker depName=ghcr.io/bigboot/autokuma
+autokuma_version: "0.7.0"
+
+# Points every host's AutoKuma instance at the single central Kuma server.
+# uptime_kuma_port (3001) is hardcoded here rather than referenced from
+# roles/uptime_kuma/defaults, since that role's defaults aren't loaded on
+# hosts (kaz, arr, tdarr_node) that don't run the uptime_kuma role.
+autokuma_kuma_url: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001"
