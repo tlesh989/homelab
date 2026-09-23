@@ -35,6 +35,7 @@
       AUTOKUMA__KUMA__URL: "{{ autokuma_kuma_url }}"
       AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"
       AUTOKUMA__KUMA__PASSWORD: "{{ lookup('env', 'AUTOKUMA_PASSWORD') }}"
+    security_opts: "{{ ['apparmor:unconfined'] if 'lxc' in group_names else [] }}"
   become: true
   no_log: true
   when:
