@@ -38,7 +38,6 @@
     labels:
       kuma.n8n.http.name: "n8n"
       kuma.n8n.http.url: "http://{{ ansible_host }}:{{ n8n_port }}"
-      kuma.n8n.http.tags: "kaz"
   become: true
   when:
     - not ansible_check_mode

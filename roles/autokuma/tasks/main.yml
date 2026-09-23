@@ -5,6 +5,13 @@
     state: present
   become: true
 
+- name: Create AutoKuma data directory
+  ansible.builtin.file:
+    path: "{{ autokuma_data_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
 - name: Assert AutoKuma credentials are set
   ansible.builtin.assert:
     that:
@@ -23,6 +30,7 @@
     restart_policy: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "{{ autokuma_data_dir }}:/data"
     env:
       AUTOKUMA__KUMA__URL: "{{ autokuma_kuma_url }}"
       AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"

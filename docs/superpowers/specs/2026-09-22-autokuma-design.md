@@ -49,9 +49,15 @@ revisit if it comes back online.)
 
 ## New role: `roles/autokuma`
 
-- Image: `ghcr.io/bigboot/autokuma`, pinned to a specific release tag (not
-  `latest`, per `.claude/rules/docker.md`).
-- Volumes: `/var/run/docker.sock:/var/run/docker.sock:ro`
+- Image: `ghcr.io/bigboot/autokuma`, pinned to `2.0.0` (not `latest`, per
+  `.claude/rules/docker.md`) — required for Uptime Kuma v2 compatibility
+  since this repo runs `louislam/uptime-kuma:2`.
+- Volumes: `/var/run/docker.sock:/var/run/docker.sock:ro` and
+  `{{ autokuma_data_dir }}:/data` (default `/opt/autokuma`). AutoKuma has
+  required persistent storage for its id-to-monitor mapping since v1.0.0
+  (previously stored in a Kuma label); without this volume every container
+  recreate loses the mapping and creates duplicate monitors — this is also
+  what makes the rollback claim below true.
 - Env:
   - `AUTOKUMA__KUMA__URL: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:{{ uptime_kuma_port }}"`
   - `AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"`
@@ -63,7 +69,11 @@ revisit if it comes back online.)
   `uptime-kuma` plays, ordered before the app roles on each host (mirrors
   `gluetun` preceding `qbittorrent` in the `arr` role) — not required for
   correctness since AutoKuma reconciles on Docker events, but keeps
-  ordering intuitive.
+  ordering intuitive. Exception: on the `uptime-kuma` play, `autokuma` is
+  ordered **after** `uptime_kuma`, not before — that host has no separate
+  `geerlingguy.docker` role (Docker is installed as the first task inside
+  `roles/uptime_kuma` itself), so `autokuma` would otherwise run before
+  Docker exists on a fresh host.
 
 ## Credentials
 
@@ -101,12 +111,11 @@ labels:
   kuma.qbittorrent.http.url: "http://{{ hostvars['arr.tlesh.xyz'].ansible_host }}:{{ arr_qbittorrent_port }}"
 ```
 
-Tagged by host so Kuma's dashboard stays organized the way manually
-grouped monitors are today:
-
-```yaml
-  kuma.qbittorrent.http.tags: "arr"
-```
+No per-host tagging: AutoKuma has no `http.tags` field accepting a plain
+string — tags require a separate `tag_names` field plus tag entities
+defined via their own `kuma.<tag-id>.tag.name` labels. That's more
+machinery than this branch needs, so it's deliberately not implemented
+(YAGNI) — revisit if dashboard grouping becomes a real pain point.
 
 Services in scope (every container with a web UI, across all Docker
 roles): arr stack (qbittorrent, sonarr, radarr, prowlarr, bazarr, seerr,
@@ -133,10 +142,11 @@ configured once in the Kuma UI, not per-label.
 - Full rollout in one pass: deploy `roles/autokuma` to all four hosts and
   add labels to every in-scope service in the same change.
 - Rollback: `docker rm -f autokuma` on affected host(s) and drop the role
-  from `main.yml`. No state is left behind — monitors AutoKuma created
-  simply stop updating and can be left or deleted from the Kuma UI; if
-  AutoKuma is redeployed later it reconciles by `<id>` and won't create
-  duplicates.
+  from `main.yml`. The persistent `/data` volume is left behind (not
+  removed) — monitors AutoKuma created simply stop updating and can be
+  left or deleted from the Kuma UI; if AutoKuma is redeployed later it
+  reconciles by `<id>` (from the mapping preserved in that volume) and
+  won't create duplicates.
 
 ## Testing
 

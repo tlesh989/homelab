@@ -196,8 +196,8 @@
   hosts: uptime-kuma
   become: true
   roles:
-    - role: autokuma
     - role: uptime_kuma
+    - role: autokuma
 
 - name: Configure claude-code LXC
   hosts: claude_code

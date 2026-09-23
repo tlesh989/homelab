@@ -1,6 +1,10 @@
 ---
 # renovate: datasource=docker depName=ghcr.io/bigboot/autokuma
-autokuma_version: "0.7.0"
+autokuma_version: "2.0.0"
+
+# Persistent storage for AutoKuma's id-to-monitor mapping (required since
+# v1.0.0 — without it, every container recreate creates duplicate monitors).
+autokuma_data_dir: /opt/autokuma
 
 # Points every host's AutoKuma instance at the single central Kuma server.
 # uptime_kuma_port (3001) is hardcoded here rather than referenced from

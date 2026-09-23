@@ -16,7 +16,6 @@ services:
     labels:
       kuma.uptime-kuma.http.name: "Uptime Kuma"
       kuma.uptime-kuma.http.url: "http://{{ ansible_host }}:{{ uptime_kuma_port }}"
-      kuma.uptime-kuma.http.tags: "uptime-kuma"
     restart: unless-stopped
 
   watchtower:
