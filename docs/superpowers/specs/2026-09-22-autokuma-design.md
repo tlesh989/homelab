@@ -67,16 +67,18 @@ revisit if it comes back online.)
 
 ## Credentials
 
-New dedicated Uptime Kuma user (created once, manually, in the Kuma UI —
-documented as a pre-deploy manual step like `BOOKORBIT_SETUP_BOOTSTRAP_TOKEN`
-today) with just enough access to manage monitors. Credentials stored as
-new Doppler secrets:
+Uptime Kuma has no multi-user support (upstream `louislam/uptime-kuma#3571`
+is still an open, unmerged PR as of this writing) — only one admin account
+exists, so a separate low-privilege service account isn't possible.
+AutoKuma's alternative (`AUTOKUMA__KUMA__AUTH_TOKEN`, a JWT) is still tied
+to that same single admin identity and adds token-refresh complexity with
+no real reduction in blast radius, so this uses the admin login directly.
+Credentials stored as new Doppler secrets:
 
 - `AUTOKUMA_USERNAME`
 - `AUTOKUMA_PASSWORD`
 
-Not reusing the personal admin login, so automation doesn't hold full
-admin credentials.
+Revisit if/when Kuma ships real multi-user support upstream.
 
 ## Label retrofit
 
@@ -123,8 +125,8 @@ configured once in the Kuma UI, not per-label.
 
 ## Rollout & error handling
 
-- Manual pre-step (you, before first deploy): create the `autokuma` Kuma
-  user in the UI, add `AUTOKUMA_USERNAME`/`AUTOKUMA_PASSWORD` to Doppler.
+- Manual pre-step (you, before first deploy): add your existing Kuma admin
+  username/password to Doppler as `AUTOKUMA_USERNAME`/`AUTOKUMA_PASSWORD`.
 - `roles/autokuma` is idempotent like every other docker role in this
   repo — no special failure handling beyond what
   `community.docker.docker_container` already provides.
