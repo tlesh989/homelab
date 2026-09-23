@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Pin `autokuma_version` to an exact release tag (`0.7.0` — confirmed current on GHCR, not `latest`), per `.claude/rules/docker.md`.
+- Pin `autokuma_version` to an exact release tag (`2.0.0` — required for Uptime Kuma v2 compatibility, this repo runs `louislam/uptime-kuma:2`, not `latest`), per `.claude/rules/docker.md`.
 - Every `kuma.*` label URL is `http://{{ ansible_host }}:<port>` — each compose file is rendered on the host it describes, so the bare `ansible_host` fact (already set via the `hosts` inventory file) is correct without a `hostvars[...]` lookup. Only `roles/autokuma/defaults/main.yml` needs a cross-host `hostvars['uptime-kuma.tlesh.xyz']` lookup, since it points *at* the central Kuma server from every other host.
 - Monitor `<id>` = container name (already unique per role).
 - Background-only containers get **no labels at all**: `gluetun`, `watchtower` (every host), `dozzle-agent`, `beszel-agent`, `cloudflare_ddns`, `filebot`, `flaresolverr`, `bookorbit-db`, `tdarr-node` (the arr-side worker, no published UI port), `hbbs`/`hbbr` (rustdesk — no web UI), and `autokuma` itself.
@@ -36,13 +36,18 @@
 ```yaml
 ---
 # renovate: datasource=docker depName=ghcr.io/bigboot/autokuma
-autokuma_version: "0.7.0"
+autokuma_version: "2.0.0"
 
-# Points every host's AutoKuma instance at the single central Kuma server.
-# uptime_kuma_port (3001) is hardcoded here rather than referenced from
-# roles/uptime_kuma/defaults, since that role's defaults aren't loaded on
-# hosts (kaz, arr, tdarr_node) that don't run the uptime_kuma role.
-autokuma_kuma_url: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001"
+# Routed through Caddy's HTTPS endpoint (same pattern as every other
+# password-authenticated service in this repo, e.g. bookorbit_host) rather
+# than a direct http://<ip>:3001 connection, since AUTOKUMA_USERNAME/
+# PASSWORD would otherwise cross the LAN in cleartext.
+autokuma_kuma_url: "https://uptime-kuma.tlesh.xyz"
+
+# Persistent storage for AutoKuma's id-to-monitor mapping, required since
+# v1.0.0 — without it, every container recreate (Watchtower update,
+# redeploy) loses the mapping and creates duplicate monitors.
+autokuma_data_dir: /opt/autokuma
 ```
 
 - [ ] **Step 2: Create `roles/autokuma/tasks/main.yml`**
@@ -53,6 +58,13 @@ autokuma_kuma_url: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:
   ansible.builtin.package:
     name: python3-docker
     state: present
+  become: true
+
+- name: Create AutoKuma data directory
+  ansible.builtin.file:
+    path: "{{ autokuma_data_dir }}"
+    state: directory
+    mode: "0755"
   become: true
 
 - name: Assert AutoKuma credentials are set
@@ -73,6 +85,7 @@ autokuma_kuma_url: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:
     restart_policy: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "{{ autokuma_data_dir }}:/data"
     env:
       AUTOKUMA__KUMA__URL: "{{ autokuma_kuma_url }}"
       AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"
@@ -239,7 +252,6 @@ Replace with:
     labels:
       kuma.qbittorrent.http.name: "qBittorrent"
       kuma.qbittorrent.http.url: "http://{{ ansible_host }}:{{ arr_qbittorrent_port }}"
-      kuma.qbittorrent.http.tags: "arr"
     depends_on:
       - gluetun
     restart: unless-stopped
@@ -271,7 +283,6 @@ Replace with:
     labels:
       kuma.sonarr.http.name: "Sonarr"
       kuma.sonarr.http.url: "http://{{ ansible_host }}:{{ arr_sonarr_port }}"
-      kuma.sonarr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -301,7 +312,6 @@ Replace with:
     labels:
       kuma.radarr.http.name: "Radarr"
       kuma.radarr.http.url: "http://{{ ansible_host }}:{{ arr_radarr_port }}"
-      kuma.radarr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -327,7 +337,6 @@ Replace with:
     labels:
       kuma.prowlarr.http.name: "Prowlarr"
       kuma.prowlarr.http.url: "http://{{ ansible_host }}:{{ arr_prowlarr_port }}"
-      kuma.prowlarr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -355,7 +364,6 @@ Replace with:
     labels:
       kuma.bazarr.http.name: "Bazarr"
       kuma.bazarr.http.url: "http://{{ ansible_host }}:{{ arr_bazarr_port }}"
-      kuma.bazarr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -385,7 +393,6 @@ Replace with:
     labels:
       kuma.lidarr.http.name: "Lidarr"
       kuma.lidarr.http.url: "http://{{ ansible_host }}:{{ arr_lidarr_port }}"
-      kuma.lidarr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -413,7 +420,6 @@ Replace with:
     labels:
       kuma.beets.http.name: "Beets"
       kuma.beets.http.url: "http://{{ ansible_host }}:{{ arr_beets_port }}"
-      kuma.beets.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -439,7 +445,6 @@ Replace with:
     labels:
       kuma.tdarr-server.http.name: "Tdarr"
       kuma.tdarr-server.http.url: "http://{{ ansible_host }}:{{ arr_tdarr_webui_port }}"
-      kuma.tdarr-server.http.tags: "arr"
     restart: unless-stopped
 
   seerr:
@@ -467,7 +472,6 @@ Replace with:
     labels:
       kuma.seerr.http.name: "Seerr"
       kuma.seerr.http.url: "http://{{ ansible_host }}:{{ arr_seerr_port }}"
-      kuma.seerr.http.tags: "arr"
     restart: unless-stopped
 ```
 
@@ -533,7 +537,6 @@ Replace with:
     labels:
       kuma.bookorbit-app.http.name: "BookOrbit"
       kuma.bookorbit-app.http.url: "http://{{ ansible_host }}:{{ bookorbit_port }}"
-      kuma.bookorbit-app.http.tags: "kaz"
   become: true
   no_log: true
   when:
@@ -565,7 +568,6 @@ Replace with:
     labels:
       kuma.uptime-kuma.http.name: "Uptime Kuma"
       kuma.uptime-kuma.http.url: "http://{{ ansible_host }}:{{ uptime_kuma_port }}"
-      kuma.uptime-kuma.http.tags: "uptime-kuma"
     restart: unless-stopped
 ```
 
@@ -592,7 +594,6 @@ Replace with:
     labels:
       kuma.n8n.http.name: "n8n"
       kuma.n8n.http.url: "http://{{ ansible_host }}:{{ n8n_port }}"
-      kuma.n8n.http.tags: "kaz"
   become: true
   when:
     - not ansible_check_mode
@@ -622,7 +623,6 @@ Replace with:
     labels:
       kuma.freshrss.http.name: "FreshRSS"
       kuma.freshrss.http.url: "http://{{ ansible_host }}:{{ freshrss_port }}"
-      kuma.freshrss.http.tags: "kaz"
   become: true
   when: not ansible_check_mode
 ```
@@ -648,7 +648,6 @@ Replace with:
     labels:
       kuma.wallos.http.name: "Wallos"
       kuma.wallos.http.url: "http://{{ ansible_host }}:{{ wallos_port }}"
-      kuma.wallos.http.tags: "kaz"
   become: true
   when:
     - not ansible_check_mode
@@ -676,7 +675,6 @@ Replace with:
     labels:
       kuma.syncthing.http.name: "Syncthing"
       kuma.syncthing.http.url: "http://{{ ansible_host }}:{{ syncthing_gui_port }}"
-      kuma.syncthing.http.tags: "kaz"
   become: true
   when:
     - not ansible_check_mode
@@ -708,7 +706,6 @@ Replace with:
     labels:
       kuma.dozzle.http.name: "Dozzle"
       kuma.dozzle.http.url: "http://{{ ansible_host }}:{{ dozzle_hub_port }}"
-      kuma.dozzle.http.tags: "kaz"
   become: true
   when:
     - not ansible_check_mode
@@ -739,7 +736,6 @@ Replace with:
     labels:
       kuma.beszel.http.name: "Beszel"
       kuma.beszel.http.url: "http://{{ ansible_host }}:{{ beszel_hub_port }}"
-      kuma.beszel.http.tags: "kaz"
   become: true
 
 - name: Deploy Beszel agent container on hub host

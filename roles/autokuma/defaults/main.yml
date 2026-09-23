@@ -6,8 +6,8 @@ autokuma_version: "2.0.0"
 # v1.0.0 — without it, every container recreate creates duplicate monitors).
 autokuma_data_dir: /opt/autokuma
 
-# Points every host's AutoKuma instance at the single central Kuma server.
-# uptime_kuma_port (3001) is hardcoded here rather than referenced from
-# roles/uptime_kuma/defaults, since that role's defaults aren't loaded on
-# hosts (kaz, arr, tdarr_node) that don't run the uptime_kuma role.
-autokuma_kuma_url: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:3001"
+# Routed through Caddy's HTTPS endpoint (same pattern as every other
+# password-authenticated service in this repo, e.g. bookorbit_host) rather
+# than a direct http://<ip>:3001 connection, since AUTOKUMA_USERNAME/
+# PASSWORD would otherwise cross the LAN in cleartext.
+autokuma_kuma_url: "https://uptime-kuma.tlesh.xyz"

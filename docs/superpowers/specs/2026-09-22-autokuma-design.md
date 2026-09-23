@@ -29,7 +29,9 @@ already deploy the service — no separate manual step, no drift.
 One AutoKuma instance per Docker host — not a single centralized instance
 reaching out over the network. Each instance reads its own host's local
 `/var/run/docker.sock` (read-only mount) and pushes monitor state to the
-single central Uptime Kuma server at `uptime-kuma.tlesh.xyz:3001`.
+single central Uptime Kuma server, over HTTPS via Caddy at
+`https://uptime-kuma.tlesh.xyz` — a direct `http://<ip>:3001` connection
+would send the admin credentials across the LAN in cleartext.
 
 This mirrors the existing per-host pattern already used for Watchtower and
 the Dozzle agents in this repo, and avoids exposing any host's Docker
@@ -59,7 +61,9 @@ revisit if it comes back online.)
   recreate loses the mapping and creates duplicate monitors — this is also
   what makes the rollback claim below true.
 - Env:
-  - `AUTOKUMA__KUMA__URL: "http://{{ hostvars['uptime-kuma.tlesh.xyz'].ansible_host }}:{{ uptime_kuma_port }}"`
+  - `AUTOKUMA__KUMA__URL: "https://uptime-kuma.tlesh.xyz"` (Caddy's existing
+    reverse-proxy entry for Kuma, per `.claude/rules/tools.md`'s "no local
+    vaults" posture — credentials should never cross the LAN in cleartext)
   - `AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"`
   - `AUTOKUMA__KUMA__PASSWORD: "{{ lookup('env', 'AUTOKUMA_PASSWORD') }}"`
 - `restart_policy: unless-stopped`, included in each host's Watchtower
