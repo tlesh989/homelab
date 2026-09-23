@@ -17,3 +17,8 @@ rtk git add . && rtk git commit -m "msg" && rtk git push
 
 RTK has dedicated filters for build, test, git, gh, package managers, file
 search, docker/kubectl, and network commands (60–99% output reduction).
+
+## Full command reference
+
+For the per-command list and savings table, read on demand:
+[`.claude/references/rtk-commands.md`](../../.claude/references/rtk-commands.md)
