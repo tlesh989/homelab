@@ -51,6 +51,9 @@
       PGID: "1000"
     command:
       - "--gui-address=0.0.0.0:{{ syncthing_gui_port }}"
+    labels:
+      kuma.syncthing.http.name: "Syncthing"
+      kuma.syncthing.http.url: "http://{{ ansible_host }}:{{ syncthing_gui_port }}"
   become: true
   when:
     - not ansible_check_mode

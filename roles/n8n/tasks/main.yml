@@ -35,6 +35,9 @@
       DB_SQLITE_POOL_SIZE: "1"
       N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
       N8N_GIT_NODE_DISABLE_BARE_REPOS: "true"
+    labels:
+      kuma.n8n.http.name: "n8n"
+      kuma.n8n.http.url: "http://{{ ansible_host }}:{{ n8n_port }}"
   become: true
   when:
     - not ansible_check_mode

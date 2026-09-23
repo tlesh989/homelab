@@ -89,6 +89,9 @@
       TZ: "{{ bookorbit_timezone }}"
       PUID: "{{ bookorbit_puid }}"
       PGID: "{{ bookorbit_pgid }}"
+    labels:
+      kuma.bookorbit-app.http.name: "BookOrbit"
+      kuma.bookorbit-app.http.url: "http://{{ ansible_host }}:{{ bookorbit_port }}"
   become: true
   no_log: true
   when:

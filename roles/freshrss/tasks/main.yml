@@ -28,5 +28,8 @@
       TZ: "America/New_York"
       CRON_MIN: "*/15"
       FRESHRSS_ENV: "production"
+    labels:
+      kuma.freshrss.http.name: "FreshRSS"
+      kuma.freshrss.http.url: "http://{{ ansible_host }}:{{ freshrss_port }}"
   become: true
   when: not ansible_check_mode

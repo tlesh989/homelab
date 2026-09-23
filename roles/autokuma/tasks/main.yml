@@ -1,0 +1,42 @@
+---
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Create AutoKuma data directory
+  ansible.builtin.file:
+    path: "{{ autokuma_data_dir }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Assert AutoKuma credentials are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'AUTOKUMA_USERNAME') | length > 0
+      - lookup('env', 'AUTOKUMA_PASSWORD') | length > 0
+    fail_msg: "AUTOKUMA_USERNAME and AUTOKUMA_PASSWORD must be set via Doppler."
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))
+
+- name: Deploy AutoKuma container
+  community.docker.docker_container:
+    name: autokuma
+    image: "ghcr.io/bigboot/autokuma:{{ autokuma_version }}"
+    state: started
+    restart_policy: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "{{ autokuma_data_dir }}:/data"
+    env:
+      AUTOKUMA__KUMA__URL: "{{ autokuma_kuma_url }}"
+      AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"
+      AUTOKUMA__KUMA__PASSWORD: "{{ lookup('env', 'AUTOKUMA_PASSWORD') }}"
+  become: true
+  no_log: true
+  when:
+    - not ansible_check_mode
+    - not (molecule_testing | default(false))

@@ -13,6 +13,9 @@ services:
       - "{{ uptime_kuma_data_path }}:/app/data"
     ports:
       - "{{ uptime_kuma_port }}:3001"
+    labels:
+      kuma.uptime-kuma.http.name: "Uptime Kuma"
+      kuma.uptime-kuma.http.url: "http://{{ ansible_host }}:{{ uptime_kuma_port }}"
     restart: unless-stopped
 
   watchtower:

@@ -32,6 +32,9 @@
       - "{{ wallos_data_dir }}/logos:/var/www/html/images/uploads/logos"
     env:
       TZ: "{{ wallos_timezone }}"
+    labels:
+      kuma.wallos.http.name: "Wallos"
+      kuma.wallos.http.url: "http://{{ ansible_host }}:{{ wallos_port }}"
   become: true
   when:
     - not ansible_check_mode

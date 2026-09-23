@@ -41,6 +41,9 @@ services:
       - "{{ arr_config_path }}/qbittorrent:/config"
       - "{{ arr_downloads_path }}:{{ arr_downloads_path }}"
       - "{{ arr_media_path }}/books:{{ arr_media_path }}/books"
+    labels:
+      kuma.qbittorrent.http.name: "qBittorrent"
+      kuma.qbittorrent.http.url: "http://{{ ansible_host }}:{{ arr_qbittorrent_port }}"
     depends_on:
       - gluetun
     restart: unless-stopped
@@ -60,6 +63,9 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     ports:
       - "{{ arr_sonarr_port }}:8989"
+    labels:
+      kuma.sonarr.http.name: "Sonarr"
+      kuma.sonarr.http.url: "http://{{ ansible_host }}:{{ arr_sonarr_port }}"
     restart: unless-stopped
 
   radarr:
@@ -77,6 +83,9 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     ports:
       - "{{ arr_radarr_port }}:7878"
+    labels:
+      kuma.radarr.http.name: "Radarr"
+      kuma.radarr.http.url: "http://{{ ansible_host }}:{{ arr_radarr_port }}"
     restart: unless-stopped
 
   prowlarr:
@@ -92,6 +101,9 @@ services:
       - "{{ arr_config_path }}/prowlarr:/config"
     ports:
       - "{{ arr_prowlarr_port }}:9696"
+    labels:
+      kuma.prowlarr.http.name: "Prowlarr"
+      kuma.prowlarr.http.url: "http://{{ ansible_host }}:{{ arr_prowlarr_port }}"
     restart: unless-stopped
 
   bazarr:
@@ -108,6 +120,9 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     ports:
       - "{{ arr_bazarr_port }}:6767"
+    labels:
+      kuma.bazarr.http.name: "Bazarr"
+      kuma.bazarr.http.url: "http://{{ ansible_host }}:{{ arr_bazarr_port }}"
     restart: unless-stopped
 
   lidarr:
@@ -125,6 +140,9 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     ports:
       - "{{ arr_lidarr_port }}:8686"
+    labels:
+      kuma.lidarr.http.name: "Lidarr"
+      kuma.lidarr.http.url: "http://{{ ansible_host }}:{{ arr_lidarr_port }}"
     restart: unless-stopped
 
   beets:
@@ -141,6 +159,9 @@ services:
       - "{{ arr_media_path }}:{{ arr_media_path }}"
     ports:
       - "{{ arr_beets_port }}:{{ arr_beets_port }}"
+    labels:
+      kuma.beets.http.name: "Beets"
+      kuma.beets.http.url: "http://{{ ansible_host }}:{{ arr_beets_port }}"
     restart: unless-stopped
 
   filebot:
@@ -181,6 +202,9 @@ services:
     ports:
       - "{{ arr_tdarr_webui_port }}:{{ arr_tdarr_webui_port }}"
       - "{{ arr_tdarr_server_port }}:{{ arr_tdarr_server_port }}"
+    labels:
+      kuma.tdarr-server.http.name: "Tdarr"
+      kuma.tdarr-server.http.url: "http://{{ ansible_host }}:{{ arr_tdarr_webui_port }}"
     restart: unless-stopped
 
   seerr:
@@ -195,6 +219,9 @@ services:
       - "{{ arr_config_path }}/seerr:/app/config"
     ports:
       - "{{ arr_seerr_port }}:5055"
+    labels:
+      kuma.seerr.http.name: "Seerr"
+      kuma.seerr.http.url: "http://{{ ansible_host }}:{{ arr_seerr_port }}"
     restart: unless-stopped
 
   flaresolverr:
