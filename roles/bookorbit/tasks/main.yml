@@ -1,4 +1,7 @@
 ---
+- name: Mount NFS media share
+  ansible.builtin.import_tasks: nfs.yml
+
 - name: Create BookOrbit data directories
   ansible.builtin.file:
     path: "{{ item }}"
