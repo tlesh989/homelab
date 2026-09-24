@@ -1,4 +1,5 @@
 ---
+# renovate: datasource=custom.minecraft-bds depName=minecraft-bds
 minecraft_bds_version: "1.26.33.2"
 minecraft_bds_download_url: "https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-{{ minecraft_bds_version }}.zip"
 minecraft_install_dir: /opt/minecraft/bedrock
