@@ -1,6 +1,6 @@
 ---
 # renovate: datasource=docker depName=bellamy/wallos
-wallos_version: "5.4.2"
+wallos_version: "5.8.1"
 wallos_port: 8282
 wallos_data_dir: /opt/wallos
 wallos_timezone: America/Detroit
