@@ -35,6 +35,7 @@
     labels:
       kuma.dozzle.http.name: "Dozzle"
       kuma.dozzle.http.url: "http://{{ ansible_host }}:{{ dozzle_hub_port }}"
+      kuma.dozzle.http.parent_name: "monitoring"
   become: true
   when:
     - not ansible_check_mode
