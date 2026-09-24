@@ -10,6 +10,15 @@
     "before 9am on monday"
   ],
   "platformAutomerge": true,
+  "customDatasources": {
+    "minecraft-bds": {
+      "defaultRegistryUrlTemplate": "https://raw.githubusercontent.com/Bedrock-OSS/BDS-Versions/main/versions.json",
+      "format": "json",
+      "transformTemplates": [
+        "{\"releases\": linux.versions.{\"version\": $}}"
+      ]
+    }
+  },
   "customManagers": [
     {
       "customType": "regex",
