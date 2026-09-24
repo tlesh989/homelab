@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path','') or params.get('tool_input',{}).get('TargetFile',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(1) if any(b in path for b in blocked) else sys.exit(0)\"",
+            "command": "python3 -c \"import sys,json; params=json.load(sys.stdin); path=params.get('tool_input',{}).get('file_path','') or params.get('tool_input',{}).get('TargetFile',''); blocked=['.vault_pass','.envrc','vars/vault.yml','.tfvars']; sys.exit(2) if any(b in path for b in blocked) else sys.exit(0)\"",
             "timeout": 5000
           }
         ]

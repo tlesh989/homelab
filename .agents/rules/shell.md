@@ -1,0 +1,1 @@
+../../.claude/rules/shell.md
