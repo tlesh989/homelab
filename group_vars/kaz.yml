@@ -2,3 +2,8 @@
 # Kaz VM
 
 tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+
+# Uptime Kuma groups for kaz monitors (referenced via parent_name)
+autokuma_labels:
+  kuma.apps.group.name: "Apps"
+  kuma.monitoring.group.name: "Monitoring"

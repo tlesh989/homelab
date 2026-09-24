@@ -31,6 +31,7 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - "{{ autokuma_data_dir }}:/data"
+    labels: "{{ autokuma_labels }}"
     env:
       AUTOKUMA__KUMA__URL: "{{ autokuma_kuma_url }}"
       AUTOKUMA__KUMA__USERNAME: "{{ lookup('env', 'AUTOKUMA_USERNAME') }}"

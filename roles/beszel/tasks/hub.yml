@@ -24,6 +24,7 @@
     labels:
       kuma.beszel.http.name: "Beszel"
       kuma.beszel.http.url: "http://{{ ansible_host }}:{{ beszel_hub_port }}"
+      kuma.beszel.http.parent_name: "monitoring"
   become: true
 
 - name: Deploy Beszel agent container on hub host

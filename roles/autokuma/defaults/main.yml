@@ -11,3 +11,9 @@ autokuma_data_dir: /opt/autokuma
 # than a direct http://<ip>:3001 connection, since AUTOKUMA_USERNAME/
 # PASSWORD would otherwise cross the LAN in cleartext.
 autokuma_kuma_url: "https://uptime-kuma.tlesh.xyz"
+
+# Extra labels on the AutoKuma container, used to define per-host group
+# monitors (e.g. kuma.arr.group.name: "Arr Stack"). Groups live here because
+# parent_name only resolves against this instance's own database — a group
+# must be defined on the same host as the monitors that reference it.
+autokuma_labels: {}

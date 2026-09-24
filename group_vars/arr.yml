@@ -10,3 +10,7 @@ arr_timezone: America/Detroit
 # Pushover notifications (for Watchtower)
 arr_pushover_api_token: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
 arr_pushover_user_key: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
+
+# Uptime Kuma group for arr monitors (referenced via parent_name: "arr")
+autokuma_labels:
+  kuma.arr.group.name: "Arr Stack"
