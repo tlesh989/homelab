@@ -31,5 +31,6 @@
     labels:
       kuma.freshrss.http.name: "FreshRSS"
       kuma.freshrss.http.url: "http://{{ ansible_host }}:{{ freshrss_port }}"
+      kuma.freshrss.http.parent_name: "apps"
   become: true
   when: not ansible_check_mode

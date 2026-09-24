@@ -92,6 +92,7 @@
     labels:
       kuma.bookorbit-app.http.name: "BookOrbit"
       kuma.bookorbit-app.http.url: "http://{{ ansible_host }}:{{ bookorbit_port }}"
+      kuma.bookorbit-app.http.parent_name: "apps"
   become: true
   no_log: true
   when:

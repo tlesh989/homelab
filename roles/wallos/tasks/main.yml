@@ -35,6 +35,7 @@
     labels:
       kuma.wallos.http.name: "Wallos"
       kuma.wallos.http.url: "http://{{ ansible_host }}:{{ wallos_port }}"
+      kuma.wallos.http.parent_name: "apps"
   become: true
   when:
     - not ansible_check_mode

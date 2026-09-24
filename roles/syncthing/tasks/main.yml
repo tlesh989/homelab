@@ -54,6 +54,7 @@
     labels:
       kuma.syncthing.http.name: "Syncthing"
       kuma.syncthing.http.url: "http://{{ ansible_host }}:{{ syncthing_gui_port }}"
+      kuma.syncthing.http.parent_name: "apps"
   become: true
   when:
     - not ansible_check_mode

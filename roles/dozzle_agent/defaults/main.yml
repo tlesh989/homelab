@@ -1,4 +1,4 @@
 ---
-# renovate: datasource=docker depName=amir20/dozzle extractVersion=^v(?<version>.+)$
-dozzle_version: "11.1.1"
+# renovate: datasource=docker depName=amir20/dozzle
+dozzle_version: "v11.1.1"
 dozzle_agent_port: 7007
