@@ -58,3 +58,5 @@ Example:
 ```
 
 Weak success criteria ("make it work") lead to rework. Define what done looks like before starting.
+
+Before ending your turn, check the plan: if any step is still open, keep going, or name what is blocking it. A progress update is not the finish line.

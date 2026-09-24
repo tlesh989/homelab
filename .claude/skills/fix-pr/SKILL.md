@@ -65,7 +65,7 @@ For each comment, decide:
 |-------|------|
 | Bug or correctness issue | Pure style preference with no clear win |
 | Security concern | "Consider using X" with no clear reason |
-| Broken convention (vs CLAUDE.md) | Contradicts existing project patterns |
+| Broken convention (vs AGENTS.md) | Contradicts existing project patterns |
 | Clear improvement | Subjective opinion ("I prefer...") |
 
 If unsure: apply it — reviewer feedback is usually worth taking.
