@@ -41,7 +41,7 @@
   ansible.builtin.set_fact:
     minecraft_installed_version: >-
       {{ (minecraft_version_file.content | b64decode | trim)
-         if minecraft_version_file is success
+         if minecraft_version_file.content is defined
          else '0.0.0.0' }}
 
 - name: Download BDS archive
