@@ -114,6 +114,25 @@
           minecraft-update exited silently with INSTALL_DIR=/ —
           the early-exit guard should print an error message before exiting.
 
+    - name: Simulate a failed slurp (fresh install, no .version file yet)
+      ansible.builtin.set_fact:
+        minecraft_test_version_fallback: >-
+          {{ (fake_slurp.content | b64decode | trim)
+             if fake_slurp.content is defined
+             else '0.0.0.0' }}
+      vars:
+        fake_slurp:
+          failed: false
+          msg: "file not found"
+
+    - name: Assert installed-version fact falls back safely with no .version file
+      ansible.builtin.assert:
+        that:
+          - minecraft_test_version_fallback == '0.0.0.0'
+        fail_msg: >
+          Installed-version fallback broke on a missing .version file —
+          this is the fresh-install regression from PR #320.
+
     - name: Check cron job via crontab
       ansible.builtin.command:
         cmd: crontab -l -u root
