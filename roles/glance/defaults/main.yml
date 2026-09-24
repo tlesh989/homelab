@@ -1,5 +1,5 @@
 ---
-# renovate: datasource=docker depName=glanceapp/glance extractVersion=^v(?<version>.+)$
+# renovate: datasource=docker depName=glanceapp/glance
 glance_version: "v0.8.6"
 glance_port: 8080
 glance_data_dir: /opt/glance
