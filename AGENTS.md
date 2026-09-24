@@ -69,7 +69,7 @@ apt-get -y             # Auto-confirm
 
 ## Definition of Done
 
-1. **Verify**: Run `task syntax`, `task lint`, and `task test` (TF).
+1. **Verify**: Run `task syntax`, `task lint`, and `task -d terraform test` (TF).
 2. **Review**: CodeRabbit reviews the PR automatically on GitHub — no local run. Address its comments with `/fix-pr`.
 3. **Commit**: Use `feat:`, `fix:`, or `chore:` prefixes.
 4. **Land the plane**:
