@@ -195,7 +195,7 @@ tasks:
         vars: { PLAYBOOK: "main.yml", LIMIT: "minecraft", CLI_ARGS: "{{.CLI_ARGS}}" }
 
   minecraft2:
-    desc: Deploy second Minecraft Bedrock server (Boot's Paradise)
+    desc: Deploy second Minecraft Bedrock server (Noob's Jungle)
     cmds:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "minecraft2", CLI_ARGS: "{{.CLI_ARGS}}" }
