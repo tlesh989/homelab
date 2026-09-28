@@ -10,6 +10,7 @@
     "before 9am on monday"
   ],
   "platformAutomerge": true,
+  "automerge": true,
   "customDatasources": {
     "minecraft-bds": {
       "defaultRegistryUrlTemplate": "https://raw.githubusercontent.com/Bedrock-OSS/BDS-Versions/main/versions.json",
@@ -33,14 +34,6 @@
   ],
   "packageRules": [
     {
-      "description": "Automerge pinning and digest updates",
-      "matchUpdateTypes": [
-        "pinning",
-        "digest"
-      ],
-      "automerge": true
-    },
-    {
       "description": "Group minor and patch updates for Terraform providers",
       "matchManagers": [
         "terraform"
@@ -49,8 +42,7 @@
         "minor",
         "patch"
       ],
-      "groupName": "terraform minor/patch",
-      "automerge": true
+      "groupName": "terraform minor/patch"
     },
     {
       "description": "Group minor and patch updates for Ansible Galaxy roles",
@@ -61,8 +53,7 @@
         "minor",
         "patch"
       ],
-      "groupName": "ansible-galaxy minor/patch",
-      "automerge": true
+      "groupName": "ansible-galaxy minor/patch"
     },
     {
       "description": "Group minor and patch updates for GitHub Actions",
@@ -73,11 +64,10 @@
         "minor",
         "patch"
       ],
-      "groupName": "github-actions minor/patch",
-      "automerge": true
+      "groupName": "github-actions minor/patch"
     },
     {
-      "description": "Automerge minor and patch updates for pre-commit",
+      "description": "Group minor and patch updates for pre-commit",
       "matchManagers": [
         "pre-commit"
       ],
@@ -85,8 +75,7 @@
         "minor",
         "patch"
       ],
-      "groupName": "pre-commit minor/patch",
-      "automerge": true
+      "groupName": "pre-commit minor/patch"
     },
     {
       "description": "Group minor and patch updates for mise-managed tools",
@@ -97,8 +86,7 @@
         "minor",
         "patch"
       ],
-      "groupName": "mise minor/patch",
-      "automerge": true
+      "groupName": "mise minor/patch"
     }
   ]
 }
