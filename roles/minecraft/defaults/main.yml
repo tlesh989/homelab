@@ -11,6 +11,7 @@ minecraft_max_players: 10
 minecraft_online_mode: true
 minecraft_difficulty: peaceful
 minecraft_gamemode: survival
+minecraft_level_type: DEFAULT
 minecraft_update_weekday: "0"
 minecraft_update_hour: "3"
 minecraft_update_minute: "0"

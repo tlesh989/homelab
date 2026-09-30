@@ -82,17 +82,26 @@ unifi_dhcp_reservations:
     ip: "192.168.233.240"
 
 unifi_port_forwards:
+  # Flat creative world on .19 is LAN-only; the public forwards below go to .20.
   - name: minecraft
     proto: udp
     dst_port: "19132"
     fwd: "192.168.233.19"
     fwd_port: "19132"
-    enabled: true
+    enabled: false
+  # NetherNet: TCP signaling on server-port, then UDP gameplay on the
+  # server-udp-ports range (same numbers externally and internally).
   - name: minecraft2
-    proto: udp
-    dst_port: "19133"
+    proto: tcp
+    dst_port: "19132"
     fwd: "192.168.233.20"
     fwd_port: "19132"
+    enabled: true
+  - name: minecraft2-udp
+    proto: udp
+    dst_port: "30000-30009"
+    fwd: "192.168.233.20"
+    fwd_port: "30000-30009"
     enabled: true
 
 # geerlingguy.ntp
