@@ -15,3 +15,16 @@ acme_deploy_target_hosts: ["caddy.tlesh.xyz"]
 # Must match roles/caddy's caddy_deploy_user / caddy_tls_dir defaults.
 acme_deploy_remote_user: acme-deploy
 acme_deploy_remote_tls_dir: /etc/caddy/tls
+
+# Second cert: the public Minecraft hostname (tlesh.net zone, so it needs the
+# tlesh.net-scoped Cloudflare token). Pushed to minecraft2's Caddy — see roles/minecraft.
+acme_mc_domain: "{{ lookup('env', 'MINECRAFT_SERVER') }}"
+acme_mc_cert_dir: "/etc/ssl/homelab-mc"
+# Separate acme.sh config home: dns_cf saves its Cloudflare token account-wide, so sharing
+# /root/.acme.sh would overwrite the tlesh.xyz token the wildcard cert renews with.
+acme_mc_home: "/root/.acme.sh-mc"
+acme_mc_cf_token: "{{ lookup('env', 'CF_DNS_API_TOKEN_NET') }}"
+acme_mc_deploy_target_hosts: ["minecraft2.tlesh.xyz"]
+# Must match roles/minecraft's minecraft_deploy_user / minecraft_tls_dir.
+acme_mc_deploy_remote_user: acme-deploy
+acme_mc_deploy_remote_tls_dir: /etc/caddy/tls

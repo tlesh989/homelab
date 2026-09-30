@@ -148,3 +148,7 @@
     minute: "{{ minecraft_update_minute }}"
     job: /usr/local/bin/minecraft-update >> /var/log/minecraft-update.log 2>&1
   become: true
+
+- name: Configure TLS proxy for NetherNet
+  ansible.builtin.include_tasks: tls_proxy.yml
+  when: minecraft_tls_proxy | bool

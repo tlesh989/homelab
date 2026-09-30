@@ -6,6 +6,10 @@ After=network.target
 Type=simple
 User=minecraft
 WorkingDirectory={{ minecraft_install_dir }}
+{% if minecraft_tls_proxy %}
+# Best-effort ('-'): if the IP lookup fails BDS still starts with the previous value.
+ExecStartPre=-/usr/local/sbin/minecraft-udp-ports.sh
+{% endif %}
 ExecStart={{ minecraft_install_dir }}/bedrock_server
 Restart=on-failure
 RestartSec=5s

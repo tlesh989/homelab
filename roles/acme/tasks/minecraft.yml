@@ -1,0 +1,95 @@
+---
+- name: Authorize deploy key on Minecraft TLS hosts
+  ansible.posix.authorized_key:
+    user: "{{ acme_mc_deploy_remote_user }}"
+    key: "{{ _acme_deploy_pubkey.content | b64decode | trim }}"
+    comment: "acme-deploy from pi-hole"
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ acme_mc_deploy_target_hosts }}"
+  when: not ansible_check_mode
+  become: true
+
+- name: Create Minecraft cert output directory
+  ansible.builtin.file:
+    path: "{{ acme_mc_cert_dir }}"
+    state: directory
+    mode: "0750"
+    owner: root
+    group: root
+  become: true
+
+- name: Template Minecraft deploy hook script
+  ansible.builtin.template:
+    src: deploy-hook-mc.sh.j2
+    dest: "{{ acme_acmesh_home }}/deploy-hook-mc.sh"
+    mode: "0750"
+    owner: root
+    group: root
+  become: true
+
+- name: Check if Minecraft cert is already installed
+  ansible.builtin.stat:
+    path: "{{ acme_mc_cert_dir }}/fullchain.pem"
+  register: _mc_cert_installed
+  become: true
+
+- name: Issue Minecraft certificate (DNS-01 via Cloudflare)
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      rc=0
+      "{{ acme_acmesh_home }}/acme.sh" \
+        --config-home "{{ acme_mc_home }}" \
+        --server letsencrypt \
+        --accountemail "{{ acme_email }}" \
+        --issue \
+        --dns dns_cf \
+        --dnssleep 30 \
+        --domain "{{ acme_mc_domain }}" || rc=$?
+      # acme.sh exits 2 when the cert is already issued and not due for renewal
+      [[ ${rc} -eq 0 || ${rc} -eq 2 ]]
+    executable: /bin/bash
+  environment:
+    CF_Token: "{{ acme_mc_cf_token }}"
+    HOME: /root
+  no_log: true
+  when:
+    - not _mc_cert_installed.stat.exists
+    - not ansible_check_mode
+  changed_when: true
+  become: true
+
+- name: Install Minecraft cert to output directory and register reloadcmd
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      "{{ acme_acmesh_home }}/acme.sh" \
+        --config-home "{{ acme_mc_home }}" \
+        --install-cert --ecc \
+        --domain "{{ acme_mc_domain }}" \
+        --cert-file "{{ acme_mc_cert_dir }}/cert.pem" \
+        --key-file "{{ acme_mc_cert_dir }}/privkey.pem" \
+        --fullchain-file "{{ acme_mc_cert_dir }}/fullchain.pem" \
+        --reloadcmd "{{ acme_acmesh_home }}/deploy-hook-mc.sh"
+    executable: /bin/bash
+  environment:
+    HOME: /root
+  when:
+    - not _mc_cert_installed.stat.exists
+    - not ansible_check_mode
+  changed_when: true
+  notify: Run Minecraft deploy hook
+  become: true
+
+# The stock cronjob only renews the default config home.
+- name: Enable acme.sh auto-renewal cron for the Minecraft cert
+  ansible.builtin.cron:
+    name: "acme.sh renew minecraft cert"
+    minute: "17"
+    hour: "0"
+    job: "{{ acme_acmesh_home }}/acme.sh --cron --home {{ acme_acmesh_home }} --config-home {{ acme_mc_home }} > /dev/null"
+    user: root
+  environment:
+    HOME: /root
+  become: true

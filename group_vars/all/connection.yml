@@ -89,13 +89,20 @@ unifi_port_forwards:
     fwd: "192.168.233.19"
     fwd_port: "19132"
     enabled: false
-  # NetherNet: TCP signaling on server-port, then UDP gameplay on the
+  # NetherNet: TLS signaling on 19134 (Caddy -> BDS), then UDP gameplay on the
   # server-udp-ports range (same numbers externally and internally).
+  # Plain BDS signaling (19132) stays LAN-only; rule kept disabled, the role does not delete.
   - name: minecraft2
     proto: tcp
     dst_port: "19132"
     fwd: "192.168.233.20"
     fwd_port: "19132"
+    enabled: false
+  - name: minecraft2-tls
+    proto: tcp
+    dst_port: "19134"
+    fwd: "192.168.233.20"
+    fwd_port: "19134"
     enabled: true
   - name: minecraft2-udp
     proto: udp

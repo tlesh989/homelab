@@ -1,0 +1,77 @@
+---
+- name: Install Caddy
+  ansible.builtin.package:
+    name: caddy
+    state: present
+  become: true
+
+- name: Create acme-deploy group
+  ansible.builtin.group:
+    name: "{{ minecraft_deploy_user }}"
+    system: true
+  become: true
+
+- name: Create acme-deploy system user (receives cert push from pi-hole)
+  ansible.builtin.user:
+    name: "{{ minecraft_deploy_user }}"
+    group: "{{ minecraft_deploy_user }}"
+    groups: caddy
+    append: true
+    system: true
+    shell: /bin/bash
+    home: "/home/{{ minecraft_deploy_user }}"
+    create_home: true
+  become: true
+
+- name: Create Caddy TLS directory (setgid so pushed certs inherit caddy group)
+  ansible.builtin.file:
+    path: "{{ minecraft_tls_dir }}"
+    state: directory
+    owner: "{{ minecraft_deploy_user }}"
+    group: caddy
+    mode: "2750"
+  become: true
+
+- name: Allow acme-deploy to reload or start caddy without a password
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ minecraft_deploy_user }}"
+    content: "{{ minecraft_deploy_user }} ALL=(root) NOPASSWD: /usr/bin/systemctl reload-or-restart caddy\n"
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: true
+
+- name: Check for pushed TLS cert
+  ansible.builtin.stat:
+    path: "{{ minecraft_tls_dir }}/fullchain.pem"
+  register: _minecraft_tls_cert
+  become: true
+
+- name: Template Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    owner: root
+    group: caddy
+    mode: "0640"
+  become: true
+  notify: restart caddy
+
+# Caddy cannot start without the cert; the deploy hook on pi-hole starts it after the first push.
+- name: Enable Caddy (started once the cert exists)
+  ansible.builtin.service:
+    name: caddy
+    enabled: true
+    state: "{{ 'started' if _minecraft_tls_cert.stat.exists else omit }}"
+  become: true
+
+- name: Deploy public-IP helper for server-udp-ports
+  ansible.builtin.template:
+    src: minecraft-udp-ports.sh.j2
+    dest: /usr/local/sbin/minecraft-udp-ports.sh
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+  notify:
+    - reload systemd
+    - restart minecraft
