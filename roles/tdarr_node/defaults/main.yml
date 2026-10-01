@@ -11,4 +11,6 @@ tdarr_node_server_ip: 192.168.220.24
 tdarr_node_server_port: 8266
 tdarr_node_id: tdarr-node-sturm
 
-tdarr_node_image: haveagitgat/tdarr_node:latest
+# Must match arr_tdarr_server_version — the server rejects nodes on a different version.
+# renovate: datasource=docker depName=haveagitgat/tdarr_node
+tdarr_node_version: "2.91.01"
