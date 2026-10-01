@@ -122,7 +122,7 @@ network_inventory:
       assignment: reservation
       managed_by: ansible
       dns: []
-      notes: "Noob's Jungle Minecraft server (public); external TCP 19134 (TLS via Caddy) + UDP 30000-30009"
+      notes: "Noob's Jungle Minecraft server (public); external TCP 19132 (TLS via Caddy, BDS on 19131) + UDP 30000-30009"
     - name: tailscale
       ip: 192.168.233.21
       mac: "ea:31:e7:19:05:63"
