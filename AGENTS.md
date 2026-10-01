@@ -21,7 +21,7 @@ Source of truth is `.claude/rules/` (Claude Code auto-loads it); `.agents/rules/
 - **[Docker](.claude/rules/docker.md)**: Image tags, Watchtower, service checklist.
 - **[Gitflow](.claude/rules/gitflow.md)**: Branching strategy, PR reviews, CI.
 - **[Tooling](.claude/rules/tools.md)**: Doppler, Context7, RTK, CLI flags.
-- **[Public Hostnames](.claude/rules/public-hostnames.md)**: Never post `tlesh.net` hostnames in PRs, comments, commits, or code.
+- **[Public Hostnames](.claude/rules/public-hostnames.md)**: Never post public-domain (`.net`) hostnames in PRs, comments, commits, or code.
 - **[RTK](.claude/rules/rtk.md)**: Token-optimized command instructions.
 - **[Memory](MEMORY.md)**: Architectural decisions and tech debt history.
 
