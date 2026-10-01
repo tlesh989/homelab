@@ -4,3 +4,5 @@ minecraft_level_name: "Boot's Paradise"
 minecraft_level_seed: ""
 minecraft_level_type: FLAT
 minecraft_gamemode: creative
+# LAN-only server: NetherNet failed from iOS 1.26.52+ clients here; RakNet connects.
+minecraft_transport: raknet
