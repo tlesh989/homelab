@@ -82,6 +82,25 @@
   notify: Run Minecraft deploy hook
   become: true
 
+# Covers a rebuilt Minecraft host: pi-hole still has the cert, so nothing above re-pushes it.
+- name: Check Minecraft cert on target hosts
+  ansible.builtin.stat:
+    path: "{{ acme_mc_deploy_remote_tls_dir }}/fullchain.pem"
+  delegate_to: "{{ item }}"
+  loop: "{{ acme_mc_deploy_target_hosts }}"
+  register: _mc_remote_cert
+  become: true
+
+- name: Re-push Minecraft cert to hosts missing it
+  ansible.builtin.debug:
+    msg: "Minecraft cert missing on a target host; running deploy hook"
+  changed_when: true
+  when:
+    - _mc_cert_installed.stat.exists
+    - _mc_remote_cert.results | rejectattr('stat.exists') | list | length > 0
+    - not ansible_check_mode
+  notify: Run Minecraft deploy hook
+
 # The stock cronjob only renews the default config home.
 - name: Enable acme.sh auto-renewal cron for the Minecraft cert
   ansible.builtin.cron:

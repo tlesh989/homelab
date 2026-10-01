@@ -58,7 +58,7 @@
 
 # Caddy cannot start without the cert; the deploy hook on pi-hole starts it after the first push.
 - name: Enable Caddy (started once the cert exists)
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: caddy
     enabled: true
     state: "{{ 'started' if _minecraft_tls_cert.stat.exists else omit }}"

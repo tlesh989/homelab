@@ -11,7 +11,7 @@
   become: true
 
 - name: restart caddy
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: caddy
     state: restarted
   become: true
