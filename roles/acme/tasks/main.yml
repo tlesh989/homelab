@@ -144,3 +144,6 @@
   changed_when: false
   when: not ansible_check_mode
   become: true
+
+- name: Issue and distribute the Minecraft certificate
+  ansible.builtin.include_tasks: minecraft.yml

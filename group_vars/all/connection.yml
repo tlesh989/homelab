@@ -89,14 +89,21 @@ unifi_port_forwards:
     fwd: "192.168.233.19"
     fwd_port: "19132"
     enabled: false
-  # NetherNet: TCP signaling on server-port, then UDP gameplay on the
-  # server-udp-ports range (same numbers externally and internally).
+  # NetherNet: TLS signaling on the default port 19132 (Caddy -> BDS on 19131), then UDP
+  # gameplay on the server-udp-ports range (same numbers externally and internally).
   - name: minecraft2
     proto: tcp
     dst_port: "19132"
     fwd: "192.168.233.20"
     fwd_port: "19132"
     enabled: true
+  # Temporary TLS port from the first rollout; superseded by the default-port rule above.
+  - name: minecraft2-tls
+    proto: tcp
+    dst_port: "19134"
+    fwd: "192.168.233.20"
+    fwd_port: "19132"
+    enabled: false
   - name: minecraft2-udp
     proto: udp
     dst_port: "30000-30009"

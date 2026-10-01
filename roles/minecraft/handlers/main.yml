@@ -9,3 +9,10 @@
     name: minecraft
     state: restarted
   become: true
+
+- name: restart caddy
+  ansible.builtin.systemd:
+    name: caddy
+    state: restarted
+  become: true
+  when: _minecraft_tls_cert.stat.exists

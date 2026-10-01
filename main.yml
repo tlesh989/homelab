@@ -183,6 +183,16 @@
     - role: users
     - role: caddy
 
+# Runs before pi-hole: acme's Minecraft deploy hook (pi-hole) authorizes an SSH key
+# against minecraft2's acme-deploy user, which the minecraft role creates.
+- name: setup minecraft2 server
+  hosts: minecraft2
+  become: true
+  roles:
+    - role: users
+    - role: geerlingguy.ntp
+    - role: minecraft
+
 - name: setup pi-hole server
   hosts: pi-hole
   become: true
@@ -210,14 +220,6 @@
 
 - name: setup minecraft server
   hosts: minecraft
-  become: true
-  roles:
-    - role: users
-    - role: geerlingguy.ntp
-    - role: minecraft
-
-- name: setup minecraft2 server
-  hosts: minecraft2
   become: true
   roles:
     - role: users

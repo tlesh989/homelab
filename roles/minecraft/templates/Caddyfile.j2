@@ -1,0 +1,9 @@
+# Managed by Ansible — do not edit manually
+{
+	auto_https off
+}
+
+{{ minecraft_tls_domain }}:{{ minecraft_tls_port }} {
+	tls {{ minecraft_tls_dir }}/fullchain.pem {{ minecraft_tls_dir }}/privkey.pem
+	reverse_proxy 127.0.0.1:{{ minecraft_port }}
+}

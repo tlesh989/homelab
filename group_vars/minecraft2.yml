@@ -4,3 +4,7 @@ minecraft_level_name: "Noob's Jungle"
 minecraft_level_seed: "sulfur caves"
 minecraft_gamemode: survival
 minecraft_operator_xuid: "{{ lookup('env', 'MINECRAFT2_OPERATOR_XUID') | default(None, true) }}"
+minecraft_tls_proxy: true
+# Caddy terminates TLS on the default port; BDS moves behind it.
+minecraft_port: 19131
+minecraft_tls_port: 19132

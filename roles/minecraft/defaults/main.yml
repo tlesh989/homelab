@@ -19,3 +19,18 @@ minecraft_update_minute: "0"
 # overridden in group_vars/host_vars. An empty XUID would produce a broken
 # permissions.json, so tasks/main.yml asserts this is non-null/non-empty.
 minecraft_operator_xuid: "{{ lookup('env', 'MINECRAFT_OPERATOR_XUID') | default(None, true) }}"
+
+# NetherNet clients (iOS 1.26.52+) do TLS on the signaling port, which BDS does not serve.
+# When enabled, Caddy terminates TLS on minecraft_tls_port and proxies to BDS, and
+# server-udp-ports advertises the UDP range at the current public IP. The cert is
+# pushed here by acme.sh on pi-hole (roles/acme) — same pattern as roles/caddy.
+minecraft_tls_proxy: false
+minecraft_tls_port: 19134
+minecraft_udp_ports: "30000-30009"
+minecraft_tls_domain: "{{ lookup('env', 'MINECRAFT_SERVER') }}"
+minecraft_tls_dir: /etc/caddy/tls
+# Must match roles/acme's acme_mc_deploy_remote_user / acme_mc_deploy_remote_tls_dir.
+minecraft_deploy_user: acme-deploy
+# BDS only accepts an IP literal in server-udp-ports, and ours is dynamic. Resolved at
+# deploy time here and at every service start by minecraft-udp-ports.sh.
+minecraft_public_ip: "{{ lookup('ansible.builtin.url', 'https://ifconfig.me/ip') }}"

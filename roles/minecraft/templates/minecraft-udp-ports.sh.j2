@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Managed by Ansible — runs before BDS starts (ExecStartPre).
+# Advertises the current public IP in server-udp-ports; BDS only takes an IP literal.
+# ponytail: refreshed on service (re)start only; an IP change mid-week needs a restart.
+set -euo pipefail
+
+PROPS="{{ minecraft_install_dir }}/server.properties"
+ip=$(curl -fsS --max-time 10 https://ifconfig.me/ip)
+[[ "${ip}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "unexpected public IP '${ip}'" >&2; exit 1; }
+
+sed -i '/^server-udp-ports=/d' "${PROPS}"
+echo "server-udp-ports=${ip}:{{ minecraft_udp_ports }}:{{ minecraft_udp_ports }}" >> "${PROPS}"

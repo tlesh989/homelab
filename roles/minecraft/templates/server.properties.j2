@@ -19,3 +19,6 @@ texturepack-required=false
 server-authoritative-movement=server-auth
 server-authoritative-block-breaking=false
 chat-restriction=None
+{% if minecraft_tls_proxy %}
+server-udp-ports={{ minecraft_public_ip }}:{{ minecraft_udp_ports }}:{{ minecraft_udp_ports }}
+{% endif %}

@@ -14,7 +14,7 @@
 - name: Assert DDNS_DOMAINS is set
   ansible.builtin.assert:
     that: lookup('env', 'DDNS_DOMAINS') | length > 0
-    fail_msg: "DDNS_DOMAINS must be set in Doppler — comma-separated list of domains to update (e.g. mc.tlesh.net,684.tlesh.net,684.tlesh.xyz)"
+    fail_msg: "DDNS_DOMAINS must be set in Doppler — comma-separated list of domains to update (e.g. host.example.net,host.example.xyz)"
   when: not ansible_check_mode
 
 - name: Assert every DDNS domain matched a known zone
