@@ -19,8 +19,6 @@ caddy_deploy_user: acme-deploy
 caddy_services:
   - name: pihole
     upstream: "192.168.233.3:8080"
-  - name: pi-hole
-    upstream: "192.168.233.3:8080"
   - name: glance
     upstream: "192.168.233.10:8080"
   - name: uptime-kuma
