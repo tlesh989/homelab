@@ -152,33 +152,33 @@ network_inventory:
       dns: []
       notes: "Personal device — do not assign to infrastructure"
     - name: drizzt
-      ip: 192.168.233.27
+      ip: 192.168.233.241
       mac: "6c:6e:07:1e:39:74"
       assignment: reservation
       managed_by: manual
       dns: []
-      notes: ""
+      notes: "Laptop — personal device pool (.240-.250)"
     - name: magius
-      ip: 192.168.233.29
+      ip: 192.168.233.242
       mac: "d0:37:45:cf:ce:4c"
       assignment: reservation
       managed_by: manual
       dns: []
-      notes: ""
+      notes: "Laptop — personal device pool (.240-.250)"
     - name: kaladin
-      ip: 192.168.233.30
+      ip: 192.168.233.243
       mac: "c4:35:d9:89:4c:b4"
       assignment: reservation
       managed_by: manual
       dns: []
-      notes: ""
+      notes: "Laptop — personal device pool (.240-.250)"
     - name: kvothe
-      ip: 192.168.233.31
+      ip: 192.168.233.244
       mac: "54:bf:64:2e:b2:51"
       assignment: reservation
       managed_by: manual
       dns: []
-      notes: ""
+      notes: "Laptop — personal device pool (.240-.250)"
     - name: homeassistant
       ip: 192.168.233.35
       mac: "b8:27:eb:75:3a:e3"
