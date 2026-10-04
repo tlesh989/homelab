@@ -62,7 +62,7 @@ GymRoku `.79`
 ## IoT Network — 192.168.40.0/24 (IoT, VLAN 40)
 
 DHCP pool: `.10–.200` (dynamic, cattle model — no reservations)
-DNS: `192.168.233.3` (pi-hole), `192.168.40.1` (fallback)
+DNS: gateway only (`192.168.40.1`, DHCP "Auto") — NextDNS CLI on the gateway applies per-device profiles; local names forwarded to Pi-hole
 
 | IP | Hostname | Notes |
 |----|----------|-------|
