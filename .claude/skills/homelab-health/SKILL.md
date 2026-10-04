@@ -35,11 +35,14 @@ Report-only. Never changes hosts, config, or issues. Ends with a ranked report.
    ```
    Also `systemctl --failed` and `docker ps -a --format '{{.Names}} {{.Status}}' | grep -i restart`. A pattern with count >=20, or seen on multiple days, is a finding — name the host, count and likely fix.
 5. **network** — rogue/noisy devices:
-   - `doppler run -- unifly clients list -o json`; any client whose MAC/IP/name is absent from `docs/known-hosts.md` is 🔴 unknown. Also flag clients with outsized tx/rx, rapid DHCP churn, or offline known devices.
+   - ```bash
+  doppler run -- sh -c 'UNIFI_URL=https://192.168.233.1 UNIFI_INSECURE=true mise exec -- unifly clients list --all -o json-compact' | grep -v '^Showing'
+  ```
+  (`unifly` reads `UNIFI_API_KEY` from Doppler; no config file or keyring.) Any client whose MAC is absent from the Doppler secret `KNOWN_DEVICES` (`mac|name|ip` lines; read it with `doppler secrets get KNOWN_DEVICES --plain`) is 🔴 unknown. Also flag clients with outsized tx/rx, rapid DHCP churn, or offline known devices.
    - Pi-hole (`PIHOLE_ADMIN_PASSWORD`): top clients and top blocked domains; one client dominating queries (>40%) is 🟡.
 6. **uptime** — Uptime Kuma monitors currently down or flapping (`AUTOKUMA_USERNAME`/`AUTOKUMA_PASSWORD`; see `docs/runbooks/uptime-kuma-monitors.md`).
 
-If a section's tool or credential is unavailable (e.g. `unifly` not installed), say so under that section and continue with what works.
+If a section's tool or credential is unavailable (e.g. `unifly` not installed or UniFi unreachable), say so under that section and continue with what works.
 
 ## Report format
 
@@ -50,4 +53,4 @@ HOMELAB HEALTH — <date>
 🟢 OK        — one line per section
 ```
 
-Keep it ranked and terse. Finish by offering to file `bd create` issues for the 🔴/🟡 items — do not create them unprompted. Offer to append confirmed-good unknown clients to `docs/known-hosts.md`.
+Keep it ranked and terse. Finish by offering to file `bd create` issues for the 🔴/🟡 items — do not create them unprompted. Offer to add confirmed-good unknown clients to `KNOWN_DEVICES` in Doppler.

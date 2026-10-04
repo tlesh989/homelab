@@ -1,7 +1,7 @@
 # Known LAN Devices
 
-Baseline for `/homelab-health` rogue-device detection. Any UniFi client not listed here is
-reported as unknown. Match on MAC where given, otherwise hostname/IP.
+Baseline for `/homelab-health` rogue-device detection. Rogue detection compares UniFi clients against
+the Doppler secret `KNOWN_DEVICES`; this file is only the infrastructure inventory.
 
 ## Infrastructure (from `hosts` inventory, 192.168.233.0/24)
 
@@ -23,9 +23,8 @@ reported as unknown. Match on MAC where given, otherwise hostname/IP.
 | claude-code | .22 | | |
 | arr | .24 | | |
 
-## Other devices (phones, TVs, IoT, APs, switches)
+## Other devices and MACs
 
-<!-- Populate from the first /homelab-health run: it lists every unmatched client. -->
-
-| Name | IP/MAC | Owner | Notes |
-|------|--------|-------|-------|
+Not stored in git (names and MACs identify the household). The baseline lives in the Doppler secret
+`KNOWN_DEVICES` (`mac|name|ip` per line, snapshot from UniFi). Update it with:
+`doppler secrets set KNOWN_DEVICES="$(cat file)"`.
