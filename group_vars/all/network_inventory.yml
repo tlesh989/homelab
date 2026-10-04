@@ -207,28 +207,49 @@ network_inventory:
       managed_by: manual
       dns: []
       notes: "UGREEN NAS — legacy, stays in dynamic range (Time Machine + iSCSI)"
-    # UniFi network gear — recorded so reconcile does not flag them as undocumented
-    - name: chimney-ap
-      ip: 192.168.233.139
-      mac:
-      assignment: dynamic-noted
-      managed_by: unifi
-      dns: []
-      notes: "UniFi AC Mesh AP"
-    - name: usw-flex-mini
-      ip: 192.168.233.185
-      mac:
-      assignment: dynamic-noted
-      managed_by: unifi
-      dns: []
-      notes: "UniFi switch"
+    # UniFi network gear — static IPs set on-device (DNS: gateway + 1.1.1.1)
     - name: usw-pro-max-16
-      ip: 192.168.233.188
+      ip: 192.168.233.32
       mac:
-      assignment: dynamic-noted
+      assignment: static
       managed_by: unifi
       dns: []
       notes: "UniFi core switch"
+    - name: sw-24
+      ip: 192.168.233.33
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi switch (US 24)"
+    - name: xbox-switch
+      ip: 192.168.233.34
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi switch (Flex Mini)"
+    - name: usw-flex-mini
+      ip: 192.168.233.36
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi switch (Flex Mini)"
+    - name: u7-pro-xg
+      ip: 192.168.233.37
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi AP"
+    - name: chimney-ap
+      ip: 192.168.233.38
+      mac:
+      assignment: static
+      managed_by: unifi
+      dns: []
+      notes: "UniFi AC Mesh AP"
     - name: coltons-tablet
       ip: 192.168.233.240
       mac: "da:4d:62:21:d6:88"
