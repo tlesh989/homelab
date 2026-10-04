@@ -1,7 +1,7 @@
 # Managed by Ansible — do not edit manually
 services:
   tdarr-node:
-    image: "{{ tdarr_node_image }}"
+    image: "haveagitgat/tdarr_node:{{ tdarr_node_version }}"
     container_name: tdarr-node
     restart: unless-stopped
     # AppArmor can't load the docker-default profile inside this LXC
