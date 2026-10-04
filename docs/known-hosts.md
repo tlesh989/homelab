@@ -27,4 +27,5 @@ the Doppler secret `KNOWN_DEVICES`; this file is only the infrastructure invento
 
 Not stored in git (names and MACs identify the household). The baseline lives in the Doppler secret
 `KNOWN_DEVICES` (`mac|name|ip` per line, snapshot from UniFi). Update it with:
-`doppler secrets set KNOWN_DEVICES="$(cat file)"`.
+`f=baseline.txt; [ -s "$f" ] || { echo "empty/missing $f" >&2; exit 1; }; doppler secrets set KNOWN_DEVICES="$(cat "$f")"`
+(the guard matters: an empty value makes every UniFi client report as unknown).
