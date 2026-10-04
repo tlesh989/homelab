@@ -61,16 +61,16 @@ unifi_dhcp_reservations:
     ip: "192.168.233.21"
   - name: drizzt
     mac: "6c:6e:07:1e:39:74"
-    ip: "192.168.233.27"
+    ip: "192.168.233.241"
   - name: magius
     mac: "d0:37:45:cf:ce:4c"
-    ip: "192.168.233.29"
+    ip: "192.168.233.242"
   - name: kaladin
     mac: "c4:35:d9:89:4c:b4"
-    ip: "192.168.233.30"
+    ip: "192.168.233.243"
   - name: kvothe
     mac: "54:bf:64:2e:b2:51"
-    ip: "192.168.233.31"
+    ip: "192.168.233.244"
   - name: homeassistant
     mac: "b8:27:eb:75:3a:e3"
     ip: "192.168.233.35"
