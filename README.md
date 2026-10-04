@@ -1,3 +1,5 @@
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/tlesh989/homelab?utm_source=oss&utm_medium=github&utm_campaign=tlesh989%2Fhomelab&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 # homelab
 
 Personal homelab infrastructure managed as code — three Proxmox nodes running LXC containers and VMs, with shared iSCSI storage from TrueNAS.
