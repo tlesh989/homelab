@@ -34,6 +34,14 @@
   ],
   "packageRules": [
     {
+      "description": "Tdarr server and node must run the same version",
+      "matchPackageNames": [
+        "haveagitgat/tdarr",
+        "haveagitgat/tdarr_node"
+      ],
+      "groupName": "tdarr"
+    },
+    {
       "description": "Group minor and patch updates for Terraform providers",
       "matchManagers": [
         "terraform"
