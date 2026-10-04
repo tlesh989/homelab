@@ -26,21 +26,20 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
-| .27 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
-| .29 | magius | Machine | DHCP reservation (MAC: d0:37:45:cf:ce:4c) |
-| .30 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
-| .31 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
+| .32 | USW Pro Max 16 PoE | UniFi core switch | Static IP set on device |
+| .33 | sw-24 | UniFi switch (US 24) | Static IP set on device |
+| .34 | Xbox Switch | UniFi switch (Flex Mini) | Static IP set on device |
 | .35 | homeassistant | Home Assistant | DHCP reservation (Raspberry Pi — MAC: b8:27:eb:75:3a:e3) |
+| .36 | USW Flex Mini | UniFi switch | Static IP set on device |
+| .37 | U7 Pro XG | UniFi AP | Static IP set on device |
+| .38 | chimney-ap | UniFi AC Mesh AP | Static IP set on device |
 | .200 | solinari | UGREEN NAS | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
 
 ### Personal/Media Devices — Dynamic but Notable
 
 | IP | Hostname | Role | Notes |
 |----|----------|------|-------|
-| .139 | chimney-ap | UniFi AC Mesh | Access point |
 | .156 | Denon-AVR-S750H | AV receiver | Stays on main (Plex/DLNA) |
-| .185 | USW Flex Mini | UniFi switch | Managed switch |
-| .188 | USW Pro Max 16 PoE | UniFi switch | Core switch |
 
 ### Personal Device Pool — Reservation-Only (.240–.250)
 
@@ -49,6 +48,10 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 | IP | Hostname | Role | Notes |
 |----|----------|------|-------|
 | .240 | coltons-tablet | Tablet | DHCP reservation (MAC: da:4d:62:21:d6:88) |
+| .241 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
+| .242 | magius | Machine | DHCP reservation (MAC: d0:37:45:cf:ce:4c) |
+| .243 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
+| .244 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
 
 ### Media Devices (staying on main — Plex/DLNA access)
 
