@@ -1,0 +1,23 @@
+discovery-dns {{ '' }}
+use-hosts true
+max-inflight-requests 256
+setup-router true
+listen localhost:53
+{% for profile in unifi_nextdns_profiles %}
+profile {{ profile }}
+{% endfor %}
+log-queries false
+max-ttl 5s
+mdns all
+hardened-privacy false
+report-client-info true
+detect-captive-portals false
+timeout 5s
+debug false
+bogus-priv true
+auto-activate true
+control /var/run/nextdns.sock
+cache-size 10MB
+cache-max-age 0s
+cache-metrics false
+forwarder tlesh.xyz.=192.168.233.3

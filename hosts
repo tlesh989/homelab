@@ -34,6 +34,13 @@ ansalon ansible_host=192.168.233.6 ansible_connection=local ansible_become=false
 [unifi]
 localhost ansible_connection=local ansible_become=false
 
+[unifi_gateway]
+# NextDNS CLI config on the Express 7 itself (root over key auth, no become)
+unifi-gateway ansible_host=192.168.233.1 ansible_user=root ansible_become=false
+
+[unifi:children]
+unifi_gateway
+
 [caddy]
 caddy.tlesh.xyz ansible_host=192.168.233.17
 

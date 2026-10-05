@@ -1,0 +1,4 @@
+---
+- name: Restart nextdns
+  ansible.builtin.command: /data/nextdns restart
+  changed_when: true

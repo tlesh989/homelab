@@ -1,0 +1,20 @@
+---
+- name: Ensure NEXTDNS_PROFILE_MAP is set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'NEXTDNS_PROFILE_MAP') | length > 0
+    fail_msg: "NEXTDNS_PROFILE_MAP must be set (run via doppler run -- or task nextdns)"
+
+# no_log: the rendered diff would expose the MAC-to-profile map.
+- name: Render NextDNS CLI config
+  ansible.builtin.template:
+    src: nextdns.conf.j2
+    dest: /data/nextdns.conf
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    # One entry per line: "<mac>=<profile id>", or a bare profile id for the default profile
+    unifi_nextdns_profiles: "{{ lookup('env', 'NEXTDNS_PROFILE_MAP').splitlines() }}"
+  no_log: true
+  notify: Restart nextdns
