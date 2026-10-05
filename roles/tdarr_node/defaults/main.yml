@@ -13,4 +13,4 @@ tdarr_node_id: tdarr-node-sturm
 
 # Must match arr_tdarr_server_version — the server rejects nodes on a different version.
 # renovate: datasource=docker depName=haveagitgat/tdarr_node
-tdarr_node_version: "2.91.01"
+tdarr_node_version: "2.94.02"
