@@ -3,7 +3,8 @@
   ansible.builtin.assert:
     that:
       - lookup('env', 'NEXTDNS_PROFILE_MAP') | length > 0
-    fail_msg: "NEXTDNS_PROFILE_MAP must be set (run via doppler run -- or task nextdns)"
+      - lookup('env', 'MINECRAFT_SERVER') | length > 0
+    fail_msg: "NEXTDNS_PROFILE_MAP and MINECRAFT_SERVER must be set (run via doppler run -- or task nextdns)"
 
 # no_log: the rendered diff would expose the MAC-to-profile map.
 - name: Render NextDNS CLI config
@@ -16,5 +17,7 @@
   vars:
     # One entry per line: "<mac>=<profile id>", or a bare profile id for the default profile
     unifi_nextdns_profiles: "{{ lookup('env', 'NEXTDNS_PROFILE_MAP').splitlines() }}"
+    # Split-horizon: Pi-hole answers the public Minecraft name with the LAN address
+    unifi_nextdns_minecraft_host: "{{ lookup('env', 'MINECRAFT_SERVER') }}"
   no_log: true
   notify: Restart nextdns
