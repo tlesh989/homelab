@@ -83,6 +83,12 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", LIMIT: "unifi", CLI_ARGS: "{{.CLI_ARGS}}" }
 
+  nextdns:
+    desc: Apply NextDNS CLI config to the UniFi gateway (add --check --diff to preview)
+    cmds:
+      - task: ansible
+        vars: { PLAYBOOK: "main.yml", LIMIT: "unifi_gateway", CLI_ARGS: "{{.CLI_ARGS}}" }
+
   tailscale:
     desc: Run Ansible playbook for Tailscale hosts
     cmds:

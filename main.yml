@@ -238,8 +238,17 @@
     - role: uptime_kuma
 
 - name: configure unifi
-  hosts: unifi
+  hosts: unifi:!unifi_gateway
   connection: local
   gather_facts: false
   roles:
     - role: unifi
+
+- name: configure unifi gateway (NextDNS CLI)
+  hosts: unifi_gateway
+  gather_facts: false
+  tasks:
+    - name: Apply NextDNS CLI config
+      ansible.builtin.import_role:
+        name: unifi
+        tasks_from: nextdns.yml
