@@ -133,6 +133,7 @@
     - role: freshrss
     - role: wallos
     - role: bookorbit
+    - role: pricebuddy
     - role: cloudflare_ddns
     - role: dozzle_hub
       tags: [dozzle]
