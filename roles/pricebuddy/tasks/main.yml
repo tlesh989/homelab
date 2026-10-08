@@ -1,0 +1,114 @@
+---
+- name: Create PriceBuddy data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ pricebuddy_data_dir }}"
+    - "{{ pricebuddy_data_dir }}/mysql"
+    - "{{ pricebuddy_data_dir }}/storage"
+    # The empty storage mount hides the image's dirs; the start script runs key:generate before creating this one and fails.
+    - "{{ pricebuddy_data_dir }}/storage/framework/views"
+  become: true
+
+# The app generates APP_KEY into this file on first start; persisting it keeps sessions valid across recreates.
+- name: Create PriceBuddy .env file
+  ansible.builtin.file:
+    path: "{{ pricebuddy_data_dir }}/.env"
+    state: touch
+    mode: "0600"
+    modification_time: preserve
+    access_time: preserve
+  become: true
+
+- name: Install Docker Python SDK
+  ansible.builtin.package:
+    name: python3-docker
+    state: present
+  become: true
+
+- name: Create PriceBuddy docker network
+  community.docker.docker_network:
+    name: pricebuddy_net
+  become: true
+
+- name: Assert required PriceBuddy secrets are set
+  ansible.builtin.assert:
+    that:
+      - lookup('env', 'PRICEBUDDY_DB_PASSWORD') | length > 0
+      - lookup('env', 'PRICEBUDDY_MYSQL_ROOT_PASSWORD') | length > 0
+      - lookup('env', 'PRICEBUDDY_ADMIN_EMAIL') | length > 0
+      - lookup('env', 'PRICEBUDDY_ADMIN_PASSWORD') | length > 0
+    fail_msg: "PRICEBUDDY_DB_PASSWORD, PRICEBUDDY_MYSQL_ROOT_PASSWORD, PRICEBUDDY_ADMIN_EMAIL, and PRICEBUDDY_ADMIN_PASSWORD must all be set via Doppler."
+  when: not ansible_check_mode
+
+- name: Deploy PriceBuddy MySQL container
+  community.docker.docker_container:
+    name: pricebuddy-db
+    image: "mysql:{{ pricebuddy_mysql_version }}"
+    command: --skip-log-bin
+    state: healthy
+    healthy_wait_timeout: 120
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 1m
+    restart_policy: unless-stopped
+    networks:
+      - name: pricebuddy_net
+    volumes:
+      - "{{ pricebuddy_data_dir }}/mysql:/var/lib/mysql"
+    env:
+      MYSQL_DATABASE: "{{ pricebuddy_db_name }}"
+      MYSQL_USER: "{{ pricebuddy_db_user }}"
+      MYSQL_PASSWORD: "{{ lookup('env', 'PRICEBUDDY_DB_PASSWORD') }}"
+      MYSQL_ROOT_PASSWORD: "{{ lookup('env', 'PRICEBUDDY_MYSQL_ROOT_PASSWORD') }}"
+  become: true
+  no_log: true
+  when: not ansible_check_mode
+
+- name: Deploy PriceBuddy scraper container
+  community.docker.docker_container:
+    name: pricebuddy-scraper
+    image: "jez500/seleniumbase-scrapper:{{ pricebuddy_scraper_version }}"
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: pricebuddy_net
+  become: true
+  when: not ansible_check_mode
+
+- name: Deploy PriceBuddy app container
+  community.docker.docker_container:
+    name: pricebuddy-app
+    image: "jez500/pricebuddy:{{ pricebuddy_app_version }}"
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: pricebuddy_net
+    ports:
+      - "{{ pricebuddy_port | string }}:80"
+    volumes:
+      - "{{ pricebuddy_data_dir }}/storage:/app/storage"
+      - "{{ pricebuddy_data_dir }}/.env:/app/.env"
+    env:
+      TZ: "{{ pricebuddy_timezone }}"
+      APP_URL: "https://{{ pricebuddy_host }}"
+      DB_HOST: pricebuddy-db
+      DB_USERNAME: "{{ pricebuddy_db_user }}"
+      DB_PASSWORD: "{{ lookup('env', 'PRICEBUDDY_DB_PASSWORD') }}"
+      DB_DATABASE: "{{ pricebuddy_db_name }}"
+      APP_USER_EMAIL: "{{ lookup('env', 'PRICEBUDDY_ADMIN_EMAIL') }}"
+      APP_USER_PASSWORD: "{{ lookup('env', 'PRICEBUDDY_ADMIN_PASSWORD') }}"
+      SCRAPER_BASE_URL: http://pricebuddy-scraper:3000
+      AFFILIATE_ENABLED: "true"
+    labels:
+      kuma.pricebuddy-app.http.name: "PriceBuddy"
+      kuma.pricebuddy-app.http.url: "http://{{ ansible_host }}:{{ pricebuddy_port }}"
+      kuma.pricebuddy-app.http.parent_name: "apps"
+  become: true
+  no_log: true
+  when: not ansible_check_mode
