@@ -15,7 +15,7 @@
   ansible.builtin.file:
     path: "{{ pricebuddy_data_dir }}/.env"
     state: touch
-    mode: "0644"
+    mode: "0600"
     modification_time: preserve
     access_time: preserve
   become: true
