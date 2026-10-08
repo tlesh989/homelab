@@ -8,6 +8,8 @@
     - "{{ pricebuddy_data_dir }}"
     - "{{ pricebuddy_data_dir }}/mysql"
     - "{{ pricebuddy_data_dir }}/storage"
+    # The empty storage mount hides the image's dirs; the start script runs key:generate before creating this one and fails.
+    - "{{ pricebuddy_data_dir }}/storage/framework/views"
   become: true
 
 # The app generates APP_KEY into this file on first start; persisting it keeps sessions valid across recreates.
