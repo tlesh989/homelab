@@ -7,7 +7,8 @@
       # config and then restart nextdns on it
       - >-
         lookup('env', 'NEXTDNS_PROFILE_MAP').splitlines()
-        | reject('match', '^(([0-9a-f]{2}(:[0-9a-f]{2}){5}|[0-9]{1,3}(\.[0-9]{1,3}){3}/[0-9]{1,2})=)?[0-9a-f]{6}$') | list | length == 0
+        | reject('match', '^(([0-9a-f]{2}(:[0-9a-f]{2}){5}|(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})(\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})){3}/(3[0-2]|[12]?[0-9]))=)?[0-9a-f]{6}$')
+        | list | length == 0
       - lookup('env', 'MINECRAFT_SERVER') | length > 0
     fail_msg: >-
       NEXTDNS_PROFILE_MAP must be non-empty with one "<mac|cidr>=<profile id>" (or bare profile id) per line,
