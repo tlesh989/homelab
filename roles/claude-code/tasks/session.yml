@@ -1,0 +1,55 @@
+---
+- name: Install claude-session script
+  ansible.builtin.template:
+    src: claude-session.j2
+    dest: /home/{{ claude_code_user }}/.local/bin/claude-session
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0755"
+  become: true
+
+- name: Ensure log directory exists
+  ansible.builtin.file:
+    path: /home/{{ claude_code_user }}/.local/state
+    state: directory
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0755"
+  become: true
+
+- name: Add cc alias for claude-session
+  ansible.builtin.lineinfile:
+    path: /home/{{ claude_code_user }}/.bashrc
+    line: alias cc='claude-session'
+    create: true
+    mode: "0644"
+  become: true
+  become_user: "{{ claude_code_user }}"
+
+- name: Schedule nightly Claude Code update and session restart
+  ansible.builtin.cron:
+    name: claude-session nightly update
+    minute: "0"
+    hour: "4"
+    job: /home/{{ claude_code_user }}/.local/bin/claude-session >> /home/{{ claude_code_user }}/.local/state/claude-session.log 2>&1
+  become: true
+  become_user: "{{ claude_code_user }}"
+
+- name: Check for claude tmux session
+  ansible.builtin.command:
+    cmd: tmux has-session -t =claude
+  become: true
+  become_user: "{{ claude_code_user }}"
+  register: claude_tmux_check
+  changed_when: false
+  failed_when: false
+
+- name: Start claude tmux session with remote control
+  ansible.builtin.command:
+    cmd: >
+      tmux new-session -d -s claude -c {{ claude_code_repo_dest }}
+      "bash -lc 'exec /home/{{ claude_code_user }}/.local/bin/claude --remote-control'"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  when: claude_tmux_check.rc != 0
+  changed_when: true

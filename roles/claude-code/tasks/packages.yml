@@ -64,13 +64,14 @@
     - /usr/share/keyrings/doppler-archive-keyring.gpg
   become: true
 
-- name: Install curl and gpg
+- name: Install curl, gpg and tmux
   ansible.builtin.apt:
     name:
       - curl
       - gpg
       - python3-debian
       - locales
+      - tmux
     state: present
     update_cache: true
   become: true
