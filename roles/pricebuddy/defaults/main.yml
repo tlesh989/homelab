@@ -1,0 +1,15 @@
+---
+# renovate: datasource=docker depName=jez500/pricebuddy
+pricebuddy_app_version: "v1.0.55"
+# renovate: datasource=docker depName=jez500/seleniumbase-scrapper
+pricebuddy_scraper_version: "v1.0.1"
+# Floating minor tag (matches upstream) — not an exact version, no renovate pin.
+pricebuddy_mysql_version: "8.2"
+
+pricebuddy_port: 8092
+pricebuddy_host: "pricebuddy.tlesh.xyz"
+pricebuddy_data_dir: /opt/pricebuddy
+pricebuddy_timezone: America/Detroit
+
+pricebuddy_db_name: pricebuddy
+pricebuddy_db_user: pricebuddy
