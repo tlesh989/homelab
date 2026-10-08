@@ -102,6 +102,7 @@ jobs:
         uses: go-task/setup-task@v2
 
       - name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v7
         with:
           python-version: '3.14'
@@ -111,7 +112,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: .venv
-          key: ${{ runner.os }}-ansible-venv-${{ hashFiles('requirements.txt') }}
+          # venv symlinks into the exact hostedtoolcache Python, so a patch bump must invalidate it
+          key: ${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-ansible-venv-${{ hashFiles('requirements.txt') }}
 
       - name: Install Ansible and Lint
         if: steps.venv-cache.outputs.cache-hit != 'true'
