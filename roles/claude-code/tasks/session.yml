@@ -37,7 +37,7 @@
 
 - name: Check for claude tmux session
   ansible.builtin.command:
-    cmd: tmux has-session -t claude
+    cmd: tmux has-session -t =claude
   become: true
   become_user: "{{ claude_code_user }}"
   register: claude_tmux_check

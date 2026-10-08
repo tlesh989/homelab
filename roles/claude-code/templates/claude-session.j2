@@ -3,6 +3,7 @@
 # "claude" tmux session is running it with remote control. Restarts the session
 # only if the version changed. Attaches when run from an interactive terminal.
 set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:$PATH"  # cron PATH lacks ~/.local/bin
 
 before=$(claude --version)
 timeout 300 claude update
@@ -10,15 +11,15 @@ after=$(claude --version)
 echo "$(date -Is) $before -> $after"
 
 if [[ "$before" != "$after" ]]; then
-  tmux kill-session -t claude 2>/dev/null || true
+  tmux kill-session -t =claude 2>/dev/null || true
 fi
 
-if ! tmux has-session -t claude 2>/dev/null; then
+if ! tmux has-session -t =claude 2>/dev/null; then
   # login shell so mise shims are on PATH under cron
   tmux new-session -d -s claude -c {{ claude_code_repo_dest }} \
     "bash -lc 'exec /home/{{ claude_code_user }}/.local/bin/claude --remote-control'"
 fi
 
 if [[ -t 0 && -z "${TMUX:-}" ]]; then
-  exec tmux attach -t claude
+  exec tmux attach -t =claude
 fi
