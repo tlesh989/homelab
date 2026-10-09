@@ -11,6 +11,10 @@ vars:
   ARR_PGID:
     sh: "awk -F': ' '/^arr_pgid:/ {print $2}' roles/arr/defaults/main.yml"
 
+env:
+  # macOS: prevents "A worker was found in a dead state" in Ansible forks
+  OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
+
 tasks:
   default:
     desc: List all available tasks
