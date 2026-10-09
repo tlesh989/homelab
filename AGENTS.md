@@ -28,7 +28,7 @@ Source of truth is `.claude/rules/` (Claude Code auto-loads it); `.agents/rules/
 ## Dev Commands
 
 ```bash
-mise install              # Install pinned tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint)
+mise install              # Install pinned tool versions (terraform, task, direnv, gh, bun, uv, ansible-core, ansible-lint, yamllint)
 task check                # Dry-run verify all hosts
 task syntax && task lint  # Fast linting/syntax checks
 task ping                 # Verify host connectivity
