@@ -15,6 +15,8 @@
 3. Obtain explicit approval before editing.
 4. Verify your branch.
 5. **PR Review**: CodeRabbit reviews the PR automatically on GitHub after `/ship` opens it — no local CLI run (conserves the free-plan review quota). Fetch and address its comments with `/fix-pr`.
+   - **Skip trivial PRs**: add the `skip-review` label (`gh pr create --label skip-review`) to any simple, straightforward PR (typo/docs, version or value bump, small config tweak). CodeRabbit ignores labelled PRs; Renovate PRs are ignored automatically.
+   - **Incremental reviews are off**: only the first push is reviewed. After later commits, or on a labelled PR that needs a look, comment `@coderabbitai review`.
 
 ## Automation
 

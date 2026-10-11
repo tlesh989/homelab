@@ -14,6 +14,13 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+    # Conserve the review quota: first push only (comment `@coderabbitai review`
+    # for later pushes), skip Renovate, and skip PRs labelled `skip-review`.
+    auto_incremental_review: false
+    ignore_usernames:
+      - "renovate[bot]"
+    labels:
+      - "!skip-review"
     # Review PRs targeting feature branches too (not just main), so stacked
     # PRs get reviewed before they retarget to main. Default is [] (main only).
     base_branches:
