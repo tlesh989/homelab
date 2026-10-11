@@ -71,6 +71,8 @@ DNS: gateway only (`192.168.40.1`, DHCP "Auto") — NextDNS CLI on the gateway a
 
 ### IoT Devices (connect to `ginkgo` SSID)
 
+`ginseng` now serves the Guest network (VLAN 60), so any IoT device still on `ginseng` lands there and must move to `ginkgo`.
+
 Live-checked against the UniFi controller (`/proxy/network/integration/v1/sites/.../clients`) on 2026-08-15.
 Migration from `ginseng` → `ginkgo` happens **only in each device's own app** — WiFi credentials
 are paired into the device at setup time, and UniFi can't reassign a client to a different SSID
@@ -107,6 +109,18 @@ RokuUltra (.189), RokuTCL (.53) — same rationale as GymRoku above.
 
 ---
 
+## Guest Network — 192.168.60.0/24 (Guest, VLAN 60)
+
+DHCP pool: `.10–.254` (dynamic, no reservations)
+DNS: gateway only (`192.168.60.1`) — NextDNS CLI maps this subnet to the `guest` profile (`NEXTDNS_PROFILE_MAP`)
+SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on it can see each other
+(LAN Minecraft). The private SSID for adults/family is `saffron` on Default.
+
+Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
+policy "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132).
+
+---
+
 ## Storage Network — 192.168.220.0/24 (Storage, VLAN 220)
 
 No DHCP. Static assignments only (managed outside UniFi).
@@ -121,6 +135,7 @@ Internet access: disabled. mDNS: enabled.
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones |
 | IoT | IoT (.40) | Internet allowed; blocked from Internal; Internal can initiate to IoT |
+| Guest | Guest (.60) | Internet + gateway allowed; blocked from Internal and IoT except Minecraft `.19`/`.20` |
 | External | WAN | Default deny inbound |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |
