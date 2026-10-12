@@ -1,0 +1,16 @@
+---
+- name: Clone shared Claude Code skills repository
+  ansible.builtin.git:
+    repo: https://github.com/tlesh989/skills.git
+    dest: "{{ claude_code_skills_dest }}"
+    version: main
+  become: true
+  become_user: "{{ claude_code_user }}"
+
+- name: Link shared skills into ~/.claude/skills
+  ansible.builtin.command:
+    cmd: "{{ claude_code_skills_dest }}/install.sh /home/{{ claude_code_user }}/.claude"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  register: claude_code_skills_install
+  changed_when: "'linked' in claude_code_skills_install.stdout"

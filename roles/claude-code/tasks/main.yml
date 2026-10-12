@@ -62,3 +62,6 @@
 
 - name: Install claude-session script, alias, nightly cron and tmux session
   ansible.builtin.import_tasks: session.yml
+
+- name: Install shared Claude Code skills
+  ansible.builtin.import_tasks: skills.yml

@@ -18,6 +18,12 @@
    - **Skip trivial PRs**: add the `skip-review` label (`gh pr create --label skip-review`) to any simple, straightforward PR (typo/docs, version or value bump, small config tweak). CodeRabbit ignores labelled PRs; Renovate PRs are ignored automatically.
    - **Incremental reviews are off**: only the first push is reviewed. After later commits, or on a labelled PR that needs a look, comment `@coderabbitai review`.
 
+## Shipping (repo-specific rules for the shared `/ship` and `/fix-pr` skills)
+
+- PR base is always `main`.
+- Validators: `task syntax` and `task lint` (plus `task -d terraform test` for Terraform).
+- Never stage `.vault_pass`, `vars/vault.yml`, or `*.tfvars`; flag any plaintext secret (secrets come from Doppler).
+
 ## Automation
 
 - **`ci.yml`**: Runs on push/PR to `main`. Executes Terraform `task ci` and Ansible syntax checks.
