@@ -118,8 +118,9 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
-(allow to `.15` on 631/9100). Guest devices must add the printer by IP — mDNS/AirPrint discovery
-doesn't cross VLANs.
+(allow to `.15` on 631/9100). Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
+Service Scope: All), so the printer is discoverable from `ginseng`. Minecraft LAN discovery is
+broadcast-based and does not cross VLANs — add the servers by IP.
 
 ---
 
