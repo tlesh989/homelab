@@ -15,3 +15,4 @@ rtk = "v0.51.0"
 doppler = "3.77.0"
 node = "24.21.0"
 "github:hyperb1iss/unifly" = "0.10.0"
+"npm:coderabbit" = { version = "0.9.0", allow_low_downloads = true, allow_builds = ["coderabbit"] }
