@@ -117,7 +117,9 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 (LAN Minecraft). The private SSID for adults/family is `saffron` on Default.
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
-policy "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132).
+policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
+(allow to `.15` on 631/9100). Guest devices must add the printer by IP — mDNS/AirPrint discovery
+doesn't cross VLANs.
 
 ---
 
