@@ -64,7 +64,7 @@
     - /usr/share/keyrings/doppler-archive-keyring.gpg
   become: true
 
-- name: Install curl, gpg and tmux
+- name: Install curl, gpg, tmux and unzip
   ansible.builtin.apt:
     name:
       - curl
@@ -72,6 +72,7 @@
       - python3-debian
       - locales
       - tmux
+      - unzip
     state: present
     update_cache: true
   become: true
