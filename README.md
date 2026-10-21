@@ -49,6 +49,9 @@ Personal homelab infrastructure managed as code — three Proxmox nodes running 
 ## Quick Start
 
 ```bash
+# Prerequisite on minimal Linux hosts: unzip (needed by mise's npm:coderabbit install; preinstalled on macOS)
+sudo apt-get install -y unzip
+
 # Install pinned tool versions (terraform, task, ansible, ansible-lint, etc.)
 mise install
 
