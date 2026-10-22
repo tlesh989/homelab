@@ -1,6 +1,7 @@
 # IP Address Map
 
-Reference for static and reserved IPs across all homelab networks.
+Reference for static and reserved IPs across all homelab networks. Proxmox node placement
+noted below can change via migration — confirm live with `pvesh get /cluster/resources --type vm`.
 
 ## Main Network — 192.168.233.0/24 (Default, VLAN 1)
 
@@ -14,18 +15,22 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 |----|----------|------|-------|
 | .1 | gateway | UniFi Express 7 | Router/controller |
 | .3 | pi-hole | Pi-hole LXC | Primary DNS (Proxmox: tika) |
-| .6 | ansalon | — | DHCP reservation (MAC: 6c:1f:f7:76:99:8f) |
+| .6 | ansalon | TrueNAS SCALE (UGREEN DXP4800 Plus) | DHCP reservation (MAC: 6c:1f:f7:76:99:8f) |
 | .7 | tika | Proxmox node | Mini PC, 1GbE (AX88179B) |
 | .8 | bupu | Proxmox node | Mini PC, 1GbE (AX88179) |
 | .9 | sturm | Proxmox node | Mini PC, 2.5GbE native |
-| .10 | kaz | Docker host VM | DHCP reservation (MAC: bc:24:11:10:00:01) — glance, n8n, watchtower (on tika) |
+| .10 | kaz | Docker host VM | DHCP reservation (MAC: bc:24:11:10:00:01) — glance, n8n, watchtower, Beszel hub, etc. (on sturm, vm_id 110; migrates) |
 | .11 | jetkvm | JetKVM | DHCP reservation (MAC: 44:b7:d0:e7:82:89) — KVM-over-IP |
 | .12 | plex | Plex LXC | Media server (on sturm) |
 | .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
+| .16 | uptime-kuma | Uptime Kuma LXC | Terraform-managed (on bupu, vm_id 116) |
+| .17 | caddy | Caddy reverse proxy LXC | Terraform-managed (on bupu, vm_id 117) |
 | .18 | tdarr-node | Tdarr transcode node LXC | Terraform-managed (on sturm, vm_id 118) — GPU/VAAPI transcode |
-| .19 | minecraft | Minecraft server VM | DHCP reservation (MAC: bc:24:11:13:00:01) |
+| .19 | minecraft | Minecraft server LXC | Terraform-managed (on sturm, vm_id 119); MAC bc:24:11:13:00:01 |
+| .20 | minecraft2 | Minecraft server LXC | Terraform-managed (on sturm, vm_id 126); MAC bc:24:11:13:00:02 |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
+| .24 | arr | arr stack LXC | Terraform-managed (on bupu, vm_id 106); also .220.24 on Storage |
 | .32 | USW Pro Max 16 PoE | UniFi core switch | Static IP set on device |
 | .33 | sw-24 | UniFi switch (US 24) | Static IP set on device |
 | .34 | Xbox Switch | UniFi switch (Flex Mini) | Static IP set on device |
@@ -33,7 +38,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .36 | USW Flex Mini | UniFi switch | Static IP set on device |
 | .37 | U7 Pro XG | UniFi AP | Static IP set on device |
 | .38 | chimney-ap | UniFi AC Mesh AP | Static IP set on device |
-| .200 | solinari | UGREEN NAS | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
+| .200 | solinari | NAS (Synology DSM, model unverified) | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
 
 ### Personal/Media Devices — Dynamic but Notable
 
