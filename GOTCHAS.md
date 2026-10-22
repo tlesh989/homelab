@@ -9,6 +9,9 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 - **Service misbehaves after a NIC was added to a running LXC** → Terraform hot-plugs
   `network_interface` changes; processes started before keep stale network state → `pct reboot <vmid>`
   after any NIC change. (homelab-6z2)
+- **Guest eth0 receives frames tagged for other VLANs (60, 40, …)** → on a VLAN-aware `vmbr0`, Proxmox
+  trunks every untagged guest NIC to VLANs 2-4094 (hardcoded, `bridge-vids` doesn't limit it) → keep
+  `vmbr0` non-VLAN-aware; `tag=N` NICs still work via the auto `vmbr0vN` bridge. (homelab-ngq)
 - **`terraform plan` wants to `+ create` an existing LXC** → it migrated to another node; bpg reads the
   node in state and finds nothing (`ignore_changes = [node_name]` doesn't help) → **don't apply**.
   Check the live node (`pvesh get /cluster/resources --type vm`), set `node_name`, then
