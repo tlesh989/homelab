@@ -38,7 +38,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .36 | USW Flex Mini | UniFi switch | Static IP set on device |
 | .37 | U7 Pro XG | UniFi AP | Static IP set on device |
 | .38 | chimney-ap | UniFi AC Mesh AP | Static IP set on device |
-| .200 | solinari | NAS (Synology DSM, model unverified) | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
+| .200 | solinari | Synology DS218play NAS | DHCP reservation (MAC: 00:11:32:8e:27:e1) — legacy: stays in dynamic range; moving would break macOS Time Machine config and Proxmox iSCSI storage references |
 
 ### Personal/Media Devices — Dynamic but Notable
 
