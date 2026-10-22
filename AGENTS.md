@@ -24,6 +24,7 @@ Source of truth is `.claude/rules/` (Claude Code auto-loads it); `.agents/rules/
 - **[Public Hostnames](.claude/rules/public-hostnames.md)**: Never post public-domain (`.net`) hostnames in PRs, comments, commits, or code.
 - **[RTK](.claude/rules/rtk.md)**: Token-optimized command instructions.
 - **[Memory](MEMORY.md)**: Architectural decisions and tech debt history.
+- **[Gotchas](GOTCHAS.md)**: Symptom → cause → fix for things that bit us. Check it when debugging; add an entry when you learn one.
 
 ## Dev Commands
 
