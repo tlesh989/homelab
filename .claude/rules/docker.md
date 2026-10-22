@@ -4,7 +4,7 @@
 
 - Prefer pinning to a major version tag (e.g., `:2`, `:1`) when the registry publishes them.
 - **`:latest` is acceptable** for homelab services where no versioned tags exist or images are rarely updated.
-- Pin Watchtower itself to a specific version (e.g., `1.14.4`), not a major tag.
+- Pin Watchtower itself to a specific version (e.g., `1.14.4`), not a major tag. GHCR tags have no `v` prefix (PR #99).
 
 ## Watchtower
 
