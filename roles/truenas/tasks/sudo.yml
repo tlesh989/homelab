@@ -1,0 +1,33 @@
+---
+# tasks file for truenas — passwordless sudo for read-only diagnostics (homelab-92l)
+# Set through the user API (not /etc/sudoers.d) so TrueNAS updates don't wipe it.
+# Adds missing commands; leaves any other nopasswd entries on the user untouched.
+
+- name: Get TrueNAS sudo user
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: user.query
+    params:
+      - [["username", "=", "{{ truenas_sudo_user }}"]]
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_sudo_user
+  changed_when: false
+  no_log: true
+
+- name: Grant passwordless sudo commands
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: user.update
+    params:
+      - "{{ _truenas_sudo_user.result[0].id }}"
+      - sudo_commands_nopasswd: >-
+          {{ _truenas_sudo_user.result[0].sudo_commands_nopasswd
+             | union(truenas_sudo_nopasswd_commands) }}
+    validate_certs: "{{ truenas_validate_certs }}"
+  when:
+    - _truenas_sudo_user.result | length > 0
+    - truenas_sudo_nopasswd_commands | difference(_truenas_sudo_user.result[0].sudo_commands_nopasswd) | length > 0
+  changed_when: true
+  no_log: true
