@@ -12,6 +12,12 @@ pveum user add terraform-prov@pve --password password
 pveum aclmod / -user terraform-prov@pve -role TerraformProv
 ```
 
+## Changing LXC network interfaces
+
+Adding or changing a `network_interface` hot-plugs it into the running container. Reboot the
+container afterwards (`pct reboot <vmid>`): services that start before the change can keep stale
+network state (Bedrock stayed non-joinable over NetherNet until its LXC was rebooted).
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

@@ -19,6 +19,9 @@
 - name: Configure UPS (NUT) monitoring
   ansible.builtin.include_tasks: ups.yml
 
+- name: Configure passwordless sudo commands
+  ansible.builtin.include_tasks: sudo.yml
+
 - name: Deploy Beszel agent as a custom app
   ansible.builtin.include_tasks: beszel_agent.yml
   when:

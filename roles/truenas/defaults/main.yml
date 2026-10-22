@@ -26,6 +26,14 @@ truenas_lvm_vg_name: "pve-iscsi"
 # TLS verification — set to false for self-signed certs
 truenas_validate_certs: false
 
+# Passwordless sudo (see sudo.yml) — lets agents read SMART without a TTY
+truenas_sudo_user: "{{ lookup('env', 'SSH_USER') }}"
+# Read-only only: sudo >= 1.9.10 regex args block -s/--set/-t (no arbitrary smartctl flags).
+truenas_sudo_nopasswd_commands:
+  - "/usr/sbin/smartctl ^(-[ajxiHAc]+ )+/dev/(sd[a-z]+|nvme[0-9]+(n[0-9]+)?)$"
+  - /usr/sbin/smartctl --scan
+  - /usr/sbin/smartctl --scan-open
+
 # Beszel agent — deployed as a custom TrueNAS SCALE app (see beszel_agent.yml)
 # Mirrors roles/beszel/defaults/main.yml (the truenas role's play doesn't load
 # that role's defaults, since it never runs the beszel role directly)
