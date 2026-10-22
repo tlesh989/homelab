@@ -1,0 +1,44 @@
+---
+# tasks file for truenas — passwordless sudo for read-only diagnostics (homelab-92l)
+# Set through the user API (not /etc/sudoers.d) so TrueNAS updates don't wipe it.
+# Adds missing commands and drops the old bare smartctl grant; leaves other nopasswd entries untouched.
+
+- name: Get TrueNAS sudo user
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: user.query
+    params:
+      - [["username", "=", "{{ truenas_sudo_user }}"]]
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_sudo_user
+  changed_when: false
+  no_log: true
+
+# The API module returns an empty result in check mode, so only assert on real runs.
+- name: Assert TrueNAS sudo user exists
+  ansible.builtin.assert:
+    that: _truenas_sudo_user.result | length > 0
+    fail_msg: "TrueNAS user '{{ truenas_sudo_user }}' not found (is SSH_USER set?)"
+  when: not ansible_check_mode
+
+- name: Grant passwordless sudo commands
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: user.update
+    params:
+      - "{{ _truenas_sudo_user.result[0].id }}"
+      - sudo_commands_nopasswd: "{{ _truenas_sudo_wanted }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  vars:
+    # Drops the earlier unrestricted smartctl grant, which the read-only entries replace.
+    _truenas_sudo_wanted: >-
+      {{ _truenas_sudo_user.result[0].sudo_commands_nopasswd
+         | difference(['/usr/sbin/smartctl'])
+         | union(truenas_sudo_nopasswd_commands) }}
+  when:
+    - _truenas_sudo_user.result | length > 0
+    - _truenas_sudo_wanted | sort != _truenas_sudo_user.result[0].sudo_commands_nopasswd | unique | sort
+  changed_when: true
+  no_log: true
