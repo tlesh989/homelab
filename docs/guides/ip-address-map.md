@@ -129,7 +129,8 @@ Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100). Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
 Service Scope: All), so the printer is discoverable from `ginseng`. Minecraft LAN discovery is
-broadcast-based and does not cross VLANs — add the servers by IP.
+broadcast-based and does not cross VLANs: `ginseng` clients find both servers through their
+`eth1` NICs above; clients on other VLANs add the servers by IP.
 
 ---
 
