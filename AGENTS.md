@@ -41,9 +41,22 @@ after cloning. `task` remains the task runner (Taskfile.yml); mise only manages 
 Ansible itself is installed via mise's `pipx:` backend (needs `uv`, also mise-managed) —
 there is no separate apt/pip install step for ansible.
 
+## Sources of Truth
+
+Each fact lives in one place. Check it before stating a fact — never answer from memory alone.
+
+- **Current state** (IPs, VLANs, SSIDs, devices, host roles): `docs/guides/ip-address-map.md`, `hosts`,
+  `terraform/*.tf`, `group_vars/`. If it's not there, check live (`doppler run -- unifly ...`,
+  `pvesh get /cluster/resources --type vm`) and add it to the doc. VM/LXC node placement migrates — always check live.
+- **History and open work**: beads. Before starting a task, `bd search <topic>` for prior issues and how they were solved.
+  Close issues with a reason that says what changed and which PR.
+- **Conventions**: `.claude/rules/`. Agent memory holds only preferences and lessons not written elsewhere —
+  when a memory and the repo disagree, the repo wins; fix or delete the memory.
+
 ## Issue Tracking
 
 ```bash
+bd search <topic>              # Prior work on a topic — check before starting
 bd onboard                     # Initial setup
 bd ready --json                # Find work
 bd update <id> --claim         # Claim atomically
