@@ -33,6 +33,12 @@ resource "proxmox_virtual_environment_container" "minecraft" {
       }
     }
 
+    ip_config {
+      ipv4 {
+        address = "192.168.60.19/24"
+      }
+    }
+
     user_account {
       keys     = [nonsensitive(data.doppler_secrets.this.map.SSH_PUBLIC_KEY)]
       password = data.doppler_secrets.this.map.ROOT_PASSWORD
@@ -50,6 +56,16 @@ resource "proxmox_virtual_environment_container" "minecraft" {
     firewall    = true
     mac_address = "BC:24:11:13:00:01"
     name        = "eth0"
+  }
+
+  # Guest VLAN so Bedrock LAN discovery reaches the kids' devices.
+  network_interface {
+    bridge      = "vmbr0"
+    enabled     = true
+    firewall    = true
+    mac_address = "BC:24:11:13:00:11"
+    name        = "eth1"
+    vlan_id     = 60
   }
 
   operating_system {
