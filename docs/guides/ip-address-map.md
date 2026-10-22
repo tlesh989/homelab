@@ -111,16 +111,26 @@ RokuUltra (.189), RokuTCL (.53) — same rationale as GymRoku above.
 
 ## Guest Network — 192.168.60.0/24 (Guest, VLAN 60)
 
-DHCP pool: `.10–.254` (dynamic, no reservations)
+DHCP pool: `.21–.254` (dynamic, no reservations)
 DNS: gateway only (`192.168.60.1`) — NextDNS CLI maps this subnet to the `guest` profile (`NEXTDNS_PROFILE_MAP`)
 SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on it can see each other
 (LAN Minecraft). The private SSID for adults/family is `saffron` on Default.
+
+| IP | Hostname | Notes |
+|----|----------|-------|
+| .1 | gateway | Guest VLAN gateway |
+| .19 | minecraft | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
+| .20 | minecraft2 | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
+
+The Minecraft LXCs keep matching last octets on both networks. `vmbr0` on sturm is VLAN-aware
+(`bridge-vlan-aware yes`, `bridge-vids 2-4094`, set by hand in `/etc/network/interfaces`).
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100). Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
 Service Scope: All), so the printer is discoverable from `ginseng`. Minecraft LAN discovery is
-broadcast-based and does not cross VLANs — add the servers by IP.
+broadcast-based and does not cross VLANs: `ginseng` clients find both servers through their
+`eth1` NICs above; clients on other VLANs add the servers by IP.
 
 ---
 
