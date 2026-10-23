@@ -157,3 +157,23 @@
     content: |
       blacklist ax88179_178a
   notify: Update initramfs
+
+# Ansible-time verification above only runs when the playbook is applied; this unit
+# repeats the vermagic check at boot so a stale build self-heals (homelab-nfr).
+- name: Install ax88179b boot self-check script
+  ansible.builtin.template:
+    src: ax88179b-selfcheck.sh.j2
+    dest: /usr/local/sbin/ax88179b-selfcheck
+    mode: "0755"
+
+- name: Install ax88179b boot self-check unit
+  ansible.builtin.template:
+    src: ax88179b-selfcheck.service.j2
+    dest: /etc/systemd/system/ax88179b-selfcheck.service
+    mode: "0644"
+
+- name: Enable ax88179b boot self-check
+  ansible.builtin.systemd:
+    name: ax88179b-selfcheck
+    enabled: true
+    daemon_reload: true

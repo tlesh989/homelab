@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Rebuild ax88179b DKMS module if stale for the running kernel
+# Runs before /etc/modules is processed so ax_usb_nic loads the rebuilt module.
+DefaultDependencies=no
+After=systemd-remount-fs.service
+Before=systemd-modules-load.service systemd-udev-trigger.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ax88179b-selfcheck
+TimeoutStartSec=1200
+
+[Install]
+WantedBy=sysinit.target
