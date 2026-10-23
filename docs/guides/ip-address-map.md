@@ -130,6 +130,12 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 The Minecraft LXCs keep matching last octets on both networks. `vmbr0` is not VLAN-aware on any
 node; Proxmox carries `tag=60` NICs on an auto-created `vmbr0v60` bridge (`eno1.60`).
 
+The nodes' main NICs (sw-24 ports 15 tika, 16 bupu, 17 sturm) use a custom port VLAN setting:
+native Default, tagged Guest (60) only; IoT (40) and Storage (220) are excluded. A non-VLAN-aware
+bridge floods any tagged frame the switch sends to every guest's `eth0`, so the port must not
+trunk VLANs the node doesn't use. Storage runs on each node's second NIC (`vmbr1`), on a Pro Max
+port with VLAN 220 untagged and tagged VLANs blocked.
+
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100). Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
