@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+# Boot-time check: rebuild the ax88179b DKMS module if the installed .ko doesn't
+# match the running kernel (e.g. a build interrupted by power loss), so the
+# storage NIC comes up without waiting for an Ansible run (homelab-nfr).
+set -euo pipefail
+
+kver=$(uname -r)
+modpath="/lib/modules/${kver}/updates/dkms/{{ ax88179b_module_name }}.ko"
+vermagic=$(modinfo -F vermagic "$modpath" 2>/dev/null | awk '{print $1}' || true)
+
+if [[ "$vermagic" == "$kver" ]]; then
+  echo "{{ ax88179b_module_name }} matches ${kver}"
+  exit 0
+fi
+
+echo "{{ ax88179b_module_name }} vermagic '${vermagic}' != ${kver}; rebuilding"
+timeout 300 dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force
+timeout 60 dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force
