@@ -127,8 +127,8 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 | .19 | minecraft | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
 | .20 | minecraft2 | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
 
-The Minecraft LXCs keep matching last octets on both networks. `vmbr0` on sturm is VLAN-aware
-(`bridge-vlan-aware yes`, `bridge-vids 2-4094`, set by hand in `/etc/network/interfaces`).
+The Minecraft LXCs keep matching last octets on both networks. `vmbr0` is not VLAN-aware on any
+node; Proxmox carries `tag=60` NICs on an auto-created `vmbr0v60` bridge (`eno1.60`).
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
