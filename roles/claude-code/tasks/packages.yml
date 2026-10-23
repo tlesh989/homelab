@@ -88,8 +88,6 @@
     path: /etc/default/locale
     regexp: "^{{ item.key }}="
     line: "{{ item.key }}={{ item.value }}"
-    create: true
-    mode: "0644"
   loop:
     - { key: LANG, value: en_US.UTF-8 }
     - { key: LC_ALL, value: en_US.UTF-8 }
@@ -104,7 +102,6 @@
     executable: /bin/bash
   become: true
   become_user: "{{ claude_code_user }}"
-  changed_when: true
 
 - name: Install git
   ansible.builtin.apt:
