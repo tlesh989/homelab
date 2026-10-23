@@ -15,5 +15,5 @@ if [[ "$vermagic" == "$kver" ]]; then
 fi
 
 echo "{{ ax88179b_module_name }} vermagic '${vermagic}' != ${kver}; rebuilding"
-timeout 900 dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force
-timeout 120 dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force
+timeout 300 dkms build "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force
+timeout 60 dkms install "{{ ax88179b_dkms_name }}/{{ ax88179b_driver_version }}" -k "$kver" --force

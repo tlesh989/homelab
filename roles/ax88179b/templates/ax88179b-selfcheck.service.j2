@@ -9,7 +9,7 @@ Before=systemd-modules-load.service systemd-udev-trigger.service
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/ax88179b-selfcheck
-TimeoutStartSec=1200
+TimeoutStartSec=420
 
 [Install]
 WantedBy=sysinit.target
