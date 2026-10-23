@@ -15,6 +15,13 @@
   ansible.builtin.meta: end_host
   when: _bootstrap_check.rc == 0
 
+# Only a key rejection means "not bootstrapped yet"; anything else (timeout, no route)
+# would just burn through root-SSH timeouts on every remaining task.
+- name: Fail host — unreachable over SSH
+  ansible.builtin.fail:
+    msg: "{{ inventory_hostname }} is unreachable: {{ _bootstrap_check.stderr | trim }}"
+  when: "'Permission denied' not in _bootstrap_check.stderr"
+
 - name: Ensure sudo package is installed
   ansible.builtin.apt:
     name: sudo
