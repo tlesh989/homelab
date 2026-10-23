@@ -12,5 +12,4 @@
     executable: /bin/bash
   become: true
   become_user: "{{ claude_code_user }}"
-  changed_when: true
   failed_when: false
