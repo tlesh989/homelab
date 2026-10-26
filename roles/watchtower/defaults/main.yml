@@ -1,4 +1,4 @@
 ---
 # renovate: datasource=docker depName=ghcr.io/nicholas-fedor/watchtower
-watchtower_version: "1.23.1"
+watchtower_version: "1.23.2"
 watchtower_schedule: "0 0 3 * * *"
