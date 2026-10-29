@@ -22,6 +22,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .10 | kaz | Docker host VM | DHCP reservation (MAC: bc:24:11:10:00:01) — glance, n8n, watchtower, Beszel hub, etc. (on sturm, vm_id 110; migrates) |
 | .11 | jetkvm | JetKVM | DHCP reservation (MAC: 44:b7:d0:e7:82:89) — KVM-over-IP |
 | .12 | plex | Plex LXC | Media server (on sturm) |
+| .14 | flashforge-ad5x | Flashforge AD5X 3D printer | DHCP reservation (MAC: 24:a1:0d:b1:ce:d0) — UniFi fingerprints it as a Panasonic heat pump |
 | .15 | printer | Brother printer | DHCP reservation (MAC: 54:35:30:68:19:38) |
 | .16 | uptime-kuma | Uptime Kuma LXC | Terraform-managed (on bupu, vm_id 116) |
 | .17 | caddy | Caddy reverse proxy LXC | Terraform-managed (on bupu, vm_id 117) |
@@ -138,7 +139,9 @@ port with VLAN 220 untagged and tagged VLANs blocked.
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
-(allow to `.15` on 631/9100). Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
+(allow to `.15` on 631/9100), and "Guest to 3D Printer" (allow to `.14` on TCP 8080/8898/8899 —
+Flashforge LAN API + camera). Flashforge discovery is UDP broadcast and does not cross VLANs, so
+add the AD5X by IP in Orca-Flashforge/FlashPrint. Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
 Service Scope: All), so the printer is discoverable from `ginseng`. Minecraft LAN discovery is
 broadcast-based and does not cross VLANs: `ginseng` clients find both servers through their
 `eth1` NICs above; clients on other VLANs add the servers by IP.
