@@ -16,7 +16,7 @@ Delegate documentation lookups to the right tool — Context7 first, web search 
 
 ```
 Is the library indexed by Context7?
-  YES → use Context7 MCP (mcp__context7__resolve-library-id + query-docs)
+  YES → use Context7 MCP (mcp__claude_ai_Context7__resolve-library-id + query-docs)
   NO  → use WebSearch or WebFetch
 ```
 
@@ -41,8 +41,8 @@ Is the library indexed by Context7?
 ## Context7 Usage
 
 ```
-1. mcp__context7__resolve-library-id  query: "{{library name}}"
-2. mcp__context7__query-docs  libraryId: "<id from step 1>"  query: "{{query}}"
+1. mcp__claude_ai_Context7__resolve-library-id  query: "{{library name}}"
+2. mcp__claude_ai_Context7__query-docs  libraryId: "<id from step 1>"  query: "{{query}}"
 ```
 
 ## Rules
