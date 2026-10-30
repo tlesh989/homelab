@@ -16,7 +16,7 @@ Delegate documentation lookups to the right tool — Context7 first, web search 
 
 ```
 Is the library indexed by Context7?
-  YES → use Context7 MCP (mcp__context7__resolve-library-id + query-docs)
+  YES → use Context7 MCP (resolve-library-id + query-docs)
   NO  → use search_web or read_url_content
 ```
 
