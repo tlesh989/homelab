@@ -147,6 +147,7 @@
     hour: "{{ minecraft_update_hour }}"
     minute: "{{ minecraft_update_minute }}"
     job: /usr/local/bin/minecraft-update >> /var/log/minecraft-update.log 2>&1
+    state: "{{ 'present' if minecraft_auto_update | bool else 'absent' }}"
   become: true
 
 - name: Configure TLS proxy for NetherNet

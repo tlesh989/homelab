@@ -98,11 +98,14 @@
   ansible.builtin.shell:
     cmd: |
       set -o pipefail
+      rc=0
       "{{ acme_acmesh_home }}/acme.sh" \
         --issue \
         --dns dns_cf \
         --domain "{{ acme_wildcard }}" \
-        --keylength 4096
+        --keylength 4096 || rc=$?
+      # acme.sh exits 2 when the cert is already issued and not due for renewal
+      [[ ${rc} -eq 0 || ${rc} -eq 2 ]]
     executable: /bin/bash
   environment:
     CF_Token: "{{ acme_cf_token }}"
@@ -134,6 +137,25 @@
   changed_when: true
   notify: Run deploy hook
   become: true
+
+# Covers a rebuilt caddy host: pi-hole still has the cert, so nothing above re-pushes it.
+- name: Check wildcard cert on target hosts
+  ansible.builtin.stat:
+    path: "{{ acme_deploy_remote_tls_dir }}/fullchain.pem"
+  delegate_to: "{{ item }}"
+  loop: "{{ acme_deploy_target_hosts }}"
+  register: _remote_cert
+  become: true
+
+- name: Re-push wildcard cert to hosts missing it
+  ansible.builtin.debug:
+    msg: "Wildcard cert missing on a target host; running deploy hook"
+  changed_when: true
+  when:
+    - _cert_installed.stat.exists
+    - _remote_cert.results | rejectattr('stat.exists') | list | length > 0
+    - not ansible_check_mode
+  notify: Run deploy hook
 
 - name: Enable acme.sh auto-renewal cron
   ansible.builtin.shell:

@@ -1,6 +1,8 @@
 ---
 # Structured network inventory — source of truth for infrastructure.
-# Phase 1: consumed by scripts/ip_inventory.py for drift detection.
+# Phase 1: consumed by scripts/ip_inventory.py for drift detection, and by the
+# unifi role (assignment=reservation hosts → unifi_dhcp_reservations).
+# LIVE CONFIG: edits here change UniFi DHCP reservations on the next `task unifi`.
 # Phase 2 (future): render pihole_local_hosts / caddy_services / ip-address-map.md from this.
 network_inventory:
   version: 1

@@ -14,6 +14,8 @@ minecraft_online_mode: true
 minecraft_difficulty: peaceful
 minecraft_gamemode: survival
 minecraft_level_type: DEFAULT
+# Set false when pinning minecraft_bds_version: the cron script always installs the latest release.
+minecraft_auto_update: true
 minecraft_update_weekday: "0"
 minecraft_update_hour: "3"
 minecraft_update_minute: "0"

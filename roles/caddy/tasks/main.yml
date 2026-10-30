@@ -49,10 +49,11 @@
     group: caddy
     mode: "2750"
 
-- name: Allow acme-deploy to reload caddy without a password
+# reload-or-restart: a rebuilt host has no cert yet, so Caddy is stopped when the first push lands.
+- name: Allow acme-deploy to reload or start caddy without a password
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ caddy_deploy_user }}"
-    content: "{{ caddy_deploy_user }} ALL=(root) NOPASSWD: /usr/bin/systemctl reload caddy\n"
+    content: "{{ caddy_deploy_user }} ALL=(root) NOPASSWD: /usr/bin/systemctl reload-or-restart caddy\n"
     mode: "0440"
     validate: "visudo -cf %s"
 
