@@ -101,6 +101,19 @@ def find_reservations_without_mac(inventory):
     ]
 
 
+def find_duplicate_reservation_macs(inventory):
+    # Two hosts on one MAC would make the unifi role overwrite one reservation with the other.
+    seen = {}
+    for h in inventory.get("hosts", []):
+        if h.get("assignment") == "reservation" and h.get("mac"):
+            seen.setdefault(h["mac"].lower(), []).append(h["name"])
+    return [
+        Finding(BLOCKING, "duplicate-mac", f"{mac} claimed by: {', '.join(names)}")
+        for mac, names in seen.items()
+        if len(names) > 1
+    ]
+
+
 def cross_check_pihole(inventory, records):
     known = inventory_ips(inventory)
     return [
@@ -125,6 +138,7 @@ def run_repo_checks(inventory, pihole_records, caddy_services):
     findings = []
     findings += find_duplicate_ips(inventory)
     findings += find_reservations_without_mac(inventory)
+    findings += find_duplicate_reservation_macs(inventory)
     findings += cross_check_pihole(inventory, pihole_records)
     findings += cross_check_caddy(inventory, caddy_services)
     return findings

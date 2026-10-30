@@ -24,8 +24,8 @@ log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >&2; }
 # If the endpoint changes:
 #   1. Check https://www.minecraft.net/en-us/download/server/bedrock to find
 #      the new API via browser devtools (Network tab, filter: download/links)
-#   2. Alternatively remove the minecraft-bds-auto-update cron job and pin
-#      minecraft_bds_version in defaults/main.yml (this script ignores the pin).
+#   2. Alternatively pin minecraft_bds_version and set minecraft_auto_update: false
+#      so the role removes this cron job (this script ignores the pin).
 # ---------------------------------------------------------------------------
 get_latest_bds_url() {
   local url
