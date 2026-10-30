@@ -10,6 +10,7 @@
   register: _proxmox_iscsi_storage
   changed_when: false
   failed_when: false
+  run_once: true # storage.cfg is cluster-wide; parallel creates race
 
 - name: Register iSCSI storage backend
   ansible.builtin.shell:
@@ -23,6 +24,7 @@
       --nodes bupu,sturm,tika
     executable: /bin/bash
   when: _proxmox_iscsi_storage.rc != 0
+  run_once: true
   register: _proxmox_iscsi_register
   changed_when: _proxmox_iscsi_register.rc == 0
   failed_when:
@@ -46,6 +48,7 @@
   register: _proxmox_lvm_storage
   changed_when: false
   failed_when: false
+  run_once: true
 
 - name: Register LVM storage backend
   ansible.builtin.shell:
@@ -60,6 +63,7 @@
       --nodes bupu,sturm,tika
     executable: /bin/bash
   when: _proxmox_lvm_storage.rc != 0
+  run_once: true
   register: _proxmox_lvm_register
   changed_when: _proxmox_lvm_register.rc == 0
   failed_when:

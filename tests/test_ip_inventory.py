@@ -15,6 +15,7 @@ from ip_inventory import (
     cross_check_caddy,
     cross_check_pihole,
     find_duplicate_ips,
+    find_reservations_without_mac,
     find_undocumented_clients,
     format_report,
     has_blocking,
@@ -129,6 +130,17 @@ def test_find_duplicate_ips_flags_collision():
     assert len(findings) == 1
     assert findings[0].severity == BLOCKING
     assert findings[0].category == "duplicate-ip"
+
+
+def test_find_reservations_without_mac_blocks():
+    inv = {"hosts": [
+        {"name": "a", "ip": "192.168.233.7", "assignment": "reservation"},
+        {"name": "b", "ip": "192.168.233.8", "assignment": "reservation", "mac": "bc:24:11:10:00:01"},
+        {"name": "c", "ip": "192.168.233.9", "assignment": "static"},
+    ]}
+    findings = find_reservations_without_mac(inv)
+    assert [(f.severity, f.category) for f in findings] == [(BLOCKING, "missing-mac")]
+    assert "a " in findings[0].message
 
 
 def test_cross_check_pihole_blocks_unknown_ip():
