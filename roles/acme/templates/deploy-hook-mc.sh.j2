@@ -11,8 +11,11 @@ ssh_opts=(-i "{{ acme_deploy_key_path }}" -o StrictHostKeyChecking=accept-new -o
 # One unreachable host must not stop the push to the others; fail at the end instead.
 rc=0
 {% for host in acme_mc_deploy_target_hosts %}
-log "pushing cert to {{ host }}"
-if scp "${ssh_opts[@]}" \
+# Daily cron re-runs this hook; skip hosts that already have the current cert.
+if ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ host }}" "cat {{ acme_mc_deploy_remote_tls_dir }}/fullchain.pem" 2>/dev/null \
+    | cmp -s - "{{ acme_mc_cert_dir }}/fullchain.pem"; then
+  log "{{ host }} already current"
+elif log "pushing cert to {{ host }}" && scp "${ssh_opts[@]}" \
     "{{ acme_mc_cert_dir }}/fullchain.pem" "{{ acme_mc_cert_dir }}/privkey.pem" \
     "{{ acme_mc_deploy_remote_user }}@{{ host }}:{{ acme_mc_deploy_remote_tls_dir }}/" \
   && ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ host }}" \
