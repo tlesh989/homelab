@@ -1,6 +1,6 @@
 ---
 # renovate: datasource=docker depName=jez500/pricebuddy
-pricebuddy_app_version: "v1.0.55"
+pricebuddy_app_version: "v1.0.57"
 # renovate: datasource=docker depName=jez500/seleniumbase-scrapper
 pricebuddy_scraper_version: "v1.0.1"
 # Floating minor tag (matches upstream) — not an exact version, no renovate pin.
