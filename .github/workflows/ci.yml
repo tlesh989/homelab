@@ -32,6 +32,7 @@ jobs:
           filters: |
             terraform:
               - 'terraform/**'
+              - 'mise.toml'
               - '.github/workflows/ci.yml'
             ansible:
               - 'main.yml'
@@ -42,6 +43,8 @@ jobs:
               - 'ansible.cfg'
               - 'scripts/ip_inventory.py'
               - 'Taskfile.yml'
+              - 'mise.toml'
+              - 'requirements.txt'
               - '.github/workflows/ci.yml'
 
   validate-terraform:
