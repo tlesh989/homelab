@@ -112,3 +112,13 @@
   environment:
     HOME: /root
   become: true
+
+# Retries a host that was offline at renewal; the hook skips hosts already current.
+- name: Re-push Minecraft cert daily to hosts that missed it
+  ansible.builtin.cron:
+    name: "acme re-push Minecraft cert"
+    minute: "40"
+    hour: "4"
+    job: "{{ acme_acmesh_home }}/deploy-hook-mc.sh 2>&1 | logger -t acme-deploy-mc"
+    user: root
+  become: true
