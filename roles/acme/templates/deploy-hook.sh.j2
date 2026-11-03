@@ -10,9 +10,13 @@ ssh_opts=(-i "{{ acme_deploy_key_path }}" -o StrictHostKeyChecking=accept-new -o
 
 # One unreachable host must not stop the push to the others; fail at the end instead.
 rc=0
+cert_sha=$(sha256sum "{{ acme_cert_dir }}/fullchain.pem" | cut -d' ' -f1)
 {% for host in acme_deploy_target_hosts %}
-# Daily cron re-runs this hook; skip hosts that already have the current cert.
-if ssh "${ssh_opts[@]}" "{{ acme_deploy_remote_user }}@{{ host }}" "cat {{ acme_deploy_remote_tls_dir }}/fullchain.pem" 2>/dev/null \
+# Daily cron re-runs this hook. Skip a host only if its last full deploy (copy, chmod, reload)
+# recorded this cert AND it still has it, so a partial failure or a rebuilt host is retried.
+marker="{{ acme_cert_dir }}/.deployed-{{ host }}"
+if [[ "$(cat "${marker}" 2>/dev/null)" == "${cert_sha}" ]] \
+  && ssh "${ssh_opts[@]}" "{{ acme_deploy_remote_user }}@{{ host }}" "cat {{ acme_deploy_remote_tls_dir }}/fullchain.pem" 2>/dev/null \
     | cmp -s - "{{ acme_cert_dir }}/fullchain.pem"; then
   log "{{ host }} already current"
 elif log "pushing cert to {{ host }}" && scp "${ssh_opts[@]}" \
@@ -21,6 +25,7 @@ elif log "pushing cert to {{ host }}" && scp "${ssh_opts[@]}" \
   && ssh "${ssh_opts[@]}" "{{ acme_deploy_remote_user }}@{{ host }}" \
     "chmod 640 {{ acme_deploy_remote_tls_dir }}/fullchain.pem {{ acme_deploy_remote_tls_dir }}/privkey.pem && sudo systemctl reload-or-restart caddy"; then
   log "reloaded caddy on {{ host }}"
+  echo "${cert_sha}" > "${marker}" || log "WARN: could not record deploy marker for {{ host }}"
 else
   log "FAILED to deploy cert to {{ host }}"
   rc=1
