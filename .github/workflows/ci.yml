@@ -57,8 +57,11 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install Task
-        uses: go-task/setup-task@v2
+      # Same terraform/task versions as dev machines; mise.toml is the only pin.
+      - name: Install Terraform and Task from mise.toml
+        uses: jdx/mise-action@v5
+        with:
+          install_args: terraform task
 
       - name: Create Terraform plugin cache directory
         run: mkdir -p ~/.terraform.d/plugin-cache
@@ -72,16 +75,6 @@ jobs:
             ${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-providers-
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_TOKEN }} # doppler github sync
-          terraform_wrapper: false
-          # Match required_version in terraform/versions.tf; "latest" broke CI when 1.17 shipped.
-          terraform_version: "~1.17.0"
-        env:
-          TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
 
       - name: Terraform Validate
         working-directory: ./terraform
