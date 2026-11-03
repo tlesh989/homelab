@@ -167,5 +167,15 @@
   when: not ansible_check_mode
   become: true
 
+# Retries a host that was offline at renewal; the hook skips hosts already current.
+- name: Re-push wildcard cert daily to hosts that missed it
+  ansible.builtin.cron:
+    name: "acme re-push wildcard cert"
+    minute: "30"
+    hour: "4"
+    job: "{{ acme_acmesh_home }}/deploy-hook.sh 2>&1 | logger -t acme-deploy"
+    user: root
+  become: true
+
 - name: Issue and distribute the Minecraft certificate
   ansible.builtin.include_tasks: minecraft.yml
