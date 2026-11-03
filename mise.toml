@@ -5,7 +5,9 @@ direnv = "2.38.2"
 gh = "2.103.3"
 bun = "1.4.4"
 uv = "0.13.6"
-"pipx:ansible-core" = "2.21.5"
+python = "3.14.10"
+# truenas_api_client lives in ansible's own venv: the truenas role runs on the controller (connection=local).
+"pipx:ansible-core" = { version = "2.21.5", with = ["truenas-api-client @ git+https://github.com/truenas/api_client.git@8c59978c3bf6c4e38271363907ec46e9b7f10abf"] }
 "pipx:ansible-lint" = "26.10.1"
 "pipx:yamllint" = "1.38.0"
 "aqua:dolthub/dolt" = "latest"

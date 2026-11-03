@@ -1,3 +1,4 @@
-ansible
-ansible-lint
-truenas-api-client @ git+https://github.com/truenas/api_client.git@8c59978c3bf6c4e38271363907ec46e9b7f10abf
+# .venv for scripts/ip_inventory.py and its tests only.
+# Ansible, ansible-lint and truenas-api-client are pinned in mise.toml.
+pyyaml==6.0.3
+pytest==9.0.3

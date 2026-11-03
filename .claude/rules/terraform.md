@@ -30,7 +30,7 @@ task ci     # CI check (no Doppler)
 - **State**: Managed in Terraform Cloud (`tlesh-net` org).
 - **Secrets**: Source all secrets from **Doppler**. Never use `.tfvars` or hardcode values.
 - **Documentation**: All variables and outputs MUST have `description` fields.
-- **Versions**: Terraform CLI version is pinned in `mise.toml` (source of truth) and mirrored in `versions.tf`'s `required_version` (`~> <minor>.0`, e.g. `~> 1.16.0`), and in `ci.yml`'s `terraform_version` (`~<minor>.0`). Renovate updates all three in one "terraform cli" PR (`renovate.json`); never bump one alone. Pin all provider versions in `versions.tf`.
+- **Versions**: Terraform CLI version is pinned in `mise.toml` (source of truth) and mirrored in `versions.tf`'s `required_version` (`~> <minor>.0`, e.g. `~> 1.16.0`). CI installs terraform from `mise.toml` (jdx/mise-action), so there is no separate CI pin. Renovate updates both in one "terraform cli" PR (`renovate.json`); never bump one alone. Pin all provider versions in `versions.tf`.
 
 ## Verification (Definition of Done)
 

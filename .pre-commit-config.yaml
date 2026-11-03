@@ -69,13 +69,15 @@ repos:
         files: ^(scripts|tests)/.*\.py$
         stages: [pre-commit]
 
-  - repo: https://github.com/ansible/ansible-lint
-    rev: v26.4.0
+  # mise's ansible-lint (mise.toml is the only pin); the upstream hook brought its own ansible-lint + ansible-core.
+  - repo: local
     hooks:
       - id: ansible-lint
-        args:
-          - --fix
-        exclude: ^galaxy_roles/
+        name: ansible-lint
+        entry: ansible-lint --fix
+        language: system
+        pass_filenames: false
+        always_run: true
         stages: [pre-commit]
 
   - repo: https://github.com/igorshubovych/markdownlint-cli

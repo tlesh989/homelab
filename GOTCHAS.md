@@ -49,6 +49,13 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 - **A static IP changed and the name stopped resolving** → Pi-hole is authoritative for `*.tlesh.xyz` →
   update `pihole_local_hosts` (roles/pi-hole) and `docs/guides/ip-address-map.md`, then `task pi-hole`.
 - **`--check` dry-run fails in beszel** → `roles/beszel` isn't check-mode safe → `--start-at-task` past it.
+- **`couldn't resolve module/action 'ansible.posix...'` (or another collection)** → collections load
+  only from `galaxy_collections/` (`collections_path` in `ansible.cfg`; the old plural key was silently
+  ignored, so `~/.ansible/collections` masked undeclared ones) → declare it in `requirements.yml`,
+  then `task reqs`.
+- **truenas role: `truenas_api_client is required`** → it lives in ansible's mise venv (`with` on
+  `pipx:ansible-core`); `mise install` skips a changed `with` when the version is unchanged →
+  `mise install -f pipx:ansible-core`.
 
 ## Networking / UniFi
 
