@@ -79,7 +79,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_TOKEN }} # doppler github sync
           terraform_wrapper: false
           # Match required_version in terraform/versions.tf; "latest" broke CI when 1.17 shipped.
-          terraform_version: "~1.16.0"
+          terraform_version: "~1.17.0"
         env:
           TF_PLUGIN_CACHE_DIR: ~/.terraform.d/plugin-cache
 
