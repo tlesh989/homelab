@@ -95,6 +95,14 @@
         "patch"
       ],
       "groupName": "mise minor/patch"
+    },
+    {
+      "description": "Terraform CLI pins (mise.toml, versions.tf required_version, ci.yml setup-terraform) must move together; last so it overrides the per-manager groups above",
+      "matchDepNames": [
+        "terraform",
+        "hashicorp/terraform"
+      ],
+      "groupName": "terraform cli"
     }
   ]
 }
