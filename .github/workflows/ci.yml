@@ -48,31 +48,27 @@ jobs:
     needs: changes
     if: needs.changes.outputs.terraform == 'true'
     runs-on: ubuntu-latest
+    env:
+      # Job-level so `task ci` (terraform init) actually uses it.
+      TF_PLUGIN_CACHE_DIR: /home/runner/.terraform.d/plugin-cache
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-
-      # Same terraform/task versions as dev machines; mise.toml is the only pin.
+      # Same versions as dev machines; mise.toml is the only pin.
       - name: Install Terraform and Task from mise.toml
         uses: jdx/mise-action@v5
         with:
           install_args: terraform task
 
       - name: Create Terraform plugin cache directory
-        run: mkdir -p ~/.terraform.d/plugin-cache
+        run: mkdir -p "$TF_PLUGIN_CACHE_DIR"
 
       - name: Cache Terraform providers
         uses: actions/cache@v6
         with:
-          path: ~/.terraform.d/plugin-cache
-          key: >-
-            ${{ runner.os }}-terraform-providers-
-            ${{ hashFiles('**/.terraform.lock.hcl') }}
+          path: /home/runner/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-providers-${{ hashFiles('terraform/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-providers-
 
@@ -88,36 +84,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
+      # Same versions as dev machines; mise.toml is the only pin. mise-action caches the installs.
+      - name: Install Ansible, ansible-lint, yamllint, Python and Task from mise.toml
+        uses: jdx/mise-action@v5
         with:
-          node-version: '24'
-
-      - name: Install Task
-        uses: go-task/setup-task@v2
-
-      - name: Set up Python
-        id: setup-python
-        uses: actions/setup-python@v7
-        with:
-          python-version: '3.14'
-
-      - name: Cache Ansible venv
-        id: venv-cache
-        uses: actions/cache@v6
-        with:
-          path: .venv
-          # venv symlinks into the exact hostedtoolcache Python, so a patch bump must invalidate it
-          key: ${{ runner.os }}-py${{ steps.setup-python.outputs.python-version }}-ansible-venv-${{ hashFiles('requirements.txt') }}
-
-      - name: Install Ansible and Lint
-        if: steps.venv-cache.outputs.cache-hit != 'true'
-        run: |
-          python -m venv .venv
-          .venv/bin/pip install -r requirements.txt
-
-      - name: Add venv to PATH
-        run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          install_args: python uv task pipx:ansible-core pipx:ansible-lint pipx:yamllint
 
       - name: Cache Ansible Galaxy Roles/Collections
         uses: actions/cache@v6
@@ -125,10 +96,7 @@ jobs:
           path: |
             galaxy_roles
             galaxy_collections
-            collections
           key: ${{ runner.os }}-ansible-galaxy-${{ hashFiles('requirements.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-ansible-galaxy-
 
       - name: Install Ansible Galaxy Dependencies
         run: |
@@ -139,19 +107,18 @@ jobs:
         run: task lint
 
       - name: Ansible Syntax Check
-        env:
-          ANSIBLE_ROLES_PATH: ./galaxy_roles:./roles
-          ANSIBLE_COLLECTIONS_PATH: ./galaxy_collections:./collections
+        run: ansible-playbook --syntax-check main.yml
+
+      - name: Set up script venv
         run: |
-          ansible-playbook --syntax-check main.yml
+          python -m venv .venv
+          .venv/bin/pip install -q -r requirements.txt
 
       - name: IP inventory tool unit tests
-        run: |
-          pip install pytest
-          python -m pytest tests/test_ip_inventory.py -q
+        run: .venv/bin/python -m pytest tests/test_ip_inventory.py -q
 
       - name: IP inventory drift check
-        run: python scripts/ip_inventory.py check
+        run: task ip:check
 
   ci:
     if: always()
