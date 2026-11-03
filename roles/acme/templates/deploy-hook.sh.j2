@@ -25,7 +25,7 @@ elif log "pushing cert to {{ host }}" && scp "${ssh_opts[@]}" \
   && ssh "${ssh_opts[@]}" "{{ acme_deploy_remote_user }}@{{ host }}" \
     "chmod 640 {{ acme_deploy_remote_tls_dir }}/fullchain.pem {{ acme_deploy_remote_tls_dir }}/privkey.pem && sudo systemctl reload-or-restart caddy"; then
   log "reloaded caddy on {{ host }}"
-  echo "${cert_sha}" > "${marker}" || log "WARN: could not record deploy marker for {{ host }}"
+  echo "${cert_sha}" > "${marker}" || { log "FAILED to record deploy marker for {{ host }}"; rc=1; }
 else
   log "FAILED to deploy cert to {{ host }}"
   rc=1
