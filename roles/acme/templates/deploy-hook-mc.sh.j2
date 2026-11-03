@@ -12,17 +12,19 @@ ssh_opts=(-i "{{ acme_deploy_key_path }}" -o StrictHostKeyChecking=accept-new -o
 rc=0
 cert_sha=$(sha256sum "{{ acme_mc_cert_dir }}/fullchain.pem" | cut -d' ' -f1)
 {% for host in acme_mc_deploy_target_hosts %}
+{# Connect by IP: pi-hole resolves via 1.1.1.1, which doesn't know the internal names. #}
+{% set addr = hostvars[host].ansible_host | default(host) %}
 # Daily cron re-runs this hook. Skip a host only if its last full deploy (copy, chmod, reload)
 # recorded this cert AND it still has it, so a partial failure or a rebuilt host is retried.
 marker="{{ acme_mc_cert_dir }}/.deployed-{{ host }}"
 if [[ "$(cat "${marker}" 2>/dev/null)" == "${cert_sha}" ]] \
-  && ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ host }}" "cat {{ acme_mc_deploy_remote_tls_dir }}/fullchain.pem" 2>/dev/null \
+  && ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ addr }}" "cat {{ acme_mc_deploy_remote_tls_dir }}/fullchain.pem" 2>/dev/null \
     | cmp -s - "{{ acme_mc_cert_dir }}/fullchain.pem"; then
   log "{{ host }} already current"
-elif log "pushing cert to {{ host }}" && scp "${ssh_opts[@]}" \
+elif log "pushing cert to {{ host }} ({{ addr }})" && scp "${ssh_opts[@]}" \
     "{{ acme_mc_cert_dir }}/fullchain.pem" "{{ acme_mc_cert_dir }}/privkey.pem" \
-    "{{ acme_mc_deploy_remote_user }}@{{ host }}:{{ acme_mc_deploy_remote_tls_dir }}/" \
-  && ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ host }}" \
+    "{{ acme_mc_deploy_remote_user }}@{{ addr }}:{{ acme_mc_deploy_remote_tls_dir }}/" \
+  && ssh "${ssh_opts[@]}" "{{ acme_mc_deploy_remote_user }}@{{ addr }}" \
     "chmod 640 {{ acme_mc_deploy_remote_tls_dir }}/fullchain.pem {{ acme_mc_deploy_remote_tls_dir }}/privkey.pem && sudo systemctl reload-or-restart caddy"; then
   log "reloaded caddy on {{ host }}"
   echo "${cert_sha}" > "${marker}" || { log "FAILED to record deploy marker for {{ host }}"; rc=1; }
