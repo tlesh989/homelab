@@ -41,7 +41,7 @@ resource "proxmox_virtual_environment_container" "uptime_kuma" {
   }
 
   memory {
-    dedicated = 1024
+    dedicated = 1536
     swap      = 256
   }
 
