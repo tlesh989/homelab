@@ -57,10 +57,13 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   when someone runs the playbook, and Docker deploy tasks skip in `--check` (`when: not
   ansible_check_mode`), so `task check` hides the drift → deploy the host. (homelab-fiq)
 - **Ubuntu hosts pile up security updates; unattended-upgrades logs "No packages found"** → a missing
-  `;` in the Origins-Pattern block silently drops that origin (geerlingguy.security < 3.1.0) → check
-  `unattended-upgrade --dry-run -d | grep "Allowed origins"`, then apply the role fleet-wide. (homelab-sst)
+  `;` in the Origins-Pattern block silently drops that origin (geerlingguy.security < 3.0.2; hosts keep
+  the old file until the role is re-applied) → check
+  `sudo unattended-upgrade --dry-run -d | grep "Allowed origins"`, then apply the role fleet-wide. (homelab-sst)
 - **Plex stuck on an old version, `apt update` says "no longer has a Release file"** → Plex moved its
-  repo to `repo.plex.tv` (v2 key) → see `roles/plex`. (homelab-yx4)
+  repo from `downloads.plex.tv/repo/deb` to `repo.plex.tv/deb/` with a new key (`PlexSign.v2.key`) →
+  remove the old `.list` and key files, add the new source with `signed-by`, then `apt-get update`;
+  `roles/plex` does this since PR #406. (homelab-yx4)
 - **truenas role: `truenas_api_client is required`** → it lives in ansible's mise venv (`with` on
   `pipx:ansible-core`); `mise install` skips a changed `with` when the version is unchanged →
   `mise install -f pipx:ansible-core`.
