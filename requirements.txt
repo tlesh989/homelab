@@ -1,4 +1,4 @@
 # .venv for scripts/ip_inventory.py and its tests only.
 # Ansible, ansible-lint and truenas-api-client are pinned in mise.toml.
 pyyaml==6.0.3
-pytest==9.0.3
+pytest==9.2.0
