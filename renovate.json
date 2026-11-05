@@ -97,6 +97,13 @@
       "groupName": "mise minor/patch"
     },
     {
+      "description": "unifly >=0.12.0 linux binaries need GLIBC_2.43; Ubuntu 24.04 (claude-code LXC, CI runners) has 2.39. Lift once upstream ships an older-glibc or musl build",
+      "matchPackageNames": [
+        "/unifly/"
+      ],
+      "allowedVersions": "<0.12.0"
+    },
+    {
       "description": "Terraform CLI pins (mise.toml, versions.tf required_version) must move together; last so it overrides the per-manager groups above",
       "matchDepNames": [
         "terraform",

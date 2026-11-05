@@ -53,6 +53,17 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   only from `galaxy_collections/` (`collections_path` in `ansible.cfg`; the old plural key was silently
   ignored, so `~/.ansible/collections` masked undeclared ones) → declare it in `requirements.yml`,
   then `task reqs`.
+- **Hosts run older image versions than the role defaults** → merged Renovate bumps are only applied
+  when someone runs the playbook, and Docker deploy tasks skip in `--check` (`when: not
+  ansible_check_mode`), so `task check` hides the drift → deploy the host. (homelab-fiq)
+- **Ubuntu hosts pile up security updates; unattended-upgrades logs "No packages found"** → a missing
+  `;` in the Origins-Pattern block silently drops that origin (geerlingguy.security < 3.0.2; hosts keep
+  the old file until the role is re-applied) → check
+  `sudo unattended-upgrade --dry-run -d | grep "Allowed origins"`, then apply the role fleet-wide. (homelab-sst)
+- **Plex stuck on an old version, `apt update` says "no longer has a Release file"** → Plex moved its
+  repo from `downloads.plex.tv/repo/deb` to `repo.plex.tv/deb/` with a new key (`PlexSign.v2.key`) →
+  remove the old `.list` and key files, add the new source with `signed-by`, then `apt-get update`;
+  `roles/plex` does this since PR #406. (homelab-yx4)
 - **truenas role: `truenas_api_client is required`** → it lives in ansible's mise venv (`with` on
   `pipx:ansible-core`); `mise install` skips a changed `with` when the version is unchanged →
   `mise install -f pipx:ansible-core`.
@@ -93,5 +104,8 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 - **`bd` refuses pending schema migrations after an upgrade** → migrate on **one** clone only
   (`bd export --all -o <backup> && bd migrate --force && bd dolt push`); other clones `bd dolt pull`.
   Migrating on two clones forks the schema.
+- **`unifly: GLIBC_2.43 not found`** → unifly 0.12.0+ release binaries need glibc 2.43; Ubuntu 24.04
+  has 2.39 → pinned to 0.11.0, capped in `renovate.json`. Lift once upstream ships a compatible
+  build. (homelab-lhs)
 - **Shell loop over filenames skips files** → media names contain spaces and quotes → `find ... -print0 |
   while IFS= read -r -d "" f; do ...; done`.
