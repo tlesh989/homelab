@@ -6,9 +6,6 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 
 ## Proxmox / LXC
 
-- **Service misbehaves after a NIC was added to a running LXC** → Terraform hot-plugs
-  `network_interface` changes; processes started before keep stale network state → `pct reboot <vmid>`
-  after any NIC change. (homelab-6z2)
 - **Guest eth0 receives frames tagged for other VLANs (60, 40, …)** → on a VLAN-aware `vmbr0`, Proxmox
   trunks every untagged guest NIC to VLANs 2-4094 (hardcoded, `bridge-vids` doesn't limit it) → keep
   `vmbr0` non-VLAN-aware; `tag=N` NICs still work via the auto `vmbr0vN` bridge. (homelab-ngq)
@@ -82,9 +79,11 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 
 ## Minecraft (Bedrock)
 
-- **World shows in LAN Games but joining fails with codeword "Boat"** → the server's discovery reply
-  says "not joinable"; the client gives up without connecting. Seen after a NIC hot-plug → reboot the
-  LXC. (homelab-6z2)
+- **World shows in LAN Games but joining fails with codeword "Boat"** → the discovery reply has
+  `AcceptsOnlineAuth=00`, so the client gives up without connecting. Every fresh BDS start reports
+  `00` until a join from outside the LAN succeeds; restarts and reboots don't fix it, and restarting
+  (including the 03:00 auto-update) resets it → join once by public hostname from off-LAN (e.g.
+  cell data). Only the host receiving the public forwards can be fixed this way. (homelab-6z2)
 - **`transport=raknet`** → BDS 1.26.52 logs "NetherNet is the only supported transport"; clients can't
   connect. Stay on NetherNet.
 - **Join by IP fails** → NetherNet signaling goes through Caddy TLS on 19132, which needs the public
