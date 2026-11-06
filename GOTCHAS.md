@@ -76,6 +76,10 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   (`source_zone_id`, not `source.zone_id`); `ip_version` is `IPV4`/`IPV6`/`IPV4_AND_IPV6`;
   `connection_states` must be non-empty.
 - **SSID update via API throws `MLO setting requires all of [...]`** (Express 7) → rebind SSIDs in the UI.
+- **A server gets TLS errors for one external site, and the cert issuer is "UniFi SSL Certificate Authority"**
+  (DNS answers `203.0.113.250` / `2001:db8:1000::fa`) → a UniFi content filter is sinkholing it. A filter
+  with `network_ids` set covers the whole network, not just its listed MACs → add the domain to the
+  filter's allow list in the UI. NextDNS logs still show these queries as allowed. (sonarr → thexem.info)
 
 ## Minecraft (Bedrock)
 
