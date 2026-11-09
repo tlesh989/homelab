@@ -1,6 +1,6 @@
 ---
 # renovate: datasource=docker depName=ghcr.io/bookorbit/bookorbit
-bookorbit_app_version: "3.6.0"
+bookorbit_app_version: "3.7.0"
 # Floating major tag (pgvector track) — not an exact version, no renovate pin.
 bookorbit_postgres_version: "pg18"
 
