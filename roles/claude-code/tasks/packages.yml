@@ -64,7 +64,7 @@
     - /usr/share/keyrings/doppler-archive-keyring.gpg
   become: true
 
-- name: Install curl, gpg, tmux and unzip
+- name: Install curl, gpg, tmux, unzip and libatomic1
   ansible.builtin.apt:
     name:
       - curl
@@ -73,6 +73,7 @@
       - locales
       - tmux
       - unzip
+      - libatomic1 # mise node >= 26 links against libatomic.so.1
     state: present
     update_cache: true
   become: true

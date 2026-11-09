@@ -104,6 +104,13 @@
       "allowedVersions": "<0.12.0"
     },
     {
+      "description": "AutoKuma is pinned to an RC; docker versioning reads -rc.N as a compatibility suffix and would never propose the unsuffixed stable tag",
+      "matchPackageNames": [
+        "ghcr.io/bigboot/autokuma"
+      ],
+      "versioning": "semver"
+    },
+    {
       "description": "Terraform CLI pins (mise.toml, versions.tf required_version) must move together; last so it overrides the per-manager groups above",
       "matchDepNames": [
         "terraform",
