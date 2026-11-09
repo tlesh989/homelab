@@ -73,7 +73,7 @@
       - locales
       - tmux
       - unzip
-      - libatomic1  # mise node >= 26 links against libatomic.so.1
+      - libatomic1 # mise node >= 26 links against libatomic.so.1
     state: present
     update_cache: true
   become: true

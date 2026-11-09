@@ -1,7 +1,7 @@
 ---
-# renovate: datasource=docker depName=ghcr.io/bigboot/autokuma
 # RC on purpose: 2.0.0 never reconnects after Uptime Kuma restarts (fixed in
 # 2.1.0-rc.1, upstream #157). Move to 2.1.0 stable when it ships.
+# renovate: datasource=docker depName=ghcr.io/bigboot/autokuma
 autokuma_version: "2.1.0-rc.2"
 
 # Persistent storage for AutoKuma's id-to-monitor mapping (required since
