@@ -19,3 +19,7 @@ node = "26.13.0"
 # 0.12.0+ needs GLIBC_2.43 (Ubuntu 24.04 has 2.39); capped in renovate.json
 "github:hyperb1iss/unifly" = "0.11.0"
 "npm:coderabbit" = { version = "0.9.3", allow_low_downloads = true, allow_builds = ["coderabbit"] }
+
+[env]
+# macOS: stops "A worker was found in a dead state" in Ansible forks run outside `task` (#356)
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY = "YES"

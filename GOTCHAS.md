@@ -35,6 +35,11 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 
 ## Ansible
 
+- **`[ERROR]: A worker was found in a dead state` on the Mac** → macOS ObjC fork safety kills Ansible
+  forks (first seen in the minecraft role) → `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`, set in
+  `Taskfile.yml` env and `mise.toml` `[env]`. If it recurs, the shell skipped both (no `mise activate`,
+  raw `ansible-playbook`).
+  (#356, homelab-lnch)
 - **`... is undefined` for a fact** → `ansible.cfg` sets `gathering = explicit` → in-house roles add a
   narrow `setup: gather_subset: [pkg_mgr]` task; Galaxy roles (e.g. `geerlingguy.ntp`) need
   `gather_facts: true` on the play.
