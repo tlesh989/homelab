@@ -65,4 +65,12 @@
     owner: root
     group: root
     mode: "0644"
-  notify: Restart systemd-journald
+  register: packages_journald_cap
+
+# Inline, not a handler: a play-wide flush_handlers would also fire queued proxmox
+# handlers (ifreload, LXC reboot) mid-play, and an end-of-play handler is lost if a later task fails.
+- name: Restart systemd-journald to apply the size cap # noqa: no-handler
+  ansible.builtin.systemd:
+    name: systemd-journald
+    state: restarted
+  when: packages_journald_cap is changed
