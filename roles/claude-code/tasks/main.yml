@@ -44,7 +44,7 @@
   become: true
   become_user: "{{ claude_code_user }}"
   register: mise_prune_result
-  changed_when: "'uninstall' in (mise_prune_result.stdout + mise_prune_result.stderr)"
+  changed_when: "'removing' in mise_prune_result.stderr"
 
 - name: Symlink /usr/bin/node to mise shim (for hardcoded plugin hooks)
   ansible.builtin.file:
