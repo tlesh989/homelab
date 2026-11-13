@@ -36,6 +36,16 @@
   register: mise_install_result
   changed_when: "'installed' in mise_install_result.stdout"
 
+# Renovate bumps leave every old tool version behind (1.9G of installs on claude-code, homelab-lnch follow-up).
+- name: Prune tool versions no tracked mise.toml needs
+  ansible.builtin.command:
+    cmd: mise prune --yes
+    chdir: "{{ claude_code_repo_dest }}"
+  become: true
+  become_user: "{{ claude_code_user }}"
+  register: mise_prune_result
+  changed_when: "'uninstall' in (mise_prune_result.stdout + mise_prune_result.stderr)"
+
 - name: Symlink /usr/bin/node to mise shim (for hardcoded plugin hooks)
   ansible.builtin.file:
     src: /home/{{ claude_code_user }}/.local/share/mise/shims/node
