@@ -227,6 +227,20 @@
     - role: geerlingguy.security
     - role: claude-code
 
+# Watchtower cleans up after its own updates, but Renovate tag bumps leave the
+# old pinned images behind (homelab-j5vu).
+- name: Prune unused Docker images weekly
+  hosts: docker_hosts
+  become: true
+  tasks:
+    - name: Schedule weekly docker image prune
+      ansible.builtin.cron:
+        name: docker image prune
+        weekday: "0"
+        hour: "4"
+        minute: "30"
+        job: docker image prune -af --filter until=168h > /dev/null
+
 - name: setup barlo remote site server
   hosts: barlo
   become: true

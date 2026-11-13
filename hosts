@@ -95,6 +95,13 @@ barlo
 # Its Beszel agent is deployed as a TrueNAS SCALE custom app via the truenas
 # role instead (roles/truenas/tasks/beszel_agent.yml).
 
+# Hosts running Docker (weekly image prune in main.yml).
+[docker_hosts:children]
+kaz
+arr
+uptime-kuma
+tdarr_node
+
 # Docker hosts running a Dozzle agent for the hub on kaz to connect to.
 # kaz itself is read locally via the hub's mounted docker.sock (no agent).
 # barlo deferred pending remote-site topology clarification (homelab-2w4).
