@@ -115,5 +115,9 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 - **`unifly: GLIBC_2.43 not found`** → unifly 0.12.0+ release binaries need glibc 2.43; Ubuntu 24.04
   has 2.39 → pinned to 0.11.0, capped in `renovate.json`. Lift once upstream ships a compatible
   build. (homelab-lhs)
+- **Ansible `truenas_api` (or any Python) fails with `[Errno 65] No route to host` on the Mac, but
+  `ping`/`curl` work** → macOS Local Network privacy is blocking the terminal app (Warp); LAN hosts fail
+  but the gateway and the internet still work, and Apple's own binaries are exempt → toggle the app in
+  Privacy & Security → Local Network, ⌘Q and relaunch, reboot if it sticks. Terminal.app works meanwhile.
 - **Shell loop over filenames skips files** → media names contain spaces and quotes → `find ... -print0 |
   while IFS= read -r -d "" f; do ...; done`.
