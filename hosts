@@ -79,16 +79,7 @@ kaz.tlesh.xyz
 
 [beszel_agents:children]
 proxmox
-tailscale
-plex
-pi-hole
-arr
-uptime-kuma
-caddy
-claude_code
-minecraft
-minecraft2
-tdarr_node
+lxc
 barlo
 # truenas deliberately excluded: ansalon uses ansible_connection=local, so the
 # binary/systemd agent.yml task would run on the Ansible controller itself.
