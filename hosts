@@ -79,21 +79,19 @@ kaz.tlesh.xyz
 
 [beszel_agents:children]
 proxmox
-tailscale
-plex
-pi-hole
-arr
-uptime-kuma
-caddy
-claude_code
-minecraft
-minecraft2
-tdarr_node
+lxc
 barlo
 # truenas deliberately excluded: ansalon uses ansible_connection=local, so the
 # binary/systemd agent.yml task would run on the Ansible controller itself.
 # Its Beszel agent is deployed as a TrueNAS SCALE custom app via the truenas
 # role instead (roles/truenas/tasks/beszel_agent.yml).
+
+# Hosts running Docker (weekly image prune in main.yml).
+[docker_hosts:children]
+kaz
+arr
+uptime-kuma
+tdarr_node
 
 # Docker hosts running a Dozzle agent for the hub on kaz to connect to.
 # kaz itself is read locally via the hub's mounted docker.sock (no agent).

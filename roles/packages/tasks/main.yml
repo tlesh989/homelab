@@ -36,3 +36,41 @@
   when:
     - ansible_facts.pkg_mgr == 'dnf'
     - not (item.dnf_ignore | default(false) | bool)
+
+# Unattended upgrades leave .debs behind; autoclean alone let 1.3G pile up (homelab-j5vu).
+- name: Clean apt package cache weekly
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/99periodic-clean
+    content: |
+      APT::Periodic::CleanInterval "7";
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_facts.pkg_mgr == 'apt'
+
+- name: Create journald drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Cap journal size
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/size.conf
+    content: |
+      [Journal]
+      SystemMaxUse=200M
+    owner: root
+    group: root
+    mode: "0644"
+  register: packages_journald_cap
+
+# Inline, not a handler: a play-wide flush_handlers would also fire queued proxmox
+# handlers (ifreload, LXC reboot) mid-play, and an end-of-play handler is lost if a later task fails.
+- name: Restart systemd-journald to apply the size cap # noqa: no-handler
+  ansible.builtin.systemd:
+    name: systemd-journald
+    state: restarted
+  when: packages_journald_cap is changed
