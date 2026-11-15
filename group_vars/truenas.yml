@@ -56,6 +56,26 @@ truenas_scrub_tasks:
       month: "*"
       dow: "7"
 
+# SMART self-tests on every disk smartctl finds: short weekly (Wed 02:00), long monthly
+# (15th 03:00). Kept off the scrub's Sunday 00:00 start where the calendar allows.
+truenas_smart_tests:
+  - type: short
+    description: "SMART short self-test, all disks (Ansible)"
+    schedule:
+      minute: "0"
+      hour: "2"
+      dom: "*"
+      month: "*"
+      dow: "3"
+  - type: long
+    description: "SMART long self-test, all disks (Ansible)"
+    schedule:
+      minute: "0"
+      hour: "3"
+      dom: "15"
+      month: "*"
+      dow: "*"
+
 # NUT/UPS monitoring — CyberPower PR1500LCDRT2U replaced the failing APC unit
 # (homelab-hms). driver/port identified via `nut-scanner -U` over USB.
 # shutdown=LOWBATT: TrueNAS only triggers its own shutdown sequence (and
