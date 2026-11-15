@@ -1,0 +1,30 @@
+---
+# Only acts when /etc/nftables.conf is the ruleset this role installed, so hosts that
+# never enabled the filter keep their distribution default untouched.
+# The nftables package stays installed; with the unit disabled it does nothing.
+- name: Check for a role-installed outbound filter
+  ansible.builtin.command: grep -qs '^table inet egress' /etc/nftables.conf
+  register: _minecraft_egress_installed
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  become: true
+
+- name: Remove role-installed outbound filter
+  when: _minecraft_egress_installed.rc == 0
+  become: true
+  block:
+    # Not "state: stopped": the unit's ExecStop flushes every nftables table.
+    - name: Stop loading the outbound filter at boot
+      ansible.builtin.systemd:
+        name: nftables
+        enabled: false
+
+    - name: Remove outbound filter table
+      ansible.builtin.command: nft destroy table inet egress
+      changed_when: true
+
+    - name: Remove outbound filter ruleset file
+      ansible.builtin.file:
+        path: /etc/nftables.conf
+        state: absent
