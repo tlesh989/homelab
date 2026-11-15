@@ -42,5 +42,6 @@ minecraft_public_ip: "{{ lookup('ansible.builtin.url', 'https://ifconfig.me/ip')
 # Internet-facing servers: reject new outbound connections to private addresses
 # (nftables, tasks/egress_filter.yml). Exceptions go in minecraft_egress_allow as
 # {dest: <ip>, proto: tcp|udp, port: <port>}.
+# Setting it back to false removes the table and the ruleset file on the next run.
 minecraft_egress_filter: false
 minecraft_egress_allow: []

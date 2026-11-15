@@ -3,7 +3,8 @@
 # Outbound filter. This server is reachable from the internet, so a compromised
 # process must not be able to open new connections to the rest of the LAN.
 # Inbound traffic and its replies are untouched.
-flush ruleset
+# Replace only this role's table; other nftables tables are left alone.
+destroy table inet egress
 
 table inet egress {
   chain output {

@@ -157,3 +157,7 @@
 - name: Configure outbound filter
   ansible.builtin.include_tasks: egress_filter.yml
   when: minecraft_egress_filter | bool
+
+- name: Remove outbound filter
+  ansible.builtin.include_tasks: egress_filter_absent.yml
+  when: not (minecraft_egress_filter | bool)
