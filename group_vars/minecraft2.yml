@@ -8,3 +8,7 @@ minecraft_tls_proxy: true
 # Caddy terminates TLS on the default port; BDS moves behind it.
 minecraft_port: 19131
 minecraft_tls_port: 19132
+# Public server: it may not open connections into the LAN, except to the Beszel hub on kaz.
+minecraft_egress_filter: true
+minecraft_egress_allow:
+  - { dest: "192.168.233.10", proto: tcp, port: 8090 }

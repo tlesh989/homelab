@@ -16,3 +16,9 @@
     state: restarted
   become: true
   when: _minecraft_tls_cert.stat.exists
+
+- name: reload nftables
+  ansible.builtin.systemd:
+    name: nftables
+    state: reloaded
+  become: true

@@ -1,0 +1,23 @@
+#!/usr/sbin/nft -f
+# {{ ansible_managed }}
+# Outbound filter. This server is reachable from the internet, so a compromised
+# process must not be able to open new connections to the rest of the LAN.
+# Inbound traffic and its replies are untouched.
+# Replace only this role's table; other nftables tables are left alone.
+destroy table inet egress
+
+table inet egress {
+  chain output {
+    type filter hook output priority filter; policy accept;
+    oifname "lo" accept
+    ct state established,related accept
+    # Game traffic to LAN players: discovery replies and NetherNet media.
+    udp sport { {{ ([19132, minecraft_port | int] | unique | join(', ')) }}, 7551, {{ minecraft_udp_ports }} } accept
+{% for rule in minecraft_egress_allow %}
+    ip daddr {{ rule.dest }} {{ rule.proto }} dport {{ rule.port }} accept
+{% endfor %}
+    meta l4proto ipv6-icmp accept
+    ip daddr { 10.0.0.0/8, 100.64.0.0/10, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16 } counter reject with icmpx admin-prohibited
+    ip6 daddr { fc00::/7, fe80::/10 } counter reject with icmpx admin-prohibited
+  }
+}
