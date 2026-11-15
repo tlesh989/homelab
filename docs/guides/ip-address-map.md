@@ -111,6 +111,10 @@ full re-add instead of an in-place network change.
 
 RokuUltra is on IoT (wired, Xbox Switch port 4; Plex via "IoT to Plex").
 
+TVs used only as displays (streaming is done by a Roku) sit on IoT so they still get firmware
+updates: LG webOS TV on `ginkgo` Wi-Fi (MAC 7c:1c:4e:87:4b:5d; webOS user agreements declined),
+Hisense Google TV wired on Xbox Switch port 5 (MAC a0:62:fb:61:ae:67).
+
 ---
 
 ## Guest Network — 192.168.60.0/24 (Guest, VLAN 60)
@@ -130,7 +134,6 @@ Media and console devices on Guest (dynamic IPs):
 
 | Device | Connection | MAC |
 |--------|------------|-----|
-| LG webOS TV | sw-24 port 24 | 38:8c:50:cd:56:7a |
 | Onkyo TX-RZ630 | sw-24 port 23 | 00:09:b0:d8:e4:b6 |
 | PS5 (UniFi name "iPhone ea:64" — stale DHCP hostname; Sony OUI) | sw-24 port 22 | b4:0a:d8:af:ea:64 |
 | PS4 (UniFi name "Playstation") | sw-24 port 21 | 70:9e:29:d2:a5:02 |
@@ -187,7 +190,7 @@ device in UniFi. Uplink: SFP 2 → USW Pro Max 16 PoE SFP+ 2.
 | 9–10 | Home services | Default | 9 homeassistant (Pi), 10 Tablo (`t4g`) |
 | 11–18 | Homelab | Default; node ports custom (see Guest section) | 11 ansalon, 12 jetkvm, 13 solinari, 14 sturm, 15 tika, 16 bupu, 17–18 spare |
 | 19–20 | IoT | Native IoT, tagged blocked | 19 spare, 20 Wyze base station |
-| 21–24 | Guest | Native Guest, tagged blocked | 21 PS4, 22 PS5, 23 Onkyo, 24 LG TV |
+| 21–24 | Guest | Native Guest, tagged blocked | 21 PS4, 22 PS5, 23 Onkyo, 24 spare |
 
 Moving a Proxmox node to another port means copying its custom VLAN setting to the new port —
 a controller-default port trunks every VLAN and floods IoT/Storage frames into guests (homelab-znh).
