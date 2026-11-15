@@ -15,7 +15,7 @@ Report-only. Never changes hosts, config, or issues. Ends with a ranked report.
 ## Rules
 
 - Use `doppler run -- ...` for anything needing secrets; inventory is `-i hosts`.
-- Run `ansible ... -m shell` with `-o` and a `timeout`; a host that fails to answer is itself a finding (🔴), not a reason to stop.
+- Run `ansible ... -m shell` with a `timeout` (no `-o`, it is deprecated), and `-b` for anything that needs root (`pvecm`, `pvesm`, `docker`); a host that fails to answer is itself a finding (🔴), not a reason to stop.
 - Sections are independent — run them in parallel where possible.
 - Never print secrets or public-domain hostnames.
 
@@ -23,17 +23,20 @@ Report-only. Never changes hosts, config, or issues. Ends with a ranked report.
 
 1. **memory** — the TrueNAS-swap lesson. Thresholds: 🔴 any swap in use or OOM kill, or RAM used >90%; 🟡 RAM used >85% or allocation >2x peak need.
    ```bash
-   doppler run -- ansible 'all:!truenas:!unifi' -i hosts -o -m shell -a "free -m | awk '/Mem|Swap/'; cat /proc/pressure/memory; dmesg 2>/dev/null | grep -ci 'out of memory'"
+   doppler run -- ansible 'all:!truenas:!unifi' -i hosts -b -m shell -a "free -m | awk '/Mem|Swap/'; cat /proc/pressure/memory; dmesg 2>/dev/null | grep -ci 'out of memory' || true"   # || true: grep -c exits 1 on a count of 0
    doppler run -- ansible proxmox -i hosts -m shell -a "pvesh get /cluster/resources --type vm --output-format json"   # allocated vs used per guest
    ```
    Compare against `memory` in `terraform/` for each guest and suggest the new size. Beszel on kaz (`:8090`) has longer history if a spike is in question.
 2. **nodes** — per Proxmox node: RAM/swap, CPU, overcommit ratio (sum guest RAM / node RAM; 🟡 >1.0), storage fill (🟡 >80%, 🔴 >90%) for `truenas-lvm` and local, `systemctl --failed`, `pvecm status` quorum.
-3. **truenas** (`ansalon`) — via the API (`TRUENAS_HOST`, `TRUENAS_API_KEY`): pool status, last scrub age (🟡 >35d), SMART/disk alerts, active alerts, ARC size vs RAM, swap used (🔴 any), iSCSI/NFS session counts.
+   ```bash
+   doppler run -- ansible proxmox -i hosts -b -m shell -a "pvecm status | grep -E 'Quorate|Total votes'; pvesm status"
+   ```
+3. **truenas** (`ansalon`) — via the websocket API, not REST (`TRUENAS_HOST` in Doppler is a `wss://.../api/current` URL; use `truenas_api_client` from ansible's venv as `roles/truenas/library/truenas_api.py` does, with `TRUENAS_API_KEY`): pool status, last scrub age (🟡 >35d), SMART/disk alerts, active alerts, ARC size vs RAM, swap used (🔴 any), iSCSI/NFS session counts.
 4. **logs** — per host, last 24h, grouped so repeats surface:
    ```bash
    journalctl -p err --since -24h --no-pager -o cat | sed -E 's/[0-9]+/N/g' | sort | uniq -c | sort -rn | head -10
    ```
-   Also `systemctl --failed` and `docker ps -a --format '{{.Names}} {{.Status}}' | grep -i restart`. A pattern with count >=20, or seen on multiple days, is a finding — name the host, count and likely fix.
+   Also `systemctl --failed` and `docker ps -a --filter status=restarting` (no `--format '{{...}}'` inside `ansible -a`: Jinja eats the braces). A pattern with count >=20, or seen on multiple days, is a finding — name the host, count and likely fix.
 5. **network** — rogue/noisy devices:
    - ```bash
   doppler run -- sh -c 'UNIFI_URL=https://192.168.233.1 UNIFI_INSECURE=true mise exec -- unifly clients list --all -o json-compact' | grep -v '^Showing'

@@ -16,6 +16,9 @@ network_inventory:
     iot:
       cidr: 192.168.40.0/24
       dhcp_pool: ["192.168.40.10", "192.168.40.200"]
+    guest:
+      cidr: 192.168.60.0/24
+      dhcp_pool: ["192.168.60.21", "192.168.60.254"]
     storage:
       cidr: 192.168.220.0/24
 
@@ -189,19 +192,19 @@ network_inventory:
       dns: [homeassistant.tlesh.xyz]
       notes: "Raspberry Pi — DHCP reservation (.35)"
     - name: GymRoku
-      ip: 192.168.233.79
+      ip: 192.168.60.157
       mac:
       assignment: dynamic-noted
       managed_by: manual
       dns: []
-      notes: "Media device — stays on main (Plex/DLNA)"
+      notes: "Media device — on Guest via ginseng (dynamic; address as of 2026-11-15)"
     - name: Denon-AVR-S750H
-      ip: 192.168.233.156
+      ip: 192.168.60.220
       mac:
       assignment: dynamic-noted
       managed_by: manual
       dns: []
-      notes: "AV receiver — stays on main (Plex/DLNA)"
+      notes: "AV receiver — on Guest via ginseng (dynamic; address as of 2026-11-15)"
     - name: solinari
       ip: 192.168.233.200
       mac: "00:11:32:8e:27:e1"
