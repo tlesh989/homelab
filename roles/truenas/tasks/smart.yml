@@ -20,9 +20,15 @@
     method: cronjob.create
     params:
       - user: root
+        # Test every disk, but exit nonzero if any test fails or no disks are found.
+        # Failures go to stderr: TrueNAS reports cron output (stdout is hidden), not exit codes.
         command: >-
-          for d in $(/usr/sbin/smartctl --scan | cut -d' ' -f1);
-          do /usr/sbin/smartctl -q errorsonly -t {{ item.type }} "$d"; done
+          disks=$(/usr/sbin/smartctl --scan | cut -d' ' -f1);
+          [ -n "$disks" ] || { echo "smartctl --scan found no disks" >&2; exit 1; }; rc=0;
+          for d in $disks;
+          do /usr/sbin/smartctl -q errorsonly -t {{ item.type }} "$d"
+          || { echo "smartctl -t {{ item.type }} failed: $d" >&2; rc=1; }; done;
+          exit $rc
         description: "{{ item.description }}"
         enabled: true
         stdout: true
