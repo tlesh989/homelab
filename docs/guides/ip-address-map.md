@@ -112,7 +112,8 @@ full re-add instead of an in-place network change.
 RokuUltra is on IoT (wired, Xbox Switch port 4; Plex via "IoT to Plex").
 
 TVs used only as displays (streaming is done by a Roku) sit on IoT so they still get firmware
-updates: LG webOS TV on `ginkgo` Wi-Fi (MAC 7c:1c:4e:87:4b:5d; webOS user agreements declined),
+updates: LG webOS TV on `ginkgo` Wi-Fi (MAC 7c:1c:4e:87:4b:5d; webOS won't check for software
+updates until the User Agreement and Privacy Policy are accepted, so both are accepted),
 Hisense Google TV wired on Xbox Switch port 5 (MAC a0:62:fb:61:ae:67).
 
 ---
