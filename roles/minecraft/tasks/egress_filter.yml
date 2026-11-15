@@ -1,0 +1,24 @@
+---
+- name: Install nftables
+  ansible.builtin.package:
+    name: nftables
+    state: present
+  become: true
+
+- name: Deploy outbound filter ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0755"
+    validate: nft -c -f %s
+  become: true
+  notify: reload nftables
+
+- name: Enable nftables service
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+    state: started
+  become: true

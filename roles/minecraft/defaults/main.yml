@@ -38,3 +38,9 @@ minecraft_deploy_user: acme-deploy
 # BDS only accepts an IP literal in server-udp-ports, and ours is dynamic. Resolved at
 # deploy time here and at every service start by minecraft-udp-ports.sh.
 minecraft_public_ip: "{{ lookup('ansible.builtin.url', 'https://ifconfig.me/ip') }}"
+
+# Internet-facing servers: reject new outbound connections to private addresses
+# (nftables, tasks/egress_filter.yml). Exceptions go in minecraft_egress_allow as
+# {dest: <ip>, proto: tcp|udp, port: <port>}.
+minecraft_egress_filter: false
+minecraft_egress_allow: []

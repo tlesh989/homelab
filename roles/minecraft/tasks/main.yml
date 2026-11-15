@@ -153,3 +153,7 @@
 - name: Configure TLS proxy for NetherNet
   ansible.builtin.include_tasks: tls_proxy.yml
   when: minecraft_tls_proxy | bool
+
+- name: Configure outbound filter
+  ansible.builtin.include_tasks: egress_filter.yml
+  when: minecraft_egress_filter | bool
