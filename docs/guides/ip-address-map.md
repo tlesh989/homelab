@@ -59,9 +59,11 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 | .243 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
 | .244 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
 
-### Media Devices (staying on main — Plex/DLNA access)
+### Media Devices
 
-GymRoku `.79`
+No streaming device is kept on main for Plex any more. The Roku Ultra and the Hisense TV are wired to
+the IoT VLAN (see below) and reach Plex through the "IoT to Plex" firewall policy. GymRoku, RokuTCL
+and the Denon AVR join `ginseng` and sit on Guest, which has no Plex policy.
 
 ---
 
@@ -75,11 +77,12 @@ DNS: gateway only (`192.168.40.1`, DHCP "Auto") — NextDNS CLI on the gateway a
 | .1 | gateway | IoT VLAN gateway |
 | .10–.200 | *(dynamic)* | All IoT devices — assigned by DHCP |
 
-### IoT Devices (connect to `ginkgo` SSID)
+### IoT Devices (`ginkgo` SSID, or a switch port set to VLAN 40)
 
 `ginseng` now serves the Guest network (VLAN 60), so any IoT device still on `ginseng` lands there and must move to `ginkgo`.
 
-Live-checked against the UniFi controller (`/proxy/network/integration/v1/sites/.../clients`) on 2026-08-15.
+Live-checked against the UniFi controller (`unifly clients list --all`) on 2026-11-15. Names are
+UniFi's labels or DHCP hostnames and can be wrong or stale; the MAC is the identity.
 Migration from `ginseng` → `ginkgo` happens **only in each device's own app** — WiFi credentials
 are paired into the device at setup time, and UniFi can't reassign a client to a different SSID
 from the network side. Re-pairing steps: open the vendor app → device settings → change WiFi
@@ -88,30 +91,47 @@ full re-add instead of an in-place network change.
 
 | Device | Type | MAC | Status |
 |--------|------|-----|--------|
-| ESP_433ABC | ESP32 sensor | 5c:cf:7f:43:3a:bc | ❌ On main (.155) — needs migration |
+| ESP_433ABC | ESP32 sensor | 5c:cf:7f:43:3a:bc | ❌ On Guest via `ginseng` (.137) — move to `ginkgo` |
 | KP303 fb:60 | Kasa power strip | e4:fa:c4:3f:fb:60 | ✅ On IoT (.161) |
-| KP303 a5:67 | Kasa power strip | 3c:84:6a:66:a5:67 | ❌ On main (.128) — needs migration |
+| KP303 a5:67 | Kasa power strip | 3c:84:6a:66:a5:67 | ❌ On Guest via `ginseng` (.96) — move to `ginkgo` |
 | TP15 5e:e6 | Tapo smart plug | 3c:52:a1:3a:5e:e6 | ✅ On IoT (.76) |
 | TP15 67:a3 | Tapo smart plug | 3c:52:a1:3a:67:a3 | ✅ On IoT (.18) |
 | TP15 65:65 | Tapo smart plug | 3c:52:a1:3a:65:65 | ✅ On IoT (.166) |
-| TP15 65:b2 | Tapo smart plug | 3c:52:a1:3a:65:b2 | ⚠️ Offline — last known on IoT (.52), unverified |
+| TP15 65:b2 | Tapo smart plug | 3c:52:a1:3a:65:b2 | ⚠️ Offline on 2026-11-15 — network unverified |
 | Etekcity-Outlet | Smart outlet | 2c:3a:e8:22:e7:a9 | ✅ On IoT (.97) |
-| Wyze Video Doorbell | Camera | 2c:aa:8e:a7:bd:bf | ⚠️ Offline — network unverified |
-| Wyze Outdoor Plug | Smart plug | 7c:78:b2:61:97:0a | ⚠️ Offline — network unverified |
+| Wyze wired device | Unidentified (UniFi labels it "Wyze Video Doorbell"; there is no doorbell) | 2c:aa:8e:a7:bd:bf | ✅ On IoT (.184) — wired, sw-24 port 22 |
+| Wyze Outdoor Plug | Smart plug | 7c:78:b2:61:97:0a | ⚠️ Offline on 2026-11-15 — network unverified |
 | WYZE_CAKP2JFUS | Wyze camera | 7c:78:b2:23:b6:72 | ✅ On IoT (.109) |
 | TwinCam | Wyze camera | 2c:aa:8e:24:1f:9a | ✅ On IoT (.110) |
-| GE_Light_1B77 | Smart light | 80:8a:f7:01:fd:fc | ❌ On main (.67) — needs migration |
+| GE_Light_1B77 | Smart light | 80:8a:f7:01:fd:fc | ❌ On Guest via `ginseng` (.95) — move to `ginkgo` |
 | Govee Lyra | Smart light | d0:c9:07:82:94:5a | ✅ On IoT (.88) |
-| Amazon Echo Dot (4th Gen) 77:de | Smart speaker | b0:73:9c:5b:77:de | ❌ On main (.58) — needs migration |
-| Amazon Echo Dot (2nd Gen) f7:9c | Smart speaker | fc:a6:67:3d:f7:9c | ❌ On main (.193) — needs migration |
-| Echo Show | Smart display | 08:91:a3:88:88:73 | ❌ On main (.68) — needs migration |
-| Wyze Plug 85:43 | Smart plug | 2c:aa:8e:e9:85:43 | ❌ On main (.183) — needs migration *(newly found)* |
-| WYZE_CAKP2JFUS 42:69 | Wyze camera | 2c:aa:8e:fb:42:69 | ❌ On main (.187) — needs migration *(newly found)* |
-| Amazon Echo Dot (3rd Gen) ca:5b | Smart speaker | 08:a6:bc:75:ca:5b | ❌ On main (.177) — needs migration *(newly found)* |
-| Amazon Echo Dot (4th Gen) e9:b2 | Smart speaker | 34:25:be:75:e9:b2 | ❌ On main (.84) — needs migration *(newly found)* |
+| Amazon Echo Dot (4th Gen) 77:de | Smart speaker | b0:73:9c:5b:77:de | ❌ On Guest via `ginseng` (.79) — move to `ginkgo` |
+| Amazon Echo Dot (2nd Gen) f7:9c | Smart speaker | fc:a6:67:3d:f7:9c | ❌ On Guest via `ginseng` (.248) — move to `ginkgo` |
+| Echo Show | Smart display | 08:91:a3:88:88:73 | ❌ On Guest via `ginseng` (.201) — move to `ginkgo` |
+| Wyze Plug 85:43 | Smart plug | 2c:aa:8e:e9:85:43 | ❌ On Guest via `ginseng` (.121) — move to `ginkgo` |
+| WYZE_CAKP2JFUS 42:69 | Wyze camera | 2c:aa:8e:fb:42:69 | ❌ On Guest via `ginseng` (.233) — move to `ginkgo` |
+| Amazon Echo Dot (3rd Gen) ca:5b | Smart speaker | 08:a6:bc:75:ca:5b | ❌ On Guest via `ginseng` (.149) — move to `ginkgo` |
+| Amazon Echo Dot (4th Gen) e9:b2 | Smart speaker | 34:25:be:75:e9:b2 | ❌ On Guest via `ginseng` (.131) — move to `ginkgo` |
+| RokuUltra | Roku (wired, Xbox Switch port 4) | a8:b5:7c:4a:f2:17 | ✅ On IoT (.179) |
+| hisense | Hisense TV (wired, Xbox Switch port 5) | a0:62:fb:61:ae:67 | ✅ On IoT (.163) |
+| ESP-D7D4B9 | ESP device | 08:3a:8d:d7:d4:b9 | ✅ On IoT (.68) |
+| FrontLight0 | Kasa light | 50:c7:bf:2e:75:f5 | ✅ On IoT (.180) |
+| GE_Light_1B77 1b:77 | Smart light | 34:13:43:31:1b:77 | ✅ On IoT (.106) |
+| GE_Light_7323 | Smart light | 34:13:43:33:73:23 | ✅ On IoT (.122) |
+| HL_CAM4 | Wyze camera | 80:48:2c:3a:17:ee | ✅ On IoT (.108) |
+| HS300 17:23 | Kasa power strip | e4:fa:c4:56:17:23 | ✅ On IoT (.149) |
+| HS300 2e:74 | Kasa power strip | f0:a7:31:95:2e:74 | ✅ On IoT (.171) |
+| KG20EQ000579 | Unidentified | 8c:4b:14:db:b1:b4 | ✅ On IoT (.147) |
+| KP303 73:d4 | Kasa power strip | 60:83:e7:05:73:d4 | ✅ On IoT (.187) |
+| KP303 f3:8e | Kasa power strip | e4:fa:c4:3f:f3:8e | ✅ On IoT (.92) |
+| LWIP 09:bb | Wyze device | 2c:aa:8e:28:09:bb | ✅ On IoT (.124) |
+| Levoit-Humidifier | Humidifier | 90:38:0c:74:73:98 | ✅ On IoT (.24) |
+| TP15 65:f8 | Tapo smart plug | 3c:52:a1:3a:65:f8 | ✅ On IoT (.123) |
+| TP15 6c:8d | Tapo smart plug | 3c:52:a1:3a:6c:8d | ✅ On IoT (.44) |
+| WYZE_CAM_OG | Wyze camera | 80:48:2c:10:8a:fb | ✅ On IoT (.75) |
 
-Intentionally staying on main (streaming devices need Plex/DLNA reachability, not IoT-isolated):
-RokuUltra (.189), RokuTCL (.53) — same rationale as GymRoku above.
+Wired devices join IoT by switch port, not SSID: Xbox Switch port 4 (Roku Ultra) and port 5
+(Hisense TV), and sw-24 port 22 (Wyze wired device), are access ports with native VLAN 40.
 
 ---
 
@@ -137,7 +157,8 @@ bridge floods any tagged frame the switch sends to every guest's `eth0`, so the 
 trunk VLANs the node doesn't use. Storage runs on each node's second NIC (`vmbr1`), on a Pro Max
 port with VLAN 220 untagged and tagged VLANs blocked.
 
-Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
+Firewall zone `Guest`: internet and gateway (DNS/DHCP/mDNS) allowed, gateway admin ports blocked
+("Guest to Gateway Block Admin": 22, 80, 443, 8080, 8443, 6789); Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100), and "Guest to 3D Printer" (allow to `.14` on TCP 8080/8898/8899 —
 Flashforge LAN API + camera). Flashforge discovery is UDP broadcast and does not cross VLANs, so
@@ -161,8 +182,8 @@ Internet access: disabled. mDNS: enabled.
 | Zone | Networks | Policy |
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones |
-| IoT | IoT (.40) | Internet allowed; blocked from Internal; Internal can initiate to IoT |
-| Guest | Guest (.60) | Internet + gateway allowed; blocked from Internal and IoT except Minecraft `.19`/`.20` |
-| External | WAN | Default deny inbound |
+| IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex (`.12` TCP 32400, "IoT to Plex"); Internal can initiate to IoT; gateway admin ports blocked (22, 80, 443, 8080, 8443, 6789) |
+| Guest | Guest (.60) | Internet + gateway DNS/DHCP allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`/`.20`, printer `.15` and 3D printer `.14` |
+| External | WAN | Default deny inbound, except the two port forwards to minecraft2 (`.20`: TCP 19132, UDP 30000-30009). Inbound is limited to US source addresses (Region Blocking). Direct Remote Connection to the console is off |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |
