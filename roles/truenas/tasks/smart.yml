@@ -1,0 +1,40 @@
+---
+# tasks file for truenas — SMART self-test schedule (homelab-2vs)
+# TrueNAS 25.10 removed Periodic S.M.A.R.T. Tests (no smart.* API methods), so
+# self-tests run from cron jobs instead. Idempotent: matched on description.
+
+- name: Get existing cron jobs
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: cronjob.query
+    validate_certs: "{{ truenas_validate_certs }}"
+  register: _truenas_cronjobs
+  changed_when: false
+  no_log: true
+
+- name: Create SMART self-test cron job
+  truenas_api:
+    host: "{{ truenas_host }}"
+    api_key: "{{ truenas_api_key }}"
+    method: cronjob.create
+    params:
+      - user: root
+        command: >-
+          for d in $(/usr/sbin/smartctl --scan | cut -d' ' -f1);
+          do /usr/sbin/smartctl -q errorsonly -t {{ item.type }} "$d"; done
+        description: "{{ item.description }}"
+        enabled: true
+        stdout: true
+        stderr: false
+        schedule: "{{ item.schedule }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+  loop: "{{ truenas_smart_tests | default([]) }}"
+  loop_control:
+    label: "{{ item.description }}"
+  when: >-
+    _truenas_cronjobs.result
+    | selectattr('description', 'equalto', item.description)
+    | list | length == 0
+  changed_when: true
+  no_log: true

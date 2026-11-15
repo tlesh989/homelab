@@ -16,6 +16,9 @@
 - name: Configure ZFS scrub schedule
   ansible.builtin.include_tasks: scrub.yml
 
+- name: Configure SMART self-test schedule
+  ansible.builtin.include_tasks: smart.yml
+
 - name: Configure UPS (NUT) monitoring
   ansible.builtin.include_tasks: ups.yml
 
