@@ -84,6 +84,8 @@ repos:
     rev: v0.48.0
     hooks:
       - id: markdownlint
+        # mise's node: nodeenv's default ("latest") breaks when nodejs.org lists an alpha release first
+        language_version: system
         args:
           - --fix
         files: \.(md|markdown)$
