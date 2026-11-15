@@ -243,6 +243,11 @@ tasks:
       - task: ansible
         vars: { PLAYBOOK: "main.yml", CLI_ARGS: "--check {{.CLI_ARGS}}" }
 
+  drift:
+    desc: Compare Renovate-pinned Docker image tags with what each host is running (read-only)
+    cmds:
+      - scripts/check-image-drift.sh
+
   syntax:
     desc: Check playbook syntax
     cmds:
