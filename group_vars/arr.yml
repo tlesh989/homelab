@@ -14,3 +14,15 @@ arr_pushover_user_key: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
 # Uptime Kuma group for arr monitors (referenced via parent_name: "arr")
 autokuma_labels:
   kuma.arr.group.name: "Arr Stack"
+
+# Pin container DNS upstreams. Docker's embedded resolver otherwise copies the
+# host's /etc/resolv.conf at container start, and Tailscale on this LXC
+# (installed by hand, accept-dns on) rewrites that file to 100.100.100.100
+# while logged in. When the node dropped to NeedsLogin on 2026-09-16 the
+# MagicDNS resolver started returning SERVFAIL and every container started
+# during the logged-in window lost DNS (EAI_AGAIN in tdarr/lidarr/prowlarr).
+# 1.1.1.1 matches the LXC's Terraform resolver.
+docker_daemon_options:
+  dns:
+    - 1.1.1.1
+    - 1.0.0.1
