@@ -60,3 +60,7 @@ daemon.*
 *.corrupt.backup/
 .beads-credential-key
 proxied_server_client_info.json
+
+# Added by bd (missing required patterns)
+*.gate.lock*
+dolt-server-config.yaml
