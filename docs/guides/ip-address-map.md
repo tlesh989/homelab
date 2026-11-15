@@ -45,7 +45,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 
 | IP | Hostname | Role | Notes |
 |----|----------|------|-------|
-| .156 | Denon-AVR-S750H | AV receiver | Stays on main (Plex/DLNA) |
+| .129 | t4g | Tablo 4th Gen OTA DVR | sw-24 port 10 — stays on main |
 
 ### Personal Device Pool — Reservation-Only (.240–.250)
 
@@ -59,9 +59,8 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 | .243 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
 | .244 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
 
-### Media Devices (staying on main — Plex/DLNA access)
-
-GymRoku `.79`
+Media devices (TVs, receivers, consoles, Rokus) live on Guest or IoT, not main — they reach
+Plex through the "Guest to Plex" / "IoT to Plex" policies (TCP 32400 to `.12`).
 
 ---
 
@@ -96,7 +95,7 @@ full re-add instead of an in-place network change.
 | TP15 65:65 | Tapo smart plug | 3c:52:a1:3a:65:65 | ✅ On IoT (.166) |
 | TP15 65:b2 | Tapo smart plug | 3c:52:a1:3a:65:b2 | ⚠️ Offline — last known on IoT (.52), unverified |
 | Etekcity-Outlet | Smart outlet | 2c:3a:e8:22:e7:a9 | ✅ On IoT (.97) |
-| Wyze Video Doorbell | Camera | 2c:aa:8e:a7:bd:bf | ⚠️ Offline — network unverified |
+| Wyze base station (UniFi name "Wyze Video Doorbell") | Camera hub, wired | 2c:aa:8e:a7:bd:bf | ✅ IoT — sw-24 port 20 |
 | Wyze Outdoor Plug | Smart plug | 7c:78:b2:61:97:0a | ⚠️ Offline — network unverified |
 | WYZE_CAKP2JFUS | Wyze camera | 7c:78:b2:23:b6:72 | ✅ On IoT (.109) |
 | TwinCam | Wyze camera | 2c:aa:8e:24:1f:9a | ✅ On IoT (.110) |
@@ -110,8 +109,7 @@ full re-add instead of an in-place network change.
 | Amazon Echo Dot (3rd Gen) ca:5b | Smart speaker | 08:a6:bc:75:ca:5b | ❌ On main (.177) — needs migration *(newly found)* |
 | Amazon Echo Dot (4th Gen) e9:b2 | Smart speaker | 34:25:be:75:e9:b2 | ❌ On main (.84) — needs migration *(newly found)* |
 
-Intentionally staying on main (streaming devices need Plex/DLNA reachability, not IoT-isolated):
-RokuUltra (.189), RokuTCL (.53) — same rationale as GymRoku above.
+RokuUltra is on IoT (wired, Xbox Switch port 4; Plex via "IoT to Plex").
 
 ---
 
@@ -128,17 +126,29 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 | .19 | minecraft | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
 | .20 | minecraft2 | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
 
+Media and console devices on Guest (dynamic IPs):
+
+| Device | Connection | MAC |
+|--------|------------|-----|
+| LG webOS TV | sw-24 port 24 | 38:8c:50:cd:56:7a |
+| Onkyo TX-RZ630 | sw-24 port 23 | 00:09:b0:d8:e4:b6 |
+| PS5 (UniFi name "iPhone ea:64" — stale DHCP hostname; Sony OUI) | sw-24 port 22 | b4:0a:d8:af:ea:64 |
+| PS4 (UniFi name "Playstation") | sw-24 port 21 | 70:9e:29:d2:a5:02 |
+| Xbox Series X | Xbox Switch port 3 | a8:8c:3e:84:8b:be |
+| Denon-AVR-S750H | Wi-Fi (`ginseng`) | 00:06:78:5f:84:ba |
+| GymRoku, RokuTCL | Wi-Fi (`ginseng`) | — |
+
 The Minecraft LXCs keep matching last octets on both networks. `vmbr0` is not VLAN-aware on any
 node; Proxmox carries `tag=60` NICs on an auto-created `vmbr0v60` bridge (`eno1.60`).
 
-The nodes' main NICs (sw-24 ports 15 tika, 16 bupu, 17 sturm) use a custom port VLAN setting:
+The nodes' main NICs (sw-24 ports 14 sturm, 15 tika, 16 bupu) use a custom port VLAN setting:
 native Default, tagged Guest (60) only; IoT (40) and Storage (220) are excluded. A non-VLAN-aware
 bridge floods any tagged frame the switch sends to every guest's `eth0`, so the port must not
 trunk VLANs the node doesn't use. Storage runs on each node's second NIC (`vmbr1`), on a Pro Max
 port with VLAN 220 untagged and tagged VLANs blocked.
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP) allowed; Internal and IoT blocked, except
-policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
+policies "Guest to Plex" (allow to `.12` on TCP 32400), "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100), and "Guest to 3D Printer" (allow to `.14` on TCP 8080/8898/8899 —
 Flashforge LAN API + camera). Flashforge discovery is UDP broadcast and does not cross VLANs, so
 add the AD5X by IP in Orca-Flashforge/FlashPrint. Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
@@ -161,8 +171,26 @@ Internet access: disabled. mDNS: enabled.
 | Zone | Networks | Policy |
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones |
-| IoT | IoT (.40) | Internet allowed; blocked from Internal; Internal can initiate to IoT |
-| Guest | Guest (.60) | Internet + gateway allowed; blocked from Internal and IoT except Minecraft `.19`/`.20` |
+| IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex `.12:32400`; Internal can initiate to IoT |
+| Guest | Guest (.60) | Internet + gateway allowed; blocked from Internal and IoT except Plex `.12:32400`, Minecraft `.19`/`.20`, printers |
+
+---
+
+## Switch Port Layout — sw-24 (US 24, `.33`)
+
+Ports are grouped by function, not by patch-panel number. Each in-use port is named after its
+device in UniFi. Uplink: SFP 2 → USW Pro Max 16 PoE SFP+ 2.
+
+| Ports | Group | Port setting | Devices |
+|-------|-------|--------------|---------|
+| 1–8 | General wired | Default (controller default) | Spare — wall drops, wired PCs |
+| 9–10 | Home services | Default | 9 homeassistant (Pi), 10 Tablo (`t4g`) |
+| 11–18 | Homelab | Default; node ports custom (see Guest section) | 11 ansalon, 12 jetkvm, 13 solinari, 14 sturm, 15 tika, 16 bupu, 17–18 spare |
+| 19–20 | IoT | Native IoT, tagged blocked | 19 spare, 20 Wyze base station |
+| 21–24 | Guest | Native Guest, tagged blocked | 21 PS4, 22 PS5, 23 Onkyo, 24 LG TV |
+
+Moving a Proxmox node to another port means copying its custom VLAN setting to the new port —
+a controller-default port trunks every VLAN and floods IoT/Storage frames into guests (homelab-znh).
 | External | WAN | Default deny inbound |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |

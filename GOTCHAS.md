@@ -85,6 +85,16 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   (DNS answers `203.0.113.250` / `2001:db8:1000::fa`) → a UniFi content filter is sinkholing it. A filter
   with `network_ids` set covers the whole network, not just its listed MACs → add the domain to the
   filter's allow list in the UI. NextDNS logs still show these queries as allowed. (sonarr → thexem.info)
+- **Recabling a Proxmox node to another sw-24 port brings back VLAN flooding into guests** → port
+  settings stay with the port, not the device; a controller-default port trunks every VLAN → copy the
+  node's custom setting (native Default, tagged Guest only) to the new port and reset the old one.
+  Layout lives in `docs/guides/ip-address-map.md` → Switch Port Layout. (homelab-jkl5, homelab-znh)
+- **`unifly devices port-set --mode trunk --tagged-vlans Guest` still trunks every VLAN** → it writes
+  `tagged_vlan_mgmt: custom` with no `excluded_networkconf_ids` (= allow all) → PUT the switch's full
+  `port_overrides` to `api/s/default/rest/device/<_id>` via `unifly api -m put`, with the excluded IDs
+  set, and verify with `stat/device/<mac>`. `firewall policies create` likewise needs zone IDs, not names.
+- **A client's UniFi name says "iPhone" but it's wired to a TV-cabinet port** → names come from stale
+  DHCP hostnames → check the MAC vendor (OUI); this one was a PS5.
 
 ## Minecraft (Bedrock)
 
