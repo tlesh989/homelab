@@ -57,9 +57,10 @@
 # one. Remove what the old tasks installed; the stock i915 driver stays.
 - name: Remove unused i915-sriov-dkms module
   ansible.builtin.shell: |
-    set -o pipefail
+    set -euo pipefail
     command -v dkms >/dev/null || exit 0
-    for v in $(dkms status | awk -F'[/,:]' '/^i915-sriov-dkms/{print $2}' | sort -u); do
+    versions=$(dkms status | awk -F'[/,:]' '/^i915-sriov-dkms/{print $2}' | sort -u)
+    for v in $versions; do
       dkms remove "i915-sriov-dkms/$v" --all
       echo removed
     done
