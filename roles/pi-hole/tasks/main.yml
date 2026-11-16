@@ -57,6 +57,19 @@
   changed_when: true
   when: not _pihole_installed.stat.exists
 
+# Hosts deployed before this role stopped rewriting setupVars.conf may still
+# have it; `pihole -up` re-runs the v5 migration whenever the file exists.
+- name: Check for v6 configuration file
+  ansible.builtin.stat:
+    path: "{{ pihole_install_dir }}/pihole.toml"
+  register: _pihole_toml
+
+- name: Remove stale v5 setupVars.conf from a v6 host
+  ansible.builtin.file:
+    path: "{{ pihole_install_dir }}/setupVars.conf"
+    state: absent
+  when: _pihole_toml.stat.exists
+
 - name: Ensure pihole-FTL is enabled and running
   ansible.builtin.service:
     name: pihole-FTL
