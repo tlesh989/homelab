@@ -31,6 +31,7 @@ pihole_local_hosts:
   - "192.168.233.8 bupu.tlesh.xyz"
   - "192.168.233.9 sturm.tlesh.xyz"
   - "192.168.233.6 ansalon.tlesh.xyz"
+  - "192.168.233.6 truenas.tlesh.xyz"
   - "192.168.233.11 jetkvm.tlesh.xyz"
   - "192.168.233.12 plex.tlesh.xyz"
   - "192.168.233.21 tailscale.tlesh.xyz"
