@@ -35,6 +35,14 @@
   become: true
   become_user: "{{ claude_code_user }}"
 
+- name: Start Claude Code session on boot
+  ansible.builtin.cron:
+    name: claude-session on boot
+    special_time: reboot
+    job: /home/{{ claude_code_user }}/.local/bin/claude-session >> /home/{{ claude_code_user }}/.local/state/claude-session.log 2>&1
+  become: true
+  become_user: "{{ claude_code_user }}"
+
 - name: Check for claude tmux session
   ansible.builtin.command:
     cmd: tmux has-session -t =claude
@@ -46,9 +54,7 @@
 
 - name: Start claude tmux session with remote control
   ansible.builtin.command:
-    cmd: >
-      tmux new-session -d -s claude -c {{ claude_code_repo_dest }}
-      "bash -lc 'exec /home/{{ claude_code_user }}/.local/bin/claude --remote-control'"
+    cmd: /home/{{ claude_code_user }}/.local/bin/claude-session
   become: true
   become_user: "{{ claude_code_user }}"
   when: claude_tmux_check.rc != 0
