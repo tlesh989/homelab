@@ -24,7 +24,7 @@ on purpose: Bedrock LAN games need the tablets to see each other and the Minecra
 |------|-------------|--------|----------|----------------|-----------------|
 | Internal | everything | everything | replies only | everything | yes |
 | IoT | Plex only (`.12` TCP 32400) | nothing | nothing | DNS, DHCP, mDNS | yes |
-| Guest | Minecraft `.19`/`.20` (19131, 19132), printer `.15` (631, 9100), 3D printer `.14` (8080, 8898, 8899) | nothing | same VLAN only | DNS, DHCP, mDNS | yes |
+| Guest | Minecraft `.19`/`.20` (19131, 19132), printer `.15` (631, 9100), 3D printer `.14` (8080, 8898, 8899), Plex `.12` (32400) | nothing | same VLAN only | DNS, DHCP, mDNS | yes |
 | Internet | the two Minecraft port forwards to `.20` | nothing | nothing | nothing | n/a |
 
 Details that are easy to miss:
