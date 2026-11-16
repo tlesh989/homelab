@@ -57,12 +57,18 @@
   changed_when: true
   when: not _pihole_installed.stat.exists
 
-- name: Ensure setupVars.conf is up to date
-  ansible.builtin.template:
-    src: setupVars.conf.j2
-    dest: "{{ pihole_install_dir }}/setupVars.conf"
-    mode: "0640"
-  notify: Restart pihole-FTL
+# Hosts deployed before this role stopped rewriting setupVars.conf may still
+# have it; `pihole -up` re-runs the v5 migration whenever the file exists.
+- name: Check for v6 configuration file
+  ansible.builtin.stat:
+    path: "{{ pihole_install_dir }}/pihole.toml"
+  register: _pihole_toml
+
+- name: Remove stale v5 setupVars.conf from a v6 host
+  ansible.builtin.file:
+    path: "{{ pihole_install_dir }}/setupVars.conf"
+    state: absent
+  when: _pihole_toml.stat.exists
 
 - name: Ensure pihole-FTL is enabled and running
   ansible.builtin.service:
@@ -135,6 +141,22 @@
     (_current_hosts.stdout | regex_replace('[ "]', ''))
     != (pihole_local_hosts | to_json | regex_replace('[ "]', ''))
   notify: Reload pihole-FTL DNS
+
+- name: Read current custom dnsmasq lines
+  ansible.builtin.command:
+    cmd: pihole-FTL --config misc.dnsmasq_lines
+  register: _current_dnsmasq_lines
+  changed_when: false
+
+- name: Configure custom dnsmasq lines
+  ansible.builtin.command:
+    cmd: >
+      pihole-FTL --config misc.dnsmasq_lines
+      '{{ pihole_dnsmasq_lines | to_json }}'
+  changed_when: >
+    (_current_dnsmasq_lines.stdout | regex_replace('[ "]', ''))
+    != (pihole_dnsmasq_lines | to_json | regex_replace('[ "]', ''))
+  notify: Restart pihole-FTL
 
 - name: Remove legacy custom.list (superseded by pihole.toml dns.hosts)
   ansible.builtin.file:
