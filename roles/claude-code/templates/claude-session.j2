@@ -6,7 +6,8 @@ set -euo pipefail
 export PATH="/home/{{ claude_code_user }}/.local/bin:$PATH"  # cron PATH lacks ~/.local/bin
 
 before=$(claude --version)
-timeout 300 claude update
+# Never let a failed update (e.g. network not up yet at boot) keep the session from starting.
+timeout 300 claude update || echo "$(date -Is) claude update failed, continuing"
 after=$(claude --version)
 echo "$(date -Is) $before -> $after"
 
@@ -15,9 +16,9 @@ if [[ "$before" != "$after" ]]; then
 fi
 
 if ! tmux has-session -t =claude 2>/dev/null; then
-  # login shell so mise shims are on PATH under cron
+  # login shell so mise shims are on PATH under cron; loop restarts claude if it exits or crashes
   tmux new-session -d -s claude -c {{ claude_code_repo_dest }} \
-    "bash -lc 'exec /home/{{ claude_code_user }}/.local/bin/claude --remote-control'"
+    "bash -lc 'while true; do /home/{{ claude_code_user }}/.local/bin/claude --remote-control; sleep 10; done'"
 fi
 
 if [[ -t 0 && -z "${TMUX:-}" ]]; then
