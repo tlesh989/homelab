@@ -50,6 +50,10 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   the public half of `~/.ssh/ansible_ed25519` → compare fingerprints with `ssh-keygen -y -f`.
 - **A static IP changed and the name stopped resolving** → Pi-hole is authoritative for `*.tlesh.xyz` →
   update `pihole_local_hosts` (roles/pi-hole) and `docs/guides/ip-address-map.md`, then `task pi-hole`.
+- **Every `*.tlesh.xyz` name stopped resolving after a Pi-hole auto-update/restart** → FTL v6 re-runs the
+  v5 migration whenever `/etc/pihole/setupVars.conf` exists, clobbering `dns.hosts`, webserver port, etc.
+  (evidence: `/etc/pihole/migration_backup_v6/`) → never write setupVars.conf post-install; `task pi-hole`
+  restores the settings. (homelab-q1q)
 - **`--check` dry-run fails in beszel** → `roles/beszel` isn't check-mode safe → `--start-at-task` past it.
 - **`couldn't resolve module/action 'ansible.posix...'` (or another collection)** → collections load
   only from `galaxy_collections/` (`collections_path` in `ansible.cfg`; the old plural key was silently

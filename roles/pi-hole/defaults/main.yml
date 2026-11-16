@@ -5,6 +5,11 @@
 pihole_upstreams:
   - "192.168.233.1"
 
+# Answer tlesh.xyz only from pihole_local_hosts; unknown names get NXDOMAIN instead of
+# looping Pi-hole -> gateway -> Pi-hole (the gateway forwards tlesh.xyz back here).
+pihole_dnsmasq_lines:
+  - "local=/tlesh.xyz/"
+
 # Admin web interface password — pulled from Doppler
 pihole_admin_password: "{{ lookup('env', 'PIHOLE_ADMIN_PASSWORD') }}"
 
