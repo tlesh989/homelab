@@ -142,6 +142,13 @@ network_inventory:
       managed_by: terraform
       dns: []
       notes: "Claude Code LXC (on tika, vm_id 125); reclaimed from decommissioned glance LXC"
+    - name: home-assistant
+      ip: 192.168.233.23
+      mac: "bc:24:11:12:30:01"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: "Home Assistant OS VM (on bupu, vm_id 123)"
     - name: arr
       ip: 192.168.233.24
       mac:

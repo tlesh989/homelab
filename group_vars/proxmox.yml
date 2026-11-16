@@ -55,6 +55,11 @@ proxmox_storage_mtu: 9000
 # Override to prohibit-password (key-only root, no password auth) for PVE nodes.
 security_ssh_permit_root_login: "prohibit-password"
 
+# Also install Proxmox's own packages (pve-manager, qemu, kernels) unattended,
+# not only Debian security updates. New kernels still need a manual reboot.
+security_autoupdate_additional_origins:
+  - "origin=Proxmox,codename=${distro_codename}"
+
 # Shared iSCSI storage variables (mirrors truenas role defaults)
 truenas_iscsi_portal_ip: "192.168.220.6"
 truenas_iscsi_target_name: "proxmox"

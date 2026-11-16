@@ -85,9 +85,8 @@
     path: /etc/default/grub
     regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
-      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off intel_iommu=on iommu=pt
-      intel_pstate=disable
-      systemd.unified_cgroup_hierarchy=1{{ ' i915.enable_guc=3 i915.max_vfs=7' if proxmox_enable_sriov | bool else '' }}"
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt
+      systemd.unified_cgroup_hierarchy=1"
     state: present
   notify: Update grub
 
@@ -101,7 +100,7 @@
     path: /etc/default/grub
     regexp: "^GRUB_CMDLINE_LINUX_DEFAULT=.*$"
     line: >-
-      GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off amd_iommu=on iommu=pt
+      GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt
       kvm.ignore_msrs=1 kvm.report_ignored_msrs=0
       systemd.unified_cgroup_hierarchy=1"
     state: present
@@ -121,7 +120,7 @@
   notify: Update grub
 
 # No VM uses hostpci passthrough; the host iGPUs feed LXCs via /dev/dri (plex,
-# tdarr-node on sturm; i915 SR-IOV on tika/bupu). The old VFIO block blacklisted
+# tdarr-node on sturm). The old VFIO block blacklisted
 # amdgpu and set nomodeset, which removed /dev/dri on the first reboot.
 - name: Remove legacy GPU passthrough modprobe config
   ansible.builtin.file:
@@ -133,9 +132,8 @@
   notify: Update initramfs
 
 # Power saving: nodes idle most of the time. powersave is HWP-managed (good)
-# on amd-pstate-epp/intel_pstate, but on acpi-cpufreq (the N100s, which boot
-# with intel_pstate=disable from the IOMMU cmdline) it pins minimum frequency,
-# so the script picks schedutil there instead.
+# on amd-pstate-epp/intel_pstate, but on acpi-cpufreq it pins minimum
+# frequency, so the script picks schedutil there instead.
 - name: Install CPU governor script
   ansible.builtin.copy:
     dest: /usr/local/bin/set-cpu-governor.sh

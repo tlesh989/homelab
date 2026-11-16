@@ -52,53 +52,37 @@
     mode: "0644"
   failed_when: false
 
-- name: Intel iGPU SR-IOV (Experimental)
-  when:
-    - proxmox_enable_sriov | bool
-    - ansible_facts.processor | list | intersect(['GenuineIntel']) | length > 0
-  block:
-    - name: Install SR-IOV dependencies
-      ansible.builtin.apt:
-        name:
-          - dkms
-          - git
-          - "proxmox-headers-{{ ansible_facts.kernel }}"
-        state: present
+# i915 SR-IOV was never used: no guest took a virtual function, and its DKMS
+# module only built for the running kernel, which kept nodes pinned to an old
+# one. Remove what the old tasks installed; the stock i915 driver stays.
+- name: Remove unused i915-sriov-dkms module
+  ansible.builtin.shell: |
+    set -euo pipefail
+    command -v dkms >/dev/null || exit 0
+    versions=$(dkms status | awk -F'[/,:]' '/^i915-sriov-dkms/{print $2}' | sort -u)
+    for v in $versions; do
+      dkms remove "i915-sriov-dkms/$v" --all
+      echo removed
+    done
+  args:
+    executable: /bin/bash
+  register: proxmox_sriov_remove
+  changed_when: "'removed' in proxmox_sriov_remove.stdout"
+  notify: Update initramfs
 
-    - name: Clone i915-sriov-dkms repository
-      ansible.builtin.git:
-        repo: https://github.com/strongtz/i915-sriov-dkms.git
-        dest: /usr/src/i915-sriov-dkms
-        version: "{{ proxmox_sriov_dkms_version }}"
-      register: proxmox_sriov_repo
+- name: Find i915-sriov-dkms source directories
+  ansible.builtin.find:
+    paths: /usr/src
+    patterns: "i915-sriov-dkms*"
+    file_type: directory
+  register: proxmox_sriov_src
 
-    - name: Check if i915-sriov-dkms is already installed
-      ansible.builtin.shell:
-        cmd: set -o pipefail && dkms status | grep i915-sriov-dkms
-        executable: /bin/bash
-      register: proxmox_dkms_status
-      failed_when: false
-      changed_when: false
-
-    - name: Install i915-sriov-dkms driver
-      ansible.builtin.shell: |
-        set -o pipefail
-        VER=$(grep '^PACKAGE_VERSION=' /usr/src/i915-sriov-dkms/dkms.conf | cut -d= -f2 | tr -d '"')
-        dkms add . || true
-        dkms install -m i915-sriov-dkms -v "$VER"
-      args:
-        executable: /bin/bash
-        chdir: /usr/src/i915-sriov-dkms
-      when: proxmox_dkms_status.rc != 0 or (proxmox_sriov_repo.changed | default(false))
-      changed_when: true
-      notify: Update initramfs
-
-    - name: Load i915 module with SR-IOV support
-      ansible.builtin.copy:
-        dest: /etc/modprobe.d/i915.conf
-        content: "options i915 enable_guc=3 max_vfs=7\n"
-        mode: "0644"
-      notify: Update initramfs
+- name: Remove i915-sriov-dkms sources and module options
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ (proxmox_sriov_src.files | map(attribute='path') | list) + ['/etc/modprobe.d/i915.conf'] }}"
+  notify: Update initramfs
 
 # Proxmox HA — software watchdog (softdog)
 

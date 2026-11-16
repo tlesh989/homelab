@@ -31,6 +31,7 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .20 | minecraft2 | Minecraft server LXC | Terraform-managed (on sturm, vm_id 126); MAC bc:24:11:13:00:02 |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
+| .23 | home-assistant | Home Assistant OS VM | DHCP reservation (MAC: bc:24:11:12:30:01) — on bupu, vm_id 123; not Terraform-managed |
 | .24 | arr | arr stack LXC | Terraform-managed (on bupu, vm_id 106); also .220.24 on Storage |
 | .32 | USW Pro Max 16 PoE | UniFi core switch | Static IP set on device |
 | .33 | sw-24 | UniFi switch (US 24) | Static IP set on device |
@@ -63,7 +64,7 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 
 No streaming device is kept on main for Plex any more. The Roku Ultra and the Hisense TV are wired to
 the IoT VLAN (see below) and reach Plex through the "IoT to Plex" firewall policy. GymRoku, RokuTCL,
-the Denon AVR, and consoles join `ginseng` and sit on Guest, which has no Plex policy.
+the Denon AVR, and consoles sit on Guest and reach Plex through the "Guest to Plex" policy.
 
 ---
 
@@ -179,7 +180,7 @@ Firewall zone `Guest`: internet and gateway (DNS/DHCP/mDNS) allowed; gateway adm
 ("Guest to Gateway Block Admin": 22, 80, 443, 8080, 8443, 6789); Internal and IoT blocked, except
 policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100), and "Guest to 3D Printer" (allow to `.14` on TCP 8080/8898/8899 —
-Flashforge LAN API + camera). Flashforge discovery is UDP broadcast and does not cross VLANs, so
+Flashforge LAN API + camera), and "Guest to Plex" (allow to `.12` on TCP 32400). Flashforge discovery is UDP broadcast and does not cross VLANs, so
 add the AD5X by IP in Orca-Flashforge/FlashPrint. Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
 Service Scope: All), so the printer is discoverable from `ginseng`. Minecraft LAN discovery is
 broadcast-based and does not cross VLANs: `ginseng` clients find both servers through their
@@ -201,7 +202,7 @@ Internet access: disabled. mDNS: enabled.
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones |
 | IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex (`.12` TCP 32400, "IoT to Plex"); Internal can initiate to IoT; gateway admin ports blocked (22, 80, 443, 8080, 8443, 6789) |
-| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`/`.20`, printer `.15` and 3D printer `.14` |
+| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`/`.20`, printer `.15`, 3D printer `.14` and Plex `.12` |
 | External | WAN | Default deny inbound, except the two port forwards to minecraft2 (`.20`: TCP 19132, UDP 30000-30009). Inbound is limited to US source addresses (Region Blocking). Direct Remote Connection to the console is off |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |
