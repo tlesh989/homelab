@@ -26,16 +26,11 @@ resource "proxmox_virtual_environment_container" "minecraft2" {
       servers = ["1.1.1.1"]
     }
 
-    ip_config {
-      ipv4 {
-        address = "192.168.233.20/24"
-        gateway = "192.168.233.1"
-      }
-    }
-
+    # Guest only: internet-facing, so no NIC on Default. Guest keeps Bedrock LAN discovery.
     ip_config {
       ipv4 {
         address = "192.168.60.20/24"
+        gateway = "192.168.60.1"
       }
     }
 
@@ -56,15 +51,6 @@ resource "proxmox_virtual_environment_container" "minecraft2" {
     firewall    = true
     mac_address = "BC:24:11:13:00:02"
     name        = "eth0"
-  }
-
-  # Guest VLAN so Bedrock LAN discovery reaches the kids' devices.
-  network_interface {
-    bridge      = "vmbr0"
-    enabled     = true
-    firewall    = true
-    mac_address = "BC:24:11:13:00:12"
-    name        = "eth1"
     vlan_id     = 60
   }
 

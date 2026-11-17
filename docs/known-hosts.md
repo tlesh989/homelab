@@ -18,7 +18,7 @@ the Doppler secret `KNOWN_DEVICES`; this file is only the infrastructure invento
 | caddy | .17 | | |
 | tdarr-node | .18 | | |
 | minecraft | .19 | | |
-| minecraft2 | .20 | | |
+| minecraft2 | 192.168.60.20 (Guest) | | |
 | tailscale | .21 | | |
 | claude-code | .22 | | |
 | arr | .24 | | |
