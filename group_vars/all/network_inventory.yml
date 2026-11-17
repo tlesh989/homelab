@@ -21,6 +21,8 @@ network_inventory:
       dhcp_pool: ["192.168.60.21", "192.168.60.254"]
     storage:
       cidr: 192.168.220.0/24
+    dmz:
+      cidr: 192.168.50.0/24
 
   hosts:
     - name: gateway
@@ -122,10 +124,10 @@ network_inventory:
       dns: []
       notes: "Boot's Paradise (flat, creative) Minecraft server; LAN only"
     - name: minecraft2
-      ip: 192.168.233.20
+      ip: 192.168.50.20
       mac: "bc:24:11:13:00:02"
-      assignment: reservation
-      managed_by: ansible
+      assignment: static
+      managed_by: terraform
       dns: []
       notes: "Noob's Jungle Minecraft server (public); external TCP 19132 (TLS via Caddy, BDS on 19131) + UDP 30000-30009"
     - name: tailscale

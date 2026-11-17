@@ -28,7 +28,6 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .17 | caddy | Caddy reverse proxy LXC | Terraform-managed (on bupu, vm_id 117) |
 | .18 | tdarr-node | Tdarr transcode node LXC | Terraform-managed (on sturm, vm_id 118) — GPU/VAAPI transcode |
 | .19 | minecraft | Minecraft server LXC | Terraform-managed (on sturm, vm_id 119); MAC bc:24:11:13:00:01 |
-| .20 | minecraft2 | Minecraft server LXC | Terraform-managed (on sturm, vm_id 126); MAC bc:24:11:13:00:02 |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
 | .23 | home-assistant | Home Assistant OS VM | DHCP reservation (MAC: bc:24:11:12:30:01) — on bupu, vm_id 123; not Terraform-managed |
@@ -154,7 +153,6 @@ SSID: `ginseng` (kids' iPads and visitors). No client isolation, so devices on i
 |----|----------|-------|
 | .1 | gateway | Guest VLAN gateway |
 | .19 | minecraft | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
-| .20 | minecraft2 | Second NIC (`eth1`, VLAN 60) — Terraform-managed; Bedrock LAN discovery for guest devices |
 
 Media and console devices on Guest (dynamic IPs):
 
@@ -171,14 +169,17 @@ The Minecraft LXCs keep matching last octets on both networks. `vmbr0` is not VL
 node; Proxmox carries `tag=60` NICs on an auto-created `vmbr0v60` bridge (`eno1.60`).
 
 The nodes' main NICs (sw-24 ports 14 sturm, 15 tika, 16 bupu) use a custom port VLAN setting:
-native Default, tagged Guest (60) only; IoT (40) and Storage (220) are excluded. A non-VLAN-aware
+native Default, tagged Guest (60) on all three and Dmz (50) on sturm only; IoT (40) and Storage (220)
+are excluded everywhere, and Dmz (50) is excluded on tika and bupu. The ports use an exclude list, so a
+new network reaches all three until it is excluded. If minecraft2 moves off sturm, its new node's port
+needs VLAN 50 and sturm's loses it. A non-VLAN-aware
 bridge floods any tagged frame the switch sends to every guest's `eth0`, so the port must not
 trunk VLANs the node doesn't use. Storage runs on each node's second NIC (`vmbr1`), on a Pro Max
 port with VLAN 220 untagged and tagged VLANs blocked.
 
 Firewall zone `Guest`: internet and gateway (DNS/DHCP/mDNS) allowed; gateway admin ports blocked
 ("Guest to Gateway Block Admin": 22, 80, 443, 8080, 8443, 6789); Internal and IoT blocked, except
-policies "Guest to Minecraft" (allow to `.19`/`.20` on 19131/19132) and "Guest to Printer"
+policies "Guest to Minecraft" (allow to `.19` on 19131/19132), "Guest to Minecraft2" (Dmz `192.168.50.20`, 19131/19132) and "Guest to Printer"
 (allow to `.15` on 631/9100), and "Guest to 3D Printer" (allow to `.14` on TCP 8080/8898/8899 —
 Flashforge LAN API + camera), and "Guest to Plex" (allow to `.12` on TCP 32400). Flashforge discovery is UDP broadcast and does not cross VLANs, so
 add the AD5X by IP in Orca-Flashforge/FlashPrint. Guest is in the gateway mDNS proxy VLAN scope (Default, IoT, Guest;
@@ -194,6 +195,17 @@ No DHCP. Static assignments only (managed outside UniFi).
 Used for iSCSI between TrueNAS and Proxmox nodes.
 Internet access: disabled. mDNS: enabled.
 
+
+## Dmz Network — `192.168.50.0/24` (VLAN 50)
+
+No DHCP, no SSID. Holds only the internet-facing host; see
+[network-segmentation.md](network-segmentation.md) for why.
+
+| IP | Hostname | Notes |
+|----|----------|-------|
+| .1 | gateway | Dmz VLAN gateway |
+| .20 | minecraft2 | Minecraft server LXC — Terraform-managed (on sturm, vm_id 126), single NIC `eth0` tag 50; MAC bc:24:11:13:00:02 |
+
 ---
 
 ## Firewall Zone Summary
@@ -202,8 +214,9 @@ Internet access: disabled. mDNS: enabled.
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones |
 | IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex (`.12` TCP 32400, "IoT to Plex"); Internal can initiate to IoT; gateway admin ports blocked (22, 80, 443, 8080, 8443, 6789) |
-| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`/`.20`, printer `.15`, 3D printer `.14` and Plex `.12` |
-| External | WAN | Default deny inbound, except the two port forwards to minecraft2 (`.20`: TCP 19132, UDP 30000-30009). Inbound is limited to US source addresses (Region Blocking). Direct Remote Connection to the console is off |
+| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`, printer `.15`, 3D printer `.14` and Plex `.12` |
+| Dmz | Dmz (.50) | minecraft2 only. Internet allowed; to Internal only kaz `.10` TCP 8090 (Beszel); IoT, Guest, Internal otherwise blocked. Internal may open connections in (SSH, Ansible, cert push); Guest may reach `.50.20` on 19131/19132 |
+| External | WAN | Default deny inbound, except the two port forwards to minecraft2 (`192.168.50.20`: TCP 19132, UDP 30000-30009). Inbound is limited to US source addresses (Region Blocking). Direct Remote Connection to the console is off |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |
 

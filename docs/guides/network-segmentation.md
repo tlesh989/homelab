@@ -14,6 +14,7 @@ the UniFi controller; the repo does not manage them.
 | IoT | 40 | 192.168.40.0/24 | IoT | `ginkgo` (2.4 GHz, WPA2) | Smart plugs, lights, cameras, TVs, streaming boxes |
 | Guest | 60 | 192.168.60.0/24 | Guest | `ginseng` | Kids' tablets and visitors |
 | Storage | 220 | 192.168.220.0/24 | Internal | none | iSCSI between TrueNAS and Proxmox; no internet, no DHCP |
+| Dmz | 50 | 192.168.50.0/24 | Dmz | none | minecraft2 only (internet-facing); no DHCP |
 
 IoT has network isolation on, so IoT devices cannot talk to each other. Guest has no client isolation,
 on purpose: Bedrock LAN games need the tablets to see each other and the Minecraft servers.
@@ -24,8 +25,9 @@ on purpose: Bedrock LAN games need the tablets to see each other and the Minecra
 |------|-------------|--------|----------|----------------|-----------------|
 | Internal | everything | everything | replies only | everything | yes |
 | IoT | Plex only (`.12` TCP 32400) | nothing | nothing | DNS, DHCP, mDNS | yes |
-| Guest | Minecraft `.19`/`.20` (19131, 19132), printer `.15` (631, 9100), 3D printer `.14` (8080, 8898, 8899), Plex `.12` (32400) | nothing | same VLAN only | DNS, DHCP, mDNS | yes |
-| Internet | the two Minecraft port forwards to `.20` | nothing | nothing | nothing | n/a |
+| Guest | Minecraft `.19` (19131, 19132), printer `.15` (631, 9100), 3D printer `.14` (8080, 8898, 8899), Plex `.12` (32400) | nothing | same VLAN only | DNS, DHCP, mDNS | yes |
+| Dmz | kaz `.10` TCP 8090 (Beszel) only | nothing | replies only | routing only | yes |
+| Internet | nothing (forwards go to Dmz) | nothing | nothing | nothing | n/a |
 
 Details that are easy to miss:
 
@@ -37,9 +39,11 @@ Details that are easy to miss:
 - **mDNS** is forwarded between Default, IoT and Guest, so casting and printer discovery work across VLANs
   where a policy allows the traffic.
 - **UPnP** is off.
-- **minecraft2** is the only internet-facing host. It has a NIC on Default and one on Guest, so the zone
-  firewall cannot contain it; an nftables outbound filter inside the container does that instead
-  (`minecraft_egress_filter` in the minecraft role).
+- **minecraft2** is the only internet-facing host, so it sits alone on Dmz (VLAN 50, `192.168.50.20`) with
+  no NIC on Default or Guest. Internal may open connections to it (SSH, Ansible, acme cert push) and Guest
+  may reach 19131/19132; Dmz may not open connections to Internal, IoT or Guest except Beszel on kaz. The
+  nftables outbound filter inside the container (`minecraft_egress_filter`) stays as a second layer. Guest
+  devices join it by address; LAN discovery only finds minecraft (`.19`).
 - **DNS** on IoT and Guest goes to the gateway, which runs the NextDNS CLI. Guest is mapped to the `guest`
   NextDNS profile (`NEXTDNS_PROFILE_MAP`); see the per-network DNS lines in the address map.
 
