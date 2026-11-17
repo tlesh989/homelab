@@ -48,7 +48,7 @@ caddy.tlesh.xyz ansible_host=192.168.233.17
 minecraft.tlesh.xyz ansible_host=192.168.233.19
 
 [minecraft2]
-minecraft2.tlesh.xyz ansible_host=192.168.50.20
+minecraft2.tlesh.xyz ansible_host=192.168.60.20
 
 [claude_code]
 claude-code.tlesh.xyz ansible_host=192.168.233.22

@@ -53,13 +53,13 @@ unifi_port_forwards:
   - name: minecraft2
     proto: tcp
     dst_port: "19132"
-    fwd: "192.168.50.20"
+    fwd: "192.168.60.20"
     fwd_port: "19132"
     enabled: true
   - name: minecraft2-udp
     proto: udp
     dst_port: "30000-30009"
-    fwd: "192.168.50.20"
+    fwd: "192.168.60.20"
     fwd_port: "30000-30009"
     enabled: true
 
