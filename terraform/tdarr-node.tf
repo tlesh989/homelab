@@ -34,6 +34,7 @@ resource "proxmox_virtual_environment_container" "tdarr_node" {
     dns {
       domain = "tlesh.xyz"
       servers = [
+        "192.168.233.1",
         "1.1.1.1",
       ]
     }

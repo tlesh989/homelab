@@ -89,6 +89,10 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   (DNS answers `203.0.113.250` / `2001:db8:1000::fa`) → a UniFi content filter is sinkholing it. A filter
   with `network_ids` set covers the whole network, not just its listed MACs → add the domain to the
   filter's allow list in the UI. NextDNS logs still show these queries as allowed. (sonarr → thexem.info)
+- **A host's NextDNS MAC mapping does nothing, or internal `tlesh.xyz` names stop resolving when a UniFi
+  content filter is disabled** → the host (or its Docker `daemon.json`) uses `1.1.1.1` directly; only a
+  filter's port-53 hijack was routing it into NextDNS, and from `127.0.0.1`, so always the default profile
+  → point Terraform `dns.servers` and Docker DNS at the gateway first (`1.1.1.1` as fallback).
 - **Recabling a Proxmox node to another sw-24 port brings back VLAN flooding into guests** → port
   settings stay with the port, not the device; a controller-default port trunks every VLAN → copy the
   node's custom setting (native Default, tagged Guest only) to the new port and reset the old one.
