@@ -44,6 +44,10 @@ for file in "$@"; do
     CHECKED+=("$url")
 
     http_code=$(curl -sI --max-time 10 -L -o /dev/null -w "%{http_code}" "$url" 2>/dev/null || echo "ERR")
+    # Some hosts 404 a HEAD but serve the GET (e.g. raw.githubusercontent.com paths with %20)
+    if [[ "$http_code" == "404" ]]; then
+      http_code=$(curl -s -r 0-0 --max-time 10 -L -o /dev/null -w "%{http_code}" "$url" 2>/dev/null || echo "ERR")
+    fi
 
     if [[ "$http_code" == "404" ]]; then
       echo "  FAIL 404: $url"
