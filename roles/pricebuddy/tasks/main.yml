@@ -1,15 +1,16 @@
 ---
 - name: Create PriceBuddy data directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
-    mode: "0755"
+    mode: "{{ item.mode }}"
   loop:
-    - "{{ pricebuddy_data_dir }}"
-    - "{{ pricebuddy_data_dir }}/mysql"
-    - "{{ pricebuddy_data_dir }}/storage"
+    - { path: "{{ pricebuddy_data_dir }}", mode: "0755" }
+    - { path: "{{ pricebuddy_data_dir }}/mysql", mode: "0755" }
+    # The app's start script chmods storage to 0777 on every start; matching it keeps runs idempotent.
+    - { path: "{{ pricebuddy_data_dir }}/storage", mode: "0777" }
     # The empty storage mount hides the image's dirs; the start script runs key:generate before creating this one and fails.
-    - "{{ pricebuddy_data_dir }}/storage/framework/views"
+    - { path: "{{ pricebuddy_data_dir }}/storage/framework/views", mode: "0777" }
   become: true
 
 # The app generates APP_KEY into this file on first start; persisting it keeps sessions valid across recreates.
