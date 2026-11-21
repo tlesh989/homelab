@@ -107,6 +107,10 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   set, and verify with `stat/device/<mac>`. `firewall policies create` likewise needs zone IDs, not names.
 - **A client's UniFi name says "iPhone" but it's wired to a TV-cabinet port** → names come from stale
   DHCP hostnames → check the MAC vendor (OUI); this one was a PS5.
+- **`unifly firewall policies create --dst-port 30000-30009` fails with `unknown-property ...
+  portFilter.items[N].endPort`** → the Integration API rejects port ranges in a policy's port list → list
+  each port (`--dst-port "22,$(seq -s, 30000 30009)"`). There is no protocol flag; a port filter covers
+  TCP and UDP. `--allow-return-traffic true` creates and keeps in sync the "(Return)" policy. (homelab-cki.24)
 
 ## Minecraft (Bedrock)
 
