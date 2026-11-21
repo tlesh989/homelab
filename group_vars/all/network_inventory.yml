@@ -77,8 +77,8 @@ network_inventory:
       mac: "bc:24:11:12:30:01"
       assignment: reservation
       managed_by: terraform
-      dns: [homeassistant.tlesh.xyz]
-      notes: "Home Assistant OS VM (on bupu, vm_id 123)"
+      dns: []
+      notes: "Home Assistant OS VM (on bupu, vm_id 123); homeassistant.tlesh.xyz goes through Caddy"
     - name: jetkvm
       ip: 192.168.233.11
       mac: "44:b7:d0:e7:82:89"
