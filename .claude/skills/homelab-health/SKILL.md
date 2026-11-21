@@ -32,6 +32,9 @@ Report-only. Never changes hosts, config, or issues. Ends with a ranked report.
    doppler run -- ansible proxmox -i hosts -b -m shell -a "pvecm status | grep -E 'Quorate|Total votes'; pvesm status"
    ```
 3. **truenas** (`ansalon`) — via the websocket API, not REST (`TRUENAS_HOST` in Doppler is a `wss://.../api/current` URL; use `truenas_api_client` from ansible's venv as `roles/truenas/library/truenas_api.py` does, with `TRUENAS_API_KEY`): pool status, last scrub age (🟡 >35d), SMART/disk alerts, active alerts, ARC size vs RAM, swap used (🔴 any), iSCSI/NFS session counts.
+   Run calls with `doppler run -- "$(mise where pipx:ansible-core)/ansible-core/bin/python3" -I <script>`, logging in with `Client(uri=os.environ["TRUENAS_HOST"], verify_ssl=False)` + `c.call("auth.login_with_api_key", os.environ["TRUENAS_API_KEY"])`:
+   - iSCSI: `iscsi.global.sessions` (list; each Proxmox node's storage IP should appear, 🔴 if one is missing). NFS: `nfs.client_count`.
+   - ARC vs RAM: `reporting.netdata_get_data([{"name": "arcsize"}], {"unit": "HOUR", "aggregate": True})[0]["aggregations"]["mean"]["size"]` against `system.mem_info()["physmem_size"]`; the `memory` graph's `available` mean is free RAM. Relative `start`/`end` offsets are rejected — use `unit`.
 4. **logs** — per host, last 24h, grouped so repeats surface:
    ```bash
    journalctl -p err --since -24h --no-pager -o cat | sed -E 's/[0-9]+/N/g' | sort | uniq -c | sort -rn | head -10
@@ -42,8 +45,8 @@ Report-only. Never changes hosts, config, or issues. Ends with a ranked report.
   doppler run -- sh -c 'UNIFI_URL=https://192.168.233.1 UNIFI_INSECURE=true mise exec -- unifly clients list --all -o json-compact' | grep -v '^Showing'
   ```
   (`unifly` reads `UNIFI_API_KEY` from Doppler; no config file or keyring.) Any client whose MAC is absent from the Doppler secret `KNOWN_DEVICES` (`mac|name|ip` lines; read it with `doppler secrets get KNOWN_DEVICES --plain`) is 🔴 unknown. Also flag clients with outsized tx/rx, rapid DHCP churn, or offline known devices.
-   - Pi-hole (`PIHOLE_ADMIN_PASSWORD`): top clients and top blocked domains; one client dominating queries (>40%) is 🟡.
-6. **uptime** — Uptime Kuma monitors currently down or flapping (`AUTOKUMA_USERNAME`/`AUTOKUMA_PASSWORD`; see `docs/runbooks/uptime-kuma-monitors.md`).
+   - Pi-hole (`PIHOLE_ADMIN_PASSWORD`): top clients; one client dominating queries (>40%) is 🟡. Pi-hole v6 API on `192.168.233.3:8080`: `POST /api/auth` with `{"password": ...}` → `.session.sid`, then `GET /api/stats/top_clients?count=10` with header `sid: <sid>` → `.clients[] {name, ip, count}` and `.total_queries`; `DELETE /api/auth` with the same header afterwards. Skip blocked domains: Pi-hole only serves local names (NextDNS filters), so blocked is always 0.
+6. **uptime** — Uptime Kuma monitors currently down or flapping (see `docs/runbooks/uptime-kuma-monitors.md`). `/metrics` only accepts a Kuma API key (username/password basic auth gets 401), and none is in Doppler yet — until one is, report this section as unavailable.
 
 If a section's tool or credential is unavailable (e.g. `unifly` not installed or UniFi unreachable), say so under that section and continue with what works.
 
