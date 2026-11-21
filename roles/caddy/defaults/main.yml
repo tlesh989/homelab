@@ -53,3 +53,5 @@ caddy_services:
     upstream: "192.168.233.10:8091"
   - name: pricebuddy
     upstream: "192.168.233.10:8092"
+  - name: homeassistant
+    upstream: "192.168.233.23:80"
