@@ -26,6 +26,13 @@ provider "proxmox" {
   username = nonsensitive(data.doppler_secrets.this.map.PM_API_USER)
   password = data.doppler_secrets.this.map.PM_API_PASSWORD
   insecure = true
+
+  # Needed for SSH-backed operations (e.g. creating a VM disk from a downloaded image).
+  # Reuses the Ansible service account, which has NOPASSWD sudo on every node.
+  ssh {
+    username    = "ansible"
+    private_key = data.doppler_secrets.this.map.ANSIBLE_SSH_PRIVATE_KEY
+  }
 }
 
 
