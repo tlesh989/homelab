@@ -35,6 +35,24 @@
   become: true
   become_user: "{{ claude_code_user }}"
 
+- name: Install homelab-digest script
+  ansible.builtin.template:
+    src: homelab-digest.j2
+    dest: /home/{{ claude_code_user }}/.local/bin/homelab-digest
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0755"
+  become: true
+
+- name: Schedule nightly homelab health digest
+  ansible.builtin.cron:
+    name: homelab-digest nightly
+    minute: "30"
+    hour: "7"
+    job: /home/{{ claude_code_user }}/.local/bin/homelab-digest >> /home/{{ claude_code_user }}/.local/state/homelab-digest.log 2>&1
+  become: true
+  become_user: "{{ claude_code_user }}"
+
 - name: Start Claude Code session on boot
   ansible.builtin.cron:
     name: claude-session on boot
