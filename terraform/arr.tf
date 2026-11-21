@@ -24,6 +24,7 @@ resource "proxmox_virtual_environment_container" "arr" {
     dns {
       domain = "tlesh.xyz"
       servers = [
+        "192.168.233.1",
         "1.1.1.1",
       ]
     }

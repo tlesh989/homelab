@@ -21,8 +21,9 @@ autokuma_labels:
 # while logged in. When the node dropped to NeedsLogin on 2026-09-16 the
 # MagicDNS resolver started returning SERVFAIL and every container started
 # during the logged-in window lost DNS (EAI_AGAIN in tdarr/lidarr/prowlarr).
-# 1.1.1.1 matches the LXC's Terraform resolver.
+# Matches the LXC's Terraform resolvers: the gateway (NextDNS "open" profile,
+# resolves internal tlesh.xyz names) with 1.1.1.1 as fallback.
 docker_daemon_options:
   dns:
+    - 192.168.233.1
     - 1.1.1.1
-    - 1.0.0.1
