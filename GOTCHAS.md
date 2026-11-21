@@ -32,6 +32,10 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   `--state started`. If rootfs is on `vm_data` (per-node), the `.conf` must sit on the node holding
   the dataset. Guests start only after storage is up (`pve-wait-storage`); HA uses
   `shutdown_policy=freeze`.
+- **`terraform apply` fails with `creating custom disk: unable to authenticate user "root" over SSH`**
+  → a VM disk built from a downloaded image (`disk.file_id`) is created over SSH, not the API → the
+  provider's `ssh` block uses the `ansible` account and `ANSIBLE_SSH_PRIVATE_KEY` from Doppler. Compressed
+  images (e.g. HAOS `.qcow2.xz`) can't use the API-only `import_from` path. (homelab-tr6)
 
 ## Ansible
 

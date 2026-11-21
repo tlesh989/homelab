@@ -72,6 +72,13 @@ network_inventory:
       managed_by: ansible
       dns: [kaz.tlesh.xyz]
       notes: "Docker host VM (on tika)"
+    - name: home-assistant
+      ip: 192.168.233.23
+      mac: "bc:24:11:12:30:01"
+      assignment: reservation
+      managed_by: terraform
+      dns: [homeassistant.tlesh.xyz]
+      notes: "Home Assistant OS VM (on bupu, vm_id 123)"
     - name: jetkvm
       ip: 192.168.233.11
       mac: "44:b7:d0:e7:82:89"
@@ -142,13 +149,6 @@ network_inventory:
       managed_by: terraform
       dns: []
       notes: "Claude Code LXC (on tika, vm_id 125); reclaimed from decommissioned glance LXC"
-    - name: home-assistant
-      ip: 192.168.233.23
-      mac: "bc:24:11:12:30:01"
-      assignment: reservation
-      managed_by: manual
-      dns: []
-      notes: "Home Assistant OS VM (on bupu, vm_id 123)"
     - name: arr
       ip: 192.168.233.24
       mac:
@@ -191,13 +191,13 @@ network_inventory:
       managed_by: manual
       dns: []
       notes: "Laptop — personal device pool (.240-.250)"
-    - name: homeassistant
+    - name: raspberry-pi
       ip: 192.168.233.35
       mac: "b8:27:eb:75:3a:e3"
       assignment: reservation
       managed_by: manual
-      dns: [homeassistant.tlesh.xyz]
-      notes: "Raspberry Pi — DHCP reservation (.35)"
+      dns: []
+      notes: "Raspberry Pi 3 — old unused HA install, to be retired (homelab-tr6)"
     - name: GymRoku
       ip: 192.168.60.157
       mac:

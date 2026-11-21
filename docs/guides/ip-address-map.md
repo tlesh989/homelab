@@ -30,12 +30,12 @@ Personal device pool: `.240–.250` (reservation-only, outside DHCP pool)
 | .19 | minecraft | Minecraft server LXC | Terraform-managed (on sturm, vm_id 119); MAC bc:24:11:13:00:01 |
 | .21 | tailscale | Tailscale LXC | DHCP reservation (MAC: ea:31:e7:19:05:63) — Subnet router (on tika) |
 | .22 | claude-code | Claude Code LXC | Terraform-managed (on tika, vm_id 125); reclaimed from decommissioned glance LXC |
-| .23 | home-assistant | Home Assistant OS VM | DHCP reservation (MAC: bc:24:11:12:30:01) — on bupu, vm_id 123; not Terraform-managed |
+| .23 | home-assistant | Home Assistant OS VM | Terraform-managed (on bupu, vm_id 123); DHCP reservation (MAC: bc:24:11:12:30:01); pinned to bupu for USB radio passthrough |
 | .24 | arr | arr stack LXC | Terraform-managed (on bupu, vm_id 106); also .220.24 on Storage |
 | .32 | USW Pro Max 16 PoE | UniFi core switch | Static IP set on device |
 | .33 | sw-24 | UniFi switch (US 24) | Static IP set on device |
 | .34 | Xbox Switch | UniFi switch (Flex Mini) | Static IP set on device |
-| .35 | homeassistant | Home Assistant | DHCP reservation (Raspberry Pi — MAC: b8:27:eb:75:3a:e3) |
+| .35 | raspberry-pi | Raspberry Pi 3 | DHCP reservation (MAC: b8:27:eb:75:3a:e3) — old unused HA install, to be retired |
 | .36 | USW Flex Mini | UniFi switch | Static IP set on device |
 | .37 | U7 Pro XG | UniFi AP | Static IP set on device |
 | .38 | chimney-ap | UniFi AC Mesh AP | Static IP set on device |
