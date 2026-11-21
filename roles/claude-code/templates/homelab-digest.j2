@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Nightly homelab health digest:
+# gather host/container health over Ansible, summarize with the Antigravity CLI
+# (plan mode, read-only), push the summary to Pushover. Detection stays with
+# Uptime Kuma/Beszel; this is a daily triage summary.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
+cd {{ claude_code_repo_dest }}
+
+# This host can't SSH to itself, so it's excluded from the ad-hoc runs.
+{% raw %}
+report=$(
+  echo "## Hosts: uptime/load, filesystems >=80%, failed systemd units"
+  timeout 300 doppler run -- ansible 'proxmox:lxc:!claude_code' -m shell \
+    -a 'uptime; df -h -x tmpfs -x devtmpfs -x overlay | awk "NR==1 || \$5+0 >= 80"; systemctl --failed --no-legend' 2>&1 || true
+  echo "## Docker containers not running/healthy"
+  timeout 300 doppler run -- ansible docker_hosts -b -m shell \
+    -a "docker ps -a --format '{{ '{{' }}.Names{{ '}}' }} {{ '{{' }}.Status{{ '}}' }}' | grep -v ' Up .*(healthy)\$' | grep -v -E ' Up [^()]*\$' || true" 2>&1 || true
+)
+{% endraw %}
+
+prompt="You are the nightly health check for a Proxmox homelab. Below is raw output from Ansible.
+Write a plain-text summary under 900 characters for a phone notification: first line is
+'OK' or the count of issues, then one short line per issue (host: problem: likely fix).
+Flag unreachable hosts, disks >=80%, failed units, and unhealthy/exited containers.
+Do not run commands or edit files.
+
+$report"
+
+summary=$(timeout 900 agy -p "$prompt" --mode plan --print-timeout 600s < /dev/null) || summary=""
+status=0
+if [[ -z "$summary" ]]; then
+  summary="Homelab digest failed: agy returned nothing. Check ~/.local/state/homelab-digest.log"
+  status=1
+fi
+echo "$(date -Is) $summary"
+
+timeout 60 doppler run -- bash -c 'curl -fsS https://api.pushover.net/1/messages.json \
+  --form-string "token=$PUSHOVER_API_TOKEN" --form-string "user=$PUSHOVER_USER_KEY" \
+  --form-string "title=Homelab digest" --form-string "message=${1:0:1024}" >/dev/null' _ "$summary"
+exit "$status"
