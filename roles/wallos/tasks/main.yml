@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: "{{ wallos_data_dir }}/db"
     state: directory
-    mode: "0700"
+    mode: "0755" # the container sets 0755 on start; matching it keeps runs idempotent
   become: true
 
 - name: Create Wallos logos directory

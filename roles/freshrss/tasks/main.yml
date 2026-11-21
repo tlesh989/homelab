@@ -5,7 +5,7 @@
     state: directory
     owner: "33"
     group: "33"
-    mode: "0755"
+    mode: "0775" # the container sets 0775 on start; matching it keeps runs idempotent
   become: true
 
 - name: Install Docker Python SDK
