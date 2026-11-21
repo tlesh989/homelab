@@ -38,6 +38,7 @@ After adding a DNS monitor, prove it can fail: temporarily change the hostname t
 |---|---|---|---|
 | Pi-hole | TCP Port | `192.168.233.3` port 53 | Only proves FTL is listening — see DNS & Proxy for resolution |
 | Plex | HTTP(s) | http://192.168.233.12:32400/identity | |
+| Home Assistant | HTTP(s) | http://192.168.233.23 | HAOS VM; UI is on port 80 (`:8123` only redirects to it) |
 
 ## Infrastructure
 
