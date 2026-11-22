@@ -53,7 +53,7 @@ Do not run commands or edit files.
 
 $report"
 
-summary=$(timeout 900 agy -p "$prompt" --mode plan --print-timeout 600s < /dev/null) || summary=""
+summary=$(timeout 900 agy-print -p "$prompt" --mode plan --print-timeout 600s < /dev/null) || summary=""
 status=0
 if [[ -z "$summary" ]]; then
   summary="Drift report failed: agy returned nothing. Check ~/.local/state/homelab-drift.log"

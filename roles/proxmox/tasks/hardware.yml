@@ -7,10 +7,16 @@
   when: ansible_facts.processor | list | intersect(['GenuineIntel', 'AuthenticAMD']) | length > 0
   notify: Update initramfs
 
+# ansible_facts.mounts omits ZFS datasets, so check for the loaded module instead.
+- name: Check for the ZFS kernel module
+  ansible.builtin.stat:
+    path: /sys/module/zfs
+  register: proxmox_zfs_module
+
 - name: Set ZFS ARC Limit
   when:
     - proxmox_zfs_arc_limit | bool
-    - "'zfs' in ansible_facts.mounts | map(attribute='fstype') | list"
+    - proxmox_zfs_module.stat.exists
   block:
     - name: Calculate automatic ZFS ARC limit
       ansible.builtin.set_fact:

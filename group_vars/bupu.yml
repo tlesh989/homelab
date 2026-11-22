@@ -5,3 +5,6 @@
 # this older chip). Use standard MTU 1500 for the storage network; it works
 # across the segment via TCP MSS negotiation. See homelab-1it.
 proxmox_storage_mtu: 1500
+
+# Hand-tuned ARC cap (~1.5 GiB) kept from before the role managed it; auto would be 2 GiB.
+proxmox_zfs_arc_max: 1653604352

@@ -21,6 +21,7 @@
   register: proxmox_pveceph_status
   failed_when: false
   changed_when: false
+  check_mode: false # read-only; a skipped probe would pull ceph.yml into every --check run
 
 - name: Disable Ceph
   ansible.builtin.include_tasks: ceph.yml
