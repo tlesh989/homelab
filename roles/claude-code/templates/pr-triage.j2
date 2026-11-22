@@ -46,7 +46,7 @@ in plain text and anything that could take a service down, most severe first, ea
 file:line and a fix. If you find nothing real, say 'No issues found.' Do not nitpick style."
   fi
 
-  note=$(timeout 900 agy -p "$task
+  note=$(timeout 900 agy-print -p "$task
 $guard
 
 PR #$num: $title
