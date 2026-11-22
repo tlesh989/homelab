@@ -2,4 +2,5 @@
 molecule
 molecule-plugins[docker]
 pytest-testinfra
-ansible-core
+# Keep equal to pipx:ansible-core in mise.toml (Renovate groups the two).
+ansible-core==2.22.0

@@ -121,6 +121,13 @@
       "versioning": "semver"
     },
     {
+      "description": "ansible-core pins (mise.toml, requirements-dev.txt for molecule) must move together",
+      "matchPackageNames": [
+        "ansible-core"
+      ],
+      "groupName": "ansible-core"
+    },
+    {
       "description": "Terraform CLI pins (mise.toml, versions.tf required_version) must move together; last so it overrides the per-manager groups above",
       "matchDepNames": [
         "terraform",
