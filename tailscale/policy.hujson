@@ -13,11 +13,6 @@
 		],
 	},
 
-	"hosts": {
-		// Example host
-		"example-host-1": "100.100.100.100",
-	},
-
 	"tagOwners": {
 		// Home infra + services
 		"tag:home-core":     ["group:owner"],
@@ -84,5 +79,22 @@
 
 		// No grant listing tag:mcc as a dst, so only group:owner, via rule 1
 		// can reach mcc-tagged devices.
+	],
+
+	// Checked by the CI "Test ACL" step and on every apply.
+	"tests": [
+		{
+			"src":    "thomas.lesh@gmail.com",
+			"accept": ["tag:home-core:22", "tag:home-services:443", "tag:mcc:22", "tag:castle:22"],
+		},
+		{
+			// Tagged devices get no grants as a source.
+			"src":  "tag:castle",
+			"deny": ["tag:home-core:22", "tag:mcc:22"],
+		},
+		{
+			"src":  "tag:streaming",
+			"deny": ["tag:home-core:22", "tag:mcc:22"],
+		},
 	],
 }
