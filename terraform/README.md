@@ -42,6 +42,7 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
+| [proxmox_download_file.haos_image](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/download_file) | resource |
 | [proxmox_download_file.ubuntu_24_04_cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/download_file) | resource |
 | [proxmox_download_file.ubuntu_24_04_lxc_template](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/download_file) | resource |
 | [proxmox_download_file.ubuntu_26_04_cloud_image](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/download_file) | resource |
@@ -57,6 +58,7 @@ No modules.
 | [proxmox_virtual_environment_container.tailscale](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.tdarr_node](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/virtual_environment_container) | resource |
 | [proxmox_virtual_environment_container.uptime_kuma](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/virtual_environment_container) | resource |
+| [proxmox_virtual_environment_vm.home_assistant](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/virtual_environment_vm) | resource |
 | [proxmox_virtual_environment_vm.kaz](https://registry.terraform.io/providers/bpg/proxmox/0.121.0/docs/resources/virtual_environment_vm) | resource |
 | [doppler_secrets.this](https://registry.terraform.io/providers/DopplerHQ/doppler/1.23.0/docs/data-sources/secrets) | data source |
 

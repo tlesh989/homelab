@@ -11,7 +11,7 @@ resource "proxmox_virtual_environment_container" "claude_code" {
 
   disk {
     datastore_id = "truenas-lvm"
-    size         = 10
+    size         = 20
   }
 
   initialization {
