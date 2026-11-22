@@ -23,6 +23,19 @@
     - ansible_facts.pkg_mgr == 'apt'
     - not (item.apt_ignore | default(false) | bool)
 
+# node_exporter was dropped for Beszel in #190 without removing its package. Its Recommends
+# chain (collectors -> ipmitool -> openipmi) leaves openipmi.service failed at boot (homelab-dny4).
+- name: Remove leftover Prometheus node exporter
+  ansible.builtin.apt:
+    name:
+      - prometheus-node-exporter
+      - prometheus-node-exporter-collectors
+      - ipmitool
+      - openipmi
+    state: absent
+    purge: true
+  when: ansible_facts.pkg_mgr == 'apt'
+
 - name: Refresh dnf cache
   ansible.builtin.dnf:
     update_cache: "{{ package_update_cache }}"
