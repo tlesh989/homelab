@@ -33,8 +33,11 @@ class Handler(BaseHTTPRequestHandler):
         if (body.get("heartbeat") or {}).get("status") == 0:
             name = (body.get("monitor") or {}).get("name") or "unknown monitor"
             with open(LOG, "a") as log:
+                # Minimal env: this process runs under `doppler run`, and homelab-alert fetches
+                # its own secrets, so agy never sees the full Doppler set.
                 subprocess.Popen([ALERT, name, str(body.get("msg", ""))],
                                  stdin=subprocess.DEVNULL, stdout=log, stderr=log,
+                                 env={"HOME": os.environ["HOME"], "PATH": os.environ["PATH"]},
                                  start_new_session=True)
 
 

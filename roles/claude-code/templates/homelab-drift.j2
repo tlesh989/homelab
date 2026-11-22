@@ -7,8 +7,12 @@ set -euo pipefail
 export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
 # A worktree of origin/main, so drift is measured against what's merged, not whatever
 # branch an interactive session has checked out in the main clone.
+# Under the repo (.worktrees/ is gitignored) so it inherits the repo's Doppler scope and mise trust.
 repo={{ claude_code_repo_dest }}
-tree="$HOME/.cache/homelab-drift"
+tree="$repo/.worktrees/homelab-drift"
+# Galaxy roles/collections are gitignored, so use the main clone's copies.
+export ANSIBLE_ROLES_PATH="$repo/galaxy_roles:$tree/roles"
+export ANSIBLE_COLLECTIONS_PATH="$repo/galaxy_collections:$tree/collections"
 git -C "$repo" fetch -q origin main
 if [[ -d "$tree" ]]; then
   git -C "$tree" checkout -q -f --detach origin/main  # -f: terraform init may touch the lock file
