@@ -13,6 +13,8 @@ LOG = "/home/{{ claude_code_user }}/.local/state/homelab-alert.log"
 
 
 class Handler(BaseHTTPRequestHandler):
+    timeout = 10  # per-connection read deadline; a stalled client would block the single-threaded server
+
     def do_POST(self):
         if not hmac.compare_digest(self.headers.get("Authorization", ""), f"Bearer {TOKEN}"):
             self.send_response(403)

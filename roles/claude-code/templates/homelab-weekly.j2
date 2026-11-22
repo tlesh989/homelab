@@ -19,7 +19,7 @@ with Client(uri=os.environ["TRUENAS_HOST"], verify_ssl=False) as c:
     c.call("auth.login_with_api_key", os.environ["TRUENAS_API_KEY"])
     for p in c.call("pool.query"):
         s = p.get("scan") or {}
-        used = f"{100 * p['allocated'] // p['size']}% used" if p.get("size") else ""
+        used = f"{100 * p['allocated'] / p['size']:.1f}% used" if p.get("size") else ""
         print(f"pool {p['name']}: {p['status']} healthy={p['healthy']} {used}; last {s.get('function')} "
               f"{s.get('state')} ended {s.get('end_time')} errors={s.get('errors')}")
     for d in c.call("disk.query"):

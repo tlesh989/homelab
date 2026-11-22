@@ -26,9 +26,12 @@ report=$(
   echo "exit $plan_rc"
 
   echo "## ansible-playbook main.yml --check --diff (only changed/failed shown; this host excluded)"
-  ANSIBLE_DISPLAY_OK_HOSTS=false ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_NOCOLOR=1 \
-    timeout 3000 doppler run -- ansible-playbook -i hosts main.yml --check --diff --limit 'all:!claude_code' 2>&1 \
-    | grep -v -E '^(PLAY \[|\s*$)' | tail -c 40000 || true
+  check_rc=0
+  check=$(ANSIBLE_DISPLAY_OK_HOSTS=false ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_NOCOLOR=1 \
+    timeout 3000 doppler run -- ansible-playbook -i hosts main.yml --check --diff --limit 'all:!claude_code' 2>&1) || check_rc=$?
+  grep -v -E '^(PLAY \[|\s*$)' <<<"$check" | tail -c 40000 || true
+  # Exit bits 2/4/8 = failed/unreachable hosts/break-play (the recap shows which); any other bit is a crash or timeout (124)
+  if (( check_rc & ~14 )); then echo "!! CHECK INCOMPLETE: ansible-playbook exited $check_rc"; fi
 
   echo "## task drift (running image tag vs Renovate pin)"
   timeout 600 scripts/check-image-drift.sh 2>&1 || echo "exit $?"
