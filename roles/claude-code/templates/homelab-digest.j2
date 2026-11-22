@@ -7,17 +7,7 @@ set -euo pipefail
 export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
 cd {{ claude_code_repo_dest }}
 
-# This host can't SSH to itself, so it's excluded from the ad-hoc runs.
-{% raw %}
-report=$(
-  echo "## Hosts: uptime/load, filesystems >=80%, failed systemd units"
-  timeout 300 doppler run -- ansible 'all:!truenas:!unifi:!claude_code' -m shell \
-    -a 'uptime; df -h -x tmpfs -x devtmpfs -x overlay | awk "NR==1 || \$5+0 >= 80"; systemctl --failed --no-legend' 2>&1 || echo "!! COLLECTION INCOMPLETE: ansible exited $? (unreachable host or timeout)"
-  echo "## Docker containers not running/healthy"
-  timeout 300 doppler run -- ansible docker_hosts -b -m shell \
-    -a "docker ps -a --format '{{ '{{' }}.Names{{ '}}' }} {{ '{{' }}.Status{{ '}}' }}' | grep -v ' Up .*(healthy)\$' | grep -v -E ' Up [^()]*\$' || true" 2>&1 || echo "!! COLLECTION INCOMPLETE: ansible exited $? (unreachable host or timeout)"
-)
-{% endraw %}
+report=$(homelab-collect)
 
 prompt="You are the nightly health check for a Proxmox homelab. Below is raw output from Ansible.
 Write a plain-text summary under 900 characters for a phone notification: first line is
@@ -35,7 +25,5 @@ if [[ -z "$summary" ]]; then
 fi
 echo "$(date -Is) $summary"
 
-timeout 60 doppler run -- bash -c 'curl -fsS https://api.pushover.net/1/messages.json \
-  --form-string "token=$PUSHOVER_API_TOKEN" --form-string "user=$PUSHOVER_USER_KEY" \
-  --form-string "title=Homelab digest" --form-string "message=${1:0:1024}" >/dev/null' _ "$summary"
+homelab-notify "Homelab digest" "$summary"
 exit "$status"

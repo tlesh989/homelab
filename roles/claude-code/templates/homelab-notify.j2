@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Usage: homelab-notify <title> <message>
+# Sends a Pushover notification; the message is cut to Pushover's 1024-char limit.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
+cd {{ claude_code_repo_dest }}
+
+timeout 60 doppler run -- bash -c 'curl -fsS https://api.pushover.net/1/messages.json \
+  --form-string "token=$PUSHOVER_API_TOKEN" --form-string "user=$PUSHOVER_USER_KEY" \
+  --form-string "title=$1" --form-string "message=${2:0:1024}" >/dev/null' _ "$1" "$2"

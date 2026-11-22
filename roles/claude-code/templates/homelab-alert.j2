@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Usage: homelab-alert <monitor name> <kuma message>
+# Started by homelab-alert-listener when an Uptime Kuma monitor goes down: gathers live
+# health over Ansible, asks the Antigravity CLI (plan mode, read-only) for the likely
+# cause, and pushes that to Pushover. Kuma still sends its own alert; this explains it.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"
+cd {{ claude_code_repo_dest }}
+
+exec 9>"$HOME/.local/state/homelab-alert.lock"
+flock -n 9 || { echo "$(date -Is) skip $1: another alert run is active"; exit 0; }
+# ponytail: one global 15-minute cooldown, since one outage usually trips several monitors
+# and the collection covers every host anyway. Per-monitor cooldowns if unrelated outages overlap.
+stamp="$HOME/.local/state/homelab-alert.last"
+if [[ -f "$stamp" ]] && (( $(date +%s) - $(stat -c %Y "$stamp") < 900 )); then
+  echo "$(date -Is) skip $1: cooldown"
+  exit 0
+fi
+touch "$stamp"
+
+report=$(
+  homelab-collect
+  echo "## Errors logged in the last 30 minutes"
+  timeout 300 doppler run -- ansible 'all:!truenas:!unifi:!claude_code' -b -m shell \
+    -a 'journalctl -p err --since -30min --no-pager -o cat | tail -20' 2>&1 || echo "!! COLLECTION INCOMPLETE: ansible exited $?"
+)
+
+prompt="An Uptime Kuma monitor in a Proxmox homelab just went down.
+Monitor: $1
+Kuma message: $2
+
+Below is live health output from Ansible, gathered right after the alert. In plain text under
+600 characters for a phone notification, give the most likely cause and the first thing to
+check or fix. If nothing below explains it, say so and name where to look next.
+Do not run commands or edit files.
+
+$report"
+
+summary=$(timeout 600 agy -p "$prompt" --mode plan --print-timeout 450s < /dev/null) || summary=""
+status=0
+if [[ -z "$summary" ]]; then
+  summary="agy returned nothing. Check ~/.local/state/homelab-alert.log"
+  status=1
+fi
+echo "$(date -Is) $1: $summary"
+
+homelab-notify "Why is $1 down?" "$summary"
+exit "$status"

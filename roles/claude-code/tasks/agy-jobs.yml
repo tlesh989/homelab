@@ -1,0 +1,74 @@
+---
+# Antigravity CLI (agy) jobs: read-only summaries pushed to Pushover or posted as PR
+# comments. homelab-digest (session.yml) uses the same homelab-notify/homelab-collect helpers.
+- name: Ensure KUMA_WEBHOOK_TOKEN is set for the Uptime Kuma alert listener
+  ansible.builtin.assert:
+    that: lookup('env', 'KUMA_WEBHOOK_TOKEN') | length > 0
+    fail_msg: Add KUMA_WEBHOOK_TOKEN to Doppler; Uptime Kuma's webhook notification sends it as a Bearer token.
+    quiet: true
+
+- name: Install Antigravity job scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /home/{{ claude_code_user }}/.local/bin/{{ item }}
+    owner: "{{ claude_code_user }}"
+    group: "{{ claude_code_user }}"
+    mode: "0755"
+  become: true
+  loop:
+    - homelab-notify
+    - homelab-collect
+    - homelab-alert
+    - homelab-alert-listener
+    - homelab-weekly
+    - homelab-drift
+    - pr-triage
+  register: claude_code_agy_scripts
+
+- name: Schedule Antigravity jobs
+  ansible.builtin.cron:
+    name: "{{ item.name }}"
+    weekday: "{{ item.weekday }}"
+    hour: "{{ item.hour }}"
+    minute: "{{ item.minute }}"
+    job: /home/{{ claude_code_user }}/.local/bin/{{ item.name }} >> /home/{{ claude_code_user }}/.local/state/{{ item.name }}.log 2>&1
+  become: true
+  become_user: "{{ claude_code_user }}"
+  loop:
+    - { name: pr-triage, weekday: "*", hour: "*", minute: "15" }
+    - { name: homelab-drift, weekday: "0", hour: "6", minute: "0" }
+    - { name: homelab-weekly, weekday: "0", hour: "8", minute: "0" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Install Uptime Kuma alert listener unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/homelab-alert-listener.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Uptime Kuma webhook receiver that starts homelab-alert (Antigravity CLI)
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      User={{ claude_code_user }}
+      WorkingDirectory={{ claude_code_repo_dest }}
+      ExecStart=/home/{{ claude_code_user }}/.local/share/mise/shims/doppler run -- /home/{{ claude_code_user }}/.local/bin/homelab-alert-listener
+      Restart=on-failure
+      RestartSec=30
+
+      [Install]
+      WantedBy=multi-user.target
+  become: true
+  register: claude_code_alert_unit
+
+- name: Enable and start Uptime Kuma alert listener
+  ansible.builtin.systemd:
+    name: homelab-alert-listener
+    state: "{{ 'restarted' if (claude_code_alert_unit is changed or claude_code_agy_scripts is changed) else 'started' }}"
+    enabled: true
+    daemon_reload: "{{ claude_code_alert_unit is changed }}"
+  become: true

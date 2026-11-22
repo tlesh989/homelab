@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Managed by Ansible (roles/claude-code). Receives Uptime Kuma webhook notifications
+and starts homelab-alert in the background for each monitor that went down."""
+import hmac
+import json
+import os
+import subprocess
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+TOKEN = os.environ["KUMA_WEBHOOK_TOKEN"]
+ALERT = "/home/{{ claude_code_user }}/.local/bin/homelab-alert"
+LOG = "/home/{{ claude_code_user }}/.local/state/homelab-alert.log"
+
+
+class Handler(BaseHTTPRequestHandler):
+    timeout = 10  # per-connection read deadline; a stalled client would block the single-threaded server
+
+    def do_POST(self):
+        if not hmac.compare_digest(self.headers.get("Authorization", ""), f"Bearer {TOKEN}"):
+            self.send_response(403)
+            self.end_headers()
+            return
+        length = min(int(self.headers.get("Content-Length", 0)), 1_000_000)
+        try:
+            body = json.loads(self.rfile.read(length) or b"{}")
+        except ValueError:
+            self.send_response(400)
+            self.end_headers()
+            return
+        self.send_response(204)
+        self.end_headers()
+        # Kuma heartbeat status: 0 = down, 1 = up. "Test" notifications have no heartbeat.
+        if (body.get("heartbeat") or {}).get("status") == 0:
+            name = (body.get("monitor") or {}).get("name") or "unknown monitor"
+            with open(LOG, "a") as log:
+                # Minimal env: this process runs under `doppler run`, and homelab-alert fetches
+                # its own secrets, so agy never sees the full Doppler set.
+                subprocess.Popen([ALERT, name, str(body.get("msg", ""))],
+                                 stdin=subprocess.DEVNULL, stdout=log, stderr=log,
+                                 env={"HOME": os.environ["HOME"], "PATH": os.environ["PATH"]},
+                                 start_new_session=True)
+
+
+HTTPServer(("0.0.0.0", {{ claude_code_alert_port }}), Handler).serve_forever()

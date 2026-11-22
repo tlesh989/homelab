@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Prints host/container health gathered over
+# Ansible, for homelab-digest and homelab-alert to hand to the Antigravity CLI.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
+cd {{ claude_code_repo_dest }}
+
+# This host can't SSH to itself, so it's excluded from the ad-hoc runs.
+{% raw %}
+echo "## Hosts: uptime/load, filesystems >=80%, failed systemd units"
+timeout 300 doppler run -- ansible 'all:!truenas:!unifi:!claude_code' -m shell \
+  -a 'uptime; df -h -x tmpfs -x devtmpfs -x overlay | awk "NR==1 || \$5+0 >= 80"; systemctl --failed --no-legend' 2>&1 || echo "!! COLLECTION INCOMPLETE: ansible exited $? (unreachable host or timeout)"
+echo "## Docker containers not running/healthy"
+timeout 300 doppler run -- ansible docker_hosts -b -m shell \
+  -a "docker ps -a --format '{{ '{{' }}.Names{{ '}}' }} {{ '{{' }}.Status{{ '}}' }}' | grep -v ' Up .*(healthy)\$' | grep -v -E ' Up [^()]*\$' || true" 2>&1 || echo "!! COLLECTION INCOMPLETE: ansible exited $? (unreachable host or timeout)"
+{% endraw %}
