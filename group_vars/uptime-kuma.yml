@@ -1,3 +1,8 @@
 ---
 uptime_kuma_pushover_api_token: "{{ lookup('env', 'PUSHOVER_API_TOKEN') }}"
 uptime_kuma_pushover_user_key: "{{ lookup('env', 'PUSHOVER_USER_KEY') }}"
+
+# This LXC resolves via 1.1.1.1, which has no records for the internal domain, so
+# AutoKuma can't reach Caddy. Talk to Uptime Kuma on this host's own IP instead;
+# the traffic never leaves the box.
+autokuma_kuma_url: "http://192.168.233.16:3001"
