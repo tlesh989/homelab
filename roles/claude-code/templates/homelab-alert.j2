@@ -36,7 +36,7 @@ Do not run commands or edit files.
 
 $report"
 
-summary=$(timeout 600 agy -p "$prompt" --mode plan --print-timeout 450s < /dev/null) || summary=""
+summary=$(timeout 600 agy-print -p "$prompt" --mode plan --print-timeout 450s < /dev/null) || summary=""
 status=0
 if [[ -z "$summary" ]]; then
   summary="agy returned nothing. Check ~/.local/state/homelab-alert.log"
