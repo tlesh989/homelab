@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Weekly storage and network report:
+# TrueNAS pool/scrub/alerts, UniFi clients missing from KNOWN_DEVICES, top NextDNS
+# blocked domains, and UniFi fixed IPs vs docs/guides/ip-address-map.md. Summarized
+# by the Antigravity CLI (plan mode, read-only) and pushed to Pushover.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
+cd {{ claude_code_repo_dest }}
+git fetch -q origin main || true  # read the IP map from main without touching the working tree interactive sessions use
+
+report=$(
+  echo "## TrueNAS (ansalon): pools, disks, active alerts"
+  timeout 120 doppler run -- "$(mise where pipx:ansible-core)/ansible-core/bin/python3" -I - <<'PY' 2>&1 || echo "!! TrueNAS query failed"
+import os
+import warnings
+warnings.filterwarnings("ignore")
+from truenas_api_client import Client
+with Client(uri=os.environ["TRUENAS_HOST"], verify_ssl=False) as c:
+    c.call("auth.login_with_api_key", os.environ["TRUENAS_API_KEY"])
+    for p in c.call("pool.query"):
+        s = p.get("scan") or {}
+        used = f"{100 * p['allocated'] // p['size']}% used" if p.get("size") else ""
+        print(f"pool {p['name']}: {p['status']} healthy={p['healthy']} {used}; last {s.get('function')} "
+              f"{s.get('state')} ended {s.get('end_time')} errors={s.get('errors')}")
+    for d in c.call("disk.query"):
+        print(f"disk {d['name']}: {d.get('model')}")
+    for a in c.call("alert.list"):
+        if not a.get("dismissed"):
+            print(f"alert {a['level']}: {a['formatted']}")
+PY
+
+  echo "## UniFi clients"
+  timeout 120 doppler run -- bash -c '
+    UNIFI_URL=https://192.168.233.1 UNIFI_INSECURE=true mise exec -- unifly clients list --all -o json-compact \
+      | grep -v "^Showing" | KNOWN="$KNOWN_DEVICES" python3 -I -c "
+import json, os, sys
+known = {l.split(\"|\")[0].strip().lower() for l in os.environ[\"KNOWN\"].splitlines() if l.strip()}
+for c in json.load(sys.stdin):
+    who = c.get(\"name\") or c.get(\"hostname\") or \"?\"
+    if c[\"mac\"].lower() not in known:
+        rand = \"(randomized private MAC)\" if int(c[\"mac\"][1], 16) & 2 else \"\"
+        print(\"UNKNOWN\", who, c[\"mac\"], c.get(\"ip\"), c.get(\"network_name\"), rand)
+    if c.get(\"use_fixedip\"):
+        print(\"fixed-ip\", who, c.get(\"fixed_ip\"), \"current\", c.get(\"ip\"))
+"' 2>&1 || echo "!! UniFi query failed"
+
+  echo "## NextDNS: top blocked domains, last 7 days, per profile"
+  timeout 120 doppler run -- bash -c '
+    n=0
+    for id in $(sed "s/.*=//" <<<"$NEXTDNS_PROFILE_MAP" | sort -u); do
+      n=$((n + 1)); echo "profile $n:"
+      curl -fsS -H "X-Api-Key: $NEXTDNS_API_KEY" \
+        "https://api.nextdns.io/profiles/$id/analytics/domains?status=blocked&from=-7d&limit=5" \
+        | python3 -I -c "import json,sys; [print(\" \", d[\"domain\"], d[\"queries\"]) for d in json.load(sys.stdin)[\"data\"]]"
+    done' 2>&1 || echo "!! NextDNS query failed"
+
+  echo "## docs/guides/ip-address-map.md"
+  git show origin/main:docs/guides/ip-address-map.md
+)
+
+prompt="You write the weekly storage and network report for a Proxmox homelab. Below is raw data.
+Write plain text under 1000 characters for a phone notification, most important first:
+1. TrueNAS: any pool not ONLINE/healthy, scrub older than 35 days or with errors, pool >80% used,
+   active alerts. Drive policy: the wayreth RAIDZ1 has WD40EFAX (SMR) disks; any replacement
+   must be CMR (Ironwolf or WD Red Plus), so flag SMART/disk alerts on them first.
+2. UniFi clients marked UNKNOWN (not in the known-devices list): name, IP, network. Group the
+   randomized-MAC ones on one line (usually phones/watches with private Wi-Fi addresses) and list
+   the rest individually; those are the ones worth a look.
+3. fixed-ip clients whose IP is missing from or differs from ip-address-map.md.
+4. NextDNS: one line on anything unusual in blocked domains (malware/phishing-looking names,
+   or a single domain far above the rest); skip routine ad/telemetry blocking.
+Say 'OK' for a section with nothing to report. Do not run commands or edit files.
+
+$report"
+
+summary=$(timeout 900 agy -p "$prompt" --mode plan --print-timeout 600s < /dev/null) || summary=""
+status=0
+if [[ -z "$summary" ]]; then
+  summary="Weekly report failed: agy returned nothing. Check ~/.local/state/homelab-weekly.log"
+  status=1
+fi
+echo "$(date -Is) $summary"
+
+homelab-notify "Homelab weekly: storage & network" "$summary"
+exit "$status"

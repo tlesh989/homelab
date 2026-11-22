@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Managed by Ansible (roles/claude-code). Weekly drift summary: terraform plan,
+# ansible-playbook --check --diff (changed/failed tasks only) and task drift (image
+# tags), summarized by the Antigravity CLI (plan mode, read-only) and pushed to Pushover.
+# Every task check mode still runs (check_mode: false) is a read-only lookup.
+set -euo pipefail
+export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"  # cron PATH
+# A worktree of origin/main, so drift is measured against what's merged, not whatever
+# branch an interactive session has checked out in the main clone.
+repo={{ claude_code_repo_dest }}
+tree="$HOME/.cache/homelab-drift"
+git -C "$repo" fetch -q origin main
+if [[ -d "$tree" ]]; then
+  git -C "$tree" checkout -q -f --detach origin/main  # -f: terraform init may touch the lock file
+else
+  git -C "$repo" worktree add -q --detach "$tree" origin/main
+fi
+cd "$tree"
+
+report=$(
+  echo "## terraform plan (exit 0 = no changes, 2 = changes)"
+  plan_rc=0
+  plan=$(cd terraform && timeout 900 doppler run -- sh -c 'export TF_TOKEN_app_terraform_io=$TF_TOKEN
+    terraform init -input=false -no-color >/dev/null && terraform plan -detailed-exitcode -input=false -no-color' 2>&1) || plan_rc=$?
+  grep -E '^\s*[#~+-]|Plan:|No changes|Error' <<<"$plan" || true
+  echo "exit $plan_rc"
+
+  echo "## ansible-playbook main.yml --check --diff (only changed/failed shown; this host excluded)"
+  ANSIBLE_DISPLAY_OK_HOSTS=false ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ANSIBLE_NOCOLOR=1 \
+    timeout 3000 doppler run -- ansible-playbook -i hosts main.yml --check --diff --limit 'all:!claude_code' 2>&1 \
+    | grep -v -E '^(PLAY \[|\s*$)' | tail -c 40000 || true
+
+  echo "## task drift (running image tag vs Renovate pin)"
+  timeout 600 scripts/check-image-drift.sh 2>&1 || echo "exit $?"
+)
+
+prompt="You write the weekly configuration-drift report for a Proxmox homelab managed with Terraform
+and Ansible. Below is raw output from terraform plan, ansible-playbook --check --diff, and an
+image-tag drift script. Write plain text under 1000 characters for a phone notification.
+First line: 'No drift' or the count of drifted items. Then one line per item:
+host or resource: what differs: blocking (live state contradicts the repo, apply would change
+something real) or advisory (cosmetic, expected check-mode noise, a pending Renovate bump).
+Check mode reports some tasks as changed every run (commands without changed_when, package
+caches); call those noise rather than drift. Flag unreachable hosts and failed tasks.
+Do not run commands or edit files.
+
+$report"
+
+summary=$(timeout 900 agy -p "$prompt" --mode plan --print-timeout 600s < /dev/null) || summary=""
+status=0
+if [[ -z "$summary" ]]; then
+  summary="Drift report failed: agy returned nothing. Check ~/.local/state/homelab-drift.log"
+  status=1
+fi
+echo "$(date -Is) $summary"
+
+homelab-notify "Homelab weekly: drift" "$summary"
+exit "$status"

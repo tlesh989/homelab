@@ -8,6 +8,12 @@ Monitors are configured by hand in the UI — keep this file in sync when you ad
   - Pushover API Token: `PUSHOVER_API_TOKEN` from Doppler
   - Pushover User Key: `PUSHOVER_USER_KEY` from Doppler
 
+**Second notification — "Why is it down?" (Antigravity):** a Webhook notification, also "Default enabled"
+and "Apply on all existing monitors". `homelab-alert-listener` on claude-code asks the Antigravity CLI for
+the likely cause of each outage and pushes it to Pushover (one run per 15 minutes).
+  - Post URL: `http://192.168.233.22:8765/`, Request Body: "Preset - application/json"
+  - Additional Headers: `{"Authorization": "Bearer <KUMA_WEBHOOK_TOKEN from Doppler>"}`
+
 **Global settings for all monitors (unless noted):**
 - Heartbeat interval: 60 seconds
 - Retries: 0
