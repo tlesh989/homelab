@@ -6,3 +6,8 @@ plex_media_path: /data/media
 
 # LXC has no CAP_SYS_TIME; ntpsec cannot start and the host clock is shared.
 ntp_enabled: false
+
+# sshd is socket-activated here (ssh.socket, Accept=yes: one sshd per connection), so
+# ssh.service must stay down; config changes apply to the next connection.
+security_sshd_state: stopped
+security_ssh_restart_handler_state: stopped
