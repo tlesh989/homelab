@@ -77,6 +77,11 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
 - **truenas role: `truenas_api_client is required`** → it lives in ansible's mise venv (`with` on
   `pipx:ansible-core`); `mise install` skips a changed `with` when the version is unchanged →
   `mise install -f pipx:ansible-core`.
+- **A `when:` block runs in `--check` (drift) but not on a real run** → it's gated on a
+  `command`/`shell` probe, which check mode skips; the skipped result passes `rc == 0`-style tests →
+  add `check_mode: false` to read-only probes. (homelab-5wjn)
+- **Task gated on `'zfs' in ansible_facts.mounts` never runs** → mount facts omit ZFS datasets → test for
+  `/sys/module/zfs` (or `zpool list`) instead. (homelab-xywe)
 
 ## Networking / UniFi
 
