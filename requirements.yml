@@ -2,7 +2,7 @@
 ---
 roles:
   - src: geerlingguy.docker
-    version: "8.0.0"
+    version: "8.0.1"
   - src: geerlingguy.ntp
     version: "4.0.1"
   - src: geerlingguy.security
