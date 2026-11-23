@@ -29,6 +29,10 @@ options:
     description: Verify TLS certificate. Set false for self-signed certs.
     type: bool
     default: true
+  job:
+    description: Wait for a job method (e.g. app.create) to finish and fail if the job fails.
+    type: bool
+    default: false
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -47,6 +51,7 @@ def main():
             method=dict(type="str", required=True),
             params=dict(type="list", default=[]),
             validate_certs=dict(type="bool", default=True),
+            job=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
     )
@@ -77,7 +82,9 @@ def main():
         with Client(uri=uri, verify_ssl=validate_certs) as c:
             if not c.call('auth.login_with_api_key', api_key):
                 module.fail_json(msg="TrueNAS authentication failed: invalid API key")
-            result = c.call(method, *params)
+            # Job methods (e.g. app.create) return a job id at once; job=True
+            # waits for the job and raises if it fails.
+            result = c.call(method, *params, job=module.params["job"])
     except Exception as e:
         module.fail_json(msg=f"TrueNAS API call '{method}' failed: {e}")
 

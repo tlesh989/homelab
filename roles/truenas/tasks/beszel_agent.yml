@@ -19,6 +19,7 @@
     host: "{{ truenas_host }}"
     api_key: "{{ truenas_api_key }}"
     method: app.create
+    job: true
     params:
       - app_name: "{{ truenas_beszel_app_name }}"
         custom_app: true
