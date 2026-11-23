@@ -1,5 +1,5 @@
 [tools]
-terraform = "1.17.1"
+terraform = "1.17.2"
 task = "3.54.0"
 direnv = "2.38.2"
 gh = "2.103.3"
