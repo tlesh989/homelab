@@ -17,7 +17,7 @@ resource "proxmox_virtual_environment_container" "uptime_kuma" {
 
     dns {
       domain  = "tlesh.xyz"
-      servers = ["1.1.1.1"]
+      servers = ["192.168.233.1", "1.1.1.1"]
     }
 
     ip_config {
