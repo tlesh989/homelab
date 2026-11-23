@@ -186,11 +186,18 @@ network_inventory:
       notes: "Laptop — personal device pool (.240-.250)"
     - name: kvothe
       ip: 192.168.233.244
-      mac: "54:bf:64:2e:b2:51"
+      mac: "00:e0:4c:af:0b:74"
       assignment: reservation
       managed_by: manual
       dns: []
-      notes: "Laptop — personal device pool (.240-.250)"
+      notes: "Laptop — wired (dock Ethernet); personal device pool (.240-.250)"
+    - name: kvothe-wifi
+      ip: 192.168.233.245
+      mac: "ee:bc:e2:0c:6c:99"
+      assignment: reservation
+      managed_by: manual
+      dns: []
+      notes: "Laptop — Wi-Fi (fixed private MAC); personal device pool (.240-.250)"
     - name: raspberry-pi
       ip: 192.168.233.35
       mac: "b8:27:eb:75:3a:e3"
