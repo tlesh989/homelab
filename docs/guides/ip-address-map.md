@@ -57,7 +57,7 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 | .241 | drizzt | Machine | DHCP reservation (MAC: 6c:6e:07:1e:39:74) |
 | .242 | magius | Machine | DHCP reservation (MAC: d0:37:45:cf:ce:4c) |
 | .243 | kaladin | Machine | DHCP reservation (MAC: c4:35:d9:89:4c:b4) |
-| .244 | kvothe | Machine | DHCP reservation (MAC: 54:bf:64:2e:b2:51) |
+| .244 | kvothe | Mac | DHCP reservation (MAC: 00:e0:4c:af:0b:74, wired USB/dock Ethernet). Wi-Fi uses a private MAC, so it stays dynamic |
 
 ### Media Devices
 
