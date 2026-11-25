@@ -58,7 +58,6 @@ pihole_local_hosts:
   - "192.168.233.17 wallos.tlesh.xyz"
   - "192.168.233.17 syncthing.tlesh.xyz"
   - "192.168.233.17 bookorbit.tlesh.xyz"
-  - "192.168.233.17 pricebuddy.tlesh.xyz"
   - "192.168.233.19 minecraft.tlesh.xyz"
   - "192.168.60.20 {{ lookup('env', 'MINECRAFT_SERVER') }}"
   - "192.168.60.20 minecraft2.tlesh.xyz"
