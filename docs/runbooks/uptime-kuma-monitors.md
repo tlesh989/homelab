@@ -63,7 +63,6 @@ After adding a DNS monitor, prove it can fail: temporarily change the hostname t
 | FreshRSS | HTTP(s) | http://192.168.233.10:8002 | |
 | Wallos | HTTP(s) | http://192.168.233.10:8282 | |
 | BookOrbit | HTTP(s) | http://192.168.233.10:8091 | |
-| PriceBuddy | HTTP(s) | http://192.168.233.10:8092 | |
 
 ## Arr Stack
 
