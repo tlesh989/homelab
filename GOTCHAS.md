@@ -36,9 +36,9 @@ it doesn't belong here. Public repo: no `.net` hostnames, no household details.
   → a VM disk built from a downloaded image (`disk.file_id`) is created over SSH, not the API → the
   provider's `ssh` block uses the `ansible` account and `ANSIBLE_SSH_PRIVATE_KEY` from Doppler. Compressed
   images (e.g. HAOS `.qcow2.xz`) can't use the API-only `import_from` path. (homelab-tr6)
-- **`ssh` to kaz says `REMOTE HOST IDENTIFICATION HAS CHANGED` but Ansible still connects** → a
-  Terraform `initialization` change (DNS, IPs) gives the VM a new cloud-init instance-id, and cloud-init
-  regenerates the host keys on next boot; Ansible doesn't notice because `host_key_checking = False` →
+- **`ssh` or Ansible to kaz says `REMOTE HOST IDENTIFICATION HAS CHANGED`** → a Terraform
+  `initialization` change (DNS, IPs) gives the VM a new cloud-init instance-id, and cloud-init
+  regenerates the host keys on next boot →
   `main.yml` writes `ssh_deletekeys: false` to `/etc/cloud/cloud.cfg.d/` on kaz. (homelab-r9gk)
 
 ## Ansible
