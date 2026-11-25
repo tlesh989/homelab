@@ -119,6 +119,15 @@
         name: qemu-guest-agent
         state: started
         enabled: true
+    # Any Terraform cloud-init change (DNS, IPs) gives the VM a new instance-id;
+    # without this, cloud-init then regenerates the SSH host keys on next boot.
+    - name: Keep SSH host keys across cloud-init instance-id changes
+      ansible.builtin.copy:
+        dest: /etc/cloud/cloud.cfg.d/99-keep-host-keys.cfg
+        content: "ssh_deletekeys: false\n"
+        owner: root
+        group: root
+        mode: "0644"
   roles:
     - role: users
     - role: geerlingguy.ntp
