@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Managed by Ansible (roles/claude-code). Usage: homelab-alert <monitor name> <kuma message>
 # Started by homelab-alert-listener when an Uptime Kuma monitor goes down: gathers live
-# health over Ansible, asks the Antigravity CLI (plan mode, read-only) for the likely
-# cause, and pushes that to Pushover. Kuma still sends its own alert; this explains it.
+# health over Ansible and asks the Antigravity CLI (plan mode, read-only) for the likely cause.
+# agy only picks a fix; this script validates it and runs it when it is a safe restart
+# (a stopped/unhealthy container or a failed systemd unit). Anything else, or a restart that
+# didn't help, becomes a beads issue with agy's proposed fix. Pushover gets the outcome.
 set -euo pipefail
 export PATH="/home/{{ claude_code_user }}/.local/bin:/home/{{ claude_code_user }}/.local/share/mise/shims:$PATH"
 cd {{ claude_code_repo_dest }}
@@ -29,20 +31,96 @@ prompt="An Uptime Kuma monitor in a Proxmox homelab just went down.
 Monitor: $1
 Kuma message: $2
 
-Below is live health output from Ansible, gathered right after the alert. In plain text under
-600 characters for a phone notification, give the most likely cause and the first thing to
-check or fix. If nothing below explains it, say so and name where to look next.
-Do not run commands or edit files.
+Below is live health output from Ansible, gathered right after the alert. Hostnames in it are
+Ansible inventory names. Do not run commands or edit files. Reply in exactly this format:
+
+SUMMARY:
+<plain text under 600 characters for a phone notification: the most likely cause and the first
+thing to check or fix; if nothing below explains it, say so and name where to look next>
+PROPOSAL:
+<the fix you recommend, step by step, naming the host, files or Ansible role involved>
+FIX: <one of: restart-container HOST CONTAINER | restart-unit HOST UNIT | none>
+
+Choose restart-container only for a container the output shows stopped or unhealthy, and
+restart-unit only for a unit it shows failed, when that restart alone would likely fix the outage.
+Otherwise FIX: none.
 
 $report"
 
-summary=$(timeout 600 agy-print -p "$prompt" --mode plan --print-timeout 450s < /dev/null) || summary=""
-status=0
-if [[ -z "$summary" ]]; then
-  summary="agy returned nothing. Check ~/.local/state/homelab-alert.log"
-  status=1
+out=$(timeout 600 agy-print -p "$prompt" --mode plan --print-timeout 450s < /dev/null) || out=""
+if [[ -z "$out" ]]; then
+  echo "$(date -Is) $1: agy returned nothing"
+  homelab-notify "Why is $1 down?" "agy returned nothing. Check ~/.local/state/homelab-alert.log"
+  exit 1
 fi
-echo "$(date -Is) $1: $summary"
+summary=$(sed -n '/^SUMMARY:/,/^PROPOSAL:/{/^SUMMARY:/d;/^PROPOSAL:/d;p}' <<<"$out")
+proposal=$(sed -n '/^PROPOSAL:/,/^FIX:/{/^PROPOSAL:/d;/^FIX:/d;p}' <<<"$out")
+fix=$(sed -n 's/^FIX:[[:space:]]*//p' <<<"$out" | head -1)
+[[ -n "$summary" ]] || summary=$out  # agy ignored the format: keep its answer, take no action
+[[ -n "$proposal" ]] || proposal=$out
+echo "$(date -Is) $1: $summary | FIX: ${fix:-none}"
 
-homelab-notify "Why is $1 down?" "$summary"
-exit "$status"
+# Runs agy's FIX line only after checking it: a known host in the right group, a plain name,
+# the target really down right now, and no auto-restart of it in the last hour (no restart loops).
+# Prints the outcome; returns 0 only when the target is back up.
+autofix() {
+  local kind=$1 host=$2 target=$3 group check fix_cmd state
+  [[ $host =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ && $target =~ ^[A-Za-z0-9][A-Za-z0-9@_.:-]*$ ]] || { echo "Auto-fix skipped: bad name in '$fix'."; return 1; }
+  case $kind in
+    restart-container)
+      group=docker_hosts
+{% raw %}
+      check="s=\$(docker inspect -f '{{ '{{' }}.State.Running{{ '}}' }} {{ '{{' }}if .State.Health{{ '}}' }}{{ '{{' }}.State.Health.Status{{ '}}' }}{{ '{{' }}end{{ '}}' }}' $target) || exit 3; case \"\$s\" in 'true unhealthy'|false*) exit 4;; esac"
+{% endraw %}
+      fix_cmd="docker restart $target" ;;
+    restart-unit)
+      group='all:!truenas:!unifi:!claude_code:!proxmox'
+      check="! systemctl is-failed --quiet $target || exit 4"
+      fix_cmd="systemctl restart $target" ;;
+  esac
+  [[ $(doppler run -- ansible "$group:&$host" --list-hosts 2>/dev/null || true) == *'hosts (1)'* ]] \
+    || { echo "Auto-fix skipped: $host is not allowed for $kind."; return 1; }
+  state="$HOME/.local/state/autofix-$host-$target"
+  if [[ -f "$state" ]] && (( $(date +%s) - $(stat -c %Y "$state") < 3600 )); then
+    echo "Auto-fix skipped: $target on $host was already restarted in the last hour."; return 1
+  fi
+  # The check exits 4 when the target is down, so only that rc runs the restart.
+  if [[ $(timeout 120 doppler run -- ansible "$host" -b -m shell -a "$check" 2>&1 || true) != *rc=4* ]]; then
+    echo "Auto-fix skipped: $target on $host is not down."; return 1
+  fi
+  touch "$state"
+  timeout 180 doppler run -- ansible "$host" -b -m shell -a "$fix_cmd" >/dev/null 2>&1 \
+    || { echo "Auto-fix failed: '$fix_cmd' on $host errored."; return 1; }
+  sleep 60
+  if [[ $(timeout 120 doppler run -- ansible "$host" -b -m shell -a "$check" 2>&1 || true) == *rc=4* ]]; then
+    echo "Auto-fix: restarted $target on $host, but it is still down."; return 1
+  fi
+  echo "Auto-fix: restarted $target on $host; it is back up."
+}
+
+result="" fixed=1
+read -r kind host target _ <<<"${fix:-none}"
+if [[ $kind == restart-container || $kind == restart-unit ]] && [[ -n ${target:-} ]]; then
+  result=$(autofix "$kind" "$host" "$target") && fixed=0
+  echo "$(date -Is) $1: $result"
+fi
+
+if (( fixed != 0 )); then
+  title="Alert: $1"
+  if [[ $(bd list --status open,in_progress --label agy-alert --title "$title" --json 2>/dev/null | jq length) == 0 ]]; then
+    id=$(bd create --title "$title" --type bug --priority 2 --labels agy-alert --silent \
+      --description "Kuma: $2
+
+$summary
+
+Proposed fix (agy):
+$proposal
+${result:+
+$result}") && bd dolt push >/dev/null 2>&1 || true
+    result="${result:+$result }Filed ${id:-a beads issue (failed)}."
+  fi
+fi
+
+homelab-notify "Why is $1 down?" "$summary${result:+
+
+$result}"

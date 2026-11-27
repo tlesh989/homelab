@@ -10,7 +10,10 @@ Monitors are configured by hand in the UI — keep this file in sync when you ad
 
 **Second notification — "Why is it down?" (Antigravity):** a Webhook notification, also "Default enabled"
 and "Apply on all existing monitors". `homelab-alert-listener` on claude-code asks the Antigravity CLI for
-the likely cause of each outage and pushes it to Pushover (one run per 15 minutes).
+the likely cause of each outage and pushes it to Pushover (one run per 15 minutes). When agy names a
+stopped/unhealthy container or a failed systemd unit, the script checks it is really down and restarts it
+(at most once an hour per target; never on Proxmox nodes, TrueNAS, UniFi or claude-code). Otherwise, or if
+the restart doesn't help, it files a beads issue labelled `agy-alert` with agy's proposed fix.
   - Post URL: `http://192.168.233.22:8765/`, Request Body: "Preset - application/json"
   - Additional Headers: `{"Authorization": "Bearer <KUMA_WEBHOOK_TOKEN from Doppler>"}`
 
