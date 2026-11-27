@@ -1,6 +1,6 @@
 ---
 # Antigravity CLI (agy) jobs: read-only summaries pushed to Pushover or posted as PR
-# comments. homelab-digest (session.yml) uses the same homelab-notify/homelab-collect helpers.
+# comments; homelab-alert also runs validated restarts agy suggests. homelab-digest (session.yml) uses the same homelab-notify/homelab-collect helpers.
 - name: Ensure KUMA_WEBHOOK_TOKEN is set for the Uptime Kuma alert listener
   ansible.builtin.assert:
     that: lookup('env', 'KUMA_WEBHOOK_TOKEN') | length > 0
