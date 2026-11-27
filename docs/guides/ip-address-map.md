@@ -64,7 +64,8 @@ These IPs are outside the DHCP pool (.51–.220) and only reachable via explicit
 
 No streaming device is kept on main for Plex any more. The Roku Ultra and the Hisense TV are wired to
 the IoT VLAN (see below) and reach Plex through the "IoT to Plex" firewall policy. GymRoku, RokuTCL,
-the Denon AVR, and consoles sit on Guest and reach Plex through the "Guest to Plex" policy.
+the Denon AVR, and consoles sit on Guest and reach Plex through the "Guest to Plex" policy. Both VLANs reach the Tablo (`t4g`) through
+"IoT to Tablo" / "Guest to Tablo".
 
 ---
 
@@ -201,8 +202,8 @@ Internet access: disabled. mDNS: enabled.
 | Zone | Networks | Policy |
 |------|----------|--------|
 | Internal | Default (.233), Storage (.220) | Full access between zones; to Guest only minecraft2 `.60.20` ("Internal to Minecraft2": TCP 22, 19132; UDP 19131, 19132, 30000-30009) |
-| IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex (`.12` TCP 32400, "IoT to Plex"); Internal can initiate to IoT; gateway admin ports blocked (22, 80, 443, 8080, 8443, 6789) |
-| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`, printer `.15`, 3D printer `.14` and Plex `.12` |
+| IoT | IoT (.40) | Internet allowed; blocked from Internal except Plex (`.12` TCP 32400, "IoT to Plex") and Tablo (`.129` TCP 80, 443, 8885, 8887, 18080, "IoT to Tablo"); Internal can initiate to IoT; gateway admin ports blocked (22, 80, 443, 8080, 8443, 6789) |
+| Guest | Guest (.60) | Internet + gateway DNS/DHCP/mDNS allowed; gateway admin ports blocked; blocked from Internal and IoT except Minecraft `.19`, printer `.15`, 3D printer `.14`, Plex `.12` and Tablo `.129` ("Guest to Tablo", same ports as IoT) |
 | External | WAN | Default deny inbound, except the two port forwards to minecraft2 (`192.168.60.20` on Guest: TCP 19132, UDP 30000-30009). Inbound is limited to US source addresses (Region Blocking). Direct Remote Connection to the console is off |
 | Gateway | — | Management access to Internal |
 | VPN | VPN tunnel | Access to Internal |
